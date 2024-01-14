@@ -1,0 +1,5 @@
+{
+  "devDependencies": {
+    "@types/events": "^3.0.3"
+  }
+}
