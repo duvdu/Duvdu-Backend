@@ -1,0 +1,156 @@
+# StackHolders
+as an admin
+  - i want to filter messages, images, video from abuse messages
+admin, employee, sp
+as an SP
+  - i want to check is username available
+  - i want to login by username, password
+  - i want ability to update phoneNumber
+  - i want to change pwd
+  - i want to reset pwd
+  - i want to recover forget pwd
+  - i want to resend verification code after 1 minute exeeded
+  - i want to see top 3 projects based on views counter on fromDate to toDate query
+    by default a week
+  - i want to see most popular projects based on (verified, subCategory, rate)
+  - i want to filter projects by (subCategory, location, reviews, priceRange, gender)
+  - I want to see on project profile recomended projects based on the same category
+  - when i create a new project i want app to suggest me total budget based on total
+    tools and creatives or i can update it manually
+  - i want to add creative if he isn't on application by his phone number
+  and the project will assigned to him when he creates an account with the same number
+  - when i get category i want to see number of creatives in each category, image, title
+  - i want to search for projects by title
+  - i want to filter project results by city, gender, priceRange, tags
+  - on my saved project i want to see number of total projects
+    title, last 3 projects cover
+  - i want to see related category to current category at home page while browse projects
+  - when  i open any project location i want to see other projects location near to me
+  related to the type of the project
+  - i want to filter projects by category
+  - in case of incomplete account i want to show percentage and what is remained to complete account
+  - Notification
+    i want notification at
+      - user follow me
+      - user saved my project
+
+as a programmer
+  - i want resend code to be after expiration date
+  - i want ranks to be static {rankName, projectCounter}
+  - i want profile views for every sp to be updated on get profile by id
+  - i want projectViews, likes, profileViews to be filtered based on fromDate to toDate query
+  - i want gross of project views to be calculated based on last month total 
+  views by default and fromDate to toDate query
+  - i want project views diagram to be calculated every 3 days for last month
+  {
+    3 October: 11
+    6 October: 15
+    9 October: 18
+  }
+  - i want producers to be users from category producers
+  - i want user to reply after 72hours
+
+# notes
+- [x] terms and condition dynamic or static >> dynamic
+- [x] user available times >> removed
+- [x] in portfolio projects today calculated based on What? >> removed
+- [x] in portfolio rank top 30% calculated based on what? >> removed
+- [x] most popular based on (verified, subCategory, rate, ..?) >> ok
+- [x] in project profile, what is the plus refer to near to Book now button >> removed
+- [x] at create new project location is written not lng, lat >> ok
+  only rental and studio booking will be lat,lng
+  select studios neat to the target 
+- [x] at create new project what is the meaning of tags >> will be key words
+- [x] at create new project what is the purpose of project budget (budget calculated from total of tools and creatives) >> put manually
+- [x] at create new project what after send invitaion >> new cycle
+- [ ] at create project what is the mean of add creative's functions (category)
+- [x] what is insurance
+- [x] why shootingTime and delieveryTime in project card but there are not exists in project form
+- [x] i want explination about offer service (favourite list contains favourite by default)
+
+
+
+# DataShape
+  ## TermsAndConditions
+    - string
+  ## category
+    - numOfCreatives, title, image, tags [string], creatives_jobs [string]
+  ## User
+    - name, phone, username, pwd, verificationCode,
+    verificationCodeExpireAt, token, version
+    - profileImg, coverImg, location, category,
+    rank: {currentRank, nextRank},
+    savedProjects: [projectID, image, name], profileViews, about
+    averageResponeTime {counter, responseTimes}, isOnline, isAvailableToInstantProjects
+    pricePerHour, hasVerificationPadge, planId
+    availableContract(default:5)
+    - virtual (rate based on rate_targetUser)
+    - virtual (projectViews based on every project views)
+  ## rate
+    - sourceUser: [id,image,name], targetProject, rate, desc
+    - index(sourceUser, targetProject, 'unique')
+  ## likes
+    - sourceUser, targetUser
+    - index(sourceUser, targetUser, 'unique')
+  ## follow
+    - sourceUser, targetUser
+    - index(sourceUser, targetUser, 'unique')
+  ## chat
+    - sourceUser, targetUser, isSeen, message, attachment(image, video, audio, pdf)
+  ## savedProjects
+  [{ project: ObjectId; image: string; name: str}]
+    - categoryId
+  ## savedProjects_categories
+    - project [id, name, image, video, price, array of project creators, rate, ]
+  ## ticket (contact-us)
+    - userId:optional, name, phoneNumber, message, timestamp
+  ## Report
+    - sourceUser, targetUser, projectId, descreption, attachment[image/video/pdf]
+  ## notification
+    - userId, sourceUserId, sourceUserImage, sourceUserName, message, action (enum: follow, saved)
+  ## Plans
+    - roleId
+  ## TreamProject
+    - userId, cover, teamName, category, budget, details, location, attachment[image/video/pdf],
+    shootingDays, startDate, projectTags [tagName, [{creativeId, workours, status: enum(accept, pending, reject)}]]
+
+  ## Post - [project - other services]
+  ### protfolio_post
+    - attachments[images/video/pdf], title, creatorId, description, address
+    tools [{name, fees}], equipment [{name, fees}]
+    creatives [{id, username:notrequired, phoneNumber:required, category:notrequired, fees:notrequired}]
+    , tags(keywords), projectBudget, categoryId
+    projectScale: {scale, time >> enum(minutes, hours)}
+    showOnHome: boolean
+    cover
+  - #### booking
+      - sourceUser, targetUser, postId, projectDetails, location, attachments[image, video, pdf]
+      customRequirement, shootingDays, appointmentDate, projectDate, isInstant
+      totalPrice // related to custom requirement and project time and project price
+      state[canceled, pending, ongoing, completed]
+  ### studioBooking
+    - attachments[images/video/pdf], name, number, email, description, equipment[{name, fees}]
+    location(lat,lang), tags(keywords), pricePerHour, insurance, showOnHome
+    cover
+    - #### booking
+      - sourceUser, targetUser, projectId, equipment[{name, fees}]. projectDetails, insurrance, numberOfHours, 
+      appointmentDate, isInstant
+      state[canceled, pending, ongoing, completed]
+  ### equipmentRental
+    - attachments[images/video/pdf], name, number, description, equipment[{name, fees}]
+    location(lat, lang), clientCanChooseDifferentLocation: boolean
+    tags, pricePerHour, insurance, showOnHome: boolean
+    cover
+    - #### booking
+      sourceUser, targetUser, projectId, equipment[{name, fees}], projectDetails, insurance, location
+      numberOfDays, appointmentDate, isInstant
+      state[canceled, pending, ongoing, completed]
+  ### copyRight
+    category, price, duration, address, tags
+      - #### booking
+        sourceUser, targetUser, projectId, jobDetails, date, location, attachments[images/video/pdf], isInstant
+        state[canceled, pending, ongoing, completed, rejected],
+        submitFiles: {link, notes}
+  ### producers-booking
+    - tagName, platform, projectDetails, episods, episodsDuration, expectedBudget, expectedProfits
+    , attachments[image/video/pdf], timestamp, status[pending, accepted, rejected, completed], selectedDate, directoryLocation
