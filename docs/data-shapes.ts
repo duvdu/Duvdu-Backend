@@ -14,6 +14,8 @@ interface Category {
 
 interface User {
   id: string;
+  googleId: string;
+  appleId: string;
   name: string;
   phoneNumber: { key: string; number: string };
   username: string;
