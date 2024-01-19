@@ -1,13 +1,19 @@
 {
-  "name": "common",
-  "version": "1.0.0",
+  "name": "@duvdu-v1/duvdu",
+  "version": "1.0.1",
   "description": "",
-  "main": "index.js",
+  "main": "./build/index.js",
+  "types": "./build/index.d.ts",
+  "files": [
+    "build/**/*"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "clean": "rimraf ./build",
+    "build": "npm run clean && tsc",
+    "pub": "git add . && git commit -m \"updates\" && npm version patch && npm run build && npm publish"
   },
   "keywords": [],
-  "author": "",
+  "author": "motemed khaled",
   "license": "ISC",
   "dependencies": {
     "@types/node": "^20.11.0",
@@ -19,6 +25,8 @@
   },
   "devDependencies": {
     "@types/express": "^4.17.21",
-    "@types/multer": "^1.4.11"
+    "@types/multer": "^1.4.11",
+    "del-cli": "^5.1.0",
+    "typescript": "^5.3.3"
   }
 }
