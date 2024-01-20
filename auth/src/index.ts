@@ -3,9 +3,13 @@ import { app } from "./app";
 
 
 const start = async () => {
+
+    if (!process.env.MONGO_URI) {
+        throw new Error("mongo uri must be defined");
+    };
     
     //connect to database
-    await dbConnection("mongodb://localhost:27017");
+    await dbConnection(process.env.MONGO_URI);
 
     app.listen(3000, () => {
         console.log("app listen in port 3000");
