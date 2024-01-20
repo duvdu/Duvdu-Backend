@@ -1,12 +1,12 @@
-import { IjwtPayload } from "./../JwtPayload";
-import { RequestHandler, Request, Response } from "express";
-import { Iuser } from "./User";
+import { RequestHandler } from 'express';
+
+import { Iuser } from './User';
 
 // param, res, req, query
 export interface IsigninHandler
   extends RequestHandler<
     undefined,
     { token: string },
-    Partial<Pick<Iuser, "username" | "phoneNumber" | "password">>,
+    Partial<Pick<Iuser, 'username' | 'phoneNumber' | 'password'>>,
     undefined
   > {}
