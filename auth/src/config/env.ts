@@ -1,6 +1,6 @@
 import { config } from 'dotenv';
 
-config({ path: '.env.local' });
+config();
 
 export const env = {
   port: +(process.env.PORT || 3000) as number,
