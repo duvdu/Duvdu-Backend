@@ -1,19 +1,14 @@
-import express from "express";
-import cookieSession from "cookie-session";
-import dotenv from "dotenv";
-import { globalErrorHandlingMiddleware } from "@duvdu-v1/duvdu";
+import { globalErrorHandlingMiddleware } from '@duvdu-v1/duvdu';
+import cookieSession from 'cookie-session';
+import express from 'express';
 
+import { checkEnvVariables, env } from './../config/env';
 
 export const app = express();
-dotenv.config();
+checkEnvVariables();
 
-app.set("trust proxy", true);
+app.set('trust proxy', true);
 app.use(express.json());
-app.use(cookieSession({
-    signed: false,
-    secure: process.env.NODE_ENV !== "test"
-}));
+app.use(cookieSession({ signed: false, secure: env.environment !== 'test' }));
 
-
-//global error middleware
-app.use(globalErrorHandlingMiddleware)
+app.use(globalErrorHandlingMiddleware);

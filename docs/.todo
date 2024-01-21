@@ -3,13 +3,13 @@ as an admin
   - i want to filter messages, images, video from abuse messages
 admin, employee, sp
 as an SP
-  - i want to check is username available
-  - i want to login by username, password
-  - i want ability to update phoneNumber
-  - i want to change pwd
-  - i want to reset pwd
-  - i want to recover forget pwd
-  - i want to resend verification code after 1 minute exeeded
+  - [x] i want to check is username available
+  - [x] i want to login by username, password
+  - [x] i want ability to update phoneNumber
+  - [x] i want to change pwd
+  - [x] i want to reset pwd
+  - [x] i want to recover forget pwd
+  - [x] i want to resend verification code after 1 minute exeeded
   - i want to see top 3 projects based on views counter on fromDate to toDate query
     by default a week
   - i want to see most popular projects based on (verified, subCategory, rate)
