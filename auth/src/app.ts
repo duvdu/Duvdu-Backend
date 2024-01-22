@@ -13,8 +13,4 @@ app.use(cookieSession({ signed: false, secure: env.environment !== 'test' }));
 
 app.use('/api/users', apiRoutes);
 
-app.get('/api/users/healthz', (req, res) =>
-  res.status(200).json({ message: 'success', data: 'server listen on port 3000' }),
-);
-
 app.use(globalErrorHandlingMiddleware);
