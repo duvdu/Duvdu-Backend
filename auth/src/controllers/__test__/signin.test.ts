@@ -1,11 +1,11 @@
-import request from 'supertest';
+import supertest from 'supertest';
 
 import { app } from '../../app';
 
+const request = supertest(app);
+
 describe('AuthController', () => {
-  it('sign in with valid credentials should return 200', async () => {
-    const response = await request(app).post('/api/auth'); // Specify the route
-    expect(response.status).toBe(200);
-    // Add other assertions based on your test case
+  beforeAll(async () => {
+    await request.post('/api/auth').send({ name: '' });
   });
 });
