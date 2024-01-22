@@ -2,8 +2,8 @@ import { CustomError } from './custom-error';
 
 export class UnauthorizedError extends CustomError {
   statusCode = 403;
-  constructor() {
-    super('un-unauthorized error');
+  constructor(message?: string) {
+    super(message || 'un-unauthorized error');
     Object.setPrototypeOf(this, UnauthorizedError.prototype);
   }
 
