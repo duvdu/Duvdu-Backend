@@ -15,3 +15,5 @@ export * from './utils/api-feature';
 export * from './middlewares/database-connection';
 
 export * from './types/JwtPayload';
+export * from './middlewares/global-validator.middleware';
+export * from './middlewares/auth.middleware';
