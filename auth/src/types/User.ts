@@ -9,11 +9,12 @@ export interface Iuser {
   username: string;
   password?: string;
   verificationCode?: { code: string; expireAt: Date };
+  isVerified?: boolean;
   token?: string;
   profileImage?: string;
   coverImage?: string;
   location?: { lat: number; lng: number };
-  categroy?: Types.ObjectId;
+  category?: Types.ObjectId;
   acceptedProjectsCounter: number;
   profileViews: number;
   about?: string;
