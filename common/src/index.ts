@@ -13,3 +13,5 @@ export * from './middlewares/global-error-handling.middleware';
 // export * from "./types/UrlQuery";
 export * from './utils/api-feature';
 export * from './middlewares/database-connection';
+
+export * from './types/JwtPayload';
