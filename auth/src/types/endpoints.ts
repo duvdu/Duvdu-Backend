@@ -16,7 +16,7 @@ export interface SigninHandler
   extends RequestHandler<
     undefined,
     successResponse<unknown>,
-    Pick<Iuser, 'username' | 'password'>,
+    { username: string; password: string },
     undefined
   > {}
 
@@ -24,7 +24,7 @@ export interface SignupHandler
   extends RequestHandler<
     undefined,
     successResponse<unknown>,
-    Pick<Iuser, 'name' | 'phoneNumber' | 'username' | 'password'>,
+    { name: string; phoneNumber: string; username: string; password: string },
     undefined
   > {}
 
@@ -43,7 +43,7 @@ export interface UpdatePhoneNumberHandler
   extends RequestHandler<
     undefined,
     successResponse<unknown>,
-    Pick<Iuser, 'verificationCode' | 'phoneNumber'>,
+    { verificationCode: string; phoneNumber: string },
     undefined
   > {}
 
@@ -62,7 +62,7 @@ export interface ResetPasswordHandler
   extends RequestHandler<
     undefined,
     successResponse<unknown>,
-    Pick<Iuser, 'verificationCode' | 'username' | 'password'>,
+    { verificationCode: string; username: string; newPassword: string },
     undefined
   > {}
 
@@ -80,7 +80,7 @@ export interface UpdateProfileHandler
         | 'profileImage'
         | 'coverImage'
         | 'location'
-        | 'categroy'
+        | 'category'
         | 'about'
         | 'isAvaliableToInstantProjects'
         | 'pricePerHour'
@@ -102,7 +102,7 @@ export interface getLoggedUserProfileHandler
         | 'profileImage'
         | 'coverImage'
         | 'location'
-        | 'categroy'
+        | 'category'
         | 'acceptedProjectsCounter'
         | 'profileViews'
         | 'about'
@@ -131,7 +131,7 @@ export interface getUserProfileHandler
         | 'profileImage'
         | 'coverImage'
         | 'location'
-        | 'categroy'
+        | 'category'
         | 'acceptedProjectsCounter'
         | 'profileViews'
         | 'about'
