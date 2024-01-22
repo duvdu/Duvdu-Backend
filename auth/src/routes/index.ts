@@ -6,8 +6,8 @@ import * as val from '../validator';
 
 const router = Router();
 
-router.post('/signin', val.signinVal, handlers.signinHandler);
-router.post('/signup', val.signupVal, handlers.signupHandler);
+router.post('/signin', val.signinVal, handlers.signinHandler as unknown as RequestHandler);
+router.post('/signup', val.signupVal, handlers.signupHandler as unknown as RequestHandler);
 router.post(
   '/retreive-username',
   rateLimit({
