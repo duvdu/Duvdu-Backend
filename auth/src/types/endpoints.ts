@@ -24,7 +24,12 @@ export interface SignupHandler
   extends RequestHandler<
     undefined,
     successResponse<unknown>,
-    { name: string; phoneNumber: string; username: string; password: string },
+    {
+      name: string;
+      phoneNumber: { key: string; number: string };
+      username: string;
+      password: string;
+    },
     undefined
   > {}
 
