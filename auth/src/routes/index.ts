@@ -1,5 +1,4 @@
-import { auth } from '@duvdu-v1/duvdu';
-import { Router } from 'express';
+import { RequestHandler, Router } from 'express';
 import rateLimit from 'express-rate-limit';
 
 import * as handlers from '../controllers/auth';
@@ -8,8 +7,8 @@ import * as val from '../validator';
 
 const router = Router();
 
-router.post('/signin', val.signinVal, handlers.signinHandler );
-router.post('/signup', val.signupVal, handlers.signinHandler );
+router.post('/signin', val.signinVal, handlers.signinHandler as unknown as RequestHandler);
+router.post('/signup', val.signupVal, handlers.signupHandler as unknown as RequestHandler);
 router.post(
   '/retreive-username',
   rateLimit({
