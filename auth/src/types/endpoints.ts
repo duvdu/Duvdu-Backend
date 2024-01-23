@@ -14,15 +14,15 @@ type successResponse<T> = T & {
 
 export interface SigninHandler
   extends RequestHandler<
-    undefined,
+    unknown,
     successResponse<unknown>,
     { username: string; password: string },
-    undefined
+    unknown
   > {}
 
 export interface SignupHandler
   extends RequestHandler<
-    undefined,
+    unknown,
     successResponse<unknown>,
     {
       name: string;
@@ -30,15 +30,15 @@ export interface SignupHandler
       username: string;
       password: string;
     },
-    undefined
+    unknown
   > {}
 
 export interface RetreiveUsernameHandler
   extends RequestHandler<
-    undefined,
+    unknown,
     successResponse<{ isUsernameExists: boolean }>,
     Pick<Iuser, 'username'>,
-    undefined
+    unknown
   > {}
 
 export interface AskUpdatePhoneNumberHandler
@@ -46,10 +46,10 @@ export interface AskUpdatePhoneNumberHandler
 
 export interface UpdatePhoneNumberHandler
   extends RequestHandler<
-    undefined,
+    unknown,
     successResponse<unknown>,
     { verificationCode: string; phoneNumber: string },
-    undefined
+    unknown
   > {}
 
 export interface ChangePasswordHandler
