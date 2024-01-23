@@ -5,7 +5,7 @@ import { CustomError } from '../errors/custom-error';
 
 // eslint-disable-next-line
 export const globalErrorHandlingMiddleware: ErrorRequestHandler = (err, req, res, next) => {
-  if(process.env.NODE_ENV === 'development') console.log(err);
+  if (process.env.NODE_ENV === 'development') console.log(err);
   // custom error
   if (err instanceof CustomError) {
     return res.status(err.statusCode).json({ errors: err.serializeError() });
@@ -13,7 +13,7 @@ export const globalErrorHandlingMiddleware: ErrorRequestHandler = (err, req, res
   // mongo dublicate error
   if (err.name === 'MongoServerError' && err.code == '11000')
     return res
-      .status(422)
+      .status(400)
       .json({ errors: [{ message: `${Object.keys(err.keyPattern)} is already exists` }] });
   // unhandled multer error
   if (err instanceof MulterError)
