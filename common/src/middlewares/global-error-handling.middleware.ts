@@ -13,7 +13,7 @@ export const globalErrorHandlingMiddleware: ErrorRequestHandler = (err, req, res
   // mongo dublicate error
   if (err.name === 'MongoServerError' && err.code == '11000')
     return res
-      .status(422)
+      .status(400)
       .json({ errors: [{ message: `${Object.keys(err.keyPattern)} is already exists` }] });
   // unhandled multer error
   if (err instanceof MulterError)
