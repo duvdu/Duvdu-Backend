@@ -5,7 +5,7 @@ import { CustomError } from '../errors/custom-error';
 
 // eslint-disable-next-line
 export const globalErrorHandlingMiddleware: ErrorRequestHandler = (err, req, res, next) => {
-  if(process.env.NODE_ENV === 'development') console.log(err);
+  if (process.env.NODE_ENV === 'development') console.log(err);
   // custom error
   if (err instanceof CustomError) {
     return res.status(err.statusCode).json({ errors: err.serializeError() });
