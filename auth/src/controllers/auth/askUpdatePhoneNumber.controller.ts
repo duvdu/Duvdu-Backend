@@ -9,7 +9,10 @@ import { generateRandom6Digit } from '../../utils/gitRandom6Dugut';
 
 
 export const askUpdateUserNameHandler:AskUpdatePhoneNumberHandler=async(req , res , next)=>{
-  const currentUser = await Users.findById(req.user?.id);
+  
+  const currentUser = await Users.findById((req as any).user?.id);
+
+  console.log(currentUser);
 
   if (!currentUser || !comparePassword(req.body.password! , currentUser.password || '')) {
     return next(new UnauthenticatedError());
