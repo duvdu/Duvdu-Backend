@@ -9,7 +9,7 @@ beforeAll(async () => {
   await mongoose.connect(mongoUri);
 });
 
-beforeEach(async () => {
+beforeAll(async () => {
   const collections = await mongoose.connection.db.collections();
   for (const collection of collections) {
     await collection.deleteMany({});
