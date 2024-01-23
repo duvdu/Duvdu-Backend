@@ -7,7 +7,7 @@ const userSchema = new Schema<Iuser & Document>(
     googleId: String,
     appleId: String,
     name: String,
-    phoneNumber: { key: String, number: String },
+    phoneNumber: { key: String, number: { type: String, unique: true } },
     username: { type: String, unique: true },
     password: String,
     verificationCode: { code: String, expireAt: Number },

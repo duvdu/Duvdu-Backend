@@ -14,64 +14,77 @@ type successResponse<T> = T & {
 
 export interface SigninHandler
   extends RequestHandler<
-    undefined,
+    unknown,
     successResponse<unknown>,
     { username: string; password: string },
-    undefined
+    unknown
   > {}
 
 export interface SignupHandler
   extends RequestHandler<
-    undefined,
+    unknown,
     successResponse<unknown>,
-    { name: string; phoneNumber: string; username: string; password: string },
-    undefined
+    {
+      name: string;
+      phoneNumber: { key: string; number: string };
+      username: string;
+      password: string;
+    },
+    unknown
   > {}
 
 export interface RetreiveUsernameHandler
   extends RequestHandler<
-    undefined,
+    unknown,
     successResponse<{ isUsernameExists: boolean }>,
     Pick<Iuser, 'username'>,
-    undefined
+    unknown
   > {}
 
 export interface AskUpdatePhoneNumberHandler
-  extends RequestHandler<undefined, successResponse<unknown>, Pick<Iuser, 'password'>, undefined> {}
+  extends RequestHandler<unknown, successResponse<unknown>, Pick<Iuser, 'password'>, unknown> {}
 
 export interface UpdatePhoneNumberHandler
   extends RequestHandler<
-    undefined,
+    unknown,
     successResponse<unknown>,
     { verificationCode: string; phoneNumber: string },
-    undefined
+    unknown
   > {}
+
+export interface verifyUpdatePhoneNumberHandler
+    extends RequestHandler<
+    unknown,
+    successResponse<unknown>,
+    {verificationCode: string},
+    unknown
+    >{}
 
 export interface ChangePasswordHandler
   extends RequestHandler<
-    undefined,
+    unknown,
     successResponse<unknown>,
     { oldPassword: string; newPassword: string },
-    undefined
+    unknown
   > {}
 
 export interface AskResetPasswordHandler
-  extends RequestHandler<undefined, successResponse<unknown>, Pick<Iuser, 'username'>, undefined> {}
+  extends RequestHandler<unknown, successResponse<unknown>, Pick<Iuser, 'username'>, unknown> {}
 
 export interface ResetPasswordHandler
   extends RequestHandler<
-    undefined,
+    unknown,
     successResponse<unknown>,
     { verificationCode: string; username: string; newPassword: string },
-    undefined
+    unknown
   > {}
 
 export interface ResendVerificationCodeHandler
-  extends RequestHandler<undefined, successResponse<unknown>, Pick<Iuser, 'username'>, undefined> {}
+  extends RequestHandler<unknown, successResponse<unknown>, Pick<Iuser, 'username'>, unknown> {}
 
 export interface UpdateProfileHandler
   extends RequestHandler<
-    undefined,
+    unknown,
     successResponse<unknown>,
     Partial<
       Pick<
@@ -86,12 +99,12 @@ export interface UpdateProfileHandler
         | 'pricePerHour'
       >
     >,
-    undefined
+    unknown
   > {}
 
 export interface getLoggedUserProfileHandler
   extends RequestHandler<
-    undefined,
+    unknown,
     successResponse<
       Pick<
         Iuser,
@@ -114,8 +127,8 @@ export interface getLoggedUserProfileHandler
         | 'avaliableContracts'
       > & { averageRate: number }
     >,
-    undefined,
-    undefined
+    unknown,
+    unknown
   > {}
 
 export interface getUserProfileHandler
@@ -141,6 +154,6 @@ export interface getUserProfileHandler
         | 'hasVerificationPadge'
       > & { averageRate: number }
     >,
-    undefined,
-    undefined
+    unknown,
+    unknown
   > {}

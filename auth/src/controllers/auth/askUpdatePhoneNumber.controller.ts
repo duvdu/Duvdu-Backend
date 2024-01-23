@@ -9,18 +9,22 @@ import { generateRandom6Digit } from '../../utils/gitRandom6Dugut';
 
 
 export const askUpdateUserNameHandler:AskUpdatePhoneNumberHandler=async(req , res , next)=>{
-  const user = await Users.findById(req.user?.id);
+  const currentUser = await Users.findById(req.user?.id);
 
-  if (!user || !comparePassword(req.body.password! , user.password || '')) {
+  if (!currentUser || !comparePassword(req.body.password! , currentUser.password || '')) {
     return next(new UnauthenticatedError());
   }
 
   const randomCode = generateRandom6Digit();
   const hashedRandomCode = hashVerificationCode(randomCode);
-  user.verificationCode = {
+  currentUser.verificationCode = {
     code:hashedRandomCode,
     expireAt: Date.now() + 10 * 60 * 1000 ,
   };
+  currentUser.isVerified = false;
+  await currentUser.save();
+
+  // send otp to user
 
   res.status(200).json({ message: 'success' });
 };
