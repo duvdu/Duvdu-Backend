@@ -1,10 +1,23 @@
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import mongoose from 'mongoose';
 import supertest from 'supertest';
 
 import { app } from '../../app';
 
 const request = supertest(app);
+let mongo: MongoMemoryServer;
+beforeAll(async () => {
+  process.env.JWT_KEY = 'sadsadsadasdas';
+  mongo = await MongoMemoryServer.create();
+  const mongoUri = mongo.getUri();
+  await mongoose.connect(mongoUri);
+  const collections = await mongoose.connection.db.collections();
+  for (const collection of collections) {
+    await collection.deleteMany({});
+  }
+});
 
-describe('AuthController', () => {
+describe('signup endpoint', () => {
   it('should return 201 on valid signup', async () => {
     const response = await request.post('/api/users/signup').send({
       name: 'ewasy',
@@ -50,4 +63,9 @@ describe('AuthController', () => {
     });
     expect(response.status).toBe(422);
   });
+});
+
+afterAll(async () => {
+  await mongo.stop();
+  await mongoose.connection.close();
 });
