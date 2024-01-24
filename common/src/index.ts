@@ -8,6 +8,7 @@ export * from './errors/notfound-error';
 export * from './errors/unauthenticated-error';
 export * from './errors/unauthorized-error';
 export * from './errors/validation-error';
+export * from './errors/generic-error';
 export * from './middlewares/global-error-handling.middleware';
 // export * from "./types/Pagination";
 // export * from "./types/UrlQuery";

@@ -12,7 +12,7 @@ export const auth = (modelName: Model<any>) =><RequestHandler> (async (req, res,
     
   const user = await modelName.findOne({ token: (req as any).session?.jwt });
 
-  if (user.isBlocked === true) {
+  if (user.isBlocked) {
     throw new GenericError('the users access is denied due to their blocked status.');
   }
     
