@@ -4,12 +4,17 @@ import jwt from 'jsonwebtoken';
 import { Model } from 'mongoose';
 
 import { BadRequestError } from '../errors/bad-request-error';
+import { GenericError } from '../errors/generic-error';
 import { UnauthenticatedError } from '../errors/unauthenticated-error';
 import { IjwtPayload } from '../types/JwtPayload';
 
 export const auth = (modelName: Model<any>) =><RequestHandler> (async (req, res, next) => {
     
   const user = await modelName.findOne({ token: (req as any).session?.jwt });
+
+  if (user.isBlocked === true) {
+    return next(new GenericError('the users access is denied due to their blocked status.' , 406));
+  }
     
   if (!(req as any).session?.jwt && !user) {
     throw new UnauthenticatedError();
