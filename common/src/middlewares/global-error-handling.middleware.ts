@@ -8,6 +8,8 @@ export const globalErrorHandlingMiddleware: ErrorRequestHandler = (err, req, res
   if (process.env.NODE_ENV === 'development') console.log(err);
   // custom error
   if (err instanceof CustomError) {
+    console.log(err);
+    
     return res.status(err.statusCode).json({ errors: err.serializeError() });
   }
   // mongo dublicate error
