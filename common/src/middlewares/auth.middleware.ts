@@ -16,7 +16,7 @@ export const auth = (modelName: Model<any>) =><RequestHandler> (async (req, res,
     throw new GenericError('the users access is denied due to their blocked status.');
   }
     
-  if (!(req as any).session?.jwt && !user) {
+  if (!(req as any).session?.jwt || !user) {
     throw new UnauthenticatedError();
   }
 
