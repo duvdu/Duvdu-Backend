@@ -9,7 +9,7 @@ import { generateToken } from '../../utils/generateToken';
 export const signinHandler: SigninHandler = async (req, res, next) => {
   const user = await Users.findOne({ username: req.body.username });
   if (!user || !comparePassword(req.body.password, user.password || ''))
-    return next(new UnauthenticatedError());
+    return next(new UnauthenticatedError('invalid credintials'));
   if (!user.isVerified) return next(new UnauthorizedError('account not verified'));
   const token = generateToken(user.id);
   req.session = { jwt: token };
