@@ -9,16 +9,20 @@ import { UnauthenticatedError } from '../errors/unauthenticated-error';
 import { IjwtPayload } from '../types/JwtPayload';
 
 export const auth = (modelName: Model<any>) =><RequestHandler> (async (req, res, next) => {
+  if (!(req as any).session?.jwt) {
+    throw new UnauthenticatedError();
+  }
     
   const user = await modelName.findOne({ token: (req as any).session?.jwt });
+
+  if (!user) {
+    throw new UnauthenticatedError();
+  }
 
   if (user.isBlocked) {
     throw new GenericError('the users access is denied due to their blocked status.');
   }
     
-  if (!(req as any).session?.jwt || !user) {
-    throw new UnauthenticatedError();
-  }
 
   try {
     const payload = jwt.verify((req as any).session!.jwt, process.env.JWT_KEY!) as IjwtPayload;
