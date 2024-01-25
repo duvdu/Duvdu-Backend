@@ -7,24 +7,23 @@ import { comparePassword } from '../../utils/bcrypt';
 import { hashVerificationCode } from '../../utils/crypto';
 import { generateRandom6Digit } from '../../utils/gitRandom6Dugut';
 
-
-export const askUpdateUserNameHandler:AskUpdatePhoneNumberHandler=async(req , res , next)=>{
+export const askUpdateUserPhoneHandler: AskUpdatePhoneNumberHandler = async (req, res, next) => {
+  console.log(true);
   
   const currentUser = await Users.findById((req as any).user?.id);
 
-  console.log(currentUser);
-
-  if (!currentUser || !comparePassword(req.body.password! , currentUser.password || '')) {
+  if (!currentUser || !comparePassword(req.body.password!, currentUser.password || '')) {
     return next(new UnauthenticatedError());
   }
 
   const randomCode = generateRandom6Digit();
   const hashedRandomCode = hashVerificationCode(randomCode);
+  console.log(randomCode);
+  
   currentUser.verificationCode = {
-    code:hashedRandomCode,
-    expireAt: Date.now() + 10 * 60 * 1000 ,
+    code: hashedRandomCode,
+    expireAt: Date.now() + 10 * 60 * 1000,
   };
-  currentUser.isVerified = false;
   await currentUser.save();
 
   // send otp to user

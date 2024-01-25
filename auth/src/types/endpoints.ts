@@ -53,12 +53,12 @@ export interface UpdatePhoneNumberHandler
   > {}
 
 export interface verifyUpdatePhoneNumberHandler
-    extends RequestHandler<
+  extends RequestHandler<
     unknown,
     successResponse<unknown>,
-    {verificationCode: string},
+    { verificationCode: string , phoneNumber: string },
     unknown
-    >{}
+  > {}
 
 export interface ChangePasswordHandler
   extends RequestHandler<
