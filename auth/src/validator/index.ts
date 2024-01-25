@@ -4,3 +4,4 @@ export * from './signup.validator';
 export * from './askUpdatePhoneNumber.validator';
 export * from './updatePhoneNumber.validation';
 export * from './verifyUpdatePhoneNumber.validation';
+export * from './changePassword.validator';

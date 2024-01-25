@@ -7,7 +7,7 @@ import { env } from '../config/env';
 
 const request = supertest(app);
 declare global {
-  const signin: () => Promise<string[]> ;
+  const signin: () => Promise<string[]>;
 }
 
 let mongo: any;
@@ -39,11 +39,9 @@ afterAll(async () => {
     password: '123@Metoo',
     phoneNumber: { number: '01234567891' },
   });
-  
 
   const cookie = response.get('Set-Cookie');
   console.log(cookie);
-  
-  return cookie ;
-  
+
+  return cookie;
 };

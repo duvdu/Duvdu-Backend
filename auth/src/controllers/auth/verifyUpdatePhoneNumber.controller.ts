@@ -8,7 +8,7 @@ import { hashVerificationCode } from '../../utils/crypto';
 export const verifyUpdatePhoneNumber: verifyUpdatePhoneNumberHandler = async (req, res, next) => {
   const hashEnterdCode: string = hashVerificationCode(req.body.verificationCode);
 
-  const currentUser = await Users.findOne({phoneNumber:{Number:req.body.phoneNumber}});
+  const currentUser = await Users.findOne({ phoneNumber: { Number: req.body.phoneNumber } });
 
   if (!currentUser) {
     return next(new NotFound());

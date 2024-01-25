@@ -4,7 +4,7 @@ import { app } from '../../app';
 
 const request = supertest(app);
 
-describe('verifyUpdatePhoneNumber' , ()=>{
+describe('verifyUpdatePhoneNumber', () => {
   it('should return 422 for invalid input', async () => {
     // Test case 1: Invalid verification code length
     await request
@@ -40,5 +40,4 @@ describe('verifyUpdatePhoneNumber' , ()=>{
       })
       .expect(422);
   });
-
 });

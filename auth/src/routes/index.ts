@@ -35,9 +35,6 @@ router.post(
   val.updatePhoneNumberVal,
   handlers.updatePhoneNumberHandler,
 );
-router.post(
-  '/verify-update-phone',
-  val.verifyUpdatePhoneVal,
-  handlers.verifyUpdatePhoneNumber,
-);
+router.post('/verify-update-phone', val.verifyUpdatePhoneVal, handlers.verifyUpdatePhoneNumber);
+router.patch('/change-password', auth(Users), val.changePasswordVal, handlers.changePassword);
 export const apiRoutes = router;

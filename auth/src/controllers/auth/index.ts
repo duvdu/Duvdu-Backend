@@ -4,3 +4,4 @@ export * from './signin.controller';
 export * from './signup.controller';
 export * from './updatePhoneNumber.controller';
 export * from './verifyUpdatePhoneNumber.controller';
+export * from './changePassword.controller';

@@ -25,5 +25,5 @@ export interface Iuser {
   hasVerificationPadge: boolean;
   avaliableContracts: number;
   rate: { ratersCounter: number; totalRates: number };
-  isBlocked:boolean
+  isBlocked: boolean;
 }

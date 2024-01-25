@@ -27,7 +27,7 @@ const userSchema = new Schema<Iuser & Document>(
     hasVerificationPadge: { type: Boolean, default: false },
     avaliableContracts: { type: Number, default: 0 },
     rate: { ratersCounter: { type: Number, default: 0 }, totalRates: { type: Number, default: 0 } },
-    isBlocked:{type:Boolean , default:false}
+    isBlocked: { type: Boolean, default: false },
   },
   { timestamps: true },
 );

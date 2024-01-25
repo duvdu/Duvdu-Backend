@@ -56,7 +56,7 @@ export interface verifyUpdatePhoneNumberHandler
   extends RequestHandler<
     unknown,
     successResponse<unknown>,
-    { verificationCode: string , phoneNumber: string },
+    { verificationCode: string; phoneNumber: string },
     unknown
   > {}
 
