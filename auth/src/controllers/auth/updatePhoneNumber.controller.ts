@@ -28,7 +28,6 @@ export const updatePhoneNumberHandler: UpdatePhoneNumberHandler = async (req, re
   const hashedVerificationCode: string = hashVerificationCode(verificationCode);
   
   currentUser.phoneNumber.number = req.body.phoneNumber;
-  console.log(currentUser.phoneNumber.number);
   
   currentUser.verificationCode = {
     code: hashedVerificationCode,
@@ -36,7 +35,6 @@ export const updatePhoneNumberHandler: UpdatePhoneNumberHandler = async (req, re
   };
   currentUser.isBlocked = true;
   await currentUser.save();
-  console.log(currentUser);
   
   // send otp to user
 

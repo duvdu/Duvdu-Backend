@@ -22,4 +22,10 @@ describe('askUpdatePhoneNumber' ,  ()=>{
       .send({password:'123@Metooooo'})
       .expect(401);
   });
+  it('should return 200 when success ', async () => {
+    await request.post('/api/users/ask-update-phone')
+      .set('Cookie' , await signin())
+      .send({password:'123@Metoo'})
+      .expect(200);
+  });
 });

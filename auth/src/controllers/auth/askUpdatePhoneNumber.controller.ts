@@ -8,7 +8,6 @@ import { hashVerificationCode } from '../../utils/crypto';
 import { generateRandom6Digit } from '../../utils/gitRandom6Dugut';
 
 export const askUpdateUserPhoneHandler: AskUpdatePhoneNumberHandler = async (req, res, next) => {
-  console.log(true);
   
   const currentUser = await Users.findById((req as any).user?.id);
 
@@ -18,7 +17,6 @@ export const askUpdateUserPhoneHandler: AskUpdatePhoneNumberHandler = async (req
 
   const randomCode = generateRandom6Digit();
   const hashedRandomCode = hashVerificationCode(randomCode);
-  console.log(randomCode);
   
   currentUser.verificationCode = {
     code: hashedRandomCode,
