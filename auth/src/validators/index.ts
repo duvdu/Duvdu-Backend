@@ -7,3 +7,4 @@ export * from './verifyUpdatePhoneNumber.validation';
 export * from './changePassword.validator';
 export * from './askResetPassword.validator';
 export * from './resetPassword.validator';
+export * from './update-profile.validator';

@@ -102,11 +102,11 @@ export interface UpdateProfileHandler
     unknown
   > {}
 
-export interface getLoggedUserProfileHandler
+export interface GetLoggedUserProfileHandler
   extends RequestHandler<
     unknown,
-    successResponse<
-      Pick<
+    successResponse<{
+      profile: Pick<
         Iuser,
         | 'id'
         | 'name'
@@ -125,8 +125,8 @@ export interface getLoggedUserProfileHandler
         | 'plan'
         | 'hasVerificationPadge'
         | 'avaliableContracts'
-      > & { averageRate: number }
-    >,
+      > & { averageRate: number };
+    }>,
     unknown,
     unknown
   > {}

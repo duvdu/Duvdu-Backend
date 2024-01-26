@@ -43,4 +43,9 @@ router.post(
   }),
   handlers.resendVerificationCodeHandler,
 );
+router
+  .route('/profile')
+  .all(auth(Users))
+  .get(handlers.getLoggedUserProfileHandler)
+  .patch(val.updateProfileVal, handlers.updateProfileHandler);
 export const apiRoutes = router;
