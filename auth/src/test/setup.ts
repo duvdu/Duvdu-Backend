@@ -38,7 +38,7 @@ afterAll(async () => {
     username: 'ewasy_mohamed',
     password: '123@Metoo',
     phoneNumber: { number: '01234567891' },
-    isVerified:true
+    isVerified: true,
   });
 
   const cookie = response.get('Set-Cookie');

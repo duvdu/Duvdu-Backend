@@ -6,7 +6,7 @@ import rateLimit from 'express-rate-limit';
 
 import * as handlers from '../controllers/auth';
 import { Users } from '../models/User.model';
-import * as val from '../validator';
+import * as val from '../validators';
 
 const router = Router();
 
