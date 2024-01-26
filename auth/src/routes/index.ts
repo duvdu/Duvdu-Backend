@@ -23,20 +23,24 @@ router.post(
   val.retreiveUsernameVal,
   handlers.retreiveUsernameHandler,
 );
-router.post(
-  '/ask-update-phone',
-  auth(Users),
-  val.askUpdatePhoneVal,
-  handlers.askUpdateUserPhoneHandler,
-);
-router.post(
-  '/update-phone-number',
-  auth(Users),
-  val.updatePhoneNumberVal,
-  handlers.updatePhoneNumberHandler,
-);
-router.post('/verify-update-phone', val.verifyUpdatePhoneVal, handlers.verifyUpdatePhoneNumber);
 router.patch('/change-password', auth(Users), val.changePasswordVal, handlers.changePassword);
-router.post('/ask-reset-password' , val.askResetPasswordVal , handlers.askResetPassword);
-router.patch('/reset-password' , val.resetPasswordVal , handlers.resetPassword);
+router
+  .route('/update-phone')
+  .get(auth(Users), val.askUpdatePhoneVal, handlers.askUpdateUserPhoneHandler)
+  .put(auth(Users), val.updatePhoneNumberVal, handlers.updatePhoneNumberHandler)
+  .post(val.verifyUpdatePhoneVal, handlers.verifyUpdatePhoneNumber);
+router
+  .route('/reset-password')
+  .get(val.askResetPasswordVal, handlers.askResetPassword)
+  .post(val.resetPasswordVal, handlers.resetPassword);
+router.post('/resend-verify', handlers.resendVerificationCodeHandler);
+router.post(
+  '/resend-code',
+  rateLimit({
+    windowMs: 10 * 60 * 1000,
+    max: 20,
+    message: 'too many requests, please try again later.',
+  }),
+  handlers.resendVerificationCodeHandler,
+);
 export const apiRoutes = router;
