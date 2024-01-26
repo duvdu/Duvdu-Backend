@@ -23,7 +23,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@duvdu-v1/duvdu": "^1.0.7",
+    "@duvdu-v1/duvdu": "^1.0.23",
     "@jridgewell/sourcemap-codec": "^1.4.15",
     "@types/bcryptjs": "^2.4.5",
     "@types/cookie-session": "^2.0.48",
@@ -45,6 +45,8 @@
     "mongoose": "^8.0.4",
     "multer": "^1.4.5-lts.1",
     "node-nats-streaming": "^0.3.2",
+    "nodemon": "^3.0.3",
+    "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.3.3"
   },
