@@ -1,5 +1,5 @@
 import 'express-async-errors';
-import { UnauthenticatedError, UnauthorizedError } from '@duvdu-v1/duvdu';
+import { UnauthenticatedError } from '@duvdu-v1/duvdu';
 
 import { Users } from '../../models/User.model';
 import { SigninHandler } from '../../types/endpoints';
