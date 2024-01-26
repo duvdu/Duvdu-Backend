@@ -10,9 +10,9 @@ export const updatePhoneNumberHandler: UpdatePhoneNumberHandler = async (req, re
   const hashEnterdCode = hashVerificationCode(req.body.verificationCode);
   const currentUser = await Users.findById((req as any).user?.id);
 
-  if (!currentUser) {
+  if (!currentUser) 
     return next(new NotFound());
-  }
+  
 
   const currentDate: number = new Date().getTime();
 
