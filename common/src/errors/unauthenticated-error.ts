@@ -8,6 +8,6 @@ export class UnauthenticatedError extends CustomError {
   }
 
   serializeError(): { message: string; field?: string | undefined }[] {
-    return [{ message: 'un-authenticated error' }];
+    return [{ message: this.message || 'un-authenticated error' }];
   }
 }
