@@ -8,7 +8,6 @@ import { hashVerificationCode } from '../../utils/crypto';
 import { generateRandom6Digit } from '../../utils/gitRandom6Dugut';
 
 export const askResetPassword: AskResetPasswordHandler = async (req, res, next) => {
-  console.log(await Users.find());
 
   const user = await Users.findOne({ username: req.body.username });
 
