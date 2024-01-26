@@ -37,4 +37,6 @@ router.post(
 );
 router.post('/verify-update-phone', val.verifyUpdatePhoneVal, handlers.verifyUpdatePhoneNumber);
 router.patch('/change-password', auth(Users), val.changePasswordVal, handlers.changePassword);
+router.post('/ask-reset-password' , val.askResetPasswordVal , handlers.askResetPassword);
+router.patch('/reset-password' , val.resetPasswordVal , handlers.resetPassword);
 export const apiRoutes = router;

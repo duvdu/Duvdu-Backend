@@ -5,3 +5,5 @@ export * from './signup.controller';
 export * from './updatePhoneNumber.controller';
 export * from './verifyUpdatePhoneNumber.controller';
 export * from './changePassword.controller';
+export * from './askResetPassword.controller';
+export * from './resetPassword.controller';
