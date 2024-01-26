@@ -131,11 +131,11 @@ export interface GetLoggedUserProfileHandler
     unknown
   > {}
 
-export interface getUserProfileHandler
+export interface GetUserProfileHandler
   extends RequestHandler<
     { userId: string },
-    successResponse<
-      Pick<
+    successResponse<{
+      profile: Pick<
         Iuser,
         | 'id'
         | 'name'
@@ -152,8 +152,8 @@ export interface getUserProfileHandler
         | 'isAvaliableToInstantProjects'
         | 'pricePerHour'
         | 'hasVerificationPadge'
-      > & { averageRate: number }
-    >,
+      > & { averageRate: number };
+    }>,
     unknown,
     unknown
   > {}
