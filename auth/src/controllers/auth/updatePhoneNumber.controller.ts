@@ -19,9 +19,9 @@ export const updatePhoneNumberHandler: UpdatePhoneNumberHandler = async (req, re
   if (
     currentDate > currentUser.verificationCode!.expireAt ||
     currentUser.verificationCode!.code != hashEnterdCode
-  ) {
+  ) 
     return next(new UnauthenticatedError());
-  }
+  
 
   const verificationCode: string = generateRandom6Digit();
   const hashedVerificationCode: string = hashVerificationCode(verificationCode);
