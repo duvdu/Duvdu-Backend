@@ -8,7 +8,7 @@ export interface Iuser {
   phoneNumber: { key: string; number: string };
   username: string;
   password?: string;
-  verificationCode?: { code: string; expireAt: Date };
+  verificationCode?: { code: string; expireAt: number };
   isVerified?: boolean;
   token?: string;
   profileImage?: string;
@@ -25,4 +25,5 @@ export interface Iuser {
   hasVerificationPadge: boolean;
   avaliableContracts: number;
   rate: { ratersCounter: number; totalRates: number };
+  isBlocked: boolean;
 }
