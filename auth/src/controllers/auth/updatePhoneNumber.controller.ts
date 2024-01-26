@@ -10,18 +10,18 @@ export const updatePhoneNumberHandler: UpdatePhoneNumberHandler = async (req, re
   const hashEnterdCode = hashVerificationCode(req.body.verificationCode);
   const currentUser = await Users.findById((req as any).user?.id);
 
-  if (!currentUser) {
+  if (!currentUser) 
     return next(new NotFound());
-  }
+  
 
   const currentDate: number = new Date().getTime();
 
   if (
     currentDate > currentUser.verificationCode!.expireAt ||
     currentUser.verificationCode!.code != hashEnterdCode
-  ) {
+  ) 
     return next(new UnauthenticatedError());
-  }
+  
 
   const verificationCode: string = generateRandom6Digit();
   const hashedVerificationCode: string = hashVerificationCode(verificationCode);

@@ -12,9 +12,7 @@ export const askResetPasswordHandler: AskResetPasswordHandler = async (req, res,
 
   const user = await Users.findOne({ username: req.body.username });
 
-  if (!user) {
-    return next(new NotFound('user not found'));
-  }
+  if (!user) return next(new NotFound('user not found'));
 
   const randomCode: string = generateRandom6Digit();
   const hashedCode = hashVerificationCode(randomCode);
