@@ -23,20 +23,17 @@ router.post(
   val.retreiveUsernameVal,
   handlers.retreiveUsernameHandler,
 );
-router.post(
-  '/ask-update-phone',
-  auth(Users),
-  val.askUpdatePhoneVal,
-  handlers.askUpdateUserPhoneHandler,
-);
-router.post(
-  '/update-phone-number',
-  auth(Users),
-  val.updatePhoneNumberVal,
-  handlers.updatePhoneNumberHandler,
-);
-router.post('/verify-update-phone', val.verifyUpdatePhoneVal, handlers.verifyUpdatePhoneNumber);
-router.patch('/change-password', auth(Users), val.changePasswordVal, handlers.changePassword);
-router.post('/ask-reset-password' , val.askResetPasswordVal , handlers.askResetPassword);
-router.patch('/reset-password' , val.resetPasswordVal , handlers.resetPassword);
+
+router
+  .route('/update-phone-number')
+  .get(auth(Users), val.askUpdatePhoneVal, handlers.askUpdateUserPhoneHandler)
+  .post(auth(Users), val.updatePhoneNumberVal, handlers.updatePhoneNumberHandler)
+  .put(val.verifyUpdatePhoneVal, handlers.verifyUpdatePhoneNumber);
+
+router.put('/change-password', auth(Users), val.changePasswordVal, handlers.changePassword);
+
+router
+  .route('/reset-password')
+  .get(val.askResetPasswordVal, handlers.askResetPassword)
+  .put(val.resetPasswordVal, handlers.resetPassword);
 export const apiRoutes = router;

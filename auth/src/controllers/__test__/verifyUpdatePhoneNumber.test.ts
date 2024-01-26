@@ -8,7 +8,7 @@ describe('verifyUpdatePhoneNumber', () => {
   it('should return 422 for invalid input', async () => {
     // Test case 1: Invalid verification code length
     await request
-      .post('/api/users/verify-update-phone')
+      .put('/api/users/update-phone-number')
       .send({
         verificationCode: '123',
         phoneNumber: '01022484942',
@@ -17,7 +17,7 @@ describe('verifyUpdatePhoneNumber', () => {
 
     // Test case 2: Invalid phone number length
     await request
-      .post('/api/users/verify-update-phone')
+      .put('/api/users/update-phone-number')
       .send({
         verificationCode: '123456',
         phoneNumber: '01022484',
@@ -26,7 +26,7 @@ describe('verifyUpdatePhoneNumber', () => {
 
     // Test case 3: Missing verificationCode field
     await request
-      .post('/api/users/verify-update-phone')
+      .put('/api/users/update-phone-number')
       .send({
         phoneNumber: '01022484942',
       })
@@ -34,7 +34,7 @@ describe('verifyUpdatePhoneNumber', () => {
 
     // Test case 4: Missing phoneNumber field
     await request
-      .post('/api/users/verify-update-phone')
+      .put('/api/users/update-phone-number')
       .send({
         verificationCode: '123456',
       })

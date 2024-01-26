@@ -7,7 +7,7 @@ const request = supertest(app);
 describe('changePassword', () => {
   it('should return 401 if user un authenticated', async () => {
     await request
-      .patch('/api/users/change-password')
+      .put('/api/users/change-password')
       .send({
         oldPassword: '123@Metoo',
         newPassword: '123',
@@ -18,7 +18,7 @@ describe('changePassword', () => {
   it('should return 422 for invalid data', async () => {
     const user = await signin();
     await request
-      .patch('/api/users/change-password')
+      .put('/api/users/change-password')
       .set('Cookie', user)
       .send({
         oldPassword: '',
@@ -27,7 +27,7 @@ describe('changePassword', () => {
       .expect(422);
 
     await request
-      .patch('/api/users/change-password')
+      .put('/api/users/change-password')
       .set('Cookie', user)
       .send({
         oldPassword: '123@Metoo',
@@ -37,7 +37,7 @@ describe('changePassword', () => {
   });
   it('should return 401 incorrect password', async () => {
     await request
-      .patch('/api/users/change-password')
+      .put('/api/users/change-password')
       .set('Cookie', await signin())
       .send({
         oldPassword: '123676@Metoo',
@@ -47,7 +47,7 @@ describe('changePassword', () => {
   });
   it('should return 200 for success', async () => {
     await request
-      .patch('/api/users/change-password')
+      .put('/api/users/change-password')
       .set('Cookie', await signin())
       .send({
         oldPassword: '123@Metoo',
