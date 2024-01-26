@@ -7,7 +7,7 @@ import { generateToken } from '../../utils/generateToken';
 
 export const signupHandler: SignupHandler = async (req, res) => {
   const newUser = await Users.create({ ...req.body, password: hashPassword(req.body.password) });
-  const token = generateToken(newUser.id);
+  const token = generateToken({id:newUser.id});
   req.session = { jwt: token };
   res.status(201).json({ message: 'success' });
 };

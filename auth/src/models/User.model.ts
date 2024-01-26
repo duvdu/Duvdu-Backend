@@ -10,7 +10,7 @@ const userSchema = new Schema<Iuser & Document>(
     phoneNumber: { key: String, number: { type: String, unique: true } },
     username: { type: String, unique: true },
     password: String,
-    verificationCode: { code: String, expireAt: Date },
+    verificationCode: { code: String, expireAt: Number },
     isVerified: { type: Boolean, default: false },
     token: String,
     profileImage: String,

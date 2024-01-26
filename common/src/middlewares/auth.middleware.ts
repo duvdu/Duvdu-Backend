@@ -7,18 +7,21 @@ import { BadRequestError } from '../errors/bad-request-error';
 import { UnauthenticatedError } from '../errors/unauthenticated-error';
 import { IjwtPayload } from '../types/JwtPayload';
 
-export const auth = (modelName: Model<any>) => <RequestHandler>(async (req, res, next) => {
-    const user = await modelName.findOne({ token: (req as any).session?.jwt });
+export const auth = (modelName: Model<any>) =><RequestHandler> (async (req, res, next) => {
+    
+  const user = await modelName.findOne({ token: (req as any).session?.jwt });
+    
+  if (!(req as any).session?.jwt && !user) {
+    throw new UnauthenticatedError();
+  }
 
-    if (!(req as any).session?.jwt && !user) {
-      throw new UnauthenticatedError();
-    }
-
-    try {
-      const payload = jwt.verify((req as any).session!.jwt, process.env.JWT_KEY!) as IjwtPayload;
-      req.user = { id: payload.id };
-      return next();
-    } catch (error) {
-      throw new BadRequestError('invalid or expired token');
-    }
-  });
+  try {
+    const payload = jwt.verify((req as any).session!.jwt, process.env.JWT_KEY!) as IjwtPayload;
+    
+    (req as any).user = { id: payload.id };
+    
+    return next();
+  } catch (error) {
+    throw new BadRequestError('invalid or expired token');
+  }
+});
