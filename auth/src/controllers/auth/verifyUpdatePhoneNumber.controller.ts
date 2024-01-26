@@ -10,18 +10,18 @@ export const verifyUpdatePhoneNumber: verifyUpdatePhoneNumberHandler = async (re
 
   const currentUser = await Users.findOne({ phoneNumber: { Number: req.body.phoneNumber } });
 
-  if (!currentUser) {
+  if (!currentUser) 
     return next(new NotFound());
-  }
+  
 
   const currentDate: number = new Date().getTime();
 
   if (
     currentDate > currentUser.verificationCode!.expireAt ||
     currentUser.verificationCode!.code != hashEnterdCode
-  ) {
+  ) 
     return next(new UnauthenticatedError('invalid or expired verification code'));
-  }
+  
 
   currentUser.verificationCode = {
     code: '',
