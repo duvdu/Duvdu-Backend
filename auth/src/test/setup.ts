@@ -38,10 +38,10 @@ afterAll(async () => {
     username: 'ewasy_mohamed',
     password: '123@Metoo',
     phoneNumber: { number: '01234567891' },
+    isVerified:true
   });
 
   const cookie = response.get('Set-Cookie');
-  console.log(cookie);
 
   return cookie;
 };
