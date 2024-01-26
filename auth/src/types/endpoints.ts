@@ -52,7 +52,7 @@ export interface UpdatePhoneNumberHandler
     unknown
   > {}
 
-export interface verifyUpdatePhoneNumberHandler
+export interface VerifyUpdatePhoneNumberHandler
   extends RequestHandler<
     unknown,
     successResponse<unknown>,

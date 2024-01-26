@@ -7,7 +7,7 @@ import { ResetPasswordHandler } from '../../types/endpoints';
 import { hashPassword } from '../../utils/bcrypt';
 import { hashVerificationCode } from '../../utils/crypto';
 
-export const resetPassword: ResetPasswordHandler = async (req, res, next) => {
+export const resetPasswordHandler: ResetPasswordHandler = async (req, res, next) => {
   const hashEnterdCode = hashVerificationCode(req.body.verificationCode);
   const user = await Users.findOne({ username: req.body.username });
 

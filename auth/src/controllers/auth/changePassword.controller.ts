@@ -6,7 +6,7 @@ import { ChangePasswordHandler } from '../../types/endpoints';
 import { comparePassword, hashPassword } from '../../utils/bcrypt';
 import { generateToken } from '../../utils/generateToken';
 
-export const changePassword: ChangePasswordHandler = async (req, res, next) => {
+export const changePasswordHandler: ChangePasswordHandler = async (req, res, next) => {
   const user = await Users.findById((req as any).user?.id);
 
   if (!user || !comparePassword(req.body.oldPassword, user.password || ''))

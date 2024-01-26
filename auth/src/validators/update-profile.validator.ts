@@ -41,5 +41,21 @@ export const updateProfileVal = [
     .optional()
     .isFloat()
     .customSanitizer((val) => +val),
+  body('password').not().exists(),
+  body('username').not().exists(),
+  body('phoneNumber').not().exists(),
+  body('googleId').not().exists(),
+  body('appleId').not().exists(),
+  body('verificationCode').not().exists(),
+  body('isVerified').not().exists(),
+  body('token').not().exists(),
+  body('acceptedProjectsCounter').not().exists(),
+  body('profileViews').not().exists(),
+  body('isOnline').not().exists(),
+  body('plan').not().exists(),
+  body('hasVerificationPadge').not().exists(),
+  body('avaliableContracts').not().exists(),
+  body('rate').not().exists(),
+  body('isBlocked').not().exists(),
   globalValidatorMiddleware,
 ];

@@ -9,3 +9,4 @@ export * from './askResetPassword.validator';
 export * from './resetPassword.validator';
 export * from './update-profile.validator';
 export * from './get-user-profile.validator';
+export * from './resend-code.validator';

@@ -22,17 +22,23 @@ router.post(
   val.retreiveUsernameVal,
   handlers.retreiveUsernameHandler,
 );
-router.patch('/change-password', auth(Users), val.changePasswordVal, handlers.changePassword);
+router.patch(
+  '/change-password',
+  auth(Users),
+  val.changePasswordVal,
+  handlers.changePasswordHandler,
+);
 router
   .route('/update-phone')
-  .get(auth(Users), val.askUpdatePhoneVal, handlers.askUpdateUserPhoneHandler)
-  .put(auth(Users), val.updatePhoneNumberVal, handlers.updatePhoneNumberHandler)
-  .post(val.verifyUpdatePhoneVal, handlers.verifyUpdatePhoneNumber);
+  .post(auth(Users), val.askUpdatePhoneVal, handlers.askUpdatePhoneNumberHandler)
+  .put(auth(Users), val.updatePhoneNumberVal, handlers.updatePhoneNumberHandler);
+router
+  .route('/update-phone/verify')
+  .post(val.verifyUpdatePhoneVal, handlers.verifyUpdatePhoneNumberHandler);
 router
   .route('/reset-password')
-  .get(val.askResetPasswordVal, handlers.askResetPassword)
-  .post(val.resetPasswordVal, handlers.resetPassword);
-router.post('/resend-verify', handlers.resendVerificationCodeHandler);
+  .get(val.askResetPasswordVal, handlers.askResetPasswordHandler)
+  .post(val.resetPasswordVal, handlers.resetPasswordHandler);
 router.post(
   '/resend-code',
   rateLimit({
@@ -40,6 +46,7 @@ router.post(
     max: 20,
     message: 'too many requests, please try again later.',
   }),
+  val.resendCodeVal,
   handlers.resendVerificationCodeHandler,
 );
 router
