@@ -1,4 +1,3 @@
-// import { auth } from '@duvdu-v1/duvdu';
 import 'express-async-errors';
 import { auth } from '@duvdu-v1/duvdu';
 import { Router } from 'express';
@@ -48,4 +47,6 @@ router
   .all(auth(Users))
   .get(handlers.getLoggedUserProfileHandler)
   .patch(val.updateProfileVal, handlers.updateProfileHandler);
+
+router.route('/profile/:userId').get(auth(Users), val.userIdVal, handlers.getUserProfileHandler);
 export const apiRoutes = router;

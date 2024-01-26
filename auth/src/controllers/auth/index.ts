@@ -10,3 +10,4 @@ export * from './resetPassword.controller';
 export * from './resend-verification-code.controller';
 export * from './update-profile.controller';
 export * from './get-logged-user-profile.controller';
+export * from './get-user-profile.controller';
