@@ -1,8 +1,11 @@
+
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // import { auth } from '@duvdu-v1/duvdu';
 import 'express-async-errors';
 import { auth } from '@duvdu-v1/duvdu';
 import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
+import passport from 'passport';
 
 import * as handlers from '../controllers/auth';
 import { Users } from '../models/User.model';
@@ -36,4 +39,19 @@ router
   .route('/reset-password')
   .get(val.askResetPasswordVal, handlers.askResetPassword)
   .put(val.resetPasswordVal, handlers.resetPassword);
+
+router.get('/auth/google', passport.authenticate('google', { scope:
+  [ 'email', 'profile' ] }
+));
+
+
+router.get( '/auth/google/callback',
+  passport.authenticate( 'google', {
+    successRedirect: '/auth/google/success',
+    failureRedirect: '/auth/google/failure'
+  }));
+
+router.get('/auth/google/success' , (req,res)=>{
+  console.log('hello here');
+});
 export const apiRoutes = router;
