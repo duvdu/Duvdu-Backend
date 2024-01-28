@@ -123,6 +123,8 @@ interface Notification {
 
 interface Plans {
   role: ObjectId;
+  key: string;
+  status: boolean;
 }
 
 interface Roles {

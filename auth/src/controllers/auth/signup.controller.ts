@@ -5,6 +5,7 @@ import { SignupHandler } from '../../types/endpoints';
 import { hashPassword } from '../../utils/bcrypt';
 import { generateToken } from '../../utils/generateToken';
 
+//TODO: add plan free by default to user if it exists
 export const signupHandler: SignupHandler = async (req, res) => {
   const newUser = await Users.create({ ...req.body, password: hashPassword(req.body.password) });
   const token = generateToken({ id: newUser.id });
