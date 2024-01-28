@@ -37,6 +37,7 @@ interface User {
   hasVerificationPadge: boolean;
   avaliableContracts: number; // default:5
   rate: { ratersCounter: number /* default:0 */; totalRates: number /* default:0 */ };
+  status: { value: boolean; reason: string };
 }
 
 interface Rate {
@@ -98,11 +99,11 @@ interface TeamProject {
     {
       tagName: string;
       list: [
-        { creative: ObjectId; workHours: number; status: "accepted" | "pending" | "rejected" }
+        { creative: ObjectId; workHours: number; status: 'accepted' | 'pending' | 'rejected' }
       ];
     }
   ];
-  state: "canceled" | "pending" | "ongoing" | "completed" | "rejected";
+  state: 'canceled' | 'pending' | 'ongoing' | 'completed' | 'rejected';
   submitFiles: { link: string; notes: string };
 }
 
@@ -117,7 +118,7 @@ interface Report {
 interface Notification {
   targetUserId: string;
   sourceUserId: string;
-  action: "follow" | "saved";
+  action: 'follow' | 'saved';
 }
 
 interface Plans {
@@ -144,7 +145,7 @@ interface PortfolioPost {
   tags: [string]; // keywords
   projectBudget: number;
   category: ObjectId;
-  projectScale: { scale: number; time: "minutes" | "hours" };
+  projectScale: { scale: number; time: 'minutes' | 'hours' };
   showOnHome: boolean; // default:true
   cover: [string];
 }
@@ -163,7 +164,7 @@ interface PortfolioPostBooking {
   projectDate: Date;
   isInstant: boolean;
   totalPrice: number;
-  state: "canceled" | "pending" | "ongoing" | "completed" | "rejected";
+  state: 'canceled' | 'pending' | 'ongoing' | 'completed' | 'rejected';
   submitFiles: { link: string; notes: string };
 }
 
@@ -193,7 +194,7 @@ interface StudioBooking {
   numberOfHours: number;
   appointmentDate: Date;
   isInstant: boolean;
-  state: "canceled" | "pending" | "ongoing" | "completed";
+  state: 'canceled' | 'pending' | 'ongoing' | 'completed';
   submit: { token: string; isScanned: boolean; scanedAt: Date };
 }
 
@@ -224,7 +225,7 @@ interface EquipmentRentalBooking {
   numberOfDays: number;
   appointmentDate: Date;
   isInstant: boolean;
-  state: "canceled" | "pending" | "ongoing" | "completed";
+  state: 'canceled' | 'pending' | 'ongoing' | 'completed';
   submit: { token: string; isScanned: boolean; scanedAt: Date };
 }
 
@@ -246,7 +247,7 @@ interface CopyRightBooking {
   location: { lat: number; lang: number };
   attachments: [string];
   isInstant: boolean;
-  state: "canceled" | "pending" | "ongoing" | "completed" | "rejected";
+  state: 'canceled' | 'pending' | 'ongoing' | 'completed' | 'rejected';
   submitFiles: { link: string; notes: string };
 }
 
@@ -261,7 +262,7 @@ interface ProcedureBooking {
   expectedBudget: number;
   expectedProfit: number;
   attachments: [string];
-  status: "pending" | "accepted" | "rejected" | "completed";
+  status: 'pending' | 'accepted' | 'rejected' | 'completed';
   selectedDate: Date;
   directoryLocation: { lat: number; lang: number };
   submit: { token: string; isScanned: boolean; scanedAt: Date };

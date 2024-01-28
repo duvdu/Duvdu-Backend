@@ -28,6 +28,7 @@ const userSchema = new Schema<Iuser & Document>(
     avaliableContracts: { type: Number, default: 0 },
     rate: { ratersCounter: { type: Number, default: 0 }, totalRates: { type: Number, default: 0 } },
     isBlocked: { type: Boolean, default: false },
+    status: { value: { type: Boolean, default: true }, reason: String },
   },
   { timestamps: true },
 );

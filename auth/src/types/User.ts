@@ -26,4 +26,5 @@ export interface Iuser {
   avaliableContracts: number;
   rate: { ratersCounter: number; totalRates: number };
   isBlocked: boolean;
+  status: { value: boolean; reason: string };
 }

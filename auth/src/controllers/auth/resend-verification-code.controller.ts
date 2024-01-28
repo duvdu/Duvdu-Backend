@@ -13,7 +13,7 @@ export const resendVerificationCodeHandler: ResendVerificationCodeHandler = asyn
 ) => {
   const user = await Users.findById(req.body.username);
   if (!user) return next(new NotFound());
-  if (user.isVerified && !user.isBlocked) return next(new UnauthorizedError());
+  // if (user.isVerified && !user.isBlocked) return next(new UnauthorizedError());
   const verificationCode = generateRandom6Digit();
   user.verificationCode = {
     code: hashVerificationCode(verificationCode),
