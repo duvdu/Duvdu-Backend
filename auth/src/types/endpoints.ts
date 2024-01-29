@@ -106,7 +106,7 @@ export interface GetLoggedUserProfileHandler
   extends RequestHandler<
     unknown,
     successResponse<{
-      profile: Pick<
+      data: Pick<
         Iuser,
         | 'id'
         | 'name'
@@ -135,7 +135,7 @@ export interface GetUserProfileHandler
   extends RequestHandler<
     { userId: string },
     successResponse<{
-      profile: Pick<
+      data: Pick<
         Iuser,
         | 'id'
         | 'name'
