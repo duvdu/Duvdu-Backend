@@ -1,6 +1,7 @@
 import { RequestHandler } from 'express';
 import { Imessage } from './Message';
 import { Iuser } from './User';
+import { Inotification } from './Notification';
 type successResponse<T> = T & {
   message: 'success';
 };
@@ -34,3 +35,14 @@ export interface GetChatsHandler
     unknown,
     { limit: number; page: number; skip: number }
   > {}
+
+export interface GetNotificationsHandler
+  extends RequestHandler<
+    unknown,
+    successResponse<{ data: Inotification[] }>,
+    unknown,
+    { limit: number; skip: number; page: number }
+  > {}
+
+export interface CreateNotificationHandler
+  extends RequestHandler<unknown, successResponse<unknown>, Inotification> {}

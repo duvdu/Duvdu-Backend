@@ -48,12 +48,6 @@ interface Rate {
   desc: string;
 }
 
-interface Like {
-  // index([sourceUser, targetUser], 'unique')
-  sourceUser: ObjectId;
-  targetUser: ObjectId;
-}
-
 interface Follow {
   // index([sourceUser, targetUser], 'unique')
   sourceUser: ObjectId;

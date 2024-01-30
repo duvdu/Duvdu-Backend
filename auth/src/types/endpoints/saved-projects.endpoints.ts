@@ -7,6 +7,7 @@ type successResponse<T> = T & {
   message: 'success';
 };
 //TODO: create favourite savedProjects on signup
+//TODO: fire event to send notification
 export interface createSavedProjectHandler
   extends RequestHandler<unknown, successResponse<unknown>, { title: string }, unknown> {}
 
