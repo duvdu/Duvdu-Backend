@@ -107,6 +107,7 @@ interface TeamProject {
   submitFiles: { link: string; notes: string };
 }
 
+// TODO: report on contract,project,chat
 interface Report {
   sourceUser: ObjectId;
   targetUser: ObjectId;
