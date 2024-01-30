@@ -27,4 +27,5 @@ export interface Iuser {
   rate: { ratersCounter: number; totalRates: number };
   isBlocked: boolean;
   status: { value: boolean; reason: string };
+  followCount: { following: number; followers: number };
 }
