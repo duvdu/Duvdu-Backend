@@ -2,8 +2,8 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
 import supertest from 'supertest';
 
-import { app } from '../../app';
-import { hashPassword } from '../../utils/bcrypt';
+import { app } from '../../../app';
+import { hashPassword } from '../../../utils/bcrypt';
 
 const request = supertest(app);
 let mongo: MongoMemoryServer;
