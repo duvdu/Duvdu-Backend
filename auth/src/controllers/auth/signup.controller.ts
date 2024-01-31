@@ -1,13 +1,18 @@
 import 'express-async-errors';
 
+import { Plans } from '../../models/Plan.model';
 import { Users } from '../../models/User.model';
 import { SignupHandler } from '../../types/endpoints/user.endpoints';
 import { hashPassword } from '../../utils/bcrypt';
 import { generateToken } from '../../utils/generateToken';
 
-//TODO: add plan free by default to user if it exists
 export const signupHandler: SignupHandler = async (req, res) => {
-  const newUser = await Users.create({ ...req.body, password: hashPassword(req.body.password) });
+  const plans = await Plans.find().sort('-createdAt').limit(1);
+  const newUser = await Users.create({
+    ...req.body,
+    password: hashPassword(req.body.password),
+    plan: plans[0].id,
+  });
   const token = generateToken({ id: newUser.id });
   newUser.token = token;
   await newUser.save();

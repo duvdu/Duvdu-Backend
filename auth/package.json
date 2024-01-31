@@ -10,7 +10,8 @@
     "test:ci": "jest",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "seeds": "ts-node seeds/plans.seeder.ts"
   },
   "jest": {
     "preset": "ts-jest",

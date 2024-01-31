@@ -1,7 +1,7 @@
 import { Document } from 'mongoose';
 
-export interface Iplan extends Document {
+export interface Irole extends Document {
   id: string;
   key: string;
-  role: string;
+  features: string[];
 }
