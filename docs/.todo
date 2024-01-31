@@ -154,3 +154,24 @@ as a programmer
   ### producers-booking
     - tagName, platform, projectDetails, episods, episodsDuration, expectedBudget, expectedProfits
     , attachments[image/video/pdf], timestamp, status[pending, accepted, rejected, completed], selectedDate, directoryLocation
+
+
+
+- Base: f1, f2, f3, f4, f5, f6, f7
+- p1 (f1, f2), p2(f3, f4), free(id, )
+
+- route allowedTo(f1) /f1
+- route allowedTo(f2) /f2
+- route allowedTo(f3) /f3
+- route allowedTo(f4) /f4
+- route allowedTo(f5) /f5
+
+-----------------------------------------------------
+# Plans
+  - id, title, key, roleId, status;
+
+# Roles
+  - id, key;
+
+# roleFeatures
+  - id, roleId, featureId;

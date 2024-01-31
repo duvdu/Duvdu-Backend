@@ -2,7 +2,7 @@ import 'express-async-errors';
 import { UnauthenticatedError } from '@duvdu-v1/duvdu';
 
 import { Users } from '../../models/User.model';
-import { ChangePasswordHandler } from '../../types/endpoints';
+import { ChangePasswordHandler } from '../../types/endpoints/user.endpoints';
 import { comparePassword, hashPassword } from '../../utils/bcrypt';
 import { generateToken } from '../../utils/generateToken';
 

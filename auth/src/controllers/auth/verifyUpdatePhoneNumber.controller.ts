@@ -2,7 +2,7 @@ import 'express-async-errors';
 import { NotFound, UnauthenticatedError } from '@duvdu-v1/duvdu';
 
 import { Users } from '../../models/User.model';
-import { VerifyUpdatePhoneNumberHandler } from '../../types/endpoints';
+import { VerifyUpdatePhoneNumberHandler } from '../../types/endpoints/user.endpoints';
 import { hashVerificationCode } from '../../utils/crypto';
 
 export const verifyUpdatePhoneNumberHandler: VerifyUpdatePhoneNumberHandler = async (

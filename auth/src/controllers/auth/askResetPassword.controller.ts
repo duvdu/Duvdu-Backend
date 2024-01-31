@@ -3,7 +3,7 @@ import 'express-async-errors';
 import { NotFound } from '@duvdu-v1/duvdu';
 
 import { Users } from '../../models/User.model';
-import { AskResetPasswordHandler } from '../../types/endpoints';
+import { AskResetPasswordHandler } from '../../types/endpoints/user.endpoints';
 import { hashVerificationCode } from '../../utils/crypto';
 import { generateRandom6Digit } from '../../utils/gitRandom6Dugut';
 
