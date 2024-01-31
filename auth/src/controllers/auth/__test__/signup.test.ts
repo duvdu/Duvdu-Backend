@@ -2,8 +2,15 @@ import mongoose from 'mongoose';
 import supertest from 'supertest';
 
 import { app } from '../../../app';
+import { Iuser } from '../../../types/User';
 
 const request = supertest(app);
+
+beforeEach(async () => {
+  const mongoId = new mongoose.Types.ObjectId().toHexString();
+  await mongoose.connection.db.collection('roles').insertOne({ id: mongoId, key: 'free' });
+  await mongoose.connection.db.collection('plans').insertOne({ role: mongoId, key: 'free' });
+});
 
 describe('AuthController', () => {
   it('should return 201 on valid signup', async () => {
@@ -17,6 +24,10 @@ describe('AuthController', () => {
     expect(response.body).toEqual({ message: 'success' });
     expect(Object.keys(response.body).length).toBe(1);
     expect(response.headers['set-cookie'].toString()).toBeDefined();
+    const user = <Iuser>(
+      await mongoose.connection.db.collection('users').findOne({ username: 'ewasy_mohamed' })
+    );
+    expect(user.plan).toBeDefined();
   });
   it('should return 400 if already exists username', async () => {
     await mongoose.connection.db.collection('users').insertOne({ username: 'ewasy_mohamed' });
@@ -33,11 +44,6 @@ describe('AuthController', () => {
     await mongoose.connection.db
       .collection('users')
       .insertOne({ phoneNumber: { number: '01234567891' } });
-    console.log(
-      await mongoose.connection.db
-        .collection('users')
-        .findOne({ 'phoneNumber.number': 'ewasy_mohamed' }),
-    );
     const response = await request.post('/api/users/signup').send({
       name: 'ewasy',
       username: 'ewasy_sadasd',

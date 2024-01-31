@@ -1,6 +1,6 @@
-import { Types } from 'mongoose';
+import { Types, Document } from 'mongoose';
 
-export interface Iuser {
+export interface Iuser extends Document {
   id: string;
   googleId?: string;
   appleId?: string;
