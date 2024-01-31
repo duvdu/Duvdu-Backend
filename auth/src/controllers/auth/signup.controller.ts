@@ -1,7 +1,7 @@
 import 'express-async-errors';
 
 import { Users } from '../../models/User.model';
-import { SignupHandler } from '../../types/endpoints';
+import { SignupHandler } from '../../types/endpoints/user.endpoints';
 import { hashPassword } from '../../utils/bcrypt';
 import { generateToken } from '../../utils/generateToken';
 
