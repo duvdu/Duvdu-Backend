@@ -13,9 +13,7 @@ export const signinHandler: SigninHandler = async (req, res, next) => {
   if (!user.isVerified) return next(new UnauthorizedError());
   const token = generateToken({ id: user.id });
   req.session = { jwt: token };
-  // res.cookie('jwt', token, { maxAge: 1000 * 60 * 60 * 24 * 30, httpOnly: true });
   user.token = token;
   await user.save();
-  console.log(token);
   res.status(200).json({ message: 'success' });
 };
