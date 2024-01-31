@@ -9,5 +9,5 @@
     "strict": true,
     "skipLibCheck": true,
   },
-  "include": ["src/**/*.ts", "custom.d.ts"],
+  "include": ["src/**/*.ts"],
 }

@@ -1,6 +1,16 @@
+/* eslint-disable @typescript-eslint/no-namespace */
 import { RequestHandler } from 'express';
 
+import { IjwtPayload } from '../JwtPayload';
 import { Iuser } from '../User';
+
+declare global {
+  namespace Express {
+    interface Request {
+      user?: IjwtPayload;
+    }
+  }
+}
 
 type successResponse<T> = T & {
   message: 'success';
