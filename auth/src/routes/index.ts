@@ -1,5 +1,5 @@
 import 'express-async-errors';
-import { auth } from '@duvdu-v1/duvdu';
+import { BadRequestError, auth } from '@duvdu-v1/duvdu';
 import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
 
@@ -16,7 +16,6 @@ router.post(
   rateLimit({
     windowMs: 10 * 60 * 1000,
     max: 20,
-    message: 'too many requests, please try again later.',
   }),
   val.retreiveUsernameVal,
   handlers.retreiveUsernameHandler,

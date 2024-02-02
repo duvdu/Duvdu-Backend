@@ -14,7 +14,7 @@ export const signupVal = [
     .isString()
     .isLength({ min: 6, max: 32 })
     .custom((val) => {
-      if (val.match(/^[a-zA-Z0-9_]+$/)) return true;
+      if (val.match(/^[a-z0-9_]+$/)) return true;
       throw new Error('');
     }),
   body('password')

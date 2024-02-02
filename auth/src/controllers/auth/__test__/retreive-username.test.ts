@@ -37,4 +37,13 @@ describe('retreive-username controller', () => {
     const response = await request.post('/api/users/retreive-username').send({ username: 'ele' });
     expect(response.status).toBe(422);
   });
+  it('should return 429 in case of too many requests', async () => {
+    for (let i = 0; i < 20; i++) {
+      await request.post('/api/users/retreive-username').send({ username: 'mohamedelewasy' });
+    }
+    await request
+      .post('/api/users/retreive-username')
+      .send({ username: 'mohamedelewasy' })
+      .expect(429);
+  });
 });
