@@ -13,7 +13,6 @@ router.post('/signin', val.signinVal, handlers.signinHandler);
 router.post('/signup', val.signupVal, handlers.signupHandler);
 router.post(
   '/retreive-username',
-  auth(Users),
   rateLimit({
     windowMs: 10 * 60 * 1000,
     max: 20,
