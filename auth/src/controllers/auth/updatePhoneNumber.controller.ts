@@ -17,7 +17,7 @@ export const updatePhoneNumberHandler: UpdatePhoneNumberHandler = async (req, re
   const currentDate: number = new Date().getTime();
 
   if (
-    currentDate > currentUser.verificationCode!.expireAt ||
+    currentDate > new Date(currentUser.verificationCode!.expireAt).getTime() ||
     currentUser.verificationCode!.code != hashEnterdCode
   ) {
     return next(new UnauthenticatedError());
@@ -30,7 +30,7 @@ export const updatePhoneNumberHandler: UpdatePhoneNumberHandler = async (req, re
 
   currentUser.verificationCode = {
     code: hashedVerificationCode,
-    expireAt: Date.now() + 10 * 60 * 1000,
+    expireAt: new Date(Date.now() + 60 * 1000).toString(),
   };
   currentUser.isBlocked = true;
   await currentUser.save();

@@ -38,16 +38,7 @@ router
   .route('/reset-password')
   .get(val.askResetPasswordVal, handlers.askResetPasswordHandler)
   .post(val.resetPasswordVal, handlers.resetPasswordHandler);
-router.post(
-  '/resend-code',
-  rateLimit({
-    windowMs: 10 * 60 * 1000,
-    max: 20,
-    message: 'too many requests, please try again later.',
-  }),
-  val.resendCodeVal,
-  handlers.resendVerificationCodeHandler,
-);
+router.post('/resend-code', val.resendCodeVal, handlers.resendVerificationCodeHandler);
 router
   .route('/profile')
   .all(auth(Users))

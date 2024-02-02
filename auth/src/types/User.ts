@@ -8,7 +8,7 @@ export interface Iuser extends Document {
   phoneNumber: { key: string; number: string };
   username: string;
   password?: string;
-  verificationCode?: { code: string; expireAt: number };
+  verificationCode?: { code: string; expireAt: string };
   isVerified?: boolean;
   token?: string;
   profileImage?: string;
