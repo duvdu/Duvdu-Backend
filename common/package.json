@@ -1,6 +1,6 @@
 {
   "name": "@duvdu-v1/duvdu",
-  "version": "1.0.25",
+  "version": "1.0.26",
   "main": "./build/index.js",
   "types": "./build/index.d.ts",
   "files": [
@@ -32,9 +32,11 @@
     "multer": "^1.4.5-lts.1",
     "node-nats-streaming": "^0.3.2",
     "rimraf": "^5.0.5",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
+    "@types/uuid": "^9.0.8",
     "del-cli": "^5.1.0",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
