@@ -21,7 +21,7 @@
   },
   "rules": {
     "indent": ["error", 2],
-    "quotes": ["error", "single"],
+    "quotes": ["warn", "single"],
     "semi": ["error", "always"],
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/no-explicit-any": "off",

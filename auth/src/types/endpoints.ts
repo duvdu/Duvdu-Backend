@@ -52,7 +52,7 @@ export interface UpdatePhoneNumberHandler
     unknown
   > {}
 
-export interface verifyUpdatePhoneNumberHandler
+export interface VerifyUpdatePhoneNumberHandler
   extends RequestHandler<
     unknown,
     successResponse<unknown>,
@@ -102,11 +102,11 @@ export interface UpdateProfileHandler
     unknown
   > {}
 
-export interface getLoggedUserProfileHandler
+export interface GetLoggedUserProfileHandler
   extends RequestHandler<
     unknown,
-    successResponse<
-      Pick<
+    successResponse<{
+      profile: Pick<
         Iuser,
         | 'id'
         | 'name'
@@ -125,17 +125,17 @@ export interface getLoggedUserProfileHandler
         | 'plan'
         | 'hasVerificationPadge'
         | 'avaliableContracts'
-      > & { averageRate: number }
-    >,
+      > & { averageRate: number };
+    }>,
     unknown,
     unknown
   > {}
 
-export interface getUserProfileHandler
+export interface GetUserProfileHandler
   extends RequestHandler<
     { userId: string },
-    successResponse<
-      Pick<
+    successResponse<{
+      profile: Pick<
         Iuser,
         | 'id'
         | 'name'
@@ -152,8 +152,8 @@ export interface getUserProfileHandler
         | 'isAvaliableToInstantProjects'
         | 'pricePerHour'
         | 'hasVerificationPadge'
-      > & { averageRate: number }
-    >,
+      > & { averageRate: number };
+    }>,
     unknown,
     unknown
   > {}

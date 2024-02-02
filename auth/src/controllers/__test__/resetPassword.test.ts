@@ -6,14 +6,14 @@ const request = supertest(app);
 
 describe('resetPassword', () => {
   it('should return 422 for invalid input', async () => {
-    await request.put('/api/users/reset-password').send({}).expect(422);
+    await request.patch('/api/users/reset-password').send({}).expect(422);
 
-    await request.put('/api/users/reset-password').send({ username: '' }).expect(422);
+    await request.patch('/api/users/reset-password').send({ username: '' }).expect(422);
 
-    await request.put('/api/users/reset-password').send({ username: 'metoo' }).expect(422);
+    await request.patch('/api/users/reset-password').send({ username: 'metoo' }).expect(422);
 
     await request
-      .put('/api/users/reset-password')
+      .patch('/api/users/reset-password')
       .send({
         username: 'motemedkhaled',
         verificationCode: '',
@@ -21,7 +21,7 @@ describe('resetPassword', () => {
       .expect(422);
 
     await request
-      .put('/api/users/reset-password')
+      .patch('/api/users/reset-password')
       .send({
         username: 'motemedkhaled',
         verificationCode: '123456',
@@ -29,7 +29,7 @@ describe('resetPassword', () => {
       .expect(422);
 
     await request
-      .put('/api/users/reset-password')
+      .patch('/api/users/reset-password')
       .send({
         username: 'motemedkhaled',
         verificationCode: '123456',
@@ -38,7 +38,7 @@ describe('resetPassword', () => {
       .expect(422);
 
     await request
-      .put('/api/users/reset-password')
+      .patch('/api/users/reset-password')
       .send({
         username: 'motemedkhaled',
         verificationCode: '123456',
@@ -48,7 +48,7 @@ describe('resetPassword', () => {
   });
   it('should return 404 if user not found', async () => {
     await request
-      .put('/api/users/reset-password')
+      .patch('/api/users/reset-password')
       .send({
         username: 'metoooo',
         verificationCode: '123456',
@@ -70,7 +70,7 @@ describe('resetPassword', () => {
       .expect(201);
 
     await request
-      .put('/api/users/reset-password')
+      .patch('/api/users/reset-password')
       .send({
         username: 'motemedKhaled',
         verificationCode: '123456',

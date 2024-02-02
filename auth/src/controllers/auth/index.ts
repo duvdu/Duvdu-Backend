@@ -7,3 +7,7 @@ export * from './verifyUpdatePhoneNumber.controller';
 export * from './changePassword.controller';
 export * from './askResetPassword.controller';
 export * from './resetPassword.controller';
+export * from './resend-verification-code.controller';
+export * from './update-profile.controller';
+export * from './get-logged-user-profile.controller';
+export * from './get-user-profile.controller';

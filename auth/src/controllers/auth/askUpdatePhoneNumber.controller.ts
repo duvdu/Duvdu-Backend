@@ -7,7 +7,7 @@ import { comparePassword } from '../../utils/bcrypt';
 import { hashVerificationCode } from '../../utils/crypto';
 import { generateRandom6Digit } from '../../utils/gitRandom6Dugut';
 
-export const askUpdateUserPhoneHandler: AskUpdatePhoneNumberHandler = async (req, res, next) => {
+export const askUpdatePhoneNumberHandler: AskUpdatePhoneNumberHandler = async (req, res, next) => {
   const currentUser = await Users.findById((req as any).user?.id);
 
   if (!currentUser || !comparePassword(req.body.password!, currentUser.password || '')) 
