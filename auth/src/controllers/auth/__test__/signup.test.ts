@@ -63,4 +63,52 @@ describe('AuthController', () => {
     });
     expect(response.status).toBe(422);
   });
+  it('should return 422 if invalid username', async () => {
+    const validUser = {
+      name: 'ewasy',
+      username: 'ewasy_mohamed',
+      password: '123@Metoo',
+      phoneNumber: { number: '01234567891' },
+    };
+    expect(
+      (
+        await request.post('/api/users/signup').send({
+          ...validUser,
+          username: 'ewasy mohamed',
+        })
+      ).status,
+    ).toBe(422);
+    expect(
+      (
+        await request.post('/api/users/signup').send({
+          ...validUser,
+          username: 'ewasymohamed ',
+        })
+      ).status,
+    ).toBe(422);
+    expect(
+      (
+        await request.post('/api/users/signup').send({
+          ...validUser,
+          username: 'ewasy$mohamed',
+        })
+      ).status,
+    ).toBe(422);
+    expect(
+      (
+        await request.post('/api/users/signup').send({
+          ...validUser,
+          username: 'ewasy.mohamed',
+        })
+      ).status,
+    ).toBe(422);
+    expect(
+      (
+        await request.post('/api/users/signup').send({
+          ...validUser,
+          username: 'ewasy-mohamed',
+        })
+      ).status,
+    ).toBe(422);
+  });
 });
