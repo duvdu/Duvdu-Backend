@@ -3,7 +3,7 @@ import 'express-async-errors';
 import { NotFound, UnauthenticatedError } from '@duvdu-v1/duvdu';
 
 import { Users } from '../../models/User.model';
-import { ResetPasswordHandler } from '../../types/endpoints';
+import { ResetPasswordHandler } from '../../types/endpoints/user.endpoints';
 import { hashPassword } from '../../utils/bcrypt';
 import { hashVerificationCode } from '../../utils/crypto';
 

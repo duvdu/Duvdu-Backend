@@ -1,8 +1,8 @@
 import 'express-async-errors';
-import { NotFound, UnauthorizedError } from '@duvdu-v1/duvdu';
+import { NotFound } from '@duvdu-v1/duvdu';
 
 import { Users } from '../../models/User.model';
-import { ResendVerificationCodeHandler } from '../../types/endpoints';
+import { ResendVerificationCodeHandler } from '../../types/endpoints/user.endpoints';
 import { hashVerificationCode } from '../../utils/crypto';
 import { generateRandom6Digit } from '../../utils/gitRandom6Dugut';
 
@@ -13,7 +13,7 @@ export const resendVerificationCodeHandler: ResendVerificationCodeHandler = asyn
 ) => {
   const user = await Users.findById(req.body.username);
   if (!user) return next(new NotFound());
-  if (user.isVerified && !user.isBlocked) return next(new UnauthorizedError());
+  // if (user.isVerified && !user.isBlocked) return next(new UnauthorizedError());
   const verificationCode = generateRandom6Digit();
   user.verificationCode = {
     code: hashVerificationCode(verificationCode),

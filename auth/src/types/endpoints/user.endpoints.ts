@@ -1,6 +1,16 @@
+/* eslint-disable @typescript-eslint/no-namespace */
 import { RequestHandler } from 'express';
 
-import { Iuser } from './User';
+import { IjwtPayload } from '../JwtPayload';
+import { Iuser } from '../User';
+
+declare global {
+  namespace Express {
+    interface Request {
+      user?: IjwtPayload;
+    }
+  }
+}
 
 type successResponse<T> = T & {
   message: 'success';
@@ -106,7 +116,7 @@ export interface GetLoggedUserProfileHandler
   extends RequestHandler<
     unknown,
     successResponse<{
-      profile: Pick<
+      data: Pick<
         Iuser,
         | 'id'
         | 'name'
@@ -135,7 +145,7 @@ export interface GetUserProfileHandler
   extends RequestHandler<
     { userId: string },
     successResponse<{
-      profile: Pick<
+      data: Pick<
         Iuser,
         | 'id'
         | 'name'

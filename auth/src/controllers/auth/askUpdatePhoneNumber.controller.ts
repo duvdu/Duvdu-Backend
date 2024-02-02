@@ -2,7 +2,7 @@ import 'express-async-errors';
 import { UnauthenticatedError } from '@duvdu-v1/duvdu';
 
 import { Users } from '../../models/User.model';
-import { AskUpdatePhoneNumberHandler } from '../../types/endpoints';
+import { AskUpdatePhoneNumberHandler } from '../../types/endpoints/user.endpoints';
 import { comparePassword } from '../../utils/bcrypt';
 import { hashVerificationCode } from '../../utils/crypto';
 import { generateRandom6Digit } from '../../utils/gitRandom6Dugut';

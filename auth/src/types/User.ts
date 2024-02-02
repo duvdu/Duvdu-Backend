@@ -1,6 +1,6 @@
-import { Types } from 'mongoose';
+import { Types, Document } from 'mongoose';
 
-export interface Iuser {
+export interface Iuser extends Document {
   id: string;
   googleId?: string;
   appleId?: string;
@@ -26,4 +26,6 @@ export interface Iuser {
   avaliableContracts: number;
   rate: { ratersCounter: number; totalRates: number };
   isBlocked: boolean;
+  status: { value: boolean; reason: string };
+  followCount: { following: number; followers: number };
 }
