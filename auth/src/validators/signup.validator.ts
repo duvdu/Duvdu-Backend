@@ -16,7 +16,7 @@ export const signupVal = [
   body('googleId').not().exists(),
   body('appleId').not().exists(),
   body('verificationCode').not().exists(),
-  body('isVerified').not().exists(),
+  // body('isVerified').not().exists(),
   body('token').not().exists(),
   body('profileImage').not().exists(),
   body('coverImage').not().exists(),

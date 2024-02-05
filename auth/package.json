@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node-dev src/index.ts",
+    "start": "ts-node seeds/plans.seeder.ts && ts-node-dev src/index.ts",
     "dev": "nodemon src/index.ts",
     "test": "jest --watchAll --no-cache",
     "test:ci": "jest",
@@ -24,7 +24,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@duvdu-v1/duvdu": "^1.0.25",
+    "@duvdu-v1/duvdu": "^1.0.27",
     "@jridgewell/sourcemap-codec": "^1.4.15",
     "@types/bcryptjs": "^2.4.5",
     "@types/cookie-session": "^2.0.48",

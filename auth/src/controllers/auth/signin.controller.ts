@@ -10,10 +10,11 @@ export const signinHandler: SigninHandler = async (req, res, next) => {
   const user = await Users.findOne({ username: req.body.username });
   if (!user || !comparePassword(req.body.password, user.password || ''))
     return next(new UnauthenticatedError());
-  if (!user.isVerified) return next(new UnauthorizedError());
+  // if (!user.isVerified) return next(new UnauthorizedError());
   const token = generateToken({ id: user.id });
   req.session = { jwt: token };
   user.token = token;
+  user.isVerified=true;
   await user.save();
   res.status(200).json({ message: 'success' });
 };

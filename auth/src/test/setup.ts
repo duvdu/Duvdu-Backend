@@ -33,6 +33,7 @@ afterAll(async () => {
 });
 
 (global as any).signin = async () => {
+  
   const response = await request.post('/api/users/signup').send({
     name: 'ewasy',
     username: 'ewasy_mohamed',
@@ -42,6 +43,7 @@ afterAll(async () => {
   });
 
   const cookie = response.get('Set-Cookie');
-
+  console.log(cookie);
+  
   return cookie;
 };
