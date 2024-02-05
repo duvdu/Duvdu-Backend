@@ -7,9 +7,9 @@ import { apiRoutes } from './routes';
 
 export const app = express();
 
-// app.set('trust proxy', true);
+app.set('trust proxy', true);
 app.use(express.json());
-app.use(cookieSession({ signed: false, secure: env.environment !== 'test' }));
+app.use(cookieSession({ signed: false, secure: env.environment === 'production' }));
 
 app.use('/api/users', apiRoutes);
 

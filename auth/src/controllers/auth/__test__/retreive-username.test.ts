@@ -20,7 +20,7 @@ describe('retreive-username controller', () => {
   });
   it('should return 200 and user exists', async () => {
     await mongoose.connection.db
-      .collection('users')
+      .collection('user')
       .insertMany([{ username: 'mohamed' }, { username: 'elewasy' }]);
     const response1 = await request
       .post('/api/users/retreive-username')

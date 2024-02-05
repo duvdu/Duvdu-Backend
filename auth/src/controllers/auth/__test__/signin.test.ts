@@ -9,7 +9,7 @@ const request = supertest(app);
 describe('signin endpoint', () => {
   it('should return 403 if valid credintials but not verified account', async () => {
     await mongoose.connection.db
-      .collection('users')
+      .collection('user')
       .insertOne({ username: 'ewasy_mohamed', password: hashPassword('123@Metoo') });
     const response = await request.post('/api/users/signin').send({
       username: 'ewasy_mohamed',
@@ -21,7 +21,7 @@ describe('signin endpoint', () => {
 
   it('should return 401 if in-valid credintials', async () => {
     await mongoose.connection.db
-      .collection('users')
+      .collection('user')
       .insertOne({ username: 'ewasy_mohamed', password: hashPassword('123@Metoo') });
     const response = await request.post('/api/users/signin').send({
       username: 'ewasy_mohamed',
@@ -31,7 +31,7 @@ describe('signin endpoint', () => {
   });
 
   it('should return 200 if valid credentials and verified account', async () => {
-    await mongoose.connection.db.collection('users').insertOne({
+    await mongoose.connection.db.collection('user').insertOne({
       username: 'ewasy_mohamed',
       password: hashPassword('123@Metoo'),
       isVerified: true,

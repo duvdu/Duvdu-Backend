@@ -13,14 +13,14 @@ describe('resend-verification-code controller', () => {
     await request.post('/api/users/resend-code').send({ username: 'guest_guest' }).expect(404);
   });
   it('should return 403 if no need to resend code', async () => {
-    await mongoose.connection.db.collection('users').insertOne({
+    await mongoose.connection.db.collection('user').insertOne({
       username: 'guest_guest',
       password: hashPassword('password'),
     });
     await request.post('/api/users/resend-code').send({ username: 'guest_guest' }).expect(403);
   });
   it('should return 400 if code not expired', async () => {
-    await mongoose.connection.db.collection('users').insertOne({
+    await mongoose.connection.db.collection('user').insertOne({
       username: 'guest_guest',
       password: hashPassword('password'),
       verificationCode: {
@@ -31,7 +31,7 @@ describe('resend-verification-code controller', () => {
     await request.post('/api/users/resend-code').send({ username: 'guest_guest' }).expect(400);
   });
   it('should return 200 if code expired', async () => {
-    await mongoose.connection.db.collection('users').insertOne({
+    await mongoose.connection.db.collection('user').insertOne({
       username: 'guest_guest',
       password: hashPassword('password'),
       verificationCode: {

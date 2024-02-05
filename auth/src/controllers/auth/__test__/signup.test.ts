@@ -8,8 +8,8 @@ const request = supertest(app);
 
 beforeEach(async () => {
   const mongoId = new mongoose.Types.ObjectId().toHexString();
-  await mongoose.connection.db.collection('roles').insertOne({ id: mongoId, key: 'free' });
-  await mongoose.connection.db.collection('plans').insertOne({ role: mongoId, key: 'free' });
+  await mongoose.connection.db.collection('role').insertOne({ id: mongoId, key: 'free' });
+  await mongoose.connection.db.collection('plan').insertOne({ role: mongoId, key: 'free' });
 });
 
 describe('AuthController', () => {
@@ -25,12 +25,12 @@ describe('AuthController', () => {
     expect(Object.keys(response.body).length).toBe(1);
     expect(response.headers['set-cookie'].toString()).toBeDefined();
     const user = <Iuser>(
-      await mongoose.connection.db.collection('users').findOne({ username: 'ewasy_mohamed' })
+      await mongoose.connection.db.collection('user').findOne({ username: 'ewasy_mohamed' })
     );
     expect(user.plan).toBeDefined();
   });
   it('should return 400 if already exists username', async () => {
-    await mongoose.connection.db.collection('users').insertOne({ username: 'ewasy_mohamed' });
+    await mongoose.connection.db.collection('user').insertOne({ username: 'ewasy_mohamed' });
     const response = await request.post('/api/users/signup').send({
       name: 'ewasy',
       username: 'ewasy_mohamed',
@@ -42,7 +42,7 @@ describe('AuthController', () => {
   });
   it('should return 400 if already exists phone number', async () => {
     await mongoose.connection.db
-      .collection('users')
+      .collection('user')
       .insertOne({ phoneNumber: { number: '01234567891' } });
     const response = await request.post('/api/users/signup').send({
       name: 'ewasy',

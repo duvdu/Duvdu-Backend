@@ -1,5 +1,4 @@
-import 'express-async-errors';
-import { BadRequestError, auth } from '@duvdu-v1/duvdu';
+import { auth, globalUploadMiddleware } from '@duvdu-v1/duvdu';
 import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
 
@@ -42,7 +41,14 @@ router
   .route('/profile')
   .all(auth(Users))
   .get(handlers.getLoggedUserProfileHandler)
-  .patch(val.updateProfileVal, handlers.updateProfileHandler);
+  .patch(
+    globalUploadMiddleware({ fileType: 'image' }).fields([
+      { name: 'profileImage', maxCount: 1 },
+      { name: 'coverImage', maxCount: 1 },
+    ]),
+    val.updateProfileVal,
+    handlers.updateProfileHandler,
+  );
 
 router.route('/profile/:userId').get(auth(Users), val.userIdVal, handlers.getUserProfileHandler);
 export const apiRoutes = router;

@@ -57,5 +57,6 @@ export const updateProfileVal = [
   body('avaliableContracts').not().exists(),
   body('rate').not().exists(),
   body('isBlocked').not().exists(),
+  body('status').not().exists(),
   globalValidatorMiddleware,
 ];

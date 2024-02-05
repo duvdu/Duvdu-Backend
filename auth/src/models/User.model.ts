@@ -30,7 +30,7 @@ const userSchema = new Schema<Iuser & Document>(
     isBlocked: { type: Boolean, default: false },
     status: { value: { type: Boolean, default: true }, reason: String },
   },
-  { timestamps: true },
+  { timestamps: true, collection: 'user' },
 );
 
 export const Users = model<Iuser & Document>('user', userSchema);
