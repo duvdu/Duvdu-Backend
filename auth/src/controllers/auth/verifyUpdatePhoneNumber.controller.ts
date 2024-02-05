@@ -21,7 +21,7 @@ export const verifyUpdatePhoneNumberHandler: VerifyUpdatePhoneNumberHandler = as
   const currentDate: number = new Date().getTime();
 
   if (
-    currentDate > currentUser.verificationCode!.expireAt ||
+    currentDate > new Date(currentUser.verificationCode!.expireAt).getTime() ||
     currentUser.verificationCode!.code != hashEnterdCode
   ) 
     return next(new UnauthenticatedError('invalid or expired verification code'));
@@ -29,7 +29,7 @@ export const verifyUpdatePhoneNumberHandler: VerifyUpdatePhoneNumberHandler = as
 
   currentUser.verificationCode = {
     code: '',
-    expireAt: 0,
+    expireAt: new Date(0).toString(),
   };
 
   currentUser.isBlocked = false;

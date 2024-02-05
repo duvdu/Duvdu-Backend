@@ -19,7 +19,7 @@ export const askUpdatePhoneNumberHandler: AskUpdatePhoneNumberHandler = async (r
 
   currentUser.verificationCode = {
     code: hashedRandomCode,
-    expireAt: Date.now() + 10 * 60 * 1000,
+    expireAt: new Date(Date.now() + 60 * 1000).toString(),
   };
   await currentUser.save();
 

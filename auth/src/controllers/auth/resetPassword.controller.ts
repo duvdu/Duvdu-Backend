@@ -16,14 +16,14 @@ export const resetPasswordHandler: ResetPasswordHandler = async (req, res, next)
   const currentDate: number = new Date().getTime();
 
   if (
-    currentDate > user.verificationCode!.expireAt ||
+    currentDate > new Date(user.verificationCode!.expireAt).getTime() ||
     user.verificationCode!.code != hashEnterdCode
   )
     return next(new UnauthenticatedError('invalid or expired verification code'));
 
   user.verificationCode = {
     code: '',
-    expireAt: 0,
+    expireAt: new Date(0).toString(),
   };
   user.password = hashPassword(req.body.newPassword);
   await user.save();
