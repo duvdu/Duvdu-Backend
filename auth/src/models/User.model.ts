@@ -7,10 +7,10 @@ const userSchema = new Schema<Iuser & Document>(
     googleId: String,
     appleId: String,
     name: String,
-    phoneNumber: { key: String, number: { type: String, unique: true } },
+    phoneNumber: { key: String, number: { type: String, unique: true, sparse: true } },
     username: { type: String, unique: true },
     password: String,
-    verificationCode: { code: String, expireAt: Number },
+    verificationCode: { code: String, expireAt: Date },
     isVerified: { type: Boolean, default: false },
     token: String,
     profileImage: String,
@@ -30,7 +30,7 @@ const userSchema = new Schema<Iuser & Document>(
     isBlocked: { type: Boolean, default: false },
     status: { value: { type: Boolean, default: true }, reason: String },
   },
-  { timestamps: true },
+  { timestamps: true, collection: 'user' },
 );
 
 export const Users = model<Iuser & Document>('user', userSchema);

@@ -19,7 +19,7 @@ export const askResetPasswordHandler: AskResetPasswordHandler = async (req, res,
 
   user.verificationCode = {
     code: hashedCode,
-    expireAt: Date.now() + 10 * 60 * 1000,
+    expireAt: new Date(Date.now() + 60 * 1000).toString(),
   };
   user.isVerified = false;
   await user.save();
