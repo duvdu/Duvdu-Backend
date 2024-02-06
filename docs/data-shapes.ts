@@ -169,7 +169,7 @@ interface Studio {
   user: ObjectId;
   attachments: [string];
   name: string;
-  number: string;
+  // number: string;
   email: string;
   desc: string;
   equipment: [{ name: string; fees: number }];
