@@ -135,6 +135,7 @@ export interface GetLoggedUserProfileHandler
         | 'plan'
         | 'hasVerificationPadge'
         | 'avaliableContracts'
+        | 'currentRank'
       > & { averageRate: number };
     }>,
     unknown,
@@ -162,6 +163,7 @@ export interface GetUserProfileHandler
         | 'isAvaliableToInstantProjects'
         | 'pricePerHour'
         | 'hasVerificationPadge'
+        | 'currentRank'
       > & { averageRate: number };
     }>,
     unknown,

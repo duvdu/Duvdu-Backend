@@ -1,6 +1,7 @@
 import { RequestHandler } from 'express';
-import { Irole } from './Role';
-import { Iplan } from './Plan';
+
+import { Iplan } from '../Plan';
+import { Irole } from '../Role';
 
 type successResponse<T> = T & {
   message: 'success';
