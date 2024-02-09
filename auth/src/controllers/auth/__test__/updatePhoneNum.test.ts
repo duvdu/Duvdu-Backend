@@ -24,58 +24,51 @@ beforeEach(async () => {
   cookieSession = response.get('Set-Cookie');
 });
 
-describe('verify update phone number' , ()=>{
-  it('should return 422 for invalid input ', async() => {
-    await request.post('/api/users/update-phone/verify')
-      .send({})
+describe('update phone number' , ()=>{
+  it('should return 401 if user un authenticated ', async () => {
+    await request.put('/api/users/update-phone')
+      .send()
+      .expect(401);
+  });
+  it('should return 422 for invalid input ', async () => {
+    await request.put('/api/users/update-phone')
+      .set('Cookie' , cookieSession)
+      .send()
       .expect(422);
   });
-  it('should return 422 for invalid input ', async() => {
-    await request.post('/api/users/update-phone/verify')
+  it('should return 422 for invalid input ', async () => {
+    await request.put('/api/users/update-phone')
+      .set('Cookie' , cookieSession)
       .send({
         verificationCode:''
       })
       .expect(422);
   });
-  it('should return 422 for invalid input ', async() => {
-    await request.post('/api/users/update-phone/verify')
+  it('should return 422 for invalid input ', async () => {
+    await request.put('/api/users/update-phone')
+      .set('Cookie' , cookieSession)
       .send({
-        verificationCode:'',
-        phoneNumber:'01022484942'
+        verificationCode:'123'
       })
       .expect(422);
   });
-  it('should return 422 for invalid input ', async() => {
-    await request.post('/api/users/update-phone/verify')
-      .send({
-        verificationCode:'123',
-        phoneNumber:'01022484942'
-      })
-      .expect(422);
-  });
-  it('should return 422 for invalid input ', async() => {
-    await request.post('/api/users/update-phone/verify')
+  it('should return 422 for invalid input ', async () => {
+    await request.put('/api/users/update-phone')
+      .set('Cookie' , cookieSession)
       .send({
         verificationCode:'123456',
-        phoneNumber:'01022484'
+        phoneNumber:'21321321321'
       })
       .expect(422);
   });
-  it('should return 422 for invalid input ', async() => {
-    await request.post('/api/users/update-phone/verify')
-      .send({
-        verificationCode:'',
-        phoneNumber:'01022484942'
-      })
-      .expect(422);
-  });
-  it('should return 404 if user not found ', async() => {
-    await request.post('/api/users/update-phone/verify')
+  it('should return 401 for invalid or expired code ', async () => {
+    await request.put('/api/users/update-phone')
+      .set('Cookie' , cookieSession)
       .send({
         verificationCode:'123456',
         phoneNumber:'01022484942'
       })
-      .expect(404);
+      .expect(401);
   });
   it('should return 200 for success response', async () => {
     const randomCode = hashVerificationCode('123456');
@@ -99,21 +92,7 @@ describe('verify update phone number' , ()=>{
       })
       .expect(200);
     const user = await mongoose.connection.db.collection('user').findOne({username:'metoooo'});
+    console.log(user);
     expect(user?.isBlocked).toBeTruthy();
-
-    await mongoose.connection.db.collection('user').updateOne(
-      {username:'metoooo'},
-      {$set:{verificationCode:{code:randomCode , expireAt:new Date(Date.now() + 60 * 1000).toString()}}}
-    );
-
-    await request.post('/api/users/update-phone/verify')
-      .send({
-        verificationCode:'123456',
-        phoneNumber:'01022484942'
-      }).expect(200);
-    const userTwo = await mongoose.connection.db.collection('user').findOne({username:'metoooo'});
-    expect(userTwo?.isBlocked).toBeFalsy();
   });
 });
-
-

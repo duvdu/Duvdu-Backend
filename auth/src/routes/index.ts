@@ -1,6 +1,7 @@
 import { auth, globalUploadMiddleware } from '@duvdu-v1/duvdu';
 import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
+import passport from 'passport';
 
 import * as handlers from '../controllers/auth';
 import { Users } from '../models/User.model';
@@ -32,6 +33,23 @@ router
 router
   .route('/update-phone/verify')
   .post(val.verifyUpdatePhoneVal, handlers.verifyUpdatePhoneNumberHandler);
+
+
+router.get('/auth/google', passport.authenticate('google', { scope:
+  [ 'email', 'profile' ] }
+));
+
+
+router.get( '/auth/google/callback',
+  passport.authenticate( 'google', {
+    successRedirect: '/auth/google/success',
+    failureRedirect: '/auth/google/failure'
+  }));
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+router.get('/auth/google/success' , (req,res)=>{
+  console.log('hello here');
+});
 router
   .route('/reset-password')
   .get(val.askResetPasswordVal, handlers.askResetPasswordHandler)
@@ -51,4 +69,5 @@ router
   );
 
 router.route('/profile/:userId').get(auth(Users), val.userIdVal, handlers.getUserProfileHandler);
+
 export const apiRoutes = router;

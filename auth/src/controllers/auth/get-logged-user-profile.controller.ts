@@ -5,7 +5,7 @@ import { Users } from '../../models/User.model';
 import { GetLoggedUserProfileHandler } from '../../types/endpoints/user.endpoints';
 
 export const getLoggedUserProfileHandler: GetLoggedUserProfileHandler = async (req, res, next) => {
-  const user = await Users.findById(req.user?.id).select(
+  const user = await Users.findById((req as any).user?.id).select(
     'id name phoneNumber username profileImage coverImage location category acceptedProjectsCounter profileViews about isOnline isAvaliableToInstantProjects pricePerHour plan hasVerificationPadge avaliableContracts',
   );
   if (!user) return next(new UnauthenticatedError());

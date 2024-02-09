@@ -23,6 +23,16 @@ spec:
                 secretKeyRef:
                   name: jwt-secret
                   key: JWT_KEY
+            - name: CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: google-client-id
+                  key: clientId
+            - name: CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: google-client-secret
+                  key: clientSecret
 
 ---
 apiVersion: v1

@@ -14,6 +14,7 @@ export const signinHandler: SigninHandler = async (req, res, next) => {
   const token = generateToken({ id: user.id });
   req.session = { jwt: token };
   user.token = token;
+  user.isVerified=true;
   await user.save();
   res.status(200).json({ message: 'success' });
 };

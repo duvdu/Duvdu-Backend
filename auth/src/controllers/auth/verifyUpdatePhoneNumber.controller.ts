@@ -10,6 +10,7 @@ export const verifyUpdatePhoneNumberHandler: VerifyUpdatePhoneNumberHandler = as
   res,
   next,
 ) => {
+  
   const hashEnterdCode: string = hashVerificationCode(req.body.verificationCode);
 
   const currentUser = await Users.findOne({ 'phoneNumber.number': req.body.phoneNumber });
