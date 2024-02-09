@@ -25,6 +25,7 @@ export interface Iuser extends Document {
   hasVerificationPadge: boolean;
   avaliableContracts: number;
   rate: { ratersCounter: number; totalRates: number };
+  currentRank: string;
   isBlocked: boolean;
   status: { value: boolean; reason: string };
   followCount: { following: number; followers: number };
