@@ -1,9 +1,9 @@
 import { auth, globalUploadMiddleware } from '@duvdu-v1/duvdu';
 import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
-import passport from 'passport';
 
 import * as handlers from '../controllers/auth';
+import passport from '../controllers/auth/googleAuth.controller';
 import { Users } from '../models/User.model';
 import * as val from '../validators';
 
@@ -36,7 +36,7 @@ router
 
 
 router.get('/auth/google', passport.authenticate('google', { scope:
-  [ 'email', 'profile' ] }
+  [ 'email', 'profile', 'phone'  ] }
 ));
 
 
@@ -50,6 +50,7 @@ router.get( '/auth/google/callback',
 router.get('/auth/google/success' , (req,res)=>{
   console.log('hello here');
 });
+
 router
   .route('/reset-password')
   .get(val.askResetPasswordVal, handlers.askResetPasswordHandler)
