@@ -12,5 +12,5 @@ export const getLoggedUserProfileHandler: GetLoggedUserProfileHandler = async (r
   const averageRate = +(
     user.rate.ratersCounter > 0 ? user.rate.totalRates / user.rate.ratersCounter : 0
   ).toFixed(2);
-  res.status(200).json({ message: 'success', data: { ...user, averageRate } });
+  res.status(200).json({ message: 'success', data: { ...(user as any)._doc, averageRate } });
 };
