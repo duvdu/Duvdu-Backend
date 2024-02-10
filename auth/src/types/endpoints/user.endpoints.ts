@@ -7,7 +7,7 @@ import { Iuser } from '../User';
 declare global {
   namespace Express {
     interface Request {
-      user?: IjwtPayload;
+      loggedUser?: IjwtPayload;
     }
   }
 }

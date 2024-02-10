@@ -16,7 +16,7 @@ export const updateProfileHandler: UpdateProfileHandler = async (req, res, next)
     const category = await Categories.findById(req.body.category);
     if (!category) return next(new NotFound('category not found'));
   }
-  const user = await Users.findByIdAndUpdate((req as any).user?.id, {
+  const user = await Users.findByIdAndUpdate(req.loggedUser?.id, {
     ...req.body,
     [coverImage ? 'coverImage' : (null as any)]: `/media/images/${coverImage?.filename}`,
     [profileImage ? 'profileImage' : (null as any)]: `/media/images/${profileImage?.filename}`,

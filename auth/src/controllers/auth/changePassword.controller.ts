@@ -7,7 +7,7 @@ import { comparePassword, hashPassword } from '../../utils/bcrypt';
 import { generateToken } from '../../utils/generateToken';
 
 export const changePasswordHandler: ChangePasswordHandler = async (req, res, next) => {
-  const user = await Users.findById((req as any).user?.id);
+  const user = await Users.findById(req.loggedUser?.id);
 
   if (!user || !comparePassword(req.body.oldPassword, user.password || ''))
     return next(new UnauthenticatedError());

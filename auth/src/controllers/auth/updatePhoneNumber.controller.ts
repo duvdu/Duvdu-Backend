@@ -8,20 +8,17 @@ import { generateRandom6Digit } from '../../utils/gitRandom6Dugut';
 
 export const updatePhoneNumberHandler: UpdatePhoneNumberHandler = async (req, res, next) => {
   const hashEnterdCode = hashVerificationCode(req.body.verificationCode);
-  const currentUser = await Users.findById((req as any).user?.id);
+  const currentUser = await Users.findById(req.loggedUser?.id);
 
-  if (!currentUser) 
-    return next(new NotFound());
-  
+  if (!currentUser) return next(new NotFound());
 
   const currentDate: number = new Date().getTime();
 
   if (
     currentDate > new Date(currentUser.verificationCode!.expireAt).getTime() ||
     currentUser.verificationCode!.code != hashEnterdCode
-  ) 
+  )
     return next(new UnauthenticatedError());
-  
 
   const verificationCode: string = generateRandom6Digit();
   const hashedVerificationCode: string = hashVerificationCode(verificationCode);
