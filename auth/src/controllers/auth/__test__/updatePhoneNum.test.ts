@@ -92,7 +92,6 @@ describe('update phone number' , ()=>{
       })
       .expect(200);
     const user = await mongoose.connection.db.collection('user').findOne({username:'metoooo'});
-    console.log(user);
     expect(user?.isBlocked).toBeTruthy();
   });
 });
