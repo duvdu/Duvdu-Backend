@@ -54,6 +54,17 @@ router.get('/auth/google/success' , (req,res)=>{
   res.send('helllo metoo');
 });
 
+router.get('/auth/apple', passport.authenticate('apple'));
+
+router.get(
+  '/auth/apple/callback',
+  passport.authenticate('apple', { failureRedirect: '/login' }),
+  (req, res) => {
+    // Successful authentication, redirect to the desired page
+    res.redirect('/profile');
+  }
+);
+
 router
   .route('/reset-password')
   .get(val.askResetPasswordVal, handlers.askResetPasswordHandler)
