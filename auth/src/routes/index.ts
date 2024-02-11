@@ -6,6 +6,7 @@ import * as handlers from '../controllers/auth';
 import passport from '../controllers/auth/googleAuth.controller';
 import { Users } from '../models/User.model';
 import * as val from '../validators';
+import { Iuser } from '../types/User';
 
 const router = Router();
 
@@ -44,15 +45,13 @@ router.get( '/auth/google/callback',
   passport.authenticate( 'google', {
     successRedirect: '/api/users/auth/google/success',
     failureRedirect: '/auth/google/failure'
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  }) , (req,res)=>{
-    console.log(req.user);
-
-  });
+  }));
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 router.get('/auth/google/success' , (req,res)=>{
   console.log('hello here');
+  req.session.jwt = (req.user as Iuser)?.token;
+  res.send('helllo metoo');
 });
 
 router
