@@ -8,7 +8,6 @@ import { Users } from '../models/User.model';
 import * as val from '../validators';
 
 const router = Router();
-
 router.post('/signin', val.signinVal, handlers.signinHandler);
 router.post('/signup', val.signupVal, handlers.signupHandler);
 router.post(
@@ -34,20 +33,18 @@ router
   .route('/update-phone/verify')
   .post(val.verifyUpdatePhoneVal, handlers.verifyUpdatePhoneNumberHandler);
 
+router.get('/auth/google', passport.authenticate('google', { scope: ['email', 'profile'] }));
 
-router.get('/auth/google', passport.authenticate('google', { scope:
-  [ 'email', 'profile' ] }
-));
-
-
-router.get( '/auth/google/callback',
-  passport.authenticate( 'google', {
+router.get(
+  '/auth/google/callback',
+  passport.authenticate('google', {
     successRedirect: '/auth/google/success',
-    failureRedirect: '/auth/google/failure'
-  }));
+    failureRedirect: '/auth/google/failure',
+  }),
+);
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-router.get('/auth/google/success' , (req,res)=>{
+router.get('/auth/google/success', (req, res) => {
   console.log('hello here');
 });
 router

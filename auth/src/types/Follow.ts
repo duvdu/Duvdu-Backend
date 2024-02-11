@@ -1,6 +1,8 @@
 import { Types } from 'mongoose';
 
+import { Iuser } from './User';
+
 export interface Ifollow {
-  sourceUser: Types.ObjectId;
-  targetUser: Types.ObjectId;
+  sourceUser: Types.ObjectId | Iuser;
+  targetUser: Types.ObjectId | Iuser;
 }

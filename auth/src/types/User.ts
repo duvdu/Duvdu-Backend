@@ -1,5 +1,8 @@
 import { Types, Document } from 'mongoose';
 
+import { Icategory } from './Category';
+import { Iplan } from './Plan';
+
 export interface Iuser extends Document {
   id: string;
   googleId?: string;
@@ -14,14 +17,14 @@ export interface Iuser extends Document {
   profileImage?: string;
   coverImage?: string;
   location?: { lat: number; lng: number };
-  category?: Types.ObjectId;
+  category?: Types.ObjectId | Icategory;
   acceptedProjectsCounter: number;
   profileViews: number;
   about?: string;
   isOnline: boolean;
   isAvaliableToInstantProjects: boolean;
   pricePerHour?: number;
-  plan: Types.ObjectId;
+  plan: Types.ObjectId | Iplan;
   hasVerificationPadge: boolean;
   avaliableContracts: number;
   rate: { ratersCounter: number; totalRates: number };
