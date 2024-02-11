@@ -42,9 +42,13 @@ router.get('/auth/google', passport.authenticate('google', { scope:
 
 router.get( '/auth/google/callback',
   passport.authenticate( 'google', {
-    successRedirect: '/auth/google/success',
+    successRedirect: '/api/users/auth/google/success',
     failureRedirect: '/auth/google/failure'
-  }));
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  }) , (req,res)=>{
+    console.log(req.user);
+
+  });
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 router.get('/auth/google/success' , (req,res)=>{
