@@ -12,13 +12,16 @@ export const updatePhoneNumberHandler: UpdatePhoneNumberHandler = async (req, re
 
   if (!currentUser) return next(new NotFound());
 
-  const currentDate: number = new Date().getTime();
-
-  if (
-    currentDate > new Date(currentUser.verificationCode!.expireAt).getTime() ||
-    currentUser.verificationCode!.code != hashEnterdCode
-  )
-    return next(new UnauthenticatedError());
+  if (currentUser.phoneNumber.number) {
+    
+    const currentDate: number = new Date().getTime();
+  
+    if (
+      currentDate > new Date(currentUser.verificationCode!.expireAt).getTime() ||
+      currentUser.verificationCode!.code != hashEnterdCode
+    )
+      return next(new UnauthenticatedError());
+  }
 
   const verificationCode: string = generateRandom6Digit();
   const hashedVerificationCode: string = hashVerificationCode(verificationCode);

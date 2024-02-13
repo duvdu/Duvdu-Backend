@@ -5,8 +5,8 @@ import rateLimit from 'express-rate-limit';
 import * as handlers from '../controllers/auth';
 import passport from '../controllers/auth/googleAuth.controller';
 import { Users } from '../models/User.model';
-import * as val from '../validators';
 import { Iuser } from '../types/User';
+import * as val from '../validators';
 
 const router = Router();
 
