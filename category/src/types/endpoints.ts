@@ -1,4 +1,5 @@
 import { RequestHandler } from 'express';
+
 import { Icategory } from './Category';
 
 type successResponse<T> = T & {
