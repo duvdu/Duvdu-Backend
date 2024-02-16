@@ -3,6 +3,8 @@ import express from 'express';
 import session from 'express-session';
 
 import { env } from './config/env';
+import { router as categoryRoutes } from './routes/index';
+
 
 export const app = express();
 
@@ -22,5 +24,5 @@ app.use(
   })
 );
 
-
+app.use('/api/category', categoryRoutes);
 app.use(globalErrorHandlingMiddleware);

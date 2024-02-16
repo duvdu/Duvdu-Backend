@@ -6,26 +6,26 @@ type successResponse<T> = T & {
   message: 'success';
 };
 
-export interface createCategoryHandler
+export interface CreateCategoryHandler
   extends RequestHandler<
     unknown,
     successResponse<unknown>,
-    Pick<Icategory, 'title' | 'image' | 'cycle' | 'tags'>,
+    Pick<Icategory, 'title' | 'image' | 'cycle' | 'tags' | 'jobTitles'>,
     unknown
   > {}
 
-export interface updateCategoryHandler
+export interface UpdateCategoryHandler
   extends RequestHandler<
-    unknown,
+    {categoryId:string},
     successResponse<unknown>,
-    Partial<Pick<Icategory, 'image' | 'cycle' | 'tags' | 'title'>>,
+    Partial<Pick<Icategory, 'image' | 'cycle' | 'tags' | 'title' | 'jobTitles'>>,
     unknown
   > {}
 
-export interface removeCategoryHandler
+export interface RemoveCategoryHandler
   extends RequestHandler<{ categoryId: string }, successResponse<unknown>, unknown, unknown> {}
 
-export interface getCategoryHandler
+export interface GetCategoryHandler
   extends RequestHandler<
     { categoryId: string },
     successResponse<{ data: Icategory }>,
@@ -33,7 +33,7 @@ export interface getCategoryHandler
     unknown
   > {}
 
-export interface getCategoriesHandler
+export interface GetCategoriesHandler
   extends RequestHandler<
     unknown,
     successResponse<{ data: Icategory[] }>,
