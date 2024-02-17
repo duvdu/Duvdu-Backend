@@ -7,8 +7,8 @@ const request = supertest(app);
 
 beforeEach(async () => {
   const mongoId = new mongoose.Types.ObjectId().toHexString();
-  await mongoose.connection.db.collection('role').insertOne({ id: mongoId, key: 'free' });
-  await mongoose.connection.db.collection('plan').insertOne({ role: mongoId, key: 'free' });
+  await mongoose.connection.db.collection('role').insertOne({ id: mongoId, key: 'admin' });
+  await mongoose.connection.db.collection('plan').insertOne({ role: mongoId, key: 'admin' });
 
   await request.post('/api/users/signup').send({
     username: 'metoooo',
@@ -21,40 +21,42 @@ beforeEach(async () => {
     .updateOne({ username: 'metoooo' }, { $set: { isVerified: true } });
 });
 
-describe('ask reset password' , ()=>{
+describe('ask reset password', () => {
   it('should return 422 for invalid input ', async () => {
-    await request.get('/api/users/reset-password')
-      .send()
-      .expect(422);
+    await request.get('/api/users/reset-password').send().expect(422);
   });
   it('should return 422 for invalid input ', async () => {
-    await request.get('/api/users/reset-password')
+    await request
+      .get('/api/users/reset-password')
       .send({
-        name:'dd'
+        name: 'dd',
       })
       .expect(422);
   });
   it('should return 422 for invalid input ', async () => {
-    await request.get('/api/users/reset-password')
+    await request
+      .get('/api/users/reset-password')
       .send({
-        username:'dd'
+        username: 'dd',
       })
       .expect(422);
   });
   it('should return 404 if user not found ', async () => {
-    await request.get('/api/users/reset-password')
+    await request
+      .get('/api/users/reset-password')
       .send({
-        username:'motemedkhaled'
+        username: 'motemedkhaled',
       })
       .expect(404);
   });
   it('should return 200 for successs ', async () => {
-    await request.get('/api/users/reset-password')
+    await request
+      .get('/api/users/reset-password')
       .send({
-        username:'metoooo'
+        username: 'metoooo',
       })
       .expect(200);
-    const user = await mongoose.connection.db.collection('user').findOne({username:'metoooo'});
+    const user = await mongoose.connection.db.collection('user').findOne({ username: 'metoooo' });
     expect(user?.isVerified).toBeFalsy;
   });
 });

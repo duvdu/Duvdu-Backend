@@ -4,7 +4,9 @@ import rateLimit from 'express-rate-limit';
 import passport from 'passport';
 
 import * as handlers from '../controllers/auth';
+import { isAuthorizedMiddleware } from '../middlewares/isAuthorized.middleware';
 import { Users } from '../models/User.model';
+import { Ifeatures } from '../types/Features';
 import * as val from '../validators';
 
 const router = Router();
@@ -22,13 +24,15 @@ router.post(
 router.patch(
   '/change-password',
   auth(Users),
+  isAuthorizedMiddleware(Ifeatures.changePassword),
   val.changePasswordVal,
   handlers.changePasswordHandler,
 );
 router
   .route('/update-phone')
-  .post(auth(Users), val.askUpdatePhoneVal, handlers.askUpdatePhoneNumberHandler)
-  .put(auth(Users), val.updatePhoneNumberVal, handlers.updatePhoneNumberHandler);
+  .all(auth(Users), isAuthorizedMiddleware(Ifeatures.updatePhoneNumber))
+  .post(val.askUpdatePhoneVal, handlers.askUpdatePhoneNumberHandler)
+  .put(val.updatePhoneNumberVal, handlers.updatePhoneNumberHandler);
 router
   .route('/update-phone/verify')
   .post(val.verifyUpdatePhoneVal, handlers.verifyUpdatePhoneNumberHandler);
@@ -57,6 +61,7 @@ router
   .all(auth(Users))
   .get(handlers.getLoggedUserProfileHandler)
   .patch(
+    isAuthorizedMiddleware(Ifeatures.updateProfile),
     globalUploadMiddleware({ fileType: 'image' }).fields([
       { name: 'profileImage', maxCount: 1 },
       { name: 'coverImage', maxCount: 1 },
@@ -65,6 +70,6 @@ router
     handlers.updateProfileHandler,
   );
 
-router.route('/profile/:userId').get(auth(Users), val.userIdVal, handlers.getUserProfileHandler);
+router.route('/profile/:userId').get(val.userIdVal, handlers.getUserProfileHandler);
 
 export const apiRoutes = router;

@@ -9,8 +9,8 @@ const request = supertest(app);
 let cookieSession: string[];
 beforeEach(async () => {
   const mongoId = new mongoose.Types.ObjectId().toHexString();
-  await mongoose.connection.db.collection('role').insertOne({ id: mongoId, key: 'free' });
-  await mongoose.connection.db.collection('plan').insertOne({ role: mongoId, key: 'free' });
+  await mongoose.connection.db.collection('role').insertOne({ id: mongoId, key: 'admin' });
+  await mongoose.connection.db.collection('plan').insertOne({ role: mongoId, key: 'admin' });
 
   const response = await request.post('/api/users/signup').send({
     username: 'metoooo',
@@ -24,96 +24,122 @@ beforeEach(async () => {
   cookieSession = response.get('Set-Cookie');
 });
 
-describe('verify update phone number' , ()=>{
-  it('should return 422 for invalid input ', async() => {
-    await request.post('/api/users/update-phone/verify')
-      .send({})
-      .expect(422);
+describe('verify update phone number', () => {
+  it('should return 422 for invalid input ', async () => {
+    await request.post('/api/users/update-phone/verify').send({}).expect(422);
   });
-  it('should return 422 for invalid input ', async() => {
-    await request.post('/api/users/update-phone/verify')
+  it('should return 422 for invalid input ', async () => {
+    await request
+      .post('/api/users/update-phone/verify')
       .send({
-        verificationCode:''
+        verificationCode: '',
       })
       .expect(422);
   });
-  it('should return 422 for invalid input ', async() => {
-    await request.post('/api/users/update-phone/verify')
+  it('should return 422 for invalid input ', async () => {
+    await request
+      .post('/api/users/update-phone/verify')
       .send({
-        verificationCode:'',
-        phoneNumber:'01022484942'
+        verificationCode: '',
+        phoneNumber: '01022484942',
       })
       .expect(422);
   });
-  it('should return 422 for invalid input ', async() => {
-    await request.post('/api/users/update-phone/verify')
+  it('should return 422 for invalid input ', async () => {
+    await request
+      .post('/api/users/update-phone/verify')
       .send({
-        verificationCode:'123',
-        phoneNumber:'01022484942'
+        verificationCode: '123',
+        phoneNumber: '01022484942',
       })
       .expect(422);
   });
-  it('should return 422 for invalid input ', async() => {
-    await request.post('/api/users/update-phone/verify')
+  it('should return 422 for invalid input ', async () => {
+    await request
+      .post('/api/users/update-phone/verify')
       .send({
-        verificationCode:'123456',
-        phoneNumber:'01022484'
+        verificationCode: '123456',
+        phoneNumber: '01022484',
       })
       .expect(422);
   });
-  it('should return 422 for invalid input ', async() => {
-    await request.post('/api/users/update-phone/verify')
+  it('should return 422 for invalid input ', async () => {
+    await request
+      .post('/api/users/update-phone/verify')
       .send({
-        verificationCode:'',
-        phoneNumber:'01022484942'
+        verificationCode: '',
+        phoneNumber: '01022484942',
       })
       .expect(422);
   });
-  it('should return 404 if user not found ', async() => {
-    await request.post('/api/users/update-phone/verify')
+  it('should return 404 if user not found ', async () => {
+    await request
+      .post('/api/users/update-phone/verify')
       .send({
-        verificationCode:'123456',
-        phoneNumber:'01022484942'
+        verificationCode: '123456',
+        phoneNumber: '01022484942',
       })
       .expect(404);
   });
   it('should return 200 for success response', async () => {
     const randomCode = hashVerificationCode('123456');
-    await request.post('/api/users/update-phone')
-      .set('Cookie' , cookieSession)
+    await request
+      .post('/api/users/update-phone')
+      .set('Cookie', cookieSession)
       .send({
-        password:'123@Metoo'
+        password: '123@Metoo',
       })
       .expect(200);
 
-    await mongoose.connection.db.collection('user').updateOne(
-      {username:'metoooo'},
-      {$set:{verificationCode:{code:randomCode , expireAt:new Date(Date.now() + 60 * 1000).toString()}}}
-    );
+    await mongoose.connection.db
+      .collection('user')
+      .updateOne(
+        { username: 'metoooo' },
+        {
+          $set: {
+            verificationCode: {
+              code: randomCode,
+              expireAt: new Date(Date.now() + 60 * 1000).toString(),
+            },
+          },
+        },
+      );
 
-    await request.put('/api/users/update-phone')
-      .set('Cookie' , cookieSession)
+    await request
+      .put('/api/users/update-phone')
+      .set('Cookie', cookieSession)
       .send({
-        verificationCode:'123456',
-        phoneNumber:'01022484942'
+        verificationCode: '123456',
+        phoneNumber: '01022484942',
       })
       .expect(200);
-    const user = await mongoose.connection.db.collection('user').findOne({username:'metoooo'});
+    const user = await mongoose.connection.db.collection('user').findOne({ username: 'metoooo' });
     expect(user?.isBlocked).toBeTruthy();
 
-    await mongoose.connection.db.collection('user').updateOne(
-      {username:'metoooo'},
-      {$set:{verificationCode:{code:randomCode , expireAt:new Date(Date.now() + 60 * 1000).toString()}}}
-    );
+    await mongoose.connection.db
+      .collection('user')
+      .updateOne(
+        { username: 'metoooo' },
+        {
+          $set: {
+            verificationCode: {
+              code: randomCode,
+              expireAt: new Date(Date.now() + 60 * 1000).toString(),
+            },
+          },
+        },
+      );
 
-    await request.post('/api/users/update-phone/verify')
+    await request
+      .post('/api/users/update-phone/verify')
       .send({
-        verificationCode:'123456',
-        phoneNumber:'01022484942'
-      }).expect(200);
-    const userTwo = await mongoose.connection.db.collection('user').findOne({username:'metoooo'});
+        verificationCode: '123456',
+        phoneNumber: '01022484942',
+      })
+      .expect(200);
+    const userTwo = await mongoose.connection.db
+      .collection('user')
+      .findOne({ username: 'metoooo' });
     expect(userTwo?.isBlocked).toBeFalsy();
   });
 });
-
-
