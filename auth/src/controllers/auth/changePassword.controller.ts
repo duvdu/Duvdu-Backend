@@ -16,7 +16,7 @@ export const changePasswordHandler: ChangePasswordHandler = async (req, res, nex
   user.password = hashPassword(req.body.newPassword);
   user.token = token;
   await user.save();
-  req.session = { jwt: token };
+  req.session.jwt = token;
 
   res.status(200).json({ message: 'success' });
 };

@@ -1,12 +1,13 @@
 import { auth, globalUploadMiddleware } from '@duvdu-v1/duvdu';
 import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
-import passport from 'passport';
 
 import * as handlers from '../controllers/auth';
+import passport from '../controllers/auth/googleAuth.controller';
 import { isAuthorizedMiddleware } from '../middlewares/isAuthorized.middleware';
 import { Users } from '../models/User.model';
 import { Ifeatures } from '../types/Features';
+import { Iuser } from '../types/User';
 import * as val from '../validators';
 
 const router = Router();
@@ -40,9 +41,14 @@ router
 router.get('/auth/google', passport.authenticate('google', { scope: ['email', 'profile'] }));
 
 router.get(
+  '/auth/google',
+  passport.authenticate('google', { scope: ['email', 'profile', 'phone'] }),
+);
+
+router.get(
   '/auth/google/callback',
   passport.authenticate('google', {
-    successRedirect: '/auth/google/success',
+    successRedirect: '/api/users/auth/google/success',
     failureRedirect: '/auth/google/failure',
   }),
 );
@@ -50,7 +56,21 @@ router.get(
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 router.get('/auth/google/success', (req, res) => {
   console.log('hello here');
+  req.session.jwt = (req.user as Iuser)?.token;
+  res.send('helllo metoo');
 });
+
+router.get('/auth/apple', passport.authenticate('apple'));
+
+router.get(
+  '/auth/apple/callback',
+  passport.authenticate('apple', { failureRedirect: '/login' }),
+  (req, res) => {
+    // Successful authentication, redirect to the desired page
+    res.redirect('/profile');
+  },
+);
+
 router
   .route('/reset-password')
   .get(val.askResetPasswordVal, handlers.askResetPasswordHandler)

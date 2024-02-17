@@ -1,6 +1,6 @@
 import { globalErrorHandlingMiddleware } from '@duvdu-v1/duvdu';
-import cookieSession from 'cookie-session';
 import express from 'express';
+import session from 'express-session';
 
 import { env } from './config/env';
 import passport from './controllers/auth/googleAuth.controller';
@@ -10,7 +10,19 @@ export const app = express();
 
 app.set('trust proxy', true);
 app.use(express.json());
-app.use(cookieSession({ signed: false, secure: env.environment === 'production' }));
+
+app.use(
+  session({
+    name:'my-session',
+    secret: 'your-secret-key',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: env.environment === 'production',
+      httpOnly:true
+    },
+  })
+);
 
 app.use(passport.initialize());
 app.use(passport.session());
