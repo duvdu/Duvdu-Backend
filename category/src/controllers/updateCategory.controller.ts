@@ -1,4 +1,4 @@
-import { BadRequestError } from '@duvdu-v1/duvdu';
+import {  NotFound } from '@duvdu-v1/duvdu';
 
 import { Category } from '../models/category.model';
 import { UpdateCategoryHandler } from '../types/endpoints';
@@ -17,7 +17,7 @@ export const updateCategoryHandler:UpdateCategoryHandler = async (req,res,next)=
     }
   );
 
-  if (!category) return next(new BadRequestError('can not update category'));
+  if (!category) return next(new NotFound('can not update category'));
 
   saveFiles('images' , image);
   removeFiles(image ? category.image : undefined);

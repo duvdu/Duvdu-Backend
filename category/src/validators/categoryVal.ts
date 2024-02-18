@@ -18,6 +18,7 @@ export const createCategoryVal = [
 ];
 
 export const updateCategoryVal = [
+  check('categoryId').isMongoId(),
   check('title.ar').optional().notEmpty()
     .isString().withMessage('title arabic required'),
   check('title.en').optional().notEmpty()
