@@ -12,7 +12,7 @@ export const changePasswordHandler: ChangePasswordHandler = async (req, res, nex
   if (!user || !comparePassword(req.body.oldPassword, user.password || ''))
     return next(new UnauthenticatedError());
 
-  const token = generateToken({ id: user.id });
+  const token = generateToken({ id: user.id , planId:user.plan.toString() });
   user.password = hashPassword(req.body.newPassword);
   user.token = token;
   await user.save();

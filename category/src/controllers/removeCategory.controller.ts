@@ -1,7 +1,7 @@
 import { NotFound } from '@duvdu-v1/duvdu';
 
 import { Category } from '../models/category.model';
-import { RemoveCategoryHandler } from '../types/endpoints';
+import { RemoveCategoryHandler } from '../types/endpoints/endpoints';
 import { removeFiles } from '../utils/file';
 
 export const removeCategoryHandler:RemoveCategoryHandler = async (req,res,next)=>{

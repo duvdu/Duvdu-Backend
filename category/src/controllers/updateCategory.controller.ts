@@ -1,7 +1,7 @@
 import {  NotFound } from '@duvdu-v1/duvdu';
 
 import { Category } from '../models/category.model';
-import { UpdateCategoryHandler } from '../types/endpoints';
+import { UpdateCategoryHandler } from '../types/endpoints/endpoints';
 import { saveFiles , removeFiles } from '../utils/file';
 
 

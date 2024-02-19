@@ -3,6 +3,7 @@ import { dbConnection } from '@duvdu-v1/duvdu';
 import { app } from './app';
 import { env, checkEnvVariables } from './config/env';
 
+
 const start = async () => {
   checkEnvVariables();
   await dbConnection(env.mongoDb.uri);

@@ -1,13 +1,17 @@
-import { globalUploadMiddleware } from '@duvdu-v1/duvdu';
-import express from 'express';
+import { globalUploadMiddleware , allowedTo , auth } from '@duvdu-v1/duvdu';
+import express, { RequestHandler } from 'express';
 
 import * as handler from '../controllers';
+import { Plan } from '../models/plan.model';
+import { Role } from '../models/role.model';
+import { User } from '../models/user.model';
+import { Ifeatures } from '../types/Features';
 import * as val from '../validators/categoryVal';
 
 export const router = express.Router();
 
 router.route('/')
-  .post(globalUploadMiddleware({fileType:'image'}).fields([
+  .post(auth(User) , allowedTo(Plan , Role , Ifeatures.createCategory),globalUploadMiddleware({fileType:'image'}).fields([
     {
       name:'image' , maxCount:1
     }

@@ -1,6 +1,6 @@
 import { NotFound } from '@duvdu-v1/duvdu';
 
-import { GetCategoryHandler } from './../types/endpoints';
+import { GetCategoryHandler } from '../types/endpoints/endpoints';
 import { Category } from '../models/category.model';
 
 

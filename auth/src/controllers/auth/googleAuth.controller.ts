@@ -27,7 +27,7 @@ async (request: any, accessToken: any, refreshToken: any, profile: any, done: an
     });
     await user.save();
   }
-  const token = generateToken({ id: user.id });
+  const token = generateToken({ id: user.id , planId:user.plan.toString() });
   user.token = token;
   await user.save();
 

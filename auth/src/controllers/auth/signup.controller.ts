@@ -14,7 +14,7 @@ export const signupHandler: SignupHandler = async (req, res) => {
     password: hashPassword(req.body.password),
     plan: plans[0].id,
   });
-  const token = generateToken({ id: newUser.id });
+  const token = generateToken({ id: newUser.id , planId:newUser.plan.toString() });
   newUser.token = token;
   await newUser.save();
   req.session.jwt = token ;

@@ -1,7 +1,7 @@
 import { BadRequestError } from '@duvdu-v1/duvdu';
 
 import { Category } from '../models/category.model';
-import { CreateCategoryHandler } from '../types/endpoints';
+import { CreateCategoryHandler } from '../types/endpoints/endpoints';
 import { saveFiles } from '../utils/file';
 
 

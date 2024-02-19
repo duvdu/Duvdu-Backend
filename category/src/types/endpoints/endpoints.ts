@@ -1,6 +1,23 @@
+/* eslint-disable @typescript-eslint/no-namespace */
+
+import { IjwtPayload } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-import { Icategory } from './Category';
+import { Icategory } from '../Category';
+
+declare module 'express-session' {
+  interface SessionData {
+    jwt?: string;
+  }
+}
+
+declare global {
+  namespace Express {
+    interface Request {
+      loggedUser?: IjwtPayload;
+    }
+  }
+}
 
 type successResponse<T> = T & {
   message: 'success';
