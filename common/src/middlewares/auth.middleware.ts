@@ -27,10 +27,11 @@ export const auth = (modelName: Model<any>) => <RequestHandler>(async (req, res,
     throw new GenericError('the users access is denied due to their blocked status.');
   }
 
+
   try {
     const payload = jwt.verify((req as any).session!.jwt, process.env.JWT_KEY!) as IjwtPayload;
 
-    (req as any).loggedUser = { id: payload.id };
+    (req as any).loggedUser = { id: payload.id , planId:payload.planId };
 
     return next();
   } catch (error) {
