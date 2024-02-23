@@ -1,5 +1,5 @@
 import { globalUploadMiddleware , allowedTo , auth } from '@duvdu-v1/duvdu';
-import express, { RequestHandler } from 'express';
+import express from 'express';
 
 import * as handler from '../controllers';
 import { Plan } from '../models/plan.model';
@@ -9,6 +9,8 @@ import { Ifeatures } from '../types/Features';
 import * as val from '../validators/categoryVal';
 
 export const router = express.Router();
+
+router.get('/crm' , handler.getCatogriesAdminHandler);
 
 router.route('/')
   .post(auth(User) , allowedTo(Plan , Role , Ifeatures.createCategory),globalUploadMiddleware({fileType:'image'}).fields([

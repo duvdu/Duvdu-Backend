@@ -8,4 +8,5 @@ export interface Icategory extends Document {
   tags?: string[];
   jobTitles?: string[];
   cycle: 1 | 2 | 3 | 4;
+  status:0|1;
 }

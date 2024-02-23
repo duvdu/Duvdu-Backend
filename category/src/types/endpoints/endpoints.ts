@@ -27,7 +27,7 @@ export interface CreateCategoryHandler
   extends RequestHandler<
     unknown,
     successResponse<unknown>,
-    Pick<Icategory, 'title' | 'image' | 'cycle' | 'tags' | 'jobTitles'>,
+    Pick<Icategory, 'title' | 'image' | 'cycle' | 'tags' | 'jobTitles' | 'status'>,
     unknown
   > {}
 
@@ -35,7 +35,7 @@ export interface UpdateCategoryHandler
   extends RequestHandler<
     {categoryId:string},
     successResponse<unknown>,
-    Partial<Pick<Icategory, 'image' | 'cycle' | 'tags' | 'title' | 'jobTitles'>>,
+    Partial<Pick<Icategory, 'image' | 'cycle' | 'tags' | 'title' | 'jobTitles' | 'status'>>,
     unknown
   > {}
 
@@ -55,8 +55,10 @@ export interface GetCategoriesHandler
     unknown,
     successResponse<{ data: Icategory[] }>,
     unknown,
-    {
-      title: string;
-      cycle: number;
-    }
+    unknown
   > {}
+
+export interface GetCatogriesAdminHandler
+  extends RequestHandler<unknown , successResponse<{data:Icategory[]}> , unknown , unknown>{}
+
+

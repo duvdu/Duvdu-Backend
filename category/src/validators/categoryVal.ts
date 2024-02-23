@@ -14,6 +14,11 @@ export const createCategoryVal = [
   check('cycle').isIn([1,2,3,4]).isInt(),
   check('jobTitles').isArray(),
   check('tags').isArray(),
+  check('status').optional().custom(val=>{
+    if ([0,1].includes(val)) return true;
+    throw new Error('status must be value of 0 or 1');
+  }
+  ),
   globalValidatorMiddleware
 ];
 
@@ -30,6 +35,10 @@ export const updateCategoryVal = [
   check('cycle').optional().isIn([1,2,3,4]).isInt(),
   check('jobTitles').optional().isArray(),
   check('tags').optional().isArray(),
+  check('status').optional().custom(val=>{
+    if ([0,1].includes(val))return true;
+    throw new Error('status must be value of 0 or 1');
+  }),
   globalValidatorMiddleware
 ];
 

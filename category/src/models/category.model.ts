@@ -21,6 +21,11 @@ const categorySchema = new mongoose.Schema<Icategory>({
   },
   tags:{
     type:[String]
+  },
+  status:{
+    type:Number,
+    enum:[0,1],
+    default:1
   }
 },{timestamps:true , toJSON:{
   transform(doc,ret){
