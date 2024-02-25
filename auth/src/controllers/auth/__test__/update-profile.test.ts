@@ -24,6 +24,7 @@ beforeEach(async () => {
     .collection('user')
     .updateOne({ username: 'elewasy' }, { $set: { isVerified: true } });
   cookieSession = response.get('Set-Cookie');
+  
 });
 
 describe('update-profile controller', () => {

@@ -1,6 +1,8 @@
 import { globalErrorHandlingMiddleware } from '@duvdu-v1/duvdu';
+import connectRedis from 'connect-redis';
 import express from 'express';
 import session from 'express-session';
+import {createClient} from 'redis';
 
 import { env } from './config/env';
 import passport from './controllers/auth/googleAuth.controller';
@@ -11,15 +13,26 @@ export const app = express();
 app.set('trust proxy', true);
 app.use(express.json());
 
+const redisClient = createClient({
+  url: 'redis://expiration-redis-srv:6379', 
+});
+
+redisClient.connect().catch(console.error);
+redisClient.on('connect', () => {
+  console.log('Connected to Redis');
+});
+
+const redisStore = new connectRedis({client:redisClient});
 app.use(
   session({
-    name:'my-session',
-    secret: 'your-secret-key',
+    secret: env.expressSession.secret,
     resave: false,
     saveUninitialized: false,
+    store: redisStore,
     cookie: {
+      sameSite: 'lax',
       secure: env.environment === 'production',
-      httpOnly:true
+      httpOnly: true,
     },
   })
 );

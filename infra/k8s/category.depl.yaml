@@ -23,6 +23,13 @@ spec:
                 secretKeyRef:
                   name: jwt-secret
                   key: JWT_KEY
+            - name: SESSION_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: session-secret
+                  key: sessionSecret
+            - name: REDIS_HOST
+              value: expiration-redis-srv
 
 ---
 apiVersion: v1
