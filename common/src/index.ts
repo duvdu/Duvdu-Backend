@@ -19,4 +19,4 @@ export * from './types/JwtPayload';
 export * from './middlewares/global-validator.middleware';
 export * from './middlewares/auth.middleware';
 export * from './middlewares/global-upload.middleware';
-export * from './middlewares/allowedTo.middleware';
+export * from './middlewares/isAuthorized.middleware';
