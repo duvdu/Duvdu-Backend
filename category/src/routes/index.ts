@@ -1,4 +1,4 @@
-import { globalUploadMiddleware , allowedTo , auth } from '@duvdu-v1/duvdu';
+import { globalUploadMiddleware , isAuthorized ,auth} from '@duvdu-v1/duvdu';
 import express from 'express';
 
 import * as handler from '../controllers';
@@ -13,7 +13,7 @@ export const router = express.Router();
 router.get('/crm' , handler.getCatogriesAdminHandler);
 
 router.route('/')
-  .post(auth(User) , allowedTo(Plan , Role , Ifeatures.createCategory),globalUploadMiddleware({fileType:'image'}).fields([
+  .post(auth(User) , isAuthorized(Plan , Role , Ifeatures.createCategory),globalUploadMiddleware({fileType:'image'}).fields([
     {
       name:'image' , maxCount:1
     }
@@ -22,9 +22,9 @@ router.route('/')
 
 router.route('/:categoryId')
   .get(val.getCatogryVal , handler.getCategoryHandler)
-  .put(globalUploadMiddleware({fileType:'image'}).fields([
+  .put(auth(User) , isAuthorized(Plan , Role , Ifeatures.updateCategory),globalUploadMiddleware({fileType:'image'}).fields([
     {
       name:'image' , maxCount:1
     }
   ]), val.updateCategoryVal , handler.updateCategoryHandler)
-  .delete(val.removeCategoryVal , handler.removeCategoryHandler);
+  .delete(auth(User) , isAuthorized(Plan , Role , Ifeatures.removeCategory),val.removeCategoryVal , handler.removeCategoryHandler);
