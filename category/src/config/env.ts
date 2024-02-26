@@ -15,12 +15,12 @@ export const env = {
   jwt: {
     secret: process.env.JWT_KEY as string,
   },
-  expressSession:{
-    secret: process.env.SESSION_SECRET as string 
+  expressSession: {
+    secret: process.env.SESSION_SECRET as string,
   },
-  redis:{
-    redisHost:process.env.REDIS_HOST as string,
-  }
+  redis: {
+    redisHost: process.env.REDIS_HOST as string,
+  },
 };
 
 export const checkEnvVariables = () => {

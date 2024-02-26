@@ -1,5 +1,5 @@
-import {Document, Types} from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 export interface Iplan extends Document {
-    role:Types.ObjectId
+  role: Types.ObjectId;
 }

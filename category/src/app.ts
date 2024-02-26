@@ -12,7 +12,7 @@ export const app = express();
 app.set('trust proxy', 1);
 
 const redisClient = createClient({
-  url: 'redis://expiration-redis-srv:6379', 
+  url: 'redis://expiration-redis-srv:6379',
 });
 
 redisClient.connect().catch(console.error);
@@ -20,19 +20,21 @@ redisClient.on('connect', () => {
   console.log('Connected to Redis');
 });
 
-const redisStore = new connectRedis({client:redisClient});
+const redisStore = new connectRedis({ client: redisClient });
 
-app.use(session({
-  store: redisStore,
-  secret: env.expressSession.secret,
-  saveUninitialized: false,
-  resave: false,
-  cookie: {
-    secure: env.environment === 'production', 
-    httpOnly: true,
-    sameSite: 'lax',
-  },
-}));
+app.use(
+  session({
+    store: redisStore,
+    secret: env.expressSession.secret,
+    saveUninitialized: false,
+    resave: false,
+    cookie: {
+      secure: env.environment === 'production',
+      httpOnly: true,
+      sameSite: 'lax',
+    },
+  }),
+);
 
 app.use(express.json());
 app.use('/api/category', categoryRoutes);

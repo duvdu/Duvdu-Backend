@@ -33,7 +33,7 @@ export interface CreateCategoryHandler
 
 export interface UpdateCategoryHandler
   extends RequestHandler<
-    {categoryId:string},
+    { categoryId: string },
     successResponse<unknown>,
     Partial<Pick<Icategory, 'image' | 'cycle' | 'tags' | 'title' | 'jobTitles' | 'status'>>,
     unknown
@@ -51,14 +51,7 @@ export interface GetCategoryHandler
   > {}
 
 export interface GetCategoriesHandler
-  extends RequestHandler<
-    unknown,
-    successResponse<{ data: Icategory[] }>,
-    unknown,
-    unknown
-  > {}
+  extends RequestHandler<unknown, successResponse<{ data: Icategory[] }>, unknown, unknown> {}
 
 export interface GetCatogriesAdminHandler
-  extends RequestHandler<unknown , successResponse<{data:Icategory[]}> , unknown , unknown>{}
-
-
+  extends RequestHandler<unknown, successResponse<{ data: Icategory[] }>, unknown, unknown> {}
