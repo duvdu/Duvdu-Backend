@@ -7,22 +7,25 @@ import {createClient} from 'redis';
 import { env } from './config/env';
 import passport from './controllers/auth/googleAuth.controller';
 import { apiRoutes } from './routes';
-
 export const app = express();
 
 app.set('trust proxy', true);
 app.use(express.json());
 
-const redisClient = createClient({
-  url: 'redis://expiration-redis-srv:6379', 
-});
 
-redisClient.connect().catch(console.error);
-redisClient.on('connect', () => {
-  console.log('Connected to Redis');
-});
+let redisStore;
 
-const redisStore = new connectRedis({client:redisClient});
+if (process.env.NODE_ENV != 'test') {
+  const redisClient = createClient({
+    url: 'redis://expiration-redis-srv:6379',
+  });
+  redisClient.connect().catch(console.error);
+  redisClient.on('connect', () => {
+    console.log('Connected to Redis');
+  });
+  redisStore = new connectRedis({client:redisClient});
+}
+
 app.use(
   session({
     secret: env.expressSession.secret,

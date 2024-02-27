@@ -7,7 +7,6 @@ import { hashPassword } from '../../utils/bcrypt';
 import { generateToken } from '../../utils/generateToken';
 
 export const signupHandler: SignupHandler = async (req, res) => {
-  console.log(true);
   
   const plans = await Plans.find().sort('-createdAt').limit(1);
   

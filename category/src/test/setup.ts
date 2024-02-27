@@ -3,11 +3,14 @@ import mongoose from 'mongoose';
 
 import { env } from '../config/env';
 
+
 let mongo: any;
 
 beforeAll(async () => {
   env.jwt.secret = 'sadsadsadasdas';
   process.env.JWT_KEY = 'sadsadsadasdas';
+  process.env.SESSION_SECRET = 'kjsdlksjdlsja';
+
   mongo = await MongoMemoryServer.create();
   const mongoUri = await mongo.getUri();
   await mongoose.connect(mongoUri);

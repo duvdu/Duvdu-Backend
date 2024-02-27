@@ -16,6 +16,7 @@ beforeEach(async () => {
     name: 'mohamed elewasy',
     phoneNumber: { number: '01552159359' },
   });
+  
   await mongoose.connection.db
     .collection('user')
     .updateOne({ username: 'metoooo' }, { $set: { isVerified: true } });

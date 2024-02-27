@@ -6,7 +6,7 @@ type successResponse<T> = T & {
   message: 'success';
 };
 
-export interface createTicketHandler
+export interface CreateTicketHandler
   extends RequestHandler<
     unknown,
     successResponse<unknown>,
@@ -14,20 +14,20 @@ export interface createTicketHandler
     unknown
   > {}
 
-export interface getTicketHandler
+export interface GetTicketHandler
   extends RequestHandler<{ ticketId: string }, successResponse<{ data: Iticket }>> {}
 
-export interface getTicketsHandler
+export interface GetTicketsHandler
   extends RequestHandler<unknown, successResponse<{ data: Iticket[] }>> {}
 
-export interface getUserTicketsHandler
+export interface GetUserTicketsHandler
   extends RequestHandler<
     unknown,
     successResponse<{ data: Pick<Iticket, 'id' | 'message' | 'name' | 'phoneNumber' | 'userId'>[] }>
   > {}
 
-export interface removeTicketHandler
+export interface RemoveTicketHandler
   extends RequestHandler<{ ticketId: string }, successResponse<unknown>> {}
 
-export interface updateTicketHandler
+export interface UpdateTicketHandler
   extends RequestHandler<{ ticketId: string }, successResponse<unknown>, Pick<Iticket, 'state'>> {}

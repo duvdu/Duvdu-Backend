@@ -24,7 +24,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@duvdu-v1/duvdu": "^1.0.31",
+    "@duvdu-v1/duvdu": "^1.0.33",
     "@jridgewell/sourcemap-codec": "^1.4.15",
     "@types/bcryptjs": "^2.4.5",
     "@types/cookie-session": "^2.0.48",
@@ -45,6 +45,7 @@
     "express-rate-limit": "^7.1.5",
     "express-session": "^1.18.0",
     "express-validator": "^7.0.1",
+    "http-errors": "^2.0.0",
     "ioredis": "^5.3.2",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.0.4",
@@ -55,13 +56,16 @@
     "passport-apple": "^2.0.2",
     "passport-google-oauth2": "^0.2.0",
     "redis": "^4.6.13",
+    "redis-mock": "^0.56.3",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.3.3"
   },
   "devDependencies": {
+    "@types/http-errors": "^2.0.4",
     "@types/jest": "^29.5.11",
     "@types/passport-apple": "^2.0.3",
+    "@types/redis-mock": "^0.17.3",
     "@types/supertest": "^2.0.16",
     "@typescript-eslint/eslint-plugin": "^6.19.0",
     "@typescript-eslint/parser": "^6.19.0",

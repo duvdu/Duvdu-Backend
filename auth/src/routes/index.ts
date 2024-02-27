@@ -6,10 +6,11 @@ import * as handlers from '../controllers/auth';
 import passport from '../controllers/auth/googleAuth.controller';
 import { Users } from '../models/User.model';
 import { Iuser } from '../types/User';
-import * as val from '../validators';
+import * as val from '../validators/auth';
 
 const router = Router();
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 router.post('/signin', val.signinVal, handlers.signinHandler);
 router.post('/signup', val.signupVal, handlers.signupHandler);
 router.post(

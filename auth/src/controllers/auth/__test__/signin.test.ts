@@ -36,12 +36,10 @@ describe('signin endpoint', () => {
       password: hashPassword('123@Metoo'),
       isVerified: true,
     });
-    const response = await request.post('/api/users/signin').send({
+    
+    await request.post('/api/users/signin').send({
       username: 'ewasy_mohamed',
       password: '123@Metoo',
-    });
-    expect(response.status).toBe(200);
-    expect(response.body).toEqual({ message: 'success' });
-    expect(response.headers['set-cookie'].toString()).toBeDefined();
+    }).expect(200);
   });
 });

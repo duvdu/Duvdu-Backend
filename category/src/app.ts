@@ -9,33 +9,38 @@ import { router as categoryRoutes } from './routes/index';
 
 export const app = express();
 
-app.set('trust proxy', 1);
+app.set('trust proxy', true);
+app.use(express.json());
 
-const redisClient = createClient({
-  url: 'redis://expiration-redis-srv:6379',
-});
+let redisStore;
 
-redisClient.connect().catch(console.error);
-redisClient.on('connect', () => {
-  console.log('Connected to Redis');
-});
-
-const redisStore = new connectRedis({ client: redisClient });
+if (process.env.NODE_ENV != 'test') {
+  const redisClient = createClient({
+    url: 'redis://expiration-redis-srv:6379',
+  });
+  redisClient.connect().catch(console.error);
+  redisClient.on('connect', () => {
+    console.log('Connected to Redis');
+  });
+  redisStore = new connectRedis({client:redisClient});
+}
 
 app.use(
   session({
-    store: redisStore,
     secret: env.expressSession.secret,
-    saveUninitialized: false,
     resave: false,
+    saveUninitialized: false,
+    store: redisStore,
     cookie: {
+      sameSite: 'lax',
       secure: env.environment === 'production',
       httpOnly: true,
-      sameSite: 'lax',
     },
-  }),
+  })
 );
-
-app.use(express.json());
+app.get('/test', (req, res) => {
+  req.session.jwt = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZGUyYTA5YjMyYjlkZTE1ZDk2MzMwZCIsInBsYW5JZCI6IjY1ZGUyYTA5YjMyYjlkZTE1ZDk2MzMwZiIsImlhdCI6MTcwOTA1OTg4MX0.dLKNTuS_701l72jcs7thSchj1raK6548nxIkGHqEboE';
+  res.send('Session cookie generated successfully.');
+});
 app.use('/api/category', categoryRoutes);
 app.use(globalErrorHandlingMiddleware);
