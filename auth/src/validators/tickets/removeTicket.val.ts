@@ -3,9 +3,8 @@ import { check } from 'express-validator';
 
 
 
-export const updateTicket = [
+
+export const removeTicketVal = [
   check('ticketId').isMongoId(),
-  check('state').exists().isObject(),
-  check('state.feedback').exists().isString(),
   globalValidatorMiddleware
 ];

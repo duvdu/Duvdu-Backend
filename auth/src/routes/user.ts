@@ -10,7 +10,6 @@ import * as val from '../validators/auth';
 
 const router = Router();
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 router.post('/signin', val.signinVal, handlers.signinHandler);
 router.post('/signup', val.signupVal, handlers.signupHandler);
 router.post(

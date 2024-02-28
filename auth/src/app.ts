@@ -6,7 +6,8 @@ import {createClient} from 'redis';
 
 import { env } from './config/env';
 import passport from './controllers/auth/googleAuth.controller';
-import { apiRoutes } from './routes';
+import { router as ticketRoutes } from './routes/ticket';
+import { apiRoutes } from './routes/user';
 export const app = express();
 
 app.set('trust proxy', true);
@@ -43,6 +44,7 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use('/api/users/ticket' , ticketRoutes);
 app.use('/api/users', apiRoutes);
 
 app.use(globalErrorHandlingMiddleware);

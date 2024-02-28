@@ -13,7 +13,7 @@ const ticketSchema = new mongoose.Schema<Iticket>({
   },
   phoneNumber: { key: String, number: { type: String, unique: true, sparse: true } },
   message:String,
-  state:{isClosed:Boolean , closedBy:mongoose.Schema.Types.ObjectId , feedback:String}
+  state:{isClosed:{type:Boolean , default:false} , closedBy:mongoose.Schema.Types.ObjectId , feedback:String}
 
 },{timestamps:true , toJSON:{
   transform(doc,ret){

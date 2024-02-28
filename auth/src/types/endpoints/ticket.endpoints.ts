@@ -14,6 +14,7 @@ export interface CreateTicketHandler
     unknown
   > {}
 
+  
 export interface GetTicketHandler
   extends RequestHandler<{ ticketId: string }, successResponse<{ data: Iticket }>> {}
 
