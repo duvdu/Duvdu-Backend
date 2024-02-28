@@ -1,3 +1,4 @@
+import 'express-async-errors';
 import { NotFound } from '@duvdu-v1/duvdu';
 
 import { Ticket } from '../../models/Ticket.model';

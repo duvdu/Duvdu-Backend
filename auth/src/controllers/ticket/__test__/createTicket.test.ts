@@ -69,7 +69,7 @@ describe('create ticket should' , ()=>{
       })
       .expect(422);
   });
-  it('should return 200 for success' , async ()=>{
+  it('should return 201 for success' , async ()=>{
     await request.post('/api/users/ticket')
       .set('Cookie' , cookieSession)
       .send({

@@ -1,3 +1,4 @@
+import 'express-async-errors';
 import { Ticket } from '../../models/Ticket.model';
 import { CreateTicketHandler } from '../../types/endpoints/ticket.endpoints';
 

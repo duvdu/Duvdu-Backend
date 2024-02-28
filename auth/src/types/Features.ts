@@ -6,6 +6,8 @@ export enum Ifeatures {
     getAllTickets = 'get-all-tickets',
     updateTicket = 'update-ticket',
     removeTicket = 'remove-ticket',
-    getTicket = 'get-ticket'
+    getTicket = 'get-ticket',
+    createTerm = 'create-term',
+    updateTerm = 'update-term'
   }
   
