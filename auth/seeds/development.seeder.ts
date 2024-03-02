@@ -30,7 +30,7 @@ import { Roles } from '../src/models/Role.model';
 
   await Roles.insertMany([
     { _id: roleAdminId, key: 'admin' },
-    { _id: roleUserId, key: 'user', features: [Ifeatures.savedProjects, Ifeatures.updateProfile] },
+    { _id: roleUserId, key: 'user', features: Object.values(Ifeatures) },
   ]);
   const [planAdminId, planUserId] = [new mongoose.Types.ObjectId(), new mongoose.Types.ObjectId()];
   await Plans.insertMany([

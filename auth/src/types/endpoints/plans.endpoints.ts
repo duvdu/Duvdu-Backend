@@ -1,36 +1,34 @@
 import { RequestHandler } from 'express';
 
+import { Ifeatures } from '../Features';
 import { Iplan } from '../Plan';
 import { Irole } from '../Role';
-
-type successResponse<T> = T & {
-  message: 'success';
-};
+import { SuccessResponse } from '../success-response';
 
 // roles
 export interface CreateRoleHandler
-  extends RequestHandler<unknown, successResponse<unknown>, Pick<Irole, 'key'>, unknown> {}
+  extends RequestHandler<unknown, SuccessResponse<{ id: string }>, Pick<Irole, 'key'>, unknown> {}
 
 // TODO: remove all features in roleFeatures related to this role
 export interface RemoveRoleHandler
-  extends RequestHandler<{ roleId: string }, successResponse<unknown>, unknown, unknown> {}
+  extends RequestHandler<{ roleId: string }, SuccessResponse, unknown, unknown> {}
 
 export interface GetRolesHandler
   extends RequestHandler<
     unknown,
-    successResponse<{ data: Pick<Irole, 'id' | 'key'>[] }>,
+    SuccessResponse<{ data: Pick<Irole, 'id' | 'key'>[] }>,
     unknown,
     unknown
   > {}
 
 export interface GetRoleHandler
-  extends RequestHandler<unknown, successResponse<{ data: Irole }>, unknown, unknown> {}
+  extends RequestHandler<{ roleId: string }, SuccessResponse<{ data: Irole }>, unknown, unknown> {}
 
 // plans
 export interface CreatePlanHandler
   extends RequestHandler<
     unknown,
-    successResponse<unknown>,
+    SuccessResponse<{ id: string }>,
     Pick<Iplan, 'title' | 'key' | 'role'>,
     unknown
   > {}
@@ -38,21 +36,21 @@ export interface CreatePlanHandler
 export interface UpdatePlanHandler
   extends RequestHandler<
     { planId: string },
-    successResponse<unknown>,
+    SuccessResponse,
     Partial<Pick<Iplan, 'title' | 'status'>>,
     unknown
   > {}
 
 export interface RemovePlanHandler
-  extends RequestHandler<{ planId: string }, successResponse<unknown>, unknown, unknown> {}
+  extends RequestHandler<{ planId: string }, SuccessResponse, unknown, unknown> {}
 
 export interface GetPlansHandler
-  extends RequestHandler<unknown, successResponse<{ data: Iplan[] }>, unknown, unknown> {}
+  extends RequestHandler<unknown, SuccessResponse<{ data: Iplan[] }>, unknown, unknown> {}
 
 export interface GetPlanHandler
   extends RequestHandler<
-    unknown,
-    successResponse<{
+    { planId: string },
+    SuccessResponse<{
       data: Pick<Iplan, 'id' | 'key' | 'title'> & {
         status?: boolean;
         role: Irole;
@@ -62,21 +60,8 @@ export interface GetPlanHandler
 
 // roleFeatures
 
-export interface AddFeaturestoRoleHandler
-  extends RequestHandler<
-    unknown,
-    successResponse<unknown>,
-    { roleId: string; Features: string[] },
-    unknown
-  > {}
-
-export interface RemoveFeaturefromRoleHandler
-  extends RequestHandler<
-    unknown,
-    successResponse<unknown>,
-    { roleId: string; Features: string[] },
-    unknown
-  > {}
+export interface UpdateRoleHandler
+  extends RequestHandler<{ roleId: string }, SuccessResponse, { features: string[] }> {}
 
 export interface GetFeaturesHandler
-  extends RequestHandler<unknown, successResponse<{ data: Ifeatures[] }>, unknown, unknown> {}
+  extends RequestHandler<unknown, SuccessResponse<{ data: Ifeatures[] }>, unknown, unknown> {}

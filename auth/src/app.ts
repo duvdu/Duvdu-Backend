@@ -1,3 +1,5 @@
+import 'express-async-errors';
+import './types/custom-definition';
 import { globalErrorHandlingMiddleware } from '@duvdu-v1/duvdu';
 import express from 'express';
 import session from 'express-session';

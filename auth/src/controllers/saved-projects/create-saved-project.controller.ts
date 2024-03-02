@@ -6,7 +6,6 @@ import { CreateSavedProjectHandler } from '../../types/endpoints/saved-projects.
 
 export const createSavedProjectHandler: CreateSavedProjectHandler = async (req, res, next) => {
   const project = await Projects.findOne({ _id: req.body.projects[0] });
-  console.log('project', project);
   if (!project) return next(new NotFound());
 
   await SavedProjects.create({

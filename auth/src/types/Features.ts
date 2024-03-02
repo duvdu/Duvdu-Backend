@@ -14,4 +14,16 @@ export enum Ifeatures {
   getTicket = 'get-ticket',
   createTerm = 'create-term',
   updateTerm = 'update-term',
+  // plan
+  createPlanHandler = 'create plan',
+  updatePlanHandler = 'update plan',
+  getPlanHandler = 'get plan',
+  getAllPlansHandler = 'get all plans',
+  removePlanHandler = 'remove plan',
+  // roles
+  createRoleHandler = 'create role',
+  updateRoleHandler = 'update role',
+  getRolesHandler = 'get roles',
+  getRoleHandler = 'get role',
+  removeRoleHandler = 'remove role',
 }
