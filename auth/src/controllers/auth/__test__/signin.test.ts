@@ -36,10 +36,13 @@ describe('signin endpoint', () => {
       password: hashPassword('123@Metoo'),
       isVerified: true,
     });
-    
-    await request.post('/api/users/signin').send({
-      username: 'ewasy_mohamed',
-      password: '123@Metoo',
-    }).expect(200);
+
+    await request
+      .post('/api/users/signin')
+      .send({
+        username: 'ewasy_mohamed',
+        password: '123@Metoo',
+      })
+      .expect(200);
   });
 });
