@@ -1,8 +1,8 @@
-import { Document, Types } from 'mongoose';
+import { Types } from 'mongoose';
 
 import { Irole } from './Role';
 
-export interface Iplan extends Document {
+export interface Iplan {
   id: string;
   title: { ar: string; en: string };
   key: string;

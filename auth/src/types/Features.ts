@@ -3,4 +3,5 @@ export enum Ifeatures {
   updatePhoneNumber = 'updatePhoneNumber',
   changePassword = 'changePassword',
   updateProfile = 'updateProfile',
+  savedProjects = 'savedProjects',
 }

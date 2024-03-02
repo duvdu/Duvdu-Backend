@@ -1,42 +1,32 @@
 import { RequestHandler } from 'express';
 
-import { Iproject } from '../Projects';
 import { IsavedProject } from '../SavedProjects';
 
 type successResponse<T> = T & {
   message: 'success';
 };
-//TODO: create favourite savedProjects on signup
 //TODO: fire event to send notification
-export interface createSavedProjectHandler
-  extends RequestHandler<unknown, successResponse<unknown>, { title: string }, unknown> {}
-
-export interface addProjectToSavedProjectHandler
-  extends RequestHandler<
-    { savedProjectId: string },
-    successResponse<unknown>,
-    { projectId: string },
-    unknown
-  > {}
-
-export interface removeProjectFromSavedProjectHandler
-  extends RequestHandler<
-    { savedProjectId: string },
-    successResponse<unknown>,
-    { projectId: string },
-    unknown
-  > {}
-
-export interface getSavedProjectHandler
+export interface CreateSavedProjectHandler
   extends RequestHandler<
     unknown,
-    successResponse<{ data: IsavedProject & { projects: Iproject[] } }>
+    successResponse<unknown>,
+    { title: string; projects: [string] },
+    unknown
   > {}
 
-export interface getSavedProjectsHandler
-  extends RequestHandler<unknown, successResponse<{ data: IsavedProject }>> {}
+export interface AddProjectToSavedProjectHandler
+  extends RequestHandler<{ savedProjectId: string; projectId: string }, successResponse<unknown>> {}
 
-export interface updateSavedProjectHandler
+export interface RemoveProjectFromSavedProjectHandler
+  extends RequestHandler<{ savedProjectId: string; projectId: string }, successResponse<unknown>> {}
+
+export interface GetSavedProjectHandler
+  extends RequestHandler<{ savedProjectId: string }, successResponse<{ data: IsavedProject }>> {}
+
+export interface GetSavedProjectsHandler
+  extends RequestHandler<unknown, successResponse<{ data: IsavedProject[] }>> {}
+
+export interface UpdateSavedProjectHandler
   extends RequestHandler<
     { savedProjectId: string },
     successResponse<unknown>,
@@ -44,5 +34,5 @@ export interface updateSavedProjectHandler
     unknown
   > {}
 
-export interface removeSavedProjectHandler
+export interface RemoveSavedProjectHandler
   extends RequestHandler<{ savedProjectId: string }, successResponse<unknown>, unknown, unknown> {}

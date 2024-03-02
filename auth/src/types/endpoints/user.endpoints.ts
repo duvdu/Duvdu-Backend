@@ -1,21 +1,7 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 import { RequestHandler } from 'express';
 
-import { IjwtPayload } from '../JwtPayload';
 import { Iuser } from '../User';
-
-declare module 'express-session' {
-  interface SessionData {
-    jwt?: string;
-  }
-}
-declare global {
-  namespace Express {
-    interface Request {
-      loggedUser?: IjwtPayload;
-    }
-  }
-}
 
 type successResponse<T> = T & {
   message: 'success';

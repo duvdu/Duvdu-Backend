@@ -5,7 +5,7 @@ import { Iplan } from '../types/Plan';
 const planSchema = new Schema<Iplan>(
   {
     key: { type: String, unique: true },
-    role: Schema.Types.ObjectId,
+    role: { type: Schema.Types.ObjectId, ref: 'role' },
   },
   { collection: 'plan' },
 );

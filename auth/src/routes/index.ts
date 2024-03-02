@@ -1,95 +1,13 @@
-import { auth, globalUploadMiddleware } from '@duvdu-v1/duvdu';
 import { Router } from 'express';
-import rateLimit from 'express-rate-limit';
 
-import * as handlers from '../controllers/auth';
-import passport from '../controllers/auth/googleAuth.controller';
-import { isAuthorizedMiddleware } from '../middlewares/isAuthorized.middleware';
-import { Users } from '../models/User.model';
-import { Ifeatures } from '../types/Features';
-import { Iuser } from '../types/User';
-import * as val from '../validators';
+import { authRoutes } from './auth.routes';
+import { oauthRoutes } from './oauth.routes';
+import { savedProjectRoutes } from './saved-project.routes';
 
 const router = Router();
-router.post('/signin', val.signinVal, handlers.signinHandler);
-router.post('/signup', val.signupVal, handlers.signupHandler);
-router.post(
-  '/retreive-username',
-  rateLimit({
-    windowMs: 10 * 60 * 1000,
-    max: 20,
-  }),
-  val.retreiveUsernameVal,
-  handlers.retreiveUsernameHandler,
-);
-router.patch(
-  '/change-password',
-  auth(Users),
-  isAuthorizedMiddleware(Ifeatures.changePassword),
-  val.changePasswordVal,
-  handlers.changePasswordHandler,
-);
-router
-  .route('/update-phone')
-  .all(auth(Users), isAuthorizedMiddleware(Ifeatures.updatePhoneNumber))
-  .post(val.askUpdatePhoneVal, handlers.askUpdatePhoneNumberHandler)
-  .put(val.updatePhoneNumberVal, handlers.updatePhoneNumberHandler);
-router
-  .route('/update-phone/verify')
-  .post(val.verifyUpdatePhoneVal, handlers.verifyUpdatePhoneNumberHandler);
 
-router.get('/auth/google', passport.authenticate('google', { scope: ['email', 'profile'] }));
-
-router.get(
-  '/auth/google',
-  passport.authenticate('google', { scope: ['email', 'profile', 'phone'] }),
-);
-
-router.get(
-  '/auth/google/callback',
-  passport.authenticate('google', {
-    successRedirect: '/api/users/auth/google/success',
-    failureRedirect: '/auth/google/failure',
-  }),
-);
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-router.get('/auth/google/success', (req, res) => {
-  console.log('hello here');
-  req.session.jwt = (req.user as Iuser)?.token;
-  res.send('helllo metoo');
-});
-
-router.get('/auth/apple', passport.authenticate('apple'));
-
-router.get(
-  '/auth/apple/callback',
-  passport.authenticate('apple', { failureRedirect: '/login' }),
-  (req, res) => {
-    // Successful authentication, redirect to the desired page
-    res.redirect('/profile');
-  },
-);
-
-router
-  .route('/reset-password')
-  .get(val.askResetPasswordVal, handlers.askResetPasswordHandler)
-  .post(val.resetPasswordVal, handlers.resetPasswordHandler);
-router.post('/resend-code', val.resendCodeVal, handlers.resendVerificationCodeHandler);
-router
-  .route('/profile')
-  .all(auth(Users))
-  .get(handlers.getLoggedUserProfileHandler)
-  .patch(
-    isAuthorizedMiddleware(Ifeatures.updateProfile),
-    globalUploadMiddleware({ fileType: 'image' }).fields([
-      { name: 'profileImage', maxCount: 1 },
-      { name: 'coverImage', maxCount: 1 },
-    ]),
-    val.updateProfileVal,
-    handlers.updateProfileHandler,
-  );
-
-router.route('/profile/:userId').get(val.userIdVal, handlers.getUserProfileHandler);
+router.use('/auth', authRoutes);
+router.use('/oauth', oauthRoutes);
+router.use('/saved-projects', savedProjectRoutes);
 
 export const apiRoutes = router;

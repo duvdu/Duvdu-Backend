@@ -2,7 +2,7 @@ import { Schema, model } from 'mongoose';
 
 import { Iuser } from '../types/User';
 
-const userSchema = new Schema<Iuser & Document>(
+const userSchema = new Schema<Iuser>(
   {
     googleId: String,
     appleId: String,
@@ -33,4 +33,4 @@ const userSchema = new Schema<Iuser & Document>(
   { timestamps: true, collection: 'user' },
 );
 
-export const Users = model<Iuser & Document>('user', userSchema);
+export const Users = model<Iuser>('user', userSchema);

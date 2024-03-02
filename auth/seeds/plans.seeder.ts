@@ -5,7 +5,6 @@ import mongoose from 'mongoose';
 import { Plans } from './../src/models/Plan.model';
 import { Roles } from './../src/models/Role.model';
 import { env } from '../src/config/env';
-import { Users } from '../src/models/User.model';
 
 config();
 
