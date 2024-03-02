@@ -1,6 +1,4 @@
-import { Document } from 'mongoose';
-
-export interface Irole extends Document {
+export interface Irole {
   id: string;
   key: string;
   features: string[];

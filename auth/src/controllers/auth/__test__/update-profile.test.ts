@@ -5,24 +5,32 @@ import mongoose from 'mongoose';
 import supertest from 'supertest';
 
 import { app } from '../../../app';
+import { Plans } from '../../../models/Plan.model';
+import { Roles } from '../../../models/Role.model';
+import { Users } from '../../../models/User.model';
+import { Ifeatures } from '../../../types/Features';
+import { hashPassword } from '../../../utils/bcrypt';
 
 const request = supertest(app);
 
 let cookieSession: string[];
 beforeEach(async () => {
   const mongoId = new mongoose.Types.ObjectId().toHexString();
-  await mongoose.connection.db.collection('role').insertOne({ id: mongoId, key: 'free' });
-  await mongoose.connection.db.collection('plan').insertOne({ role: mongoId, key: 'free' });
-
-  const response = await request.post('/api/users/auth/signup').send({
+  await Roles.create({ _id: mongoId, key: 'free', features: [Ifeatures.updateProfile] });
+  await Plans.create({ _id: mongoId, role: mongoId, key: 'free' });
+  await Users.create({
     username: 'elewasy',
-    password: '123@Metoo',
+    password: hashPassword('123@Metoo'),
     name: 'mohamed elewasy',
     phoneNumber: { number: '01552159359' },
+    isVerified: true,
+    plan: mongoId,
   });
-  await mongoose.connection.db
-    .collection('user')
-    .updateOne({ username: 'elewasy' }, { $set: { isVerified: true } });
+
+  const response = await request.post('/api/users/auth/signin').send({
+    username: 'elewasy',
+    password: '123@Metoo',
+  });
   cookieSession = response.get('Set-Cookie');
 });
 
