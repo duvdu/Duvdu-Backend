@@ -8,6 +8,9 @@ export const env = {
   mongoDb: {
     uri: process.env.MONGO_URI as string,
   },
+  redis: {
+    uri: process.env.REDIS_URI as string,
+  },
   bcrypt: {
     salt: +(process.env.BCRYPT_SALT || 10) as number,
     paper: (process.env.BCRYPT_PAPER || 'password') as string,
@@ -21,9 +24,7 @@ export const env = {
   },
   expressSession: {
     secret: process.env.SESSION_SECRET as string,
-  },
-  redis: {
-    redisHost: process.env.REDIS_HOST as string,
+    allowUseStorage: (process.env.ALLOW_USE_SESSION_STORAGE === 'true') as boolean,
   },
 };
 
@@ -35,5 +36,5 @@ export const checkEnvVariables = () => {
   if (!env.google.client_id) throw new Error('env:CLIENT_ID must be defined');
   if (!env.google.client_secret) throw new Error('env:CLIENT_SECRET must be defined');
   if (!env.expressSession.secret) return new Error('env:SESSION_SECRET must be defined');
-  if (!env.redis.redisHost) return new Error('env:REDIS_HOST must be defined');
+  if (!env.redis.uri) return new Error('env:REDIS_HOST must be defined');
 };
