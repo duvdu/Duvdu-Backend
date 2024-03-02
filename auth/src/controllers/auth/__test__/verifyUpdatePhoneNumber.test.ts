@@ -12,7 +12,7 @@ beforeEach(async () => {
   await mongoose.connection.db.collection('role').insertOne({ id: mongoId, key: 'admin' });
   await mongoose.connection.db.collection('plan').insertOne({ role: mongoId, key: 'admin' });
 
-  const response = await request.post('/api/users/signup').send({
+  const response = await request.post('/api/users/auth/signup').send({
     username: 'metoooo',
     password: '123@Metoo',
     name: 'mohamed elewasy',
@@ -26,11 +26,11 @@ beforeEach(async () => {
 
 describe('verify update phone number', () => {
   it('should return 422 for invalid input ', async () => {
-    await request.post('/api/users/update-phone/verify').send({}).expect(422);
+    await request.post('/api/users/auth/update-phone/verify').send({}).expect(422);
   });
   it('should return 422 for invalid input ', async () => {
     await request
-      .post('/api/users/update-phone/verify')
+      .post('/api/users/auth/update-phone/verify')
       .send({
         verificationCode: '',
       })
@@ -38,7 +38,7 @@ describe('verify update phone number', () => {
   });
   it('should return 422 for invalid input ', async () => {
     await request
-      .post('/api/users/update-phone/verify')
+      .post('/api/users/auth/update-phone/verify')
       .send({
         verificationCode: '',
         phoneNumber: '01022484942',
@@ -47,7 +47,7 @@ describe('verify update phone number', () => {
   });
   it('should return 422 for invalid input ', async () => {
     await request
-      .post('/api/users/update-phone/verify')
+      .post('/api/users/auth/update-phone/verify')
       .send({
         verificationCode: '123',
         phoneNumber: '01022484942',
@@ -56,7 +56,7 @@ describe('verify update phone number', () => {
   });
   it('should return 422 for invalid input ', async () => {
     await request
-      .post('/api/users/update-phone/verify')
+      .post('/api/users/auth/update-phone/verify')
       .send({
         verificationCode: '123456',
         phoneNumber: '01022484',
@@ -65,7 +65,7 @@ describe('verify update phone number', () => {
   });
   it('should return 422 for invalid input ', async () => {
     await request
-      .post('/api/users/update-phone/verify')
+      .post('/api/users/auth/update-phone/verify')
       .send({
         verificationCode: '',
         phoneNumber: '01022484942',
@@ -74,7 +74,7 @@ describe('verify update phone number', () => {
   });
   it('should return 404 if user not found ', async () => {
     await request
-      .post('/api/users/update-phone/verify')
+      .post('/api/users/auth/update-phone/verify')
       .send({
         verificationCode: '123456',
         phoneNumber: '01022484942',
@@ -84,29 +84,27 @@ describe('verify update phone number', () => {
   it('should return 200 for success response', async () => {
     const randomCode = hashVerificationCode('123456');
     await request
-      .post('/api/users/update-phone')
+      .post('/api/users/auth/update-phone')
       .set('Cookie', cookieSession)
       .send({
         password: '123@Metoo',
       })
       .expect(200);
 
-    await mongoose.connection.db
-      .collection('user')
-      .updateOne(
-        { username: 'metoooo' },
-        {
-          $set: {
-            verificationCode: {
-              code: randomCode,
-              expireAt: new Date(Date.now() + 60 * 1000).toString(),
-            },
+    await mongoose.connection.db.collection('user').updateOne(
+      { username: 'metoooo' },
+      {
+        $set: {
+          verificationCode: {
+            code: randomCode,
+            expireAt: new Date(Date.now() + 60 * 1000).toString(),
           },
         },
-      );
+      },
+    );
 
     await request
-      .put('/api/users/update-phone')
+      .put('/api/users/auth/update-phone')
       .set('Cookie', cookieSession)
       .send({
         verificationCode: '123456',
@@ -116,22 +114,20 @@ describe('verify update phone number', () => {
     const user = await mongoose.connection.db.collection('user').findOne({ username: 'metoooo' });
     expect(user?.isBlocked).toBeTruthy();
 
-    await mongoose.connection.db
-      .collection('user')
-      .updateOne(
-        { username: 'metoooo' },
-        {
-          $set: {
-            verificationCode: {
-              code: randomCode,
-              expireAt: new Date(Date.now() + 60 * 1000).toString(),
-            },
+    await mongoose.connection.db.collection('user').updateOne(
+      { username: 'metoooo' },
+      {
+        $set: {
+          verificationCode: {
+            code: randomCode,
+            expireAt: new Date(Date.now() + 60 * 1000).toString(),
           },
         },
-      );
+      },
+    );
 
     await request
-      .post('/api/users/update-phone/verify')
+      .post('/api/users/auth/update-phone/verify')
       .send({
         verificationCode: '123456',
         phoneNumber: '01022484942',

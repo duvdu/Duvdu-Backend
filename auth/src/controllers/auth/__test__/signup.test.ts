@@ -14,7 +14,7 @@ beforeEach(async () => {
 
 describe('AuthController', () => {
   it('should return 201 on valid signup', async () => {
-    const response = await request.post('/api/users/signup').send({
+    const response = await request.post('/api/users/auth/signup').send({
       name: 'ewasy',
       username: 'ewasy_mohamed',
       password: '123@Metoo',
@@ -31,7 +31,7 @@ describe('AuthController', () => {
   });
   it('should return 400 if already exists username', async () => {
     await mongoose.connection.db.collection('user').insertOne({ username: 'ewasy_mohamed' });
-    const response = await request.post('/api/users/signup').send({
+    const response = await request.post('/api/users/auth/signup').send({
       name: 'ewasy',
       username: 'ewasy_mohamed',
       password: '123@Metoo',
@@ -44,7 +44,7 @@ describe('AuthController', () => {
     await mongoose.connection.db
       .collection('user')
       .insertOne({ phoneNumber: { number: '01234567891' } });
-    const response = await request.post('/api/users/signup').send({
+    const response = await request.post('/api/users/auth/signup').send({
       name: 'ewasy',
       username: 'ewasy_sadasd',
       password: '123@Metoo',
@@ -56,7 +56,7 @@ describe('AuthController', () => {
     });
   });
   it('should return 422 if name not sent in request', async () => {
-    const response = await request.post('/api/users/signup').send({
+    const response = await request.post('/api/users/auth/signup').send({
       username: 'ewasy_sadasd',
       password: '123@Metoo',
       phoneNumber: { number: '01234567891' },
@@ -72,7 +72,7 @@ describe('AuthController', () => {
     };
     expect(
       (
-        await request.post('/api/users/signup').send({
+        await request.post('/api/users/auth/signup').send({
           ...validUser,
           username: 'ewasy mohamed',
         })
@@ -80,7 +80,7 @@ describe('AuthController', () => {
     ).toBe(422);
     expect(
       (
-        await request.post('/api/users/signup').send({
+        await request.post('/api/users/auth/signup').send({
           ...validUser,
           username: 'ewasymohamed ',
         })
@@ -88,7 +88,7 @@ describe('AuthController', () => {
     ).toBe(422);
     expect(
       (
-        await request.post('/api/users/signup').send({
+        await request.post('/api/users/auth/signup').send({
           ...validUser,
           username: 'ewasy$mohamed',
         })
@@ -96,7 +96,7 @@ describe('AuthController', () => {
     ).toBe(422);
     expect(
       (
-        await request.post('/api/users/signup').send({
+        await request.post('/api/users/auth/signup').send({
           ...validUser,
           username: 'ewasy.mohamed',
         })
@@ -104,7 +104,7 @@ describe('AuthController', () => {
     ).toBe(422);
     expect(
       (
-        await request.post('/api/users/signup').send({
+        await request.post('/api/users/auth/signup').send({
           ...validUser,
           username: 'ewasy-mohamed',
         })

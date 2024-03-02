@@ -11,7 +11,7 @@ beforeEach(async () => {
   await mongoose.connection.db.collection('role').insertOne({ id: mongoId, key: 'free' });
   await mongoose.connection.db.collection('plan').insertOne({ role: mongoId, key: 'free' });
 
-  const response = await request.post('/api/users/signup').send({
+  const response = await request.post('/api/users/auth/signup').send({
     username: 'elewasy',
     password: '123@Metoo',
     name: 'mohamed elewasy',
@@ -25,18 +25,18 @@ beforeEach(async () => {
 
 describe('change password', () => {
   it('should return 401 if user not authenticated ', async () => {
-    await request.patch('/api/users/change-password').send().expect(401);
+    await request.patch('/api/users/auth/change-password').send().expect(401);
   });
   it('should return 422 for invalid input', async () => {
     await request
-      .patch('/api/users/change-password')
+      .patch('/api/users/auth/change-password')
       .set('Cookie', cookieSession)
       .send()
       .expect(422);
   });
   it('should return 422 for invalid input', async () => {
     await request
-      .patch('/api/users/change-password')
+      .patch('/api/users/auth/change-password')
       .set('Cookie', cookieSession)
       .send({
         oldPassword: '',
@@ -45,7 +45,7 @@ describe('change password', () => {
   });
   it('should return 422 for invalid input', async () => {
     await request
-      .patch('/api/users/change-password')
+      .patch('/api/users/auth/change-password')
       .set('Cookie', cookieSession)
       .send({
         newPassword: '123',
@@ -54,7 +54,7 @@ describe('change password', () => {
   });
   it('should return 422 for invalid input', async () => {
     await request
-      .patch('/api/users/change-password')
+      .patch('/api/users/auth/change-password')
       .set('Cookie', cookieSession)
       .send({
         newPassword: '123',
@@ -64,7 +64,7 @@ describe('change password', () => {
   });
   it('should return 401 for wrong old password', async () => {
     await request
-      .patch('/api/users/change-password')
+      .patch('/api/users/auth/change-password')
       .set('Cookie', cookieSession)
       .send({
         newPassword: '123!Metoo',
@@ -74,7 +74,7 @@ describe('change password', () => {
   });
   it('should return 200 for success response', async () => {
     const response = await request
-      .patch('/api/users/change-password')
+      .patch('/api/users/auth/change-password')
       .set('Cookie', cookieSession)
       .send({
         newPassword: '123@eeMetoo',

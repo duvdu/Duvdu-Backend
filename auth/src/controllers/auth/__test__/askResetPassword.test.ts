@@ -10,7 +10,7 @@ beforeEach(async () => {
   await mongoose.connection.db.collection('role').insertOne({ id: mongoId, key: 'free' });
   await mongoose.connection.db.collection('plan').insertOne({ role: mongoId, key: 'free' });
 
-  await request.post('/api/users/signup').send({
+  await request.post('/api/users/auth/signup').send({
     username: 'metoooo',
     password: '123@Metoo',
     name: 'mohamed elewasy',
@@ -24,11 +24,11 @@ beforeEach(async () => {
 
 describe('ask reset password', () => {
   it('should return 422 for invalid input ', async () => {
-    await request.get('/api/users/reset-password').send().expect(422);
+    await request.get('/api/users/auth/reset-password').send().expect(422);
   });
   it('should return 422 for invalid input ', async () => {
     await request
-      .get('/api/users/reset-password')
+      .get('/api/users/auth/reset-password')
       .send({
         name: 'dd',
       })
@@ -36,7 +36,7 @@ describe('ask reset password', () => {
   });
   it('should return 422 for invalid input ', async () => {
     await request
-      .get('/api/users/reset-password')
+      .get('/api/users/auth/reset-password')
       .send({
         username: 'dd',
       })
@@ -44,7 +44,7 @@ describe('ask reset password', () => {
   });
   it('should return 404 if user not found ', async () => {
     await request
-      .get('/api/users/reset-password')
+      .get('/api/users/auth/reset-password')
       .send({
         username: 'motemedkhaled',
       })
@@ -52,7 +52,7 @@ describe('ask reset password', () => {
   });
   it('should return 200 for successs ', async () => {
     await request
-      .get('/api/users/reset-password')
+      .get('/api/users/auth/reset-password')
       .send({
         username: 'metoooo',
       })

@@ -30,7 +30,7 @@ beforeEach(async () => {
   savedProjectId = new mongoose.Types.ObjectId().toHexString();
   await SavedProjects.insertMany([{ _id: savedProjectId, user: user.id, title: 'favoutite' }]);
   const response = await request
-    .post('/api/users/signin')
+    .post('/api/users/auth/signin')
     .send({ username: 'mohamed', password: '123@Ewasy' });
   cookie = response.headers['set-cookie'];
 });

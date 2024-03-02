@@ -10,7 +10,7 @@ beforeEach(async () => {
   await mongoose.connection.db.collection('role').insertOne({ id: mongoId, key: 'admin' });
   await mongoose.connection.db.collection('plan').insertOne({ role: mongoId, key: 'admin' });
 
-  await request.post('/api/users/signup').send({
+  await request.post('/api/users/auth/signup').send({
     username: 'metoooo',
     password: '123@Metoo',
     name: 'mohamed elewasy',
@@ -23,11 +23,11 @@ beforeEach(async () => {
 
 describe('resetPassword', () => {
   it('should return 422 for invalid input ', async () => {
-    await request.post('/api/users/reset-password').send({}).expect(422);
+    await request.post('/api/users/auth/reset-password').send({}).expect(422);
   });
   it('should return 422 for invalid input ', async () => {
     await request
-      .post('/api/users/reset-password')
+      .post('/api/users/auth/reset-password')
       .send({
         verificationCode: '',
       })
@@ -35,7 +35,7 @@ describe('resetPassword', () => {
   });
   it('should return 422 for invalid input ', async () => {
     await request
-      .post('/api/users/reset-password')
+      .post('/api/users/auth/reset-password')
       .send({
         verificationCode: '123456',
         newPassword: '',
@@ -44,7 +44,7 @@ describe('resetPassword', () => {
   });
   it('should return 422 for invalid input ', async () => {
     await request
-      .post('/api/users/reset-password')
+      .post('/api/users/auth/reset-password')
       .send({
         verificationCode: '123456',
         newPassword: '123',
@@ -54,7 +54,7 @@ describe('resetPassword', () => {
   });
   it('should return 422 for invalid input ', async () => {
     await request
-      .post('/api/users/reset-password')
+      .post('/api/users/auth/reset-password')
       .send({
         verificationCode: '123456',
         newPassword: '123@Jhhh',
@@ -64,7 +64,7 @@ describe('resetPassword', () => {
   });
   it('should return 404 if user not found ', async () => {
     await request
-      .post('/api/users/reset-password')
+      .post('/api/users/auth/reset-password')
       .send({
         verificationCode: '123456',
         newPassword: '123@Jhhh',
@@ -74,7 +74,7 @@ describe('resetPassword', () => {
   });
   it('should return 401 for invalid or expire code ', async () => {
     await request
-      .post('/api/users/reset-password')
+      .post('/api/users/auth/reset-password')
       .send({
         verificationCode: '123456',
         newPassword: '123@Jhhh',
@@ -85,7 +85,7 @@ describe('resetPassword', () => {
   it('should return 200 for success ', async () => {
     const randomCode = hashVerificationCode('123456');
     await request
-      .get('/api/users/reset-password')
+      .get('/api/users/auth/reset-password')
       .send({
         username: 'metoooo',
       })
@@ -93,22 +93,20 @@ describe('resetPassword', () => {
     const user = await mongoose.connection.db.collection('user').findOne({ username: 'metoooo' });
     expect(user?.isVerified).toBeFalsy;
 
-    await mongoose.connection.db
-      .collection('user')
-      .updateOne(
-        { username: 'metoooo' },
-        {
-          $set: {
-            verificationCode: {
-              code: randomCode,
-              expireAt: new Date(Date.now() + 60 * 1000).toString(),
-            },
+    await mongoose.connection.db.collection('user').updateOne(
+      { username: 'metoooo' },
+      {
+        $set: {
+          verificationCode: {
+            code: randomCode,
+            expireAt: new Date(Date.now() + 60 * 1000).toString(),
           },
         },
-      );
+      },
+    );
 
     await request
-      .post('/api/users/reset-password')
+      .post('/api/users/auth/reset-password')
       .send({
         verificationCode: '123456',
         newPassword: '123@Jhhh',

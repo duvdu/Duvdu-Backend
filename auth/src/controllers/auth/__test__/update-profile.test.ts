@@ -14,7 +14,7 @@ beforeEach(async () => {
   await mongoose.connection.db.collection('role').insertOne({ id: mongoId, key: 'free' });
   await mongoose.connection.db.collection('plan').insertOne({ role: mongoId, key: 'free' });
 
-  const response = await request.post('/api/users/signup').send({
+  const response = await request.post('/api/users/auth/signup').send({
     username: 'elewasy',
     password: '123@Metoo',
     name: 'mohamed elewasy',
@@ -29,7 +29,7 @@ beforeEach(async () => {
 describe('update-profile controller', () => {
   it('should return 422 if update sensitive field', async () => {
     await request
-      .patch('/api/users/profile')
+      .patch('/api/users/auth/profile')
       .set('Cookie', cookieSession)
       .set('Content-Type', 'multipart/form-data')
       .field('googleId', 'googleId')
@@ -37,7 +37,7 @@ describe('update-profile controller', () => {
   });
   it('should return 422 if update sensitive field', async () => {
     await request
-      .patch('/api/users/profile')
+      .patch('/api/users/auth/profile')
       .set('Cookie', cookieSession)
       .set('Content-Type', 'multipart/form-data')
       .field('appleId', 'appleId')
@@ -45,7 +45,7 @@ describe('update-profile controller', () => {
   });
   it('should return 422 if update sensitive field', async () => {
     await request
-      .patch('/api/users/profile')
+      .patch('/api/users/auth/profile')
       .set('Cookie', cookieSession)
       .set('Content-Type', 'multipart/form-data')
       .field('phoneNumber[number]', '01234567899')
@@ -54,7 +54,7 @@ describe('update-profile controller', () => {
   });
   it('should return 422 if update sensitive field', async () => {
     await request
-      .patch('/api/users/profile')
+      .patch('/api/users/auth/profile')
       .set('Cookie', cookieSession)
       .set('Content-Type', 'multipart/form-data')
       .field('username', 'username')
@@ -62,7 +62,7 @@ describe('update-profile controller', () => {
   });
   it('should return 422 if update sensitive field', async () => {
     await request
-      .patch('/api/users/profile')
+      .patch('/api/users/auth/profile')
       .set('Cookie', cookieSession)
       .set('Content-Type', 'multipart/form-data')
       .field('password', 'passworD@1')
@@ -70,7 +70,7 @@ describe('update-profile controller', () => {
   });
   it('should return 422 if update sensitive field', async () => {
     await request
-      .patch('/api/users/profile')
+      .patch('/api/users/auth/profile')
       .set('Cookie', cookieSession)
       .set('Content-Type', 'multipart/form-data')
       .field('verificationCode[code]', 'stringCode')
@@ -79,7 +79,7 @@ describe('update-profile controller', () => {
   });
   it('should return 422 if update sensitive field', async () => {
     await request
-      .patch('/api/users/profile')
+      .patch('/api/users/auth/profile')
       .set('Cookie', cookieSession)
       .set('Content-Type', 'multipart/form-data')
       .field('token', 'token')
@@ -87,7 +87,7 @@ describe('update-profile controller', () => {
   });
   it('should return 200 if update unsensitive field', async () => {
     await request
-      .patch('/api/users/profile')
+      .patch('/api/users/auth/profile')
       .set('Cookie', cookieSession)
       .set('Content-Type', 'multipart/form-data')
       .field('name', 'mohamed mostafa elewasy')
@@ -95,7 +95,7 @@ describe('update-profile controller', () => {
   });
   it('should return 200 if update unsensitive field', async () => {
     await request
-      .patch('/api/users/profile')
+      .patch('/api/users/auth/profile')
       .attach('coverImage', fs.readFileSync(path.join(__dirname, 'image.jpg')), 'image.jpg')
       .set('Cookie', cookieSession)
       .set('Content-Type', 'multipart/form-data')
@@ -106,7 +106,7 @@ describe('update-profile controller', () => {
   });
   it('should return 200 if update unsensitive field', async () => {
     await request
-      .patch('/api/users/profile')
+      .patch('/api/users/auth/profile')
       .attach('profileImage', fs.readFileSync(path.join(__dirname, 'image.jpg')), 'image.jpg')
       .set('Cookie', cookieSession)
       .set('Content-Type', 'multipart/form-data')
@@ -117,7 +117,7 @@ describe('update-profile controller', () => {
   });
   it('should return 200 if update unsensitive field', async () => {
     await request
-      .patch('/api/users/profile')
+      .patch('/api/users/auth/profile')
       .set('Cookie', cookieSession)
       .set('Content-Type', 'multipart/form-data')
       .field('location[lat]', '40.1234654')
@@ -130,7 +130,7 @@ describe('update-profile controller', () => {
       .collection('category')
       .insertOne({ _id: categoryId, title: 'cat1' });
     await request
-      .patch('/api/users/profile')
+      .patch('/api/users/auth/profile')
       .set('Cookie', cookieSession)
       .set('Content-Type', 'multipart/form-data')
       .field('category', categoryId.toString())
@@ -139,7 +139,7 @@ describe('update-profile controller', () => {
   it('should return 404 if update invalid field', async () => {
     const categoryId = new mongoose.Types.ObjectId();
     await request
-      .patch('/api/users/profile')
+      .patch('/api/users/auth/profile')
       .set('Cookie', cookieSession)
       .set('Content-Type', 'multipart/form-data')
       .field('category', categoryId.toString())
@@ -147,7 +147,7 @@ describe('update-profile controller', () => {
   });
   it('should return 422 if unsensitive field', async () => {
     await request
-      .patch('/api/users/profile')
+      .patch('/api/users/auth/profile')
       .set('Cookie', cookieSession)
       .set('Content-Type', 'multipart/form-data')
       .field('acceptedProjectsCounter', '5')
@@ -155,7 +155,7 @@ describe('update-profile controller', () => {
   });
   it('should return 422 if unsensitive field', async () => {
     await request
-      .patch('/api/users/profile')
+      .patch('/api/users/auth/profile')
       .set('Cookie', cookieSession)
       .set('Content-Type', 'multipart/form-data')
       .field('profileViews', '5')
@@ -163,7 +163,7 @@ describe('update-profile controller', () => {
   });
   it('should return 200 if unsensitive field', async () => {
     await request
-      .patch('/api/users/profile')
+      .patch('/api/users/auth/profile')
       .set('Cookie', cookieSession)
       .set('Content-Type', 'multipart/form-data')
       .field('about', 'this is my breif')
@@ -171,7 +171,7 @@ describe('update-profile controller', () => {
   });
   it('should return 422 if sensitive field', async () => {
     await request
-      .patch('/api/users/profile')
+      .patch('/api/users/auth/profile')
       .set('Cookie', cookieSession)
       .set('Content-Type', 'multipart/form-data')
       .field('isOnline', 'true')
@@ -179,7 +179,7 @@ describe('update-profile controller', () => {
   });
   it('should return 200 if unsensitive field', async () => {
     await request
-      .patch('/api/users/profile')
+      .patch('/api/users/auth/profile')
       .set('Cookie', cookieSession)
       .set('Content-Type', 'multipart/form-data')
       .field('isAvaliableToInstantProjects', 'true')
@@ -187,7 +187,7 @@ describe('update-profile controller', () => {
   });
   it('should return 200 if unsensitive field', async () => {
     await request
-      .patch('/api/users/profile')
+      .patch('/api/users/auth/profile')
       .set('Cookie', cookieSession)
       .set('Content-Type', 'multipart/form-data')
       .field('pricePerHour', '20')
@@ -196,7 +196,7 @@ describe('update-profile controller', () => {
   it('should return 422 if sensitive field', async () => {
     const planId = new mongoose.Types.ObjectId();
     await request
-      .patch('/api/users/profile')
+      .patch('/api/users/auth/profile')
       .set('Cookie', cookieSession)
       .set('Content-Type', 'multipart/form-data')
       .field('plan', planId.toString())
@@ -204,7 +204,7 @@ describe('update-profile controller', () => {
   });
   it('should return 422 if sensitive field', async () => {
     await request
-      .patch('/api/users/profile')
+      .patch('/api/users/auth/profile')
       .set('Cookie', cookieSession)
       .set('Content-Type', 'multipart/form-data')
       .field('hasVerificationPadge', 'true')
@@ -212,7 +212,7 @@ describe('update-profile controller', () => {
   });
   it('should return 422 if sensitive field', async () => {
     await request
-      .patch('/api/users/profile')
+      .patch('/api/users/auth/profile')
       .set('Cookie', cookieSession)
       .set('Content-Type', 'multipart/form-data')
       .field('avaliableContracts', 'true')
@@ -220,7 +220,7 @@ describe('update-profile controller', () => {
   });
   it('should return 422 if sensitive field', async () => {
     await request
-      .patch('/api/users/profile')
+      .patch('/api/users/auth/profile')
       .set('Cookie', cookieSession)
       .set('Content-Type', 'multipart/form-data')
       .field('rate[ratesCounter]', '10')
@@ -229,7 +229,7 @@ describe('update-profile controller', () => {
   });
   it('should return 422 if sensitive field', async () => {
     await request
-      .patch('/api/users/profile')
+      .patch('/api/users/auth/profile')
       .set('Cookie', cookieSession)
       .set('Content-Type', 'multipart/form-data')
       .field('isBlocked', 'false')
@@ -237,7 +237,7 @@ describe('update-profile controller', () => {
   });
   it('should return 422 if sensitive field', async () => {
     await request
-      .patch('/api/users/profile')
+      .patch('/api/users/auth/profile')
       .set('Cookie', cookieSession)
       .set('Content-Type', 'multipart/form-data')
       .field('status', 'false')

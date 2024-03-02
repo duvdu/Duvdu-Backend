@@ -11,7 +11,7 @@ describe('signin endpoint', () => {
     await mongoose.connection.db
       .collection('user')
       .insertOne({ username: 'ewasy_mohamed', password: hashPassword('123@Metoo') });
-    const response = await request.post('/api/users/signin').send({
+    const response = await request.post('/api/users/auth/signin').send({
       username: 'ewasy_mohamed',
       password: '123@Metoo',
     });
@@ -23,7 +23,7 @@ describe('signin endpoint', () => {
     await mongoose.connection.db
       .collection('user')
       .insertOne({ username: 'ewasy_mohamed', password: hashPassword('123@Metoo') });
-    const response = await request.post('/api/users/signin').send({
+    const response = await request.post('/api/users/auth/signin').send({
       username: 'ewasy_mohamed',
       password: '123@Metoooo',
     });
@@ -38,7 +38,7 @@ describe('signin endpoint', () => {
     });
 
     await request
-      .post('/api/users/signin')
+      .post('/api/users/auth/signin')
       .send({
         username: 'ewasy_mohamed',
         password: '123@Metoo',

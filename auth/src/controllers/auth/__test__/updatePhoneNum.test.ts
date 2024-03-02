@@ -12,7 +12,7 @@ beforeEach(async () => {
   await mongoose.connection.db.collection('role').insertOne({ id: mongoId, key: 'admin' });
   await mongoose.connection.db.collection('plan').insertOne({ role: mongoId, key: 'admin' });
 
-  const response = await request.post('/api/users/signup').send({
+  const response = await request.post('/api/users/auth/signup').send({
     username: 'metoooo',
     password: '123@Metoo',
     name: 'mohamed elewasy',
@@ -26,14 +26,18 @@ beforeEach(async () => {
 
 describe('update phone number', () => {
   it('should return 401 if user un authenticated ', async () => {
-    await request.put('/api/users/update-phone').send().expect(401);
-  });
-  it('should return 422 for invalid input ', async () => {
-    await request.put('/api/users/update-phone').set('Cookie', cookieSession).send().expect(422);
+    await request.put('/api/users/auth/update-phone').send().expect(401);
   });
   it('should return 422 for invalid input ', async () => {
     await request
-      .put('/api/users/update-phone')
+      .put('/api/users/auth/update-phone')
+      .set('Cookie', cookieSession)
+      .send()
+      .expect(422);
+  });
+  it('should return 422 for invalid input ', async () => {
+    await request
+      .put('/api/users/auth/update-phone')
       .set('Cookie', cookieSession)
       .send({
         verificationCode: '',
@@ -42,7 +46,7 @@ describe('update phone number', () => {
   });
   it('should return 422 for invalid input ', async () => {
     await request
-      .put('/api/users/update-phone')
+      .put('/api/users/auth/update-phone')
       .set('Cookie', cookieSession)
       .send({
         verificationCode: '123',
@@ -51,7 +55,7 @@ describe('update phone number', () => {
   });
   it('should return 422 for invalid input ', async () => {
     await request
-      .put('/api/users/update-phone')
+      .put('/api/users/auth/update-phone')
       .set('Cookie', cookieSession)
       .send({
         verificationCode: '123456',
@@ -61,7 +65,7 @@ describe('update phone number', () => {
   });
   it('should return 401 for invalid or expired code ', async () => {
     await request
-      .put('/api/users/update-phone')
+      .put('/api/users/auth/update-phone')
       .set('Cookie', cookieSession)
       .send({
         verificationCode: '123456',
@@ -72,29 +76,27 @@ describe('update phone number', () => {
   it('should return 200 for success response', async () => {
     const randomCode = hashVerificationCode('123456');
     await request
-      .post('/api/users/update-phone')
+      .post('/api/users/auth/update-phone')
       .set('Cookie', cookieSession)
       .send({
         password: '123@Metoo',
       })
       .expect(200);
 
-    await mongoose.connection.db
-      .collection('user')
-      .updateOne(
-        { username: 'metoooo' },
-        {
-          $set: {
-            verificationCode: {
-              code: randomCode,
-              expireAt: new Date(Date.now() + 60 * 1000).toString(),
-            },
+    await mongoose.connection.db.collection('user').updateOne(
+      { username: 'metoooo' },
+      {
+        $set: {
+          verificationCode: {
+            code: randomCode,
+            expireAt: new Date(Date.now() + 60 * 1000).toString(),
           },
         },
-      );
+      },
+    );
 
     await request
-      .put('/api/users/update-phone')
+      .put('/api/users/auth/update-phone')
       .set('Cookie', cookieSession)
       .send({
         verificationCode: '123456',
