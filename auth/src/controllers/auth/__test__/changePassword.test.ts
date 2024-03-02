@@ -8,8 +8,8 @@ const request = supertest(app);
 let cookieSession: string[];
 beforeEach(async () => {
   const mongoId = new mongoose.Types.ObjectId().toHexString();
-  await mongoose.connection.db.collection('role').insertOne({ id: mongoId, key: 'admin' });
-  await mongoose.connection.db.collection('plan').insertOne({ role: mongoId, key: 'admin' });
+  await mongoose.connection.db.collection('role').insertOne({ id: mongoId, key: 'free' });
+  await mongoose.connection.db.collection('plan').insertOne({ role: mongoId, key: 'free' });
 
   const response = await request.post('/api/users/signup').send({
     username: 'elewasy',

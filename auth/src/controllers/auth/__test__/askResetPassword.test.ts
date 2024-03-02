@@ -7,8 +7,8 @@ const request = supertest(app);
 
 beforeEach(async () => {
   const mongoId = new mongoose.Types.ObjectId().toHexString();
-  await mongoose.connection.db.collection('role').insertOne({ id: mongoId, key: 'admin' });
-  await mongoose.connection.db.collection('plan').insertOne({ role: mongoId, key: 'admin' });
+  await mongoose.connection.db.collection('role').insertOne({ id: mongoId, key: 'free' });
+  await mongoose.connection.db.collection('plan').insertOne({ role: mongoId, key: 'free' });
 
   await request.post('/api/users/signup').send({
     username: 'metoooo',
@@ -16,6 +16,7 @@ beforeEach(async () => {
     name: 'mohamed elewasy',
     phoneNumber: { number: '01552159359' },
   });
+
   await mongoose.connection.db
     .collection('user')
     .updateOne({ username: 'metoooo' }, { $set: { isVerified: true } });

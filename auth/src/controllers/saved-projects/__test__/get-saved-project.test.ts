@@ -42,8 +42,9 @@ beforeEach(async () => {
     },
   ]);
   const response = await request
-    .post('/api/users/auth/signin')
+    .post('/api/users/signin')
     .send({ username: 'mohamed', password: '123@Ewasy' });
+  console.log(response.body, response.error);
   cookie = response.headers['set-cookie'];
 });
 

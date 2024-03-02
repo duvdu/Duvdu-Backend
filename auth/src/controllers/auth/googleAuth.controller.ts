@@ -4,7 +4,6 @@ import { Strategy as GoogleStrategy } from 'passport-google-oauth2';
 import { env } from '../../config/env';
 import { Plans } from '../../models/Plan.model';
 import { Users } from '../../models/User.model';
-import { createDefaultSavedProject } from '../../services/saved-projects/create-favourite.service';
 import { generateToken } from '../../utils/generateToken';
 
 passport.use(
@@ -12,7 +11,7 @@ passport.use(
     {
       clientID: `${env.google.client_id}`,
       clientSecret: `${env.google.client_secret}`,
-      callbackURL: 'http://localhost:3000/api/users/oauth/google/callback',
+      callbackURL: 'http://localhost:3000/api/users/auth/google/callback',
       scope: ['profile', 'email', 'phone'],
       passReqToCallback: true,
     },
@@ -30,10 +29,9 @@ passport.use(
         });
         await user.save();
       }
-      const token = generateToken({ id: user.id });
+      const token = generateToken({ id: user.id, planId: user.plan.toString() });
       user.token = token;
       await user.save();
-      await createDefaultSavedProject(user.id);
 
       return done(null, user);
     },

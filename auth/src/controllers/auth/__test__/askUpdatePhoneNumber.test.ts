@@ -8,8 +8,8 @@ const request = supertest(app);
 let cookieSession: string[];
 beforeEach(async () => {
   const mongoId = new mongoose.Types.ObjectId().toHexString();
-  await mongoose.connection.db.collection('role').insertOne({ id: mongoId, key: 'admin' });
-  await mongoose.connection.db.collection('plan').insertOne({ role: mongoId, key: 'admin' });
+  await mongoose.connection.db.collection('role').insertOne({ id: mongoId, key: 'free' });
+  await mongoose.connection.db.collection('plan').insertOne({ role: mongoId, key: 'free' });
 
   const response = await request.post('/api/users/signup').send({
     username: 'metoooo',
@@ -23,44 +23,41 @@ beforeEach(async () => {
   cookieSession = response.get('Set-Cookie');
 });
 
-describe('ask update phone number' , ()=>{
+describe('ask update phone number', () => {
   it('should return 401 if user un authenticated ', async () => {
-    await request.post('/api/users/update-phone')
-      .send()
-      .expect(401);
+    await request.post('/api/users/update-phone').send().expect(401);
   });
   it('should return 422 for invalid inputs ', async () => {
-    await request.post('/api/users/update-phone')
-      .set('Cookie' , cookieSession)
-      .send({})
-      .expect(422);
+    await request.post('/api/users/update-phone').set('Cookie', cookieSession).send({}).expect(422);
   });
   it('should return 422 for invalid inputs ', async () => {
-    await request.post('/api/users/update-phone')
-      .set('Cookie' , cookieSession)
+    await request
+      .post('/api/users/update-phone')
+      .set('Cookie', cookieSession)
       .send({
-        password:'123'
+        password: '123',
       })
       .expect(422);
   });
   it('should return 401 for incorrect password ', async () => {
-    await request.post('/api/users/update-phone')
-      .set('Cookie' , cookieSession)
+    await request
+      .post('/api/users/update-phone')
+      .set('Cookie', cookieSession)
       .send({
-        password:'123@Metoooo'
+        password: '123@Metoooo',
       })
       .expect(401);
   });
   it('should return 200 for success ', async () => {
-    await request.post('/api/users/update-phone')
-      .set('Cookie' , cookieSession)
+    await request
+      .post('/api/users/update-phone')
+      .set('Cookie', cookieSession)
       .send({
-        password:'123@Metoo'
+        password: '123@Metoo',
       })
       .expect(200);
 
-    const user = await mongoose.connection.db.collection('user').findOne({username:'metoooo'});
+    const user = await mongoose.connection.db.collection('user').findOne({ username: 'metoooo' });
     expect(user?.verificationCode.code).toBeDefined();
-      
   });
 });

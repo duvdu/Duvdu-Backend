@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: category-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: category
+  template:
+    metadata:
+      labels:
+        app: category
+    spec:
+      containers:
+        - name: category
+          image: duvdu/category
+          env:
+            - name: MONGO_URI
+              value: "mongodb://category-mongo-srv:27017/duvdu_category"
+            - name: JWT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret
+                  key: JWT_KEY
+            - name: SESSION_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: session-secret
+                  key: sessionSecret
+            - name: REDIS_HOST
+              value: expiration-redis-srv
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: category-srv
+spec:
+  selector:
+    app: category
+  ports:
+    - name: category
+      protocol: TCP 
+      port: 3000
+      targetPort: 3000
