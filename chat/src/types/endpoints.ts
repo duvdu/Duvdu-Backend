@@ -1,11 +1,27 @@
+/* eslint-disable @typescript-eslint/no-namespace */
+import { IjwtPayload } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
+
 import { Imessage } from './Message';
-import { Iuser } from './User';
 import { Inotification } from './Notification';
+import { Iuser } from './User';
 type successResponse<T> = T & {
   message: 'success';
 };
 
+declare module 'express-session' {
+  interface SessionData {
+    jwt?: string;
+  }
+}
+
+declare global {
+  namespace Express {
+    interface Request {
+      loggedUser?: IjwtPayload;
+    }
+  }
+}
 // emit event (new_message) to the target user
 export interface SendMessageHandler
   extends RequestHandler<

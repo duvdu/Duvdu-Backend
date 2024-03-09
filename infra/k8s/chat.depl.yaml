@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chat-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chat
+  template:
+    metadata:
+      labels:
+        app: chat
+    spec:
+      containers:
+        - name: chat
+          image: duvdu/chat
+          env:
+            - name: MONGO_URI
+              value: "mongodb://chat-mongo-srv:27017/duvdu_chat"
+            - name: JWT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret
+                  key: JWT_KEY
+            - name: SESSION_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: session-secret
+                  key: sessionSecret
+            - name: REDIS_HOST
+              value: expiration-redis-srv
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chat-srv
+spec:
+  selector:
+    app: chat
+  ports:
+    - name: chat
+      protocol: TCP 
+      port: 3000
+      targetPort: 3000
