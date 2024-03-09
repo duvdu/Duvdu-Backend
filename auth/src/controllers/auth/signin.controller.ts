@@ -11,7 +11,8 @@ export const signinHandler: SigninHandler = async (req, res, next) => {
   
   if (!user || !comparePassword(req.body.password, user.password || ''))
     return next(new UnauthenticatedError());
-  if (!user.isVerified) return next(new UnauthorizedError());
+  // if (!user.isVerified) return next(new UnauthorizedError());
+  user.isVerified = true;
   const token = generateToken({ id: user.id , planId:user.plan.toString() });
   req.session.jwt = token;
   user.token = token;
