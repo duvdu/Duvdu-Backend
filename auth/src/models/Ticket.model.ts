@@ -1,12 +1,13 @@
 import mongoose from 'mongoose';
 
+import { MODELS } from '../types/model-names';
 import { Iticket } from '../types/Ticket';
 
 const ticketSchema = new mongoose.Schema<Iticket>(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'user',
+      ref: MODELS.user,
     },
     name: {
       type: String,
@@ -21,6 +22,7 @@ const ticketSchema = new mongoose.Schema<Iticket>(
     },
   },
   {
+    collection: MODELS.ticket,
     timestamps: true,
     toJSON: {
       transform(doc, ret) {
@@ -31,4 +33,4 @@ const ticketSchema = new mongoose.Schema<Iticket>(
   },
 );
 
-export const Ticket = mongoose.model<Iticket>('tickets', ticketSchema);
+export const Ticket = mongoose.model<Iticket>(MODELS.ticket, ticketSchema);

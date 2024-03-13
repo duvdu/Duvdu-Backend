@@ -1,9 +1,10 @@
-import { Types, Document } from 'mongoose';
+import { Types } from 'mongoose';
 
 import { Icategory } from './Category';
 import { Iplan } from './Plan';
+import { Irole } from './Role';
 
-export interface Iuser extends Document {
+export interface Iuser {
   id: string;
   googleId?: string;
   appleId?: string;
@@ -24,7 +25,8 @@ export interface Iuser extends Document {
   isOnline: boolean;
   isAvaliableToInstantProjects: boolean;
   pricePerHour?: number;
-  plan: Types.ObjectId | Iplan;
+  role: Irole | Types.ObjectId;
+  // plan: Types.ObjectId | Iplan;
   hasVerificationPadge: boolean;
   avaliableContracts: number;
   rate: { ratersCounter: number; totalRates: number };

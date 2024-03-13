@@ -1,5 +1,5 @@
 export interface Irole {
   id: string;
   key: string;
-  features: string[];
+  permissions: string[];
 }

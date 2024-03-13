@@ -1,11 +1,9 @@
-import { compareSync, hashSync } from 'bcryptjs';
+import { compare, hash } from 'bcryptjs';
 
 import { env } from '../config/env';
 
-export const hashPassword = (password: string) => {
-  return hashSync(password + env.bcrypt.paper, env.bcrypt.salt);
-};
+export const hashPassword = async (password: string) =>
+  await hash(password + env.bcrypt.paper, env.bcrypt.salt);
 
-export const comparePassword = (password: string, hash: string) => {
-  return compareSync(password + env.bcrypt.paper, hash);
-};
+export const comparePassword = async (password: string, hash: string) =>
+  await compare(password + env.bcrypt.paper, hash);

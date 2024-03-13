@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express';
 
-import { Ifeatures } from '../Features';
+import { Ifeatures } from '../Permissions';
 import { Iplan } from '../Plan';
 import { Irole } from '../Role';
 import { SuccessResponse } from '../success-response';

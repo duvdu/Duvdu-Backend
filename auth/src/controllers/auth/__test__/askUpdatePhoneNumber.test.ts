@@ -5,7 +5,7 @@ import { app } from '../../../app';
 import { Plans } from '../../../models/Plan.model';
 import { Roles } from '../../../models/Role.model';
 import { Users } from '../../../models/User.model';
-import { Ifeatures } from '../../../types/Features';
+import { Ifeatures } from '../../../types/Permissions';
 import { hashPassword } from '../../../utils/bcrypt';
 
 const request = supertest(app);

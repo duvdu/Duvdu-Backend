@@ -2,7 +2,7 @@ import mongoose, { Types } from 'mongoose';
 import supertest from 'supertest';
 
 import { app } from '../../../app';
-import { Ifeatures } from '../../../types/Features';
+import { Ifeatures } from '../../../types/Permissions';
 
 const request = supertest(app);
 const id = new mongoose.Types.ObjectId().toHexString();

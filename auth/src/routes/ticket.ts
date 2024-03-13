@@ -5,7 +5,7 @@ import * as handler from '../controllers/ticket';
 import { Plans } from '../models/Plan.model';
 import { Roles } from '../models/Role.model';
 import { Users } from '../models/User.model';
-import { Ifeatures } from '../types/Features';
+import { Ifeatures } from '../types/Permissions';
 import * as val from '../validators/tickets';
 
 const router = express.Router();

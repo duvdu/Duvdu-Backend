@@ -4,11 +4,11 @@ import mongoose from 'mongoose';
 import { Projects } from './../src/models/Projects.model';
 import { SavedProjects } from './../src/models/Saved-Project.model';
 import { Users } from './../src/models/User.model';
-import { Ifeatures } from './../src/types/Features';
 import { hashPassword } from './../src/utils/bcrypt';
 import { env } from '../src/config/env';
 import { Plans } from '../src/models/Plan.model';
 import { Roles } from '../src/models/Role.model';
+import { Ifeatures } from '../src/types/Permissions';
 
 (async () => {
   await dbConnection(env.mongoDb.uri);

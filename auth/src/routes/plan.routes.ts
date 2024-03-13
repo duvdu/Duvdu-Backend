@@ -4,7 +4,7 @@ import { Router } from 'express';
 import * as controllers from '../controllers/plans/plan.controllers';
 import { isAuthorizedMiddleware } from '../middlewares/isAuthorized.middleware';
 import { Users } from '../models/User.model';
-import { Ifeatures } from '../types/Features';
+import { Ifeatures } from '../types/Permissions';
 import * as val from '../validators/plan/plan.validator';
 
 const router = Router();

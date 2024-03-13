@@ -7,7 +7,7 @@ import { Projects } from '../../../models/Projects.model';
 import { Roles } from '../../../models/Role.model';
 import { SavedProjects } from '../../../models/Saved-Project.model';
 import { Users } from '../../../models/User.model';
-import { Ifeatures } from '../../../types/Features';
+import { Ifeatures } from '../../../types/Permissions';
 import { hashPassword } from '../../../utils/bcrypt';
 
 const request = supertest(app);
