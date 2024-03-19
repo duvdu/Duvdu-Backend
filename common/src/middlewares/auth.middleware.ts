@@ -3,38 +3,42 @@ import { RequestHandler } from 'express';
 import jwt from 'jsonwebtoken';
 import { Model } from 'mongoose';
 
-import { BadRequestError } from '../errors/bad-request-error';
 import { GenericError } from '../errors/generic-error';
 import { UnauthenticatedError } from '../errors/unauthenticated-error';
 import { IjwtPayload } from '../types/JwtPayload';
+import { generateToken } from '../utils/generateToken';
 
-export const auth = (modelName: Model<any>) => <RequestHandler>(async (req, res, next) => {
+export const auth = (User: Model<any> , Roles:Model<any>) => <RequestHandler>(async (req, res, next) => {
   if (!(req as any).session?.jwt) {
     throw new UnauthenticatedError();
   }
 
-  const user = await modelName.findOne({ token: (req as any).session?.jwt });
+  const user = await User.findOne({ token: (req as any).session?.jwt });
 
   if (!user) {
     throw new UnauthenticatedError();
   }
 
-  if (!user.isVerified) {
-    throw new UnauthenticatedError('pleas verify your self first');
+  if (!user.isVerified.value) {
+    throw new UnauthenticatedError(`${user.isVerified.reason}`);
   }
 
   if (user.isBlocked) {
     throw new GenericError('the users access is denied due to their blocked status.');
   }
-
-
   try {
     const payload = jwt.verify((req as any).session!.jwt, process.env.JWT_KEY!) as IjwtPayload;
 
-    (req as any).loggedUser = { id: payload.id , planId:payload.planId };
+    (req as any).loggedUser = { id: payload.id , permession:payload.permession };
 
     return next();
   } catch (error) {
-    throw new BadRequestError('invalid or expired token');
+    const role = await Roles.findById(user.role);
+    if (!role) return next(new UnauthenticatedError('user dont have role'));
+    const token = generateToken({id:user.id , permession:role.features});
+    user.token = token;
+    await user.save();
+    (req as any).session.jwt = token;
+    next();
   }
 });
