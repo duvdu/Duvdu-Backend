@@ -12,17 +12,17 @@ export const auth = (User: Model<any> , Roles:Model<any>) => <RequestHandler>(as
   if (!(req as any).session?.jwt) {
     throw new UnauthenticatedError();
   }
-
+  
   const user = await User.findOne({ token: (req as any).session?.jwt });
-
+  
   if (!user) {
     throw new UnauthenticatedError();
   }
-
+  
   if (!user.isVerified.value) {
     throw new UnauthenticatedError(`${user.isVerified.reason}`);
   }
-
+  
   if (user.isBlocked) {
     throw new GenericError('the users access is denied due to their blocked status.');
   }
@@ -34,8 +34,10 @@ export const auth = (User: Model<any> , Roles:Model<any>) => <RequestHandler>(as
     return next();
   } catch (error) {
     const role = await Roles.findById(user.role);
+    
     if (!role) return next(new UnauthenticatedError('user dont have role'));
-    const token = generateToken({id:user.id , permession:role.features});
+    const token = generateToken({id:user._id , permession:role.features});
+    (req as any).loggedUser = { id: user._id , permession:role.features };
     user.token = token;
     await user.save();
     (req as any).session.jwt = token;
