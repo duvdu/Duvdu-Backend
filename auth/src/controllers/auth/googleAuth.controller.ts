@@ -4,7 +4,7 @@ import { Strategy as GoogleStrategy } from 'passport-google-oauth2';
 import { env } from '../../config/env';
 import { Plans } from '../../models/Plan.model';
 import { Users } from '../../models/User.model';
-import { generateToken } from '../../utils/generateToken';
+// import { generateToken } from '../../utils/generateToken';
 
 passport.use(
   new GoogleStrategy(
@@ -29,8 +29,8 @@ passport.use(
         });
         await user.save();
       }
-      const token = generateToken({ id: user.id, planId: user.plan.toString() });
-      user.token = token;
+      // const token = generateToken({ id: user.id, planId: user.plan.toString() });
+      // user.token = token;
       await user.save();
 
       return done(null, user);

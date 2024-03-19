@@ -1,12 +1,15 @@
 import { Document, Types } from 'mongoose';
 
 export interface Iuser extends Document {
-  isVerified: boolean;
+  isVerified?: {
+    value:boolean,
+    reason:string
+  };
   token: string;
   isBlocked: boolean;
   status: {
     value: boolean;
     reason: string;
   };
-  plan: Types.ObjectId;
+  role: Types.ObjectId;
 }

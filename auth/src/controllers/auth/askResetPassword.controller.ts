@@ -19,7 +19,10 @@ export const askResetPasswordHandler: AskResetPasswordHandler = async (req, res,
     code: hashedCode,
     expireAt: new Date(Date.now() + 60 * 1000).toString(),
   };
-  user.isVerified = false;
+  user.isVerified = {
+    value:false,
+    reason:''
+  };
   await user.save();
 
   //   send otp

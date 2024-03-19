@@ -8,6 +8,10 @@ export const Roles = model<Irole>(
     {
       key: { type: String, unique: true },
       features: [String],
+      system:{
+        type:Boolean,
+        default:false
+      }
     },
     { collection: 'role' },
   ),

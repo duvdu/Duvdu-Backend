@@ -11,7 +11,13 @@ const userSchema = new Schema<Iuser>(
     username: { type: String, unique: true },
     password: String,
     verificationCode: { code: String, expireAt: Date },
-    isVerified: { type: Boolean, default: false },
+    isVerified: {
+      value:{
+        type:Boolean,
+        default:false
+      },
+      reason:String
+    },
     token: String,
     profileImage: String,
     coverImage: String,
@@ -23,7 +29,7 @@ const userSchema = new Schema<Iuser>(
     isOnline: { type: Boolean, default: false },
     isAvaliableToInstantProjects: { type: Boolean, default: false },
     pricePerHour: { type: Number, default: 0 },
-    plan: { type: Schema.Types.ObjectId, ref: 'plan' },
+    role: { type: Schema.Types.ObjectId, ref: 'role' },
     hasVerificationPadge: { type: Boolean, default: false },
     avaliableContracts: { type: Number, default: 0 },
     rate: { ratersCounter: { type: Number, default: 0 }, totalRates: { type: Number, default: 0 } },

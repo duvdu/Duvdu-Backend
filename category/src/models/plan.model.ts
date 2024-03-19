@@ -10,13 +10,9 @@ const planSchema = new mongoose.Schema<Iplan>(
   },
   {
     timestamps: true,
-    toJSON: {
-      transform(doc, ret) {
-        ret.id = ret._id;
-        delete ret._id;
-      },
-    },
+    collection:'plan'
   },
 );
 
-export const Plan = mongoose.model<Iplan>('plans', planSchema);
+
+export const Plan = mongoose.model<Iplan>('plan', planSchema);

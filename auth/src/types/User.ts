@@ -1,7 +1,7 @@
 import { Types, Document } from 'mongoose';
 
 import { Icategory } from './Category';
-import { Iplan } from './Plan';
+import { Irole } from './Role';
 
 export interface Iuser extends Document {
   id: string;
@@ -12,7 +12,7 @@ export interface Iuser extends Document {
   username: string;
   password?: string;
   verificationCode?: { code: string; expireAt: string };
-  isVerified?: boolean;
+  isVerified?: {value:boolean , reason:string};
   token?: string;
   profileImage?: string;
   coverImage?: string;
@@ -24,7 +24,7 @@ export interface Iuser extends Document {
   isOnline: boolean;
   isAvaliableToInstantProjects: boolean;
   pricePerHour?: number;
-  plan: Types.ObjectId | Iplan;
+  role: Types.ObjectId | Irole;
   hasVerificationPadge: boolean;
   avaliableContracts: number;
   rate: { ratersCounter: number; totalRates: number };
