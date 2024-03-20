@@ -4,7 +4,7 @@ export enum MODELS {
   plan = 'plans',
   project = 'projects',
   role = 'roles',
-  savedProject = 'saved-projects',
+  bookmark = 'bookmarks',
   term = 'terms',
   ticket = 'tickets',
 }

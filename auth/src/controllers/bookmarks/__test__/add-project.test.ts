@@ -5,7 +5,7 @@ import { app } from '../../../app';
 import { Plans } from '../../../models/Plan.model';
 import { Projects } from '../../../models/Projects.model';
 import { Roles } from '../../../models/Role.model';
-import { SavedProjects } from '../../../models/Saved-Project.model';
+import { SavedProjects } from '../../../models/Bookmark.model';
 import { Users } from '../../../models/User.model';
 import { Ifeatures } from '../../../types/Permissions';
 import { hashPassword } from '../../../utils/bcrypt';
@@ -38,7 +38,7 @@ beforeEach(async () => {
       _id: savedProjectId,
       user: user.id,
       title: 'favoutite',
-      projects: [projectIds.p1, projectIds.p2, projectIds.p3],
+      projects: [projectIds.p1, projectIds.p2],
     },
   ]);
   const response = await request
@@ -47,17 +47,14 @@ beforeEach(async () => {
   cookie = response.headers['set-cookie'];
 });
 
-describe('get project list controller', () => {
-  it('should return 200 with populated projects', async () => {
-    const response = await request
-      .get(`/api/users/saved-projects/${savedProjectId}`)
+describe('remove project from list controller', () => {
+  it('should return 200 when remove a valid saved project', async () => {
+    await request
+      .post(`/api/users/saved-projects/${savedProjectId}/project/${projectIds.p3}`)
       .set('Cookie', cookie)
       .expect(200);
 
-    expect(response.body.data).toBeDefined();
-    expect(response.body.data?.projects.length).toBe(3);
-    expect(response.body.data?.projects?.[0].title).toBeDefined();
-    expect(response.body.data?.projects?.[1].title).toBeDefined();
-    expect(response.body.data?.projects?.[2].title).toBeDefined();
+    const savedProject = await SavedProjects.findOne({ _id: savedProjectId });
+    expect(savedProject?.projects.length).toBe(3);
   });
 });

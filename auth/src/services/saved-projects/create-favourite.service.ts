@@ -1,6 +1,6 @@
-import { SavedProjects } from '../../models/Saved-Project.model';
+import { Bookmarks } from '../../models/Bookmark.model';
 
-export const createDefaultSavedProject = async (userId?: string) => {
+export const createDefaultBookmark = async (userId?: string) => {
   if (!userId) return;
-  await SavedProjects.create({ user: userId, title: 'favourite', projects: [] });
+  await Bookmarks.create({ user: userId, title: 'favourite', projects: [] });
 };

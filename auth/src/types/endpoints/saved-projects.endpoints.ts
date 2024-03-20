@@ -1,12 +1,12 @@
 import { RequestHandler } from 'express';
 
-import { IsavedProject } from '../SavedProjects';
+import { Ibookmark } from '../Bookmarks';
 
 type successResponse<T> = T & {
   message: 'success';
 };
 //TODO: fire event to send notification
-export interface CreateSavedProjectHandler
+export interface CreateBookmarkHandler
   extends RequestHandler<
     unknown,
     successResponse<unknown>,
@@ -14,25 +14,25 @@ export interface CreateSavedProjectHandler
     unknown
   > {}
 
-export interface AddProjectToSavedProjectHandler
-  extends RequestHandler<{ savedProjectId: string; projectId: string }, successResponse<unknown>> {}
+export interface AddProjectToBookmarkHandler
+  extends RequestHandler<{ bookmarkId: string; projectId: string }, successResponse<unknown>> {}
 
-export interface RemoveProjectFromSavedProjectHandler
-  extends RequestHandler<{ savedProjectId: string; projectId: string }, successResponse<unknown>> {}
+export interface RemoveProjectFromBookmarkHandler
+  extends RequestHandler<{ bookmarkId: string; projectId: string }, successResponse<unknown>> {}
 
-export interface GetSavedProjectHandler
-  extends RequestHandler<{ savedProjectId: string }, successResponse<{ data: IsavedProject }>> {}
+export interface GetBookmarkHandler
+  extends RequestHandler<{ bookmarkId: string }, successResponse<{ data: Ibookmark }>> {}
 
-export interface GetSavedProjectsHandler
-  extends RequestHandler<unknown, successResponse<{ data: IsavedProject[] }>> {}
+export interface GetBookmarksHandler
+  extends RequestHandler<unknown, successResponse<{ data: Ibookmark[] }>> {}
 
-export interface UpdateSavedProjectHandler
+export interface UpdateBookmarkHandler
   extends RequestHandler<
-    { savedProjectId: string },
+    { bookmarkId: string },
     successResponse<unknown>,
     { title: string },
     unknown
   > {}
 
-export interface RemoveSavedProjectHandler
-  extends RequestHandler<{ savedProjectId: string }, successResponse<unknown>, unknown, unknown> {}
+export interface RemoveBookmarkHandler
+  extends RequestHandler<{ bookmarkId: string }, successResponse<unknown>, unknown, unknown> {}

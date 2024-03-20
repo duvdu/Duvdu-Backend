@@ -62,7 +62,7 @@ interface Chat {
   message: string;
 }
 
-interface savedProject {
+interface bookmark {
   userId: ObjectId;
   title: string;
   projects: [ObjectId];

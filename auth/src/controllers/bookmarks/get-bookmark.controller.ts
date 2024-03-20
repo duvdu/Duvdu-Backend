@@ -1,0 +1,14 @@
+import { NotFound } from '@duvdu-v1/duvdu';
+
+import { Bookmarks } from '../../models/Bookmark.model';
+import { GetBookmarkHandler } from '../../types/endpoints/saved-projects.endpoints';
+
+export const getBookmarkHandler: GetBookmarkHandler = async (req, res, next) => {
+  const bookmark = await Bookmarks.findById(req.params.bookmarkId)
+    .select('title projects')
+    .populate('projects');
+
+  if (!bookmark) return next(new NotFound());
+
+  res.status(200).json({ message: 'success', data: bookmark });
+};

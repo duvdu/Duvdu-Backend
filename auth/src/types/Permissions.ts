@@ -3,7 +3,7 @@ export enum PERMISSIONS {
   updatePhoneNumber = 'updatePhoneNumber',
   changePassword = 'changePassword',
   updateProfile = 'updateProfile',
-  savedProjects = 'savedProjects',
+  bookmarks = 'bookmarks',
   createCategory = 'create-category',
   updateCategory = 'update-category',
   removeCategory = 'remove-category',
@@ -36,7 +36,7 @@ export const permissions = {
     PERMISSIONS.changePassword,
     PERMISSIONS.updateProfile,
   ],
-  savedProjects: [PERMISSIONS.savedProjects],
+  bookmarks: [PERMISSIONS.bookmarks],
   category: [
     PERMISSIONS.createCategory,
     PERMISSIONS.updateCategory,
