@@ -1,4 +1,9 @@
+import { PERMISSIONS } from './Permissions';
+
 export interface IjwtPayload {
   id: string;
-  planId: string;
+  role: {
+    key: string;
+    permissions: PERMISSIONS[];
+  };
 }

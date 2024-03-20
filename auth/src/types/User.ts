@@ -3,6 +3,11 @@ import { Types } from 'mongoose';
 import { Icategory } from './Category';
 import { Irole } from './Role';
 
+enum VerificationReason {
+  forgetPassword = 'forget-password',
+  forgetPasswordVerified = 'forget-password-verified',
+  signup = 'signup',
+}
 export interface Iuser {
   id: string;
   googleId?: string;
@@ -11,8 +16,8 @@ export interface Iuser {
   phoneNumber: { key: string; number: string };
   username: string;
   password?: string;
-  verificationCode?: { code: string; expireAt: string };
-  isVerified?: { value: boolean; reason: string };
+  verificationCode?: { code: string; expireAt: string; reason: VerificationReason };
+  isVerified: boolean;
   token?: string;
   profileImage?: string;
   coverImage?: string;
@@ -23,13 +28,12 @@ export interface Iuser {
   about?: string;
   isOnline: boolean;
   isAvaliableToInstantProjects: boolean;
-  pricePerHour?: number;
+  pricePerHour: number;
   role: Types.ObjectId | Irole;
-  hasVerificationPadge: boolean;
+  hasVerificationBadge: boolean;
   avaliableContracts: number;
   rate: { ratersCounter: number; totalRates: number };
   currentRank: string;
-  isBlocked: boolean;
-  status: { value: boolean; reason: string };
+  isBlocked: { value: boolean; reason: string };
   followCount: { following: number; followers: number };
 }

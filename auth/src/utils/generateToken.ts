@@ -1,9 +1,9 @@
 import jwt from 'jsonwebtoken';
 
 import { env } from '../config/env';
-import { Irole } from '../types/Role';
+import { IjwtPayload } from '../types/JwtPayload';
 
-export const generateToken = (payload: { id: string; permession: string[] }) =>
+export const generateToken = (payload: IjwtPayload) =>
   jwt.sign(payload, env.jwt.secret, {
-    expiresIn: '1m',
+    expiresIn: env.environment === 'development' ? 5 * 24 * 60 * 60 : 60,
   });
