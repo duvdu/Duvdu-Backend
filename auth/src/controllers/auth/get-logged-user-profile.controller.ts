@@ -1,4 +1,3 @@
-import 'express-async-errors';
 import { UnauthenticatedError } from '@duvdu-v1/duvdu';
 
 import { Users } from '../../models/User.model';

@@ -12,7 +12,7 @@ export const resendVerificationCodeHandler: ResendVerificationCodeHandler = asyn
 ) => {
   const user = await Users.findOne({ username: req.body.username });
   if (!user) return next(new NotFound('User not found'));
-  if (user.isVerified || !user.verificationCode?.code) return next(new UnauthorizedError());
+  if (!user.verificationCode?.reason) return next(new UnauthorizedError());
   const currentTime = Date.now();
   const expireTime = new Date(user.verificationCode.expireAt || '0').getTime();
   if (currentTime < expireTime)

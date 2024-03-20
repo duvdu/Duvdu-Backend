@@ -1,5 +1,3 @@
-import 'express-async-errors';
-
 import { Users } from '../../models/User.model';
 import { RetreiveUsernameHandler } from '../../types/endpoints/user.endpoints';
 

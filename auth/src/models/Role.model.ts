@@ -8,15 +8,11 @@ export const Roles = model<Irole>(
   new Schema<Irole>(
     {
       key: { type: String, unique: true },
-<<<<<<< HEAD
       permissions: [String],
-=======
-      features: [String],
-      system:{
-        type:Boolean,
-        default:false
-      }
->>>>>>> main
+      system: {
+        type: Boolean,
+        default: false,
+      },
     },
     { collection: MODELS.role },
   ),
