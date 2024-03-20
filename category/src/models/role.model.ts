@@ -9,16 +9,12 @@ const roleSchema = new mongoose.Schema<Irole>(
       unique: true,
     },
     features: [String],
+    system:Boolean
   },
   {
     timestamps: true,
-    toJSON: {
-      transform(doc, ret) {
-        ret.id = ret._id;
-        delete ret._id;
-      },
-    },
+    collection:'role'
   },
 );
 
-export const Role = mongoose.model<Irole>('roles', roleSchema);
+export const Role = mongoose.model<Irole>('role', roleSchema);

@@ -14,7 +14,7 @@ export const createCategoryVal = [
   check('status')
     .optional()
     .custom((val) => {
-      if ([0, 1].includes(val)) return true;
+      if ([0, 1].includes(+val)) return true;
       throw new Error('status must be value of 0 or 1');
     }),
   globalValidatorMiddleware,

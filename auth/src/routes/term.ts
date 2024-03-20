@@ -2,7 +2,6 @@ import { auth, isAuthorized } from '@duvdu-v1/duvdu';
 import express from 'express';
 
 import * as handler from '../controllers/terms&condition';
-import { Plans } from '../models/Plan.model';
 import { Roles } from '../models/Role.model';
 import { Users } from '../models/User.model';
 import { Ifeatures } from '../types/Permissions';
@@ -13,8 +12,8 @@ const router = express.Router();
 router
   .route('/')
   .post(
-    auth(Users),
-    isAuthorized(Plans, Roles, Ifeatures.createTerm),
+    auth(Users , Roles),
+    isAuthorized( Ifeatures.createTerm),
     val.craeteTermVal,
     handler.createTermHandler,
   )
@@ -22,8 +21,8 @@ router
 
 router.put(
   '/:termId',
-  auth(Users),
-  isAuthorized(Plans, Roles, Ifeatures.updateTerm),
+  auth(Users ,Roles),
+  isAuthorized( Ifeatures.updateTerm),
   val.updateTermVal,
   handler.updateTermHandler,
 );

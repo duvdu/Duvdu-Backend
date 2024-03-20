@@ -31,13 +31,9 @@ const categorySchema = new mongoose.Schema<Icategory>(
   },
   {
     timestamps: true,
-    toJSON: {
-      transform(doc, ret) {
-        ret.id = ret._id;
-        delete ret._id;
-      },
-    },
+    collection:'category'
   },
 );
 
-export const Category = mongoose.model<Icategory>('categories', categorySchema);
+
+export const Category = mongoose.model<Icategory>('category', categorySchema);

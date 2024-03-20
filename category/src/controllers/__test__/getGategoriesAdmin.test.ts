@@ -9,20 +9,22 @@ const request = supertest(app);
 
 let cookieSession: string[];
 beforeEach(async () => {
-  await mongoose.connection.db.collection('roles').insertOne({ _id: new Types.ObjectId('65de2a09b32b9de15d963305'), key: 'free' });
-  await mongoose.connection.db.collection('plans').insertOne({ _id: new Types.ObjectId('65de2a09b32b9de15d96330f'), role: '65de2a09b32b9de15d963305' });
+  await mongoose.connection.db.collection('role').insertOne({ _id: new Types.ObjectId('65de2a09b32b9de15d963306'), key: 'free' });
+  await mongoose.connection.db.collection('plan').insertOne({ _id: new Types.ObjectId('65de2a09b32b9de15d96330f'), role: '65de2a09b32b9de15d963306' });
 
-  await mongoose.connection.db.collection('users').insertOne({
+  await mongoose.connection.db.collection('user').insertOne({
     id: '65de2a09b32b9de15d96330d',
-    isVerified: true,
-    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZGUyYTA5YjMyYjlkZTE1ZDk2MzMwZCIsInBsYW5JZCI6IjY1ZGUyYTA5YjMyYjlkZTE1ZDk2MzMwZiIsImlhdCI6MTcwOTA1OTg4MX0.dLKNTuS_701l72jcs7thSchj1raK6548nxIkGHqEboE',
+    isVerified: {value:true },
+    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZjlmOTEzMzNiNTg0ODA3YTg1NDg2MCIsInBlcm1lc3Npb24iOlsidXBkYXRlUHJvZmlsZSJdLCJpYXQiOjE3MTA4ODEwNDMsImV4cCI6MTcxMDg4MTEwM30.e211RTlR7mgiDFEYT8KAYuAdw_2CTIQc2cCmCpQZAQw',
     isBlocked: false,
     status: { value: true },
-    plan:'65de2a09b32b9de15d96330f'
+    role:'65de2a09b32b9de15d963306'
   });
+  
 
   const response = await request.get('/test').send();
   cookieSession = response.get('Set-Cookie');
+  
 });
 
 describe('get admin category should' , ()=>{
@@ -33,7 +35,7 @@ describe('get admin category should' , ()=>{
     await request.get('/api/category/crm').set('Cookie' , cookieSession).expect(403);
   });
   it('return 403 if user unAuthenticated' , async()=>{
-    await mongoose.connection.db.collection('roles')
+    await mongoose.connection.db.collection('role')
       .updateOne({ key: 'free' }, { $set: { features: [Ifeatures.getGategoriesAdmin] } });
     await request.get('/api/category/crm').set('Cookie' , cookieSession).expect(200);
   });

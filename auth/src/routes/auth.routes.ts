@@ -1,9 +1,9 @@
-import { auth, globalUploadMiddleware } from '@duvdu-v1/duvdu';
+import { auth, globalUploadMiddleware , isAuthorized } from '@duvdu-v1/duvdu';
 import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
 
 import * as handlers from '../controllers/auth';
-import { isAuthorizedMiddleware } from '../middlewares/isAuthorized.middleware';
+import { Roles } from '../models/Role.model';
 import { Users } from '../models/User.model';
 import { Ifeatures } from '../types/Permissions';
 import * as val from '../validators/auth';
@@ -22,14 +22,14 @@ router.post(
 );
 router.patch(
   '/change-password',
-  auth(Users),
-  isAuthorizedMiddleware(Ifeatures.changePassword),
+  auth(Users , Roles),
+  isAuthorized(Ifeatures.changePassword),
   val.changePasswordVal,
   handlers.changePasswordHandler,
 );
 router
   .route('/update-phone')
-  .all(auth(Users), isAuthorizedMiddleware(Ifeatures.updatePhoneNumber))
+  .all(auth(Users,Roles), isAuthorized(Ifeatures.updatePhoneNumber))
   .post(val.askUpdatePhoneVal, handlers.askUpdatePhoneNumberHandler)
   .put(val.updatePhoneNumberVal, handlers.updatePhoneNumberHandler);
 router
@@ -43,10 +43,10 @@ router
 router.post('/resend-code', val.resendCodeVal, handlers.resendVerificationCodeHandler);
 router
   .route('/profile')
-  .all(auth(Users))
+  .all(auth(Users,Roles))
   .get(handlers.getLoggedUserProfileHandler)
   .patch(
-    isAuthorizedMiddleware(Ifeatures.updateProfile),
+    isAuthorized(Ifeatures.updateProfile),
     globalUploadMiddleware({ fileType: 'image' }).fields([
       { name: 'profileImage', maxCount: 1 },
       { name: 'coverImage', maxCount: 1 },

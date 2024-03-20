@@ -1,6 +1,7 @@
 import 'express-async-errors';
 import { UnauthenticatedError } from '@duvdu-v1/duvdu';
 
+import { Roles } from '../../models/Role.model';
 import { Users } from '../../models/User.model';
 import { ChangePasswordHandler } from '../../types/endpoints/user.endpoints';
 import { comparePassword, hashPassword } from '../../utils/bcrypt';
@@ -11,8 +12,10 @@ export const changePasswordHandler: ChangePasswordHandler = async (req, res, nex
 
   if (!user || !comparePassword(req.body.oldPassword, user.password || ''))
     return next(new UnauthenticatedError());
+  const role = await Roles.findById(user.role);
+  if (!role) return next(new UnauthenticatedError('user dont have arole'));
 
-  const token = generateToken({ id: user.id, planId: user.plan.toString() });
+  const token = generateToken({ id: user.id, permession: role.features });
   user.password = hashPassword(req.body.newPassword);
   user.token = token;
   await user.save();
