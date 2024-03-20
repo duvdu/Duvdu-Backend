@@ -24,13 +24,13 @@ export const verifyHandler: RequestHandler<
   user.verificationCode.expireAt = undefined;
   if (user.verificationCode.reason === VerificationReason.forgetPassword)
     user.verificationCode.reason = VerificationReason.forgetPasswordVerified;
+  else if (user.verificationCode.reason === VerificationReason.updateOldPhoneNumber)
+    user.verificationCode.reason = VerificationReason.updateOldPhoneNumberVerified;
   else user.isVerified = true;
   await user.save();
-  res
-    .status(200)
-    .json({
-      message: 'success',
-      reason: user.verificationCode.reason as string,
-      username: req.body.username,
-    });
+  res.status(200).json({
+    message: 'success',
+    reason: user.verificationCode.reason as string,
+    username: req.body.username,
+  });
 };

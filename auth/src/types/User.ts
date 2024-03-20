@@ -4,6 +4,10 @@ import { Icategory } from './Category';
 import { Irole } from './Role';
 
 export enum VerificationReason {
+  updateOldPhoneNumber = 'update-old-phone-number',
+  updateOldPhoneNumberVerified = 'update-old-phone-number-verified',
+  updateNewPhoneNumber = 'update-new-phone-number',
+  verifyUpdatedPhoneNumber = 'verify-updated-phone-number',
   forgetPassword = 'forget-password',
   forgetPasswordVerified = 'forget-password-verified',
   signup = 'signup',
