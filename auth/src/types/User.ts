@@ -3,7 +3,7 @@ import { Types } from 'mongoose';
 import { Icategory } from './Category';
 import { Irole } from './Role';
 
-enum VerificationReason {
+export enum VerificationReason {
   forgetPassword = 'forget-password',
   forgetPasswordVerified = 'forget-password-verified',
   signup = 'signup',
@@ -16,7 +16,7 @@ export interface Iuser {
   phoneNumber: { key: string; number: string };
   username: string;
   password?: string;
-  verificationCode?: { code: string; expireAt: string; reason: VerificationReason };
+  verificationCode?: { code?: string; expireAt?: string; reason?: VerificationReason };
   isVerified: boolean;
   token?: string;
   profileImage?: string;

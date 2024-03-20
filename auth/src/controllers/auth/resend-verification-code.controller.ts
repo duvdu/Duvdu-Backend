@@ -1,4 +1,3 @@
-import 'express-async-errors';
 import { BadRequestError, NotFound, UnauthorizedError } from '@duvdu-v1/duvdu';
 
 import { Users } from '../../models/User.model';
@@ -12,23 +11,25 @@ export const resendVerificationCodeHandler: ResendVerificationCodeHandler = asyn
   next,
 ) => {
   const user = await Users.findOne({ username: req.body.username });
-  if (!user) return next(new NotFound());
-  if (!user.verificationCode || !user.verificationCode.code) return next(new UnauthorizedError());
-  const restSecondsToResend = getRestSecondsToResend(user.verificationCode.expireAt);
-  if (restSecondsToResend > 0)
-    return next(new BadRequestError(`will be available in ${restSecondsToResend} seconds`));
-  const verificationCode = generateRandom6Digit();
+  if (!user) return next(new NotFound('User not found'));
+  if (user.isVerified || !user.verificationCode?.code) return next(new UnauthorizedError());
+  const currentTime = Date.now();
+  const expireTime = new Date(user.verificationCode.expireAt || '0').getTime();
+  if (currentTime < expireTime)
+    return next(
+      new BadRequestError(
+        `can generate code after ${Math.ceil((expireTime - currentTime) / 1000)} seconds`,
+      ),
+    );
+
+  const code = generateRandom6Digit();
   user.verificationCode = {
-    code: hashVerificationCode(verificationCode),
-    expireAt: new Date(Date.now() + 60 * 1000).toString(),
+    code: hashVerificationCode(code),
+    expireAt: new Date(Date.now() + 2 * 60 * 1000).toISOString(),
+    reason: user.verificationCode.reason,
   };
   await user.save();
-  //TODO: send verification code by OTP server
-  res.status(200).json({ message: 'success' });
-};
 
-const getRestSecondsToResend = (expireAt: string) => {
-  const expireAtTime = new Date(expireAt || 0).getTime();
-  const currentTime = Date.now();
-  return expireAtTime > currentTime ? Math.ceil((expireAtTime - currentTime) / 1000) : -1;
+  //TODO: send OTP
+  res.status(200).json(<any>{ message: 'success', code });
 };

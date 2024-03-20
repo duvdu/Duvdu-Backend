@@ -81,7 +81,7 @@ export interface ResetPasswordHandler
   > {}
 
 export interface ResendVerificationCodeHandler
-  extends RequestHandler<unknown, successResponse<unknown>, Pick<Iuser, 'username'>, unknown> {}
+  extends RequestHandler<unknown, successResponse<unknown>, Pick<Iuser, 'username'>> {}
 
 export interface UpdateProfileHandler
   extends RequestHandler<
