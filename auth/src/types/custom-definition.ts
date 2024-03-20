@@ -4,7 +4,8 @@ import { Ipagination } from './Pagination';
 
 declare module 'express-session' {
   interface SessionData {
-    jwt: string;
+    access: string;
+    refresh: string;
   }
 }
 

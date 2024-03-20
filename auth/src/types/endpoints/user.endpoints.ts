@@ -123,9 +123,7 @@ export interface GetLoggedUserProfileHandler
         | 'isOnline'
         | 'isAvaliableToInstantProjects'
         | 'pricePerHour'
-        | 'plan'
-        | 'hasVerificationPadge'
-        | 'avaliableContracts'
+        | 'hasVerificationBadge'
         | 'currentRank'
       > & { averageRate: number };
     }>,
@@ -153,7 +151,7 @@ export interface GetUserProfileHandler
         | 'isOnline'
         | 'isAvaliableToInstantProjects'
         | 'pricePerHour'
-        | 'hasVerificationPadge'
+        | 'hasVerificationBadge'
         | 'currentRank'
       > & { averageRate: number };
     }>,
