@@ -13,7 +13,7 @@ export const isauthenticated: RequestHandler = async (req, res, next) => {
     payload = <IjwtPayload>verify(req.session.access, env.jwt.secret);
     req.loggedUser = payload;
   } catch (error) {
-    return res.status(423).json({ message: 'token expired' });
+    return res.status(423).json({ message: 'access token expired' });
   }
 
   next();
