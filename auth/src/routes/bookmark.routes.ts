@@ -1,31 +1,30 @@
-import { auth, isAuthorized } from '@duvdu-v1/duvdu';
 import { Router } from 'express';
 
-import * as controllers from '../controllers/saved-projects';
-import { Roles } from '../models/Role.model';
-import { Users } from '../models/User.model';
-import { Ifeatures } from '../types/Permissions';
+import * as controllers from '../controllers/bookmarks';
+import { isauthenticated } from '../guards/isauthenticated.guard';
+import { isauthorized } from '../guards/isauthorized.guard';
+import { PERMISSIONS } from '../types/Permissions';
 import * as val from '../validators/saved-project';
 
 const router = Router();
 
 router
   .route('/')
-  .all(auth(Users, Roles), isAuthorized(Ifeatures.savedProjects))
-  .get(controllers.getSavedProjectsHandler)
-  .post(val.createSavedProject, controllers.createSavedProjectHandler);
+  .all(isauthenticated, isauthorized(PERMISSIONS.bookmarks))
+  .get(controllers.getBookmarksHandler)
+  .post(val.createBookmark, controllers.createBookmarkHandler);
 
 router
-  .route('/:savedProjectId')
-  .all(auth(Users, Roles), isAuthorized(Ifeatures.savedProjects))
-  .get(val.savedProjectParam, controllers.getSavedProjectHandler)
-  .put(val.updateSavedProject, controllers.updateSavedProjectHandler)
-  .delete(val.savedProjectParam, controllers.removeSavedProjectHandler);
+  .route('/:bookmarkId')
+  .all(isauthenticated, isauthorized(PERMISSIONS.bookmarks))
+  .get(val.bookmarkParam, controllers.getBookmarkHandler)
+  .put(val.updateBookmark, controllers.updateBookmarkHandler)
+  .delete(val.bookmarkParam, controllers.removeBookmarkHandler);
 
 router
-  .route('/:savedProjectId/project/:projectId')
-  .all(auth(Users, Roles), isAuthorized(Ifeatures.savedProjects))
-  .post(val.addProject, controllers.addProjectToSavedProjectHandler)
-  .delete(val.addProject, controllers.removeProjectFromSavedProjectHandler);
+  .route('/:bookmarkId/project/:projectId')
+  .all(isauthenticated, isauthorized(PERMISSIONS.bookmarks))
+  .post(val.addProject, controllers.addProjectToBookmarksHandler)
+  .delete(val.addProject, controllers.removeProjectFromBookmarkHandler);
 
 export const bookmarkRoutes = router;

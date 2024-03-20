@@ -29,8 +29,6 @@ export const env = {
 };
 
 export const checkEnvVariables = () => {
-  console.log(process.env.REDIS_HOST);
-
   if (!env.mongoDb.uri) throw new Error('env:MONGO_URI must be defined');
   if (!env.jwt.secret) throw new Error('env:JWT_KEY must be defined');
   if (!env.google.client_id) throw new Error('env:CLIENT_ID must be defined');

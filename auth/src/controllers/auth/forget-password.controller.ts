@@ -51,7 +51,7 @@ export const updateForgetenPasswordHandler: RequestHandler<
   const accessToken = generateAccessToken({
     id: user.id,
     isVerified: user.isVerified,
-    isBlocked: user.isBlocked.value,
+    isBlocked: user.isBlocked,
     role: { key: role.key, permissions: role.permissions },
   });
   const refreshToken = generateRefreshToken({ id: user.id });

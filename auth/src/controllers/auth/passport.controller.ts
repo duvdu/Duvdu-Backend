@@ -1,10 +1,23 @@
 import passport from 'passport';
+import { Strategy as AppleStrategy } from 'passport-apple';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth2';
 
 import { env } from '../../config/env';
 import { Plans } from '../../models/Plan.model';
 import { Users } from '../../models/User.model';
-// import { generateToken } from '../../utils/generateToken';
+
+passport.serializeUser((user, done) => {
+  done(null, user);
+});
+
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await Users.findById(id);
+    done(null, user);
+  } catch (error) {
+    done(error);
+  }
+});
 
 passport.use(
   new GoogleStrategy(
@@ -38,17 +51,23 @@ passport.use(
   ),
 );
 
-passport.serializeUser((user, done) => {
-  done(null, user);
-});
+passport.use(
+  new AppleStrategy(
+    {
+      clientID: 'YOUR_APPLE_CLIENT_ID',
+      teamID: 'YOUR_APPLE_TEAM_ID',
+      keyID: 'YOUR_APPLE_KEY_ID',
+      privateKeyString: 'YOUR_APPLE_PRIVATE_KEY',
+      callbackURL: 'http://localhost:3000/api/users/oauth/apple/callback',
+    },
+    (accessToken: any, refreshToken: any, decodedIdToken: any, profile: any, done: any) => {
+      console.log(profile);
 
-passport.deserializeUser(async (id, done) => {
-  try {
-    const user = await Users.findById(id);
-    done(null, user);
-  } catch (error) {
-    done(error);
-  }
-});
+      // Handle the user authentication and profile creation here
+      // Call the `done` callback with the user object
+      // TODO: create default saved project list after user creation
+    },
+  ),
+);
 
-export default passport;
+export { passport };

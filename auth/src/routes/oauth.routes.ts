@@ -1,8 +1,6 @@
 import { Router } from 'express';
 import passport from 'passport';
 
-import { Iuser } from '../types/User';
-
 const router = Router();
 
 router.get('/google', passport.authenticate('google', { scope: ['email', 'profile'] }));
@@ -20,7 +18,7 @@ router.get(
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 router.get('/google/success', (req, res) => {
   console.log('hello here');
-  req.session.jwt = (req.user as Iuser)?.token;
+  // req.session.jwt = (req.user as Iuser)?.token;
   res.send('helllo metoo');
 });
 

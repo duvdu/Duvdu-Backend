@@ -5,8 +5,8 @@ import { bookmarkRoutes } from './bookmark.routes';
 import { oauthRoutes } from './oauth.routes';
 import { planRoutes } from './plan.routes';
 import { roleRoutes } from './role.routes';
-import { termsRoutes } from './term';
-import { ticketsRoutes } from './ticket';
+import { termsRoutes } from './term.routes';
+import { ticketsRoutes } from './ticket.routes';
 
 const router = Router();
 

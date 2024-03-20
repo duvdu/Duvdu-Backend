@@ -1,10 +1,9 @@
-import { auth , isAuthorized } from '@duvdu-v1/duvdu';
 import { Router } from 'express';
 
 import * as controllers from '../controllers/plans/plan.controllers';
-import { Roles } from '../models/Role.model';
-import { Users } from '../models/User.model';
-import { Ifeatures } from '../types/Permissions';
+import { isauthenticated } from '../guards/isauthenticated.guard';
+import { isauthorized } from '../guards/isauthorized.guard';
+import { PERMISSIONS } from '../types/Permissions';
 import * as val from '../validators/plan/plan.validator';
 
 const router = Router();
@@ -12,8 +11,8 @@ const router = Router();
 router
   .route('/')
   .post(
-    auth(Users , Roles),
-    isAuthorized(Ifeatures.createPlanHandler),
+    isauthenticated,
+    isauthorized(PERMISSIONS.createPlanHandler),
     val.create,
     controllers.createPlanHandler,
   )
@@ -21,24 +20,20 @@ router
 router
   .route('/all')
   .get(
-    auth(Users,Roles),
-    isAuthorized(Ifeatures.getAllPlansHandler),
+    isauthenticated,
+    isauthorized(PERMISSIONS.getAllPlansHandler),
     controllers.getAllPlansHandler,
   );
 router
   .route('/:planId')
-  .all(auth(Users,Roles))
-  .get(isAuthorized(Ifeatures.getPlanHandler), val.planId, controllers.getPlanHandler)
+  .all(isauthenticated)
+  .get(isauthorized(PERMISSIONS.getPlanHandler), val.planId, controllers.getPlanHandler)
   .patch(
-    isAuthorized(Ifeatures.updatePlanHandler),
+    isauthorized(PERMISSIONS.updatePlanHandler),
     val.planId,
     val.update,
     controllers.updatePlanHandler,
   )
-  .delete(
-    isAuthorized(Ifeatures.removePlanHandler),
-    val.planId,
-    controllers.removePlanHandler,
-  );
+  .delete(isauthorized(PERMISSIONS.removePlanHandler), val.planId, controllers.removePlanHandler);
 
 export const planRoutes = router;

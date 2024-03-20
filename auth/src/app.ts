@@ -6,7 +6,7 @@ import session from 'express-session';
 
 import { env } from './config/env';
 import { sessionStore } from './config/redis';
-import passport from './controllers/auth/googleAuth.controller';
+import { passport } from './controllers/auth/passport.controller';
 import { apiRoutes } from './routes';
 export const app = express();
 

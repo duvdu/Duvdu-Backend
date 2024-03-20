@@ -1,38 +1,33 @@
-import { auth , isAuthorized } from '@duvdu-v1/duvdu';
 import { Router } from 'express';
 
 import * as controllers from '../controllers/roles/role.controllers';
-import { Roles } from '../models/Role.model';
-import { Users } from '../models/User.model';
-import { Ifeatures } from '../types/Permissions';
+import { isauthenticated } from '../guards/isauthenticated.guard';
+import { isauthorized } from '../guards/isauthorized.guard';
+import { PERMISSIONS } from '../types/Permissions';
 import * as val from '../validators/role/role.validator';
 
 const router = Router();
 
 router
   .route('/')
-  .get(auth(Users , Roles), isAuthorized(Ifeatures.getRolesHandler), controllers.getRolesHandler)
+  .get(isauthenticated, isauthorized(PERMISSIONS.getRolesHandler), controllers.getRolesHandler)
   .post(
-    auth(Users,Roles),
-    isAuthorized(Ifeatures.createRoleHandler),
+    isauthenticated,
+    isauthorized(PERMISSIONS.createRoleHandler),
     val.create,
     controllers.createRoleHandler,
   );
 
 router
   .route('/:roleId')
-  .all(auth(Users,Roles))
-  .get(isAuthorized(Ifeatures.getRoleHandler), val.roleId, controllers.getRoleHandler)
+  .all(isauthenticated)
+  .get(isauthorized(PERMISSIONS.getRoleHandler), val.roleId, controllers.getRoleHandler)
   .put(
-    isAuthorized(Ifeatures.updateRoleHandler),
+    isauthorized(PERMISSIONS.updateRoleHandler),
     val.roleId,
     val.update,
     controllers.updateRoleHandler,
   )
-  .delete(
-    isAuthorized(Ifeatures.removeRoleHandler),
-    val.roleId,
-    controllers.removeRoleHandler,
-  );
+  .delete(isauthorized(PERMISSIONS.removeRoleHandler), val.roleId, controllers.removeRoleHandler);
 
 export const roleRoutes = router;
