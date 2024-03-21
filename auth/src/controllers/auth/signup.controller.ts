@@ -17,7 +17,7 @@ export const signupHandler: SignupHandler = async (req, res, next) => {
   const verificationCode = generateRandom6Digit();
   const newUser = await Users.create({
     ...req.body,
-    password: hashPassword(req.body.password),
+    password: await hashPassword(req.body.password),
     role: role.id,
     isVerified: false,
     verificationCode: {

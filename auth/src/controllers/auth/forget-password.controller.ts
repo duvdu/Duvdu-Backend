@@ -18,6 +18,8 @@ export const askForgetPasswordHandler: RequestHandler<
   if (!user) return next(new NotFound());
 
   if (!user.isVerified) return next(new BadRequestError('account not verified'));
+  if (user.isBlocked.value)
+    return next(new BadRequestError(`user is blocked:${user.isBlocked.reason}`));
 
   const code = generateRandom6Digit();
   user.verificationCode = {
@@ -34,7 +36,7 @@ export const updateForgetenPasswordHandler: RequestHandler<
   { username: string },
   SuccessResponse,
   {
-    password: string;
+    newPassword: string;
   }
 > = async (req, res, next) => {
   const user = await Users.findOne({ username: req.params.username }).populate('role');
@@ -56,7 +58,7 @@ export const updateForgetenPasswordHandler: RequestHandler<
   });
   const refreshToken = generateRefreshToken({ id: user.id });
 
-  user.password = await hashPassword(req.body.password);
+  user.password = await hashPassword(req.body.newPassword);
   user.token = refreshToken;
 
   await user.save();

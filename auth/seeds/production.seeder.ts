@@ -1,10 +1,10 @@
 import { dbConnection } from '@duvdu-v1/duvdu';
 import mongoose from 'mongoose';
 
-import { env } from '../src/config/env';
-import { Roles } from '../src/models/Role.model';
-import { Users } from '../src/models/User.model';
-import { PERMISSIONS } from '../src/types/Permissions';
+import { env } from '../config/env';
+import { Roles } from '../models/Role.model';
+import { Users } from '../models/User.model';
+import { PERMISSIONS } from '../types/Permissions';
 
 (async () => {
   await dbConnection(env.mongoDb.uri);

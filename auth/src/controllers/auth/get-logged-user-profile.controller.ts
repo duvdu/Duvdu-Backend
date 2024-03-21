@@ -5,7 +5,7 @@ import { GetLoggedUserProfileHandler } from '../../types/endpoints/user.endpoint
 
 export const getLoggedUserProfileHandler: GetLoggedUserProfileHandler = async (req, res, next) => {
   const user = await Users.findById(req.loggedUser?.id).select(
-    'id name phoneNumber username profileImage coverImage location category acceptedProjectsCounter profileViews about isOnline isAvaliableToInstantProjects pricePerHour plan hasVerificationPadge avaliableContracts',
+    '-googleId -appleId -password -verificationCode.code -verificationCode.expireAt -token -role',
   );
   if (!user) return next(new UnauthenticatedError());
   const averageRate = +(

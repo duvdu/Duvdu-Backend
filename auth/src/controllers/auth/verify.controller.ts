@@ -1,7 +1,9 @@
 import { BadRequestError, NotFound, UnauthorizedError } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
+import { Roles } from '../../models/Role.model';
 import { Users } from '../../models/User.model';
+import { SystemRoles } from '../../types/Role';
 import { SuccessResponse } from '../../types/success-response';
 import { VerificationReason } from '../../types/User';
 import { hashVerificationCode } from '../../utils/crypto';
@@ -26,7 +28,13 @@ export const verifyHandler: RequestHandler<
     user.verificationCode.reason = VerificationReason.forgetPasswordVerified;
   else if (user.verificationCode.reason === VerificationReason.updateOldPhoneNumber)
     user.verificationCode.reason = VerificationReason.updateOldPhoneNumberVerified;
-  else user.isVerified = true;
+  else {
+    user.isVerified = true;
+    user.verificationCode.reason = undefined;
+    const role = await Roles.findOne({ key: SystemRoles.verified });
+    user.role = role?.id;
+  }
+
   await user.save();
   res.status(200).json({
     message: 'success',

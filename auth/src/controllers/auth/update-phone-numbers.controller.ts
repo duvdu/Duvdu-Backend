@@ -31,23 +31,12 @@ export const askUpdatePhoneNumberHandler: AskUpdatePhoneNumberHandler = async (r
 export const updatePhoneNumberHandler: RequestHandler<
   unknown,
   SuccessResponse,
-  { verificationCode: string; phoneNumber: string }
+  { phoneNumber: string }
 > = async (req, res, next) => {
   const currentUser = await Users.findById(req.loggedUser?.id);
   if (!currentUser) return next(new NotFound());
-  if (currentUser.verificationCode?.reason === VerificationReason.updateOldPhoneNumberVerified)
+  if (currentUser.verificationCode?.reason !== VerificationReason.updateOldPhoneNumberVerified)
     return next(new UnauthorizedError());
-
-  const hashEnterdCode = hashVerificationCode(req.body.verificationCode);
-  if (currentUser.phoneNumber.number) {
-    const currentDate: number = new Date().getTime();
-
-    if (
-      currentDate > new Date(currentUser.verificationCode?.expireAt || 0).getTime() ||
-      currentUser.verificationCode!.code != hashEnterdCode
-    )
-      return next(new UnauthenticatedError());
-  }
 
   const verificationCode: string = generateRandom6Digit();
   const hashedVerificationCode: string = hashVerificationCode(verificationCode);

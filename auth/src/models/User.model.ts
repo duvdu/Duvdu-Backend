@@ -24,7 +24,7 @@ const userSchema = new Schema<Iuser>(
     isOnline: { type: Boolean, default: false },
     isAvaliableToInstantProjects: { type: Boolean, default: false },
     pricePerHour: { type: Number, default: 0 },
-    role: { type: Schema.Types.ObjectId, ref: 'role' },
+    role: { type: Schema.Types.ObjectId, ref: MODELS.role },
     hasVerificationBadge: { type: Boolean, default: false },
     avaliableContracts: { type: Number, default: 0 },
     rate: { ratersCounter: { type: Number, default: 0 }, totalRates: { type: Number, default: 0 } },

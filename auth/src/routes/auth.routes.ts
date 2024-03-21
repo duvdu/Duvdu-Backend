@@ -34,7 +34,7 @@ router
   .patch(val.updatePhoneNumberVal, handlers.updatePhoneNumberHandler);
 
 router
-  .route('/reset-password')
+  .route('/reset-password/:username')
   .get(val.askResetPasswordVal, handlers.askForgetPasswordHandler)
   .post(val.resetPasswordVal, handlers.updateForgetenPasswordHandler);
 

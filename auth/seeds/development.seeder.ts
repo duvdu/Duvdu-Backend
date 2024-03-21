@@ -1,14 +1,14 @@
 import { dbConnection } from '@duvdu-v1/duvdu';
 import mongoose from 'mongoose';
 
-import { Projects } from './../src/models/Projects.model';
 import { SavedProjects } from './../src/models/Saved-Project.model';
-import { Users } from './../src/models/User.model';
-import { hashPassword } from './../src/utils/bcrypt';
-import { env } from '../src/config/env';
-import { Plans } from '../src/models/Plan.model';
-import { Roles } from '../src/models/Role.model';
-import { Ifeatures } from '../src/types/Permissions';
+import { env } from '../config/env';
+import { Plans } from '../models/Plan.model';
+import { Projects } from '../models/Projects.model';
+import { Roles } from '../models/Role.model';
+import { Users } from '../models/User.model';
+import { Ifeatures } from '../types/Permissions';
+import { hashPassword } from '../utils/bcrypt';
 
 (async () => {
   await dbConnection(env.mongoDb.uri);
@@ -47,11 +47,16 @@ import { Ifeatures } from '../src/types/Permissions';
   ]);
   const userId = new mongoose.Types.ObjectId().toHexString();
   await Users.insertMany([
-    { username: 'admin', password: hashPassword('123@Ewasy'), isVerified: true, plan: planAdminId },
+    {
+      username: 'admin',
+      password: await hashPassword('123@Ewasy'),
+      isVerified: true,
+      plan: planAdminId,
+    },
     {
       _id: userId,
       username: 'user',
-      password: hashPassword('123@Ewasy'),
+      password: await hashPassword('123@Ewasy'),
       isVerified: true,
       plan: planUserId,
     },
