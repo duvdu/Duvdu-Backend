@@ -6,6 +6,8 @@ import { env } from '../config/env';
 import { IjwtPayload } from '../types/JwtPayload';
 
 export const isauthenticated: RequestHandler = async (req, res, next) => {
+  console.log(req.session);
+  
   if (!req.session.access) return next(new UnauthenticatedError('access token not found'));
 
   let payload: IjwtPayload;

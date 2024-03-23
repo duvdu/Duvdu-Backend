@@ -28,6 +28,8 @@ export const verifyHandler: RequestHandler<
     user.verificationCode.reason = VerificationReason.forgetPasswordVerified;
   else if (user.verificationCode.reason === VerificationReason.updateOldPhoneNumber)
     user.verificationCode.reason = VerificationReason.updateOldPhoneNumberVerified;
+  else if (user.verificationCode.reason === VerificationReason.completeSginUp)
+    user.verificationCode.reason = VerificationReason.CompleteSginUpVerfied;
   else {
     user.isVerified = true;
     user.verificationCode.reason = undefined;

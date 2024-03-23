@@ -1,4 +1,4 @@
-import { globalUploadMiddleware } from '@duvdu-v1/duvdu';
+import {  globalUploadMiddleware } from '@duvdu-v1/duvdu';
 import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
 
@@ -11,6 +11,7 @@ import * as val from '../validators/auth';
 const router = Router();
 router.post('/signin', val.signinVal, handlers.signinHandler);
 router.post('/signup', val.signupVal, handlers.signupHandler);
+router.post('/complete-sginup' , isauthenticated, val.completeSginUpVal, handlers.completeSginupHandler);
 router.post(
   '/retreive-username',
   rateLimit({

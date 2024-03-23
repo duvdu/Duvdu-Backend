@@ -67,3 +67,4 @@ export const updateForgetenPasswordHandler: RequestHandler<
 
   res.status(200).json({ message: 'success' });
 };
+
