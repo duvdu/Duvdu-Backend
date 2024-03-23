@@ -7,8 +7,8 @@ import { env } from '../config/env';
 let mongo: any;
 
 beforeAll(async () => {
-  env.jwt.secret = 'sadsadsadasdas';
-  process.env.JWT_KEY = 'sadsadsadasdas';
+  env.jwt.secret = 'dddddddd';
+  process.env.JWT_KEY = 'dddddddd';
   process.env.SESSION_SECRET = 'kjsdlksjdlsja';
 
   mongo = await MongoMemoryServer.create();

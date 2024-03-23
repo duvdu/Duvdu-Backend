@@ -1,10 +1,9 @@
-import { dbConnection } from '@duvdu-v1/duvdu';
+import { dbConnection , PERMISSIONS } from '@duvdu-v1/duvdu';
 import mongoose from 'mongoose';
 
-import { env } from '../config/env';
-import { Roles } from '../models/Role.model';
-import { Users } from '../models/User.model';
-import { PERMISSIONS } from '../types/Permissions';
+import { env } from '.././src/config/env';
+import { Roles } from '.././src/models/Role.model';
+import { Users } from '.././src/models/User.model';
 
 (async () => {
   await dbConnection(env.mongoDb.uri);
@@ -19,7 +18,6 @@ import { PERMISSIONS } from '../types/Permissions';
       permissions: [
         PERMISSIONS.changePassword,
         PERMISSIONS.updateProfile,
-        PERMISSIONS.savedProjects,
       ],
     },
     {
@@ -29,7 +27,6 @@ import { PERMISSIONS } from '../types/Permissions';
         PERMISSIONS.updatePhoneNumber,
         PERMISSIONS.changePassword,
         PERMISSIONS.updateProfile,
-        PERMISSIONS.savedProjects,
         PERMISSIONS.createTicket,
         PERMISSIONS.getTicket,
       ],

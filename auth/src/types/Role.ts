@@ -1,10 +1,7 @@
-import { PERMISSIONS } from './Permissions';
+import { PERMISSIONS } from '@duvdu-v1/duvdu';
 
-export enum SystemRoles {
-  verified = 'verified',
-  unverified = 'unverified',
-  admin = 'admin',
-}
+
+
 
 export interface Irole {
   id: string;

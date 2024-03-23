@@ -1,3 +1,4 @@
+import { MODELS } from '@duvdu-v1/duvdu';
 import mongoose from 'mongoose';
 
 import { Iplan } from '../types/plan';
@@ -10,9 +11,9 @@ const planSchema = new mongoose.Schema<Iplan>(
   },
   {
     timestamps: true,
-    collection:'plan'
+    collection:MODELS.plan
   },
 );
 
 
-export const Plan = mongoose.model<Iplan>('plan', planSchema);
+export const Plan = mongoose.model<Iplan>(MODELS.plan, planSchema);

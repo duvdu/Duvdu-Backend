@@ -1,3 +1,4 @@
+import { SystemRoles } from '@duvdu-v1/duvdu';
 import passport from 'passport';
 import { Strategy as AppleStrategy } from 'passport-apple';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth2';
@@ -5,7 +6,6 @@ import { Strategy as GoogleStrategy } from 'passport-google-oauth2';
 import { env } from '../../config/env';
 import { Roles } from '../../models/Role.model';
 import { Users } from '../../models/User.model';
-import { SystemRoles } from '../../types/Role';
 import { VerificationReason } from '../../types/User';
 import { generateAccessToken } from '../../utils/generateToken';
 

@@ -1,11 +1,9 @@
-import { dbConnection } from '@duvdu-v1/duvdu';
+import { dbConnection , PERMISSIONS , SystemRoles } from '@duvdu-v1/duvdu';
 import mongoose from 'mongoose';
 
 import { Users } from './../src/models/User.model';
 import { env } from '../src/config/env';
 import { Roles } from '../src/models/Role.model';
-import { PERMISSIONS } from '../src/types/Permissions';
-import { SystemRoles } from '../src/types/Role';
 
 (async () => {
   await dbConnection(env.mongoDb.uri);

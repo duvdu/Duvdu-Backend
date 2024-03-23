@@ -1,9 +1,8 @@
-import { NotFound, UnauthorizedError } from '@duvdu-v1/duvdu';
+import { NotFound, UnauthorizedError , SystemRoles } from '@duvdu-v1/duvdu';
 
 import { Roles } from '../../models/Role.model';
 import { Users } from '../../models/User.model';
 import { CompleteSginUpHandler } from '../../types/endpoints/user.endpoints';
-import { SystemRoles } from '../../types/Role';
 import { VerificationReason } from '../../types/User';
 import { hashVerificationCode } from '../../utils/crypto';
 import { generateAccessToken, generateRefreshToken } from '../../utils/generateToken';

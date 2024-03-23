@@ -1,6 +1,6 @@
+import { MODELS } from '@duvdu-v1/duvdu';
 import { Schema, model } from 'mongoose';
 
-import { MODELS } from '../types/model-names';
 import { Iuser } from '../types/User';
 
 const userSchema = new Schema<Iuser>(

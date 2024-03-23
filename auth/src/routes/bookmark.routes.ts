@@ -1,9 +1,7 @@
+import { isauthenticated, isauthorized, PERMISSIONS } from '@duvdu-v1/duvdu';
 import { Router } from 'express';
 
 import * as controllers from '../controllers/bookmarks';
-import { isauthenticated } from '../guards/isauthenticated.guard';
-import { isauthorized } from '../guards/isauthorized.guard';
-import { PERMISSIONS } from '../types/Permissions';
 import * as val from '../validators/saved-project';
 
 const router = Router();

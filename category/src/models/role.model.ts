@@ -1,3 +1,4 @@
+import { MODELS } from '@duvdu-v1/duvdu';
 import mongoose from 'mongoose';
 
 import { Irole } from '../types/role';
@@ -13,8 +14,8 @@ const roleSchema = new mongoose.Schema<Irole>(
   },
   {
     timestamps: true,
-    collection:'role'
+    collection:MODELS.role
   },
 );
 
-export const Role = mongoose.model<Irole>('role', roleSchema);
+export const Role = mongoose.model<Irole>(MODELS.role, roleSchema);

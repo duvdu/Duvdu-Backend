@@ -1,7 +1,7 @@
+import { MODELS } from '@duvdu-v1/duvdu';
 import { Schema, model } from 'mongoose';
 
 import { Icategory } from '../types/Category';
-import { MODELS } from '../types/model-names';
 
 const categorySchema = new Schema<Icategory>(
   {
