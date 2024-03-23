@@ -1,11 +1,17 @@
 import { RequestHandler } from 'express';
 
 import { UnauthorizedError } from '../errors/unauthorized-error';
+import { PERMISSIONS } from '../types/Permissions';
+import { SystemRoles } from '../types/systemRoles';
 
 
 
-export const isAuthorized = ( permission:string)=><RequestHandler>(async (req,res,next)=>{    
-  if (!(req as any).loggedUser.permession.includes(permission))
-    return next(new UnauthorizedError('user not allowed access this route'));
-  return next();
+export const isauthorized = (permission: PERMISSIONS) => <RequestHandler>(async (
+  req,
+  res,
+  next,
+) => {
+  if ((req as any).loggedUser.role.key === SystemRoles.admin) return next();
+  if (!(req as any).loggedUser.role.permissions.includes(permission)) return next(new UnauthorizedError());
+  next();
 });
