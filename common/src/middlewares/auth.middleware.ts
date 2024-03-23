@@ -12,7 +12,7 @@ export const isauthenticated: RequestHandler = async (req, res, next) => {
   try {
     payload = <IjwtPayload>verify((req as any).session.access, process.env.JWT_KEY!);
     (req as any).loggedUser = payload;
-    if (!(req as any).loggedUser.isBlocked.value)
+    if ((req as any).loggedUser.isBlocked.value)
       return next(new UnauthorizedError(`user is blocked:${(req as any).loggedUser.isBlocked.reason}`));
   } catch (error) {
     return res.status(423).json({ message: 'access token expired' });
