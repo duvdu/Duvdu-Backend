@@ -158,3 +158,7 @@ export interface GetUserProfileHandler
     unknown,
     unknown
   > {}
+
+
+export interface CompleteSginUpHandler 
+extends RequestHandler<unknown , successResponse<unknown> , Pick<Iuser , 'phoneNumber' | 'username' | 'name'> , unknown>{}

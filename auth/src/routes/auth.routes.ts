@@ -1,16 +1,14 @@
-import { globalUploadMiddleware } from '@duvdu-v1/duvdu';
+import {  globalUploadMiddleware, isauthenticated, isauthorized, PERMISSIONS } from '@duvdu-v1/duvdu';
 import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
 
 import * as handlers from '../controllers/auth';
-import { isauthenticated } from '../guards/isauthenticated.guard';
-import { isauthorized } from '../guards/isauthorized.guard';
-import { PERMISSIONS } from '../types/Permissions';
 import * as val from '../validators/auth';
 
 const router = Router();
 router.post('/signin', val.signinVal, handlers.signinHandler);
 router.post('/signup', val.signupVal, handlers.signupHandler);
+router.post('/complete-sginup' , isauthenticated, val.completeSginUpVal, handlers.completeSginupHandler);
 router.post(
   '/retreive-username',
   rateLimit({

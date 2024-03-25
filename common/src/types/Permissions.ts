@@ -1,34 +1,34 @@
 export enum PERMISSIONS {
-  resetPassword = 'resetPassword',
-  updatePhoneNumber = 'updatePhoneNumber',
-  changePassword = 'changePassword',
-  updateProfile = 'updateProfile',
-  bookmarks = 'bookmarks',
-  createCategory = 'create-category',
-  updateCategory = 'update-category',
-  removeCategory = 'remove-category',
-  getAdminCategories = 'get-gategories-admin',
-  createTicket = 'create ticket',
-  getAllTickets = 'get-all-tickets',
-  updateTicket = 'update-ticket',
-  removeTicket = 'remove-ticket',
-  getTicket = 'get-ticket',
-  createTerm = 'create-term',
-  updateTerm = 'update-term',
-  // plan
-  createPlanHandler = 'create plan',
-  updatePlanHandler = 'update plan',
-  getPlanHandler = 'get plan',
-  getAllPlansHandler = 'get all plans',
-  removePlanHandler = 'remove plan',
-  // roles
-  createRoleHandler = 'create role',
-  updateRoleHandler = 'update role',
-  getRolesHandler = 'get roles',
-  getRoleHandler = 'get role',
-  removeRoleHandler = 'remove role',
-}
-
+    resetPassword = 'resetPassword',
+    updatePhoneNumber = 'updatePhoneNumber',
+    changePassword = 'changePassword',
+    updateProfile = 'updateProfile',
+    bookmarks = 'bookmarks',
+    createCategory = 'create-category',
+    updateCategory = 'update-category',
+    removeCategory = 'remove-category',
+    getAdminCategories = 'get-gategories-admin',
+    createTicket = 'create ticket',
+    getAllTickets = 'get-all-tickets',
+    updateTicket = 'update-ticket',
+    removeTicket = 'remove-ticket',
+    getTicket = 'get-ticket',
+    createTerm = 'create-term',
+    updateTerm = 'update-term',
+    // plan
+    createPlanHandler = 'create plan',
+    updatePlanHandler = 'update plan',
+    getPlanHandler = 'get plan',
+    getAllPlansHandler = 'get all plans',
+    removePlanHandler = 'remove plan',
+    // roles
+    createRoleHandler = 'create role',
+    updateRoleHandler = 'update role',
+    getRolesHandler = 'get roles',
+    getRoleHandler = 'get role',
+    removeRoleHandler = 'remove role',
+  }
+  
 export const permissions = {
   auth: [
     PERMISSIONS.resetPassword,
@@ -68,3 +68,4 @@ export const permissions = {
     PERMISSIONS.removeRoleHandler,
   ],
 };
+  

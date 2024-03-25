@@ -1,7 +1,7 @@
+import { IjwtPayload } from '@duvdu-v1/duvdu';
 import jwt from 'jsonwebtoken';
 
 import { env } from '../config/env';
-import { IjwtPayload } from '../types/JwtPayload';
 
 export const generateAccessToken = (payload: IjwtPayload) =>
   jwt.sign(payload, env.jwt.secret, {

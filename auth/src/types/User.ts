@@ -11,6 +11,8 @@ export enum VerificationReason {
   forgetPassword = 'forget-password',
   forgetPasswordVerified = 'forget-password-verified',
   signup = 'signup',
+  completeSginUp = 'complete-sginup',
+  CompleteSginUpVerfied = 'complete-sginup-verified'
 }
 export interface Iuser {
   id: string;

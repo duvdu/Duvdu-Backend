@@ -1,7 +1,6 @@
-import { globalValidatorMiddleware } from '@duvdu-v1/duvdu';
+import { globalValidatorMiddleware, PERMISSIONS } from '@duvdu-v1/duvdu';
 import { body, param } from 'express-validator';
 
-import { PERMISSIONS } from '../../types/Permissions';
 
 export const create = [
   body('key').exists().isString().trim().isLength({ min: 2 }),

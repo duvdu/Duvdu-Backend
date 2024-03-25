@@ -1,9 +1,7 @@
+import { isauthenticated, isauthorized, PERMISSIONS } from '@duvdu-v1/duvdu';
 import express from 'express';
 
 import * as handler from '../controllers/terms&condition';
-import { isauthenticated } from '../guards/isauthenticated.guard';
-import { isauthorized } from '../guards/isauthorized.guard';
-import { PERMISSIONS } from '../types/Permissions';
 import * as val from '../validators/terms&condition/createTerm.val';
 
 const router = express.Router();

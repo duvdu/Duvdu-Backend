@@ -1,10 +1,13 @@
+import { SystemRoles } from '@duvdu-v1/duvdu';
 import passport from 'passport';
 import { Strategy as AppleStrategy } from 'passport-apple';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth2';
 
 import { env } from '../../config/env';
-import { Plans } from '../../models/Plan.model';
+import { Roles } from '../../models/Role.model';
 import { Users } from '../../models/User.model';
+import { VerificationReason } from '../../types/User';
+import { generateAccessToken } from '../../utils/generateToken';
 
 passport.serializeUser((user, done) => {
   done(null, user);
@@ -24,28 +27,35 @@ passport.use(
     {
       clientID: `${env.google.client_id}`,
       clientSecret: `${env.google.client_secret}`,
-      callbackURL: 'http://localhost:3000/api/users/auth/google/callback',
+      callbackURL: 'http://localhost:3000/api/users/oauth/google/callback',
       scope: ['profile', 'email', 'phone'],
       passReqToCallback: true,
     },
     async (request: any, accessToken: any, refreshToken: any, profile: any, done: any) => {
-      const plans = await Plans.find().sort('-createdAt').limit(1);
-
+      const role = await Roles.findOne({key:SystemRoles.unverified});
+      if (!role) throw new Error('role not found');
       let user = await Users.findOne({ googleId: profile.id });
       if (!user) {
         user = new Users({
           googleId: profile.id,
-          username: profile.email.substring(0, profile.email.indexOf('@')),
-          plan: plans[0].id,
-          name: profile.displayName,
-          isBlocked: true,
+          role:role.id,
+          verificationCode:{
+            reason:VerificationReason.completeSginUp
+          }
         });
         await user.save();
       }
-      // const token = generateToken({ id: user.id, planId: user.plan.toString() });
-      // user.token = token;
-      await user.save();
+      console.log(true);
+      
+      const Token = generateAccessToken({
+        id: user.id,
+        isBlocked: { value: false },
+        isVerified: false,
+        role: { key: role.key, permissions: role.permissions },
+      });
 
+      user.token = Token;
+      await user.save();
       return done(null, user);
     },
   ),

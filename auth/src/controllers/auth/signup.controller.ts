@@ -1,9 +1,8 @@
-import { NotFound } from '@duvdu-v1/duvdu';
+import { NotFound , SystemRoles } from '@duvdu-v1/duvdu';
 
 import { Roles } from '../../models/Role.model';
 import { Users } from '../../models/User.model';
 import { SignupHandler } from '../../types/endpoints/user.endpoints';
-import { SystemRoles } from '../../types/Role';
 import { VerificationReason } from '../../types/User';
 import { hashPassword } from '../../utils/bcrypt';
 import { hashVerificationCode } from '../../utils/crypto';

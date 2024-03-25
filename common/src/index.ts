@@ -22,3 +22,6 @@ export * from './middlewares/global-upload.middleware';
 export * from './middlewares/isAuthorized.middleware';
 
 export * from './utils/generateToken';
+export * from './types/Permissions';
+export * from './types/model-names';
+export * from './types/systemRoles';

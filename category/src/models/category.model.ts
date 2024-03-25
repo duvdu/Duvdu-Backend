@@ -1,3 +1,4 @@
+import { MODELS } from '@duvdu-v1/duvdu';
 import mongoose from 'mongoose';
 
 import { Icategory } from '../types/Category';
@@ -31,9 +32,9 @@ const categorySchema = new mongoose.Schema<Icategory>(
   },
   {
     timestamps: true,
-    collection:'category'
+    collection:MODELS.category
   },
 );
 
 
-export const Category = mongoose.model<Icategory>('category', categorySchema);
+export const Category = mongoose.model<Icategory>(MODELS.category, categorySchema);

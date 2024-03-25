@@ -1,6 +1,6 @@
+import { MODELS } from '@duvdu-v1/duvdu';
 import { Schema, model } from 'mongoose';
 
-import { MODELS } from '../types/model-names';
 import { Iplan } from '../types/Plan';
 
 const planSchema = new Schema<Iplan>(

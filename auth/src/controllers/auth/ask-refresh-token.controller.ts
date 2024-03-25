@@ -1,10 +1,9 @@
-import { NotFound, UnauthenticatedError } from '@duvdu-v1/duvdu';
+import { NotFound, UnauthenticatedError , MODELS } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import { verify } from 'jsonwebtoken';
 
 import { env } from '../../config/env';
 import { Users } from '../../models/User.model';
-import { MODELS } from '../../types/model-names';
 import { Irole } from '../../types/Role';
 import { generateAccessToken } from '../../utils/generateToken';
 

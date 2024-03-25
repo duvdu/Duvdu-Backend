@@ -1,6 +1,7 @@
+import { MODELS } from '@duvdu-v1/duvdu';
 import { Schema, model } from 'mongoose';
 
-import { MODELS } from '../types/model-names';
+import { Icategory } from '../types/Category';
 
 export interface Icategory {
   id: string;

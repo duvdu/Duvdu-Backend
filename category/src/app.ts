@@ -1,10 +1,9 @@
 import { globalErrorHandlingMiddleware } from '@duvdu-v1/duvdu';
-import connectRedis from 'connect-redis';
 import express from 'express';
 import session from 'express-session';
-import { createClient } from 'redis';
 
 import { env } from './config/env';
+import { sessionStore } from './config/redis';
 import { router as categoryRoutes } from './routes/index';
 
 export const app = express();
@@ -12,34 +11,22 @@ export const app = express();
 app.set('trust proxy', true);
 app.use(express.json());
 
-let redisStore;
-
-if (process.env.NODE_ENV != 'test') {
-  const redisClient = createClient({
-    url: 'redis://expiration-redis-srv:6379',
-  });
-  redisClient.connect().catch(console.error);
-  redisClient.on('connect', () => {
-    console.log('Connected to Redis');
-  });
-  redisStore = new connectRedis({client:redisClient});
-}
-
 app.use(
   session({
     secret: env.expressSession.secret,
     resave: false,
     saveUninitialized: false,
-    store: redisStore,
+    store:
+      env.environment !== 'test' && env.expressSession.allowUseStorage ? sessionStore() : undefined,
     cookie: {
       sameSite: 'lax',
       secure: env.environment === 'production',
       httpOnly: true,
     },
-  })
+  }),
 );
 app.get('/test', (req, res) => {
-  req.session.jwt = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZjlmOTEzMzNiNTg0ODA3YTg1NDg2MCIsInBlcm1lc3Npb24iOlsidXBkYXRlUHJvZmlsZSJdLCJpYXQiOjE3MTA4ODEwNDMsImV4cCI6MTcxMDg4MTEwM30.e211RTlR7mgiDFEYT8KAYuAdw_2CTIQc2cCmCpQZAQw';
+  req.session.access = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZmYzMGQ1YmI5OTUwOTY1ZDQzZGVhZCIsImlzQmxvY2tlZCI6eyJ2YWx1ZSI6ZmFsc2V9LCJpc1ZlcmlmaWVkIjpmYWxzZSwicm9sZSI6eyJrZXkiOiJ1bnZlcmlmaWVkIiwicGVybWlzc2lvbnMiOlsiY2hhbmdlUGFzc3dvcmQiLCJ1cGRhdGVQcm9maWxlIl19LCJpYXQiOjE3MTEyMjI5OTcsImV4cCI6MTcxMTY1NDk5N30.aGkU73UQSr5h34WbA1raJrbYP6VsqYbMhnQl9tYScyw';
   res.send('Session cookie generated successfully.');
 });
 app.use('/api/category', categoryRoutes);

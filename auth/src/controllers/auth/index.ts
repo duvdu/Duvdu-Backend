@@ -10,3 +10,4 @@ export * from './update-phone-numbers.controller';
 export * from './forget-password.controller';
 export * from './verify.controller';
 export * from './ask-refresh-token.controller';
+export * from './completeSginUp.controller';

@@ -1,9 +1,12 @@
 import { Router } from 'express';
 import passport from 'passport';
 
+import { Iuser } from '../types/User';
+import { generateRefreshToken } from '../utils/generateToken';
+
 const router = Router();
 
-router.get('/google', passport.authenticate('google', { scope: ['email', 'profile'] }));
+// router.get('/google', passport.authenticate('google', { scope: ['email', 'profile'] }));
 
 router.get('/google', passport.authenticate('google', { scope: ['email', 'profile', 'phone'] }));
 
@@ -18,7 +21,12 @@ router.get(
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 router.get('/google/success', (req, res) => {
   console.log('hello here');
-  // req.session.jwt = (req.user as Iuser)?.token;
+  req.session.access = (req.user as Iuser).token;
+  req.session.refresh = generateRefreshToken({id:(req.user as Iuser).id});
+  res.redirect('/profile');
+});
+router.get('/google/failure', (req, res) => {
+  console.log('fail');
   res.send('helllo metoo');
 });
 

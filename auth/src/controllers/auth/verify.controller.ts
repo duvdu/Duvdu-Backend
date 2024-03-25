@@ -1,9 +1,8 @@
-import { BadRequestError, NotFound, UnauthorizedError } from '@duvdu-v1/duvdu';
+import { BadRequestError, NotFound, UnauthorizedError , SystemRoles } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 import { Roles } from '../../models/Role.model';
 import { Users } from '../../models/User.model';
-import { SystemRoles } from '../../types/Role';
 import { SuccessResponse } from '../../types/success-response';
 import { VerificationReason } from '../../types/User';
 import { hashVerificationCode } from '../../utils/crypto';
@@ -28,6 +27,8 @@ export const verifyHandler: RequestHandler<
     user.verificationCode.reason = VerificationReason.forgetPasswordVerified;
   else if (user.verificationCode.reason === VerificationReason.updateOldPhoneNumber)
     user.verificationCode.reason = VerificationReason.updateOldPhoneNumberVerified;
+  else if (user.verificationCode.reason === VerificationReason.completeSginUp)
+    user.verificationCode.reason = VerificationReason.CompleteSginUpVerfied;
   else {
     user.isVerified = true;
     user.verificationCode.reason = undefined;
