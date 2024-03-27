@@ -48,3 +48,5 @@ export * from './models/Term.model';
 export * from './models/Ticket.model';
 export * from './models/User.model';
 export * from './models/category.model';
+
+export * from './middlewares/redis-connection';
