@@ -1,7 +1,6 @@
 export interface Ipagination {
-  currentPage: number;
   limit: number;
-  numberOfPages: number;
-  nextPage: number;
-  previousPage: number;
+  skip: number;
+  page: number;
+  filter: any;
 }
