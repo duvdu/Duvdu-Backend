@@ -20,7 +20,7 @@ export const env = {
     allowUseStorage: (process.env.ALLOW_USE_SESSION_STORAGE === 'true') as boolean,
   },
   redis: {
-    uri: process.env.REDIS_URI as string,
+    uri: process.env.REDIS_HOST as string,
   },
 };
 

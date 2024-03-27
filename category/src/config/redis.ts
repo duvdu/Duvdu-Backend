@@ -8,9 +8,9 @@ export const redisConnection = (url: string) => {
   const client = createClient({ url });
   client
     .connect()
-    .then(() => console.log('redis connected in : localhost'))
+    .then(() => console.log(`redis connected in : ${url}`))
     .catch(() => {
-      throw new DatabaseConnectionError('cannot connect to redis');
+      throw new DatabaseConnectionError(`cannot connect to redis : ${url}`);
     });
   return client;
 };

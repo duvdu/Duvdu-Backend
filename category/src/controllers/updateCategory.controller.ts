@@ -1,6 +1,5 @@
-import { NotFound } from '@duvdu-v1/duvdu';
+import { NotFound, Categories } from '@duvdu-v1/duvdu';
 
-import { Category } from '../models/category.model';
 import { UpdateCategoryHandler } from '../types/endpoints/endpoints';
 import { saveFiles, removeFiles } from '../utils/file';
 
@@ -8,7 +7,7 @@ export const updateCategoryHandler: UpdateCategoryHandler = async (req, res, nex
   const files = <{ image?: [Express.Multer.File] }>req.files;
   const image = files.image ? files.image[0] : undefined;
 
-  const category = await Category.findByIdAndUpdate(req.params.categoryId, {
+  const category = await Categories.findByIdAndUpdate(req.params.categoryId, {
     ...req.body,
     [image ? 'image' : (null as any)]: `/media/images/${image?.filename}`,
   });
