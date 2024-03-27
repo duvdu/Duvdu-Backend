@@ -1,9 +1,9 @@
-import { globalErrorHandlingMiddleware } from '@duvdu-v1/duvdu';
+import { globalErrorHandlingMiddleware, sessionStore } from '@duvdu-v1/duvdu';
 import express from 'express';
 import session from 'express-session';
 
 import { env } from './config/env';
-import { sessionStore } from './config/redis';
+
 
 export const app = express();
 
@@ -14,7 +14,7 @@ export const mySession =   session({
   resave: false,
   saveUninitialized: false,
   store:
-    env.environment !== 'test' && env.expressSession.allowUseStorage ? sessionStore() : undefined,
+    env.environment !== 'test' && env.expressSession.allowUseStorage ? sessionStore(env.redis.uri) : undefined,
   cookie: {
     sameSite: 'lax',
     secure: env.environment === 'production',
