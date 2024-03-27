@@ -65,26 +65,26 @@ export class Api_Feature {
     return this;
   }
 
-  pagination(documentCount: number): this {
-    const page: number = +(this.queryString.page || 1);
-    const limit: number = +(this.queryString.limit || 10);
-    const skip: number = (page - 1) * limit;
-    const endPageIndex: number = page * limit;
+  // pagination(documentCount: number): this {
+  //   const page: number = +(this.queryString.page || 1);
+  //   const limit: number = +(this.queryString.limit || 10);
+  //   const skip: number = (page - 1) * limit;
+  //   const endPageIndex: number = page * limit;
 
-    const pagination: Partial<Ipagination> = {};
-    pagination.currentPage = page;
-    pagination.limit = limit;
-    pagination.numberOfPages = Math.ceil(documentCount / limit);
-    if (endPageIndex < documentCount) {
-      pagination.nextPage = page + 1;
-    }
+  //   const pagination: Partial<Ipagination> = {};
+  //   pagination.currentPage = page;
+  //   pagination.limit = limit;
+  //   pagination.numberOfPages = Math.ceil(documentCount / limit);
+  //   if (endPageIndex < documentCount) {
+  //     pagination.nextPage = page + 1;
+  //   }
 
-    if (skip > 0) {
-      pagination.previousPage = page - 1;
-    }
+  //   if (skip > 0) {
+  //     pagination.previousPage = page - 1;
+  //   }
 
-    this.mongooseQuery = this.mongooseQuery.skip(skip).limit(limit);
-    this.paginateResult = pagination;
-    return this;
-  }
+  //   this.mongooseQuery = this.mongooseQuery.skip(skip).limit(limit);
+  //   this.paginateResult = pagination;
+  //   return this;
+  // }
 }
