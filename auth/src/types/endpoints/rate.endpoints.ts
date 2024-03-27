@@ -1,6 +1,6 @@
+import { Irate } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-import { Irate } from '../Rate';
 type successResponse<T> = T & {
   message: 'success';
 };

@@ -1,7 +1,5 @@
-import { BadRequestError, NotFound } from '@duvdu-v1/duvdu';
+import { BadRequestError, NotFound, Roles, Plans } from '@duvdu-v1/duvdu';
 
-import { Plans } from '../../models/Plan.model';
-import { Roles } from '../../models/Role.model';
 import {
   CreateRoleHandler,
   GetRoleHandler,

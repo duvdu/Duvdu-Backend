@@ -1,6 +1,6 @@
+import { Ireport } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-import { Ireport } from '../Report';
 
 type successResponse<T> = T & {
   message: 'success';

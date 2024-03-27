@@ -1,6 +1,5 @@
-import { UnauthenticatedError } from '@duvdu-v1/duvdu';
+import { UnauthenticatedError , Users } from '@duvdu-v1/duvdu';
 
-import { Users } from '../../models/User.model';
 import { GetLoggedUserProfileHandler } from '../../types/endpoints/user.endpoints';
 
 export const getLoggedUserProfileHandler: GetLoggedUserProfileHandler = async (req, res, next) => {

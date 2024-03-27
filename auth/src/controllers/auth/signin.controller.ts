@@ -1,7 +1,5 @@
-import { UnauthenticatedError } from '@duvdu-v1/duvdu';
+import { UnauthenticatedError, Roles, Users } from '@duvdu-v1/duvdu';
 
-import { Roles } from '../../models/Role.model';
-import { Users } from '../../models/User.model';
 import { SigninHandler } from '../../types/endpoints/user.endpoints';
 import { comparePassword } from '../../utils/bcrypt';
 import { generateAccessToken, generateRefreshToken } from '../../utils/generateToken';

@@ -1,10 +1,6 @@
-import { BadRequestError, NotFound, UnauthorizedError } from '@duvdu-v1/duvdu';
+import { BadRequestError, NotFound, UnauthorizedError, Users , Irole , SuccessResponse , VerificationReason } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-import { Users } from '../../models/User.model';
-import { Irole } from '../../types/Role';
-import { SuccessResponse } from '../../types/success-response';
-import { VerificationReason } from '../../types/User';
 import { hashPassword } from '../../utils/bcrypt';
 import { hashVerificationCode } from '../../utils/crypto';
 import { generateAccessToken, generateRefreshToken } from '../../utils/generateToken';

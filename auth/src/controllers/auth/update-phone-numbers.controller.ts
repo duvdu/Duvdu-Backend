@@ -1,10 +1,7 @@
-import { NotFound, UnauthenticatedError, UnauthorizedError } from '@duvdu-v1/duvdu';
+import { NotFound, UnauthenticatedError, UnauthorizedError, Users, SuccessResponse, VerificationReason } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-import { Users } from '../../models/User.model';
 import { AskUpdatePhoneNumberHandler } from '../../types/endpoints/user.endpoints';
-import { SuccessResponse } from '../../types/success-response';
-import { VerificationReason } from '../../types/User';
 import { comparePassword } from '../../utils/bcrypt';
 import { hashVerificationCode } from '../../utils/crypto';
 import { generateRandom6Digit } from '../../utils/gitRandom6Dugut';

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-namespace */
+import { Iuser } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-import { Iuser } from '../User';
 
 type successResponse<T> = T & {
   message: 'success';

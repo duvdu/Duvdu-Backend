@@ -1,6 +1,6 @@
+import { Iticket } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-import { Iticket } from '../Ticket';
 
 type successResponse<T> = T & {
   message: 'success';

@@ -1,6 +1,5 @@
-import { NotFound } from '@duvdu-v1/duvdu';
+import { NotFound , Bookmarks } from '@duvdu-v1/duvdu';
 
-import { Bookmarks } from '../../models/Bookmark.model';
 import { GetBookmarksHandler } from '../../types/endpoints/saved-projects.endpoints';
 
 export const getBookmarksHandler: GetBookmarksHandler = async (req, res, next) => {

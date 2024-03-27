@@ -1,6 +1,6 @@
+import { Ibookmark } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-import { Ibookmark } from '../Bookmarks';
 
 type successResponse<T> = T & {
   message: 'success';
