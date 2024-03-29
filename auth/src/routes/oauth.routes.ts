@@ -1,7 +1,7 @@
+import { Iuser } from '@duvdu-v1/duvdu';
 import { Router } from 'express';
 import passport from 'passport';
 
-import { Iuser } from '../types/User';
 import { generateRefreshToken } from '../utils/generateToken';
 
 const router = Router();

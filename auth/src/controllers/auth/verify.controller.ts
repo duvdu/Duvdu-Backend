@@ -1,10 +1,6 @@
-import { BadRequestError, NotFound, UnauthorizedError , SystemRoles } from '@duvdu-v1/duvdu';
+import { BadRequestError, NotFound, UnauthorizedError , SystemRoles , Roles , Users , SuccessResponse , VerificationReason} from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-import { Roles } from '../../models/Role.model';
-import { Users } from '../../models/User.model';
-import { SuccessResponse } from '../../types/success-response';
-import { VerificationReason } from '../../types/User';
 import { hashVerificationCode } from '../../utils/crypto';
 
 export const verifyHandler: RequestHandler<

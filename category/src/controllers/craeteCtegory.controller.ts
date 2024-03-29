@@ -1,6 +1,5 @@
-import { BadRequestError } from '@duvdu-v1/duvdu';
+import { BadRequestError , Categories } from '@duvdu-v1/duvdu';
 
-import { Category } from '../models/category.model';
 import { CreateCategoryHandler } from '../types/endpoints/endpoints';
 import { saveFiles } from '../utils/file';
 
@@ -8,7 +7,7 @@ export const createCategoryHandler: CreateCategoryHandler = async (req, res, nex
   const files = <{ image?: [Express.Multer.File] }>req.files;
   const image = files.image ? files.image[0] : undefined;
 
-  const category = await Category.create({
+  const category = await Categories.create({
     ...req.body,
     [image ? 'image' : (null as any)]: `/media/images/${image?.filename}`,
   });

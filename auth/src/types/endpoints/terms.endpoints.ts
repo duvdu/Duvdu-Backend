@@ -1,6 +1,6 @@
+import { Iterm } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-import { Iterm } from '../Terms';
 
 type successResponse<T> = T & {
   message: 'success';

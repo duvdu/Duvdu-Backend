@@ -1,7 +1,8 @@
-import { MODELS } from '@duvdu-v1/duvdu';
+
 import mongoose from 'mongoose';
 
 import { Icategory } from '../types/Category';
+import { MODELS } from '../types/model-names';
 const categorySchema = new mongoose.Schema<Icategory>(
   {
     creativesCounter: {
@@ -37,4 +38,4 @@ const categorySchema = new mongoose.Schema<Icategory>(
 );
 
 
-export const Category = mongoose.model<Icategory>(MODELS.category, categorySchema);
+export const Categories = mongoose.model<Icategory>(MODELS.category, categorySchema);

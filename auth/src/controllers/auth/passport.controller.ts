@@ -1,12 +1,9 @@
-import { SystemRoles } from '@duvdu-v1/duvdu';
+import { SystemRoles, Roles, Users, VerificationReason } from '@duvdu-v1/duvdu';
 import passport from 'passport';
 import { Strategy as AppleStrategy } from 'passport-apple';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth2';
 
 import { env } from '../../config/env';
-import { Roles } from '../../models/Role.model';
-import { Users } from '../../models/User.model';
-import { VerificationReason } from '../../types/User';
 import { generateAccessToken } from '../../utils/generateToken';
 
 passport.serializeUser((user, done) => {

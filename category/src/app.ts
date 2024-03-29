@@ -1,9 +1,8 @@
-import { globalErrorHandlingMiddleware } from '@duvdu-v1/duvdu';
+import { globalErrorHandlingMiddleware, sessionStore } from '@duvdu-v1/duvdu';
 import express from 'express';
 import session from 'express-session';
 
 import { env } from './config/env';
-import { sessionStore } from './config/redis';
 import { router as categoryRoutes } from './routes/index';
 
 export const app = express();
@@ -17,7 +16,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     store:
-      env.environment !== 'test' && env.expressSession.allowUseStorage ? sessionStore() : undefined,
+      env.environment !== 'test' && env.expressSession.allowUseStorage ? sessionStore(env.redis.uri) : undefined,
     cookie: {
       sameSite: 'lax',
       secure: env.environment === 'production',
@@ -25,9 +24,9 @@ app.use(
     },
   }),
 );
-app.get('/test', (req, res) => {
-  req.session.access = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZmYzMGQ1YmI5OTUwOTY1ZDQzZGVhZCIsImlzQmxvY2tlZCI6eyJ2YWx1ZSI6ZmFsc2V9LCJpc1ZlcmlmaWVkIjpmYWxzZSwicm9sZSI6eyJrZXkiOiJ1bnZlcmlmaWVkIiwicGVybWlzc2lvbnMiOlsiY2hhbmdlUGFzc3dvcmQiLCJ1cGRhdGVQcm9maWxlIl19LCJpYXQiOjE3MTEyMjI5OTcsImV4cCI6MTcxMTY1NDk5N30.aGkU73UQSr5h34WbA1raJrbYP6VsqYbMhnQl9tYScyw';
-  res.send('Session cookie generated successfully.');
-});
+// app.get('/test', (req:express.Request, res:express.Response) => {
+//   req.session.access = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZmYzMGQ1YmI5OTUwOTY1ZDQzZGVhZCIsImlzQmxvY2tlZCI6eyJ2YWx1ZSI6ZmFsc2V9LCJpc1ZlcmlmaWVkIjpmYWxzZSwicm9sZSI6eyJrZXkiOiJ1bnZlcmlmaWVkIiwicGVybWlzc2lvbnMiOlsiY2hhbmdlUGFzc3dvcmQiLCJ1cGRhdGVQcm9maWxlIl19LCJpYXQiOjE3MTEyMjI5OTcsImV4cCI6MTcxMTY1NDk5N30.aGkU73UQSr5h34WbA1raJrbYP6VsqYbMhnQl9tYScyw';
+//   res.send('Session cookie generated successfully.');
+// });
 app.use('/api/category', categoryRoutes);
 app.use(globalErrorHandlingMiddleware);

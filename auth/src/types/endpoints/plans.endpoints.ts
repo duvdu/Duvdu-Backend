@@ -1,9 +1,5 @@
+import {  Iplan, Irole , SuccessResponse } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
-
-import { Ifeatures } from '../Permissions';
-import { Iplan } from '../Plan';
-import { Irole } from '../Role';
-import { SuccessResponse } from '../success-response';
 
 // roles
 export interface CreateRoleHandler
@@ -64,4 +60,4 @@ export interface UpdateRoleHandler
   extends RequestHandler<{ roleId: string }, SuccessResponse, { features: string[] }> {}
 
 export interface GetFeaturesHandler
-  extends RequestHandler<unknown, SuccessResponse<{ data: Ifeatures[] }>, unknown, unknown> {}
+  extends RequestHandler<unknown, SuccessResponse<{ data: string[] }>, unknown, unknown> {}

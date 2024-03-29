@@ -1,4 +1,5 @@
-import { PERMISSIONS } from '@duvdu-v1/duvdu';
+import { PERMISSIONS } from './Permissions';
+
 
 
 

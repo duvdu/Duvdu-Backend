@@ -1,9 +1,7 @@
-import { BadRequestError, NotFound } from '@duvdu-v1/duvdu';
+import { BadRequestError, NotFound, Categories, Users } from '@duvdu-v1/duvdu';
 
 import 'express-async-errors';
 import { UpdateProfileHandler } from './../../types/endpoints/user.endpoints';
-import { Categories } from '../../models/Category.model';
-import { Users } from '../../models/User.model';
 import { saveFiles, removeFiles } from '../../utils/file';
 
 export const updateProfileHandler: UpdateProfileHandler = async (req, res, next) => {

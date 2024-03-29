@@ -1,6 +1,6 @@
-import { MODELS } from '@duvdu-v1/duvdu';
 import mongoose from 'mongoose';
 
+import { MODELS } from '../types/model-names';
 import { Iterm } from '../types/Terms';
 
 const termSchema = new mongoose.Schema<Iterm>(

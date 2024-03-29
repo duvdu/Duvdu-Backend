@@ -1,5 +1,6 @@
 import 'express-async-errors';
-import { Ticket } from '../../models/Ticket.model';
+import { Ticket } from '@duvdu-v1/duvdu';
+
 import { GetTicketsHandler } from '../../types/endpoints/ticket.endpoints';
 
 export const getTicketsHandler: GetTicketsHandler = async (req, res) => {

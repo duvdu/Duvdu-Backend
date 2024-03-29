@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-namespace */
+import { Icategory } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-import { Icategory } from '../Category';
 
 
 type successResponse<T> = T & {

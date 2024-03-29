@@ -1,7 +1,7 @@
-import { MODELS } from '@duvdu-v1/duvdu';
 import { model, Schema } from 'mongoose';
 
 import { Ibookmark } from '../types/Bookmarks';
+import { MODELS } from '../types/model-names';
 
 const bookmarksSchema = new Schema<Ibookmark>(
   {

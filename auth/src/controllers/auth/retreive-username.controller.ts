@@ -1,4 +1,5 @@
-import { Users } from '../../models/User.model';
+import { Users } from '@duvdu-v1/duvdu';
+
 import { RetreiveUsernameHandler } from '../../types/endpoints/user.endpoints';
 
 export const retreiveUsernameHandler: RetreiveUsernameHandler = async (req, res) => {

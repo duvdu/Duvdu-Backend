@@ -1,7 +1,6 @@
 import 'express-async-errors';
-import { BadRequestError } from '@duvdu-v1/duvdu';
+import { BadRequestError, Term } from '@duvdu-v1/duvdu';
 
-import { Term } from '../../models/Term.model';
 import { CreateTermHandler } from '../../types/endpoints/terms.endpoints';
 
 export const createTermHandler: CreateTermHandler = async (req, res, next) => {

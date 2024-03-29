@@ -1,6 +1,5 @@
-import { BadRequestError, NotFound } from '@duvdu-v1/duvdu';
+import { BadRequestError, NotFound, Users } from '@duvdu-v1/duvdu';
 
-import { Users } from '../../models/User.model';
 import { GetUserProfileHandler } from '../../types/endpoints/user.endpoints';
 
 export const getUserProfileHandler: GetUserProfileHandler = async (req, res, next) => {

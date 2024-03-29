@@ -1,6 +1,6 @@
-import { MODELS } from '@duvdu-v1/duvdu';
 import { model, Schema } from 'mongoose';
 
+import { MODELS } from '../types/model-names';
 import { Irole } from '../types/Role';
 
 export const Roles = model<Irole>(

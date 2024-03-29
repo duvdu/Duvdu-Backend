@@ -1,7 +1,6 @@
 import 'express-async-errors';
-import { NotFound } from '@duvdu-v1/duvdu';
+import { NotFound, Term } from '@duvdu-v1/duvdu';
 
-import { Term } from '../../models/Term.model';
 import { UpdateTermHandler } from '../../types/endpoints/terms.endpoints';
 
 export const updateTermHandler: UpdateTermHandler = async (req, res, next) => {

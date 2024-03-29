@@ -17,15 +17,17 @@ export const env = {
   },
   expressSession: {
     secret: process.env.SESSION_SECRET as string,
+    allowUseStorage: (process.env.ALLOW_USE_SESSION_STORAGE === 'true') as boolean,
   },
   redis: {
-    redisHost: process.env.REDIS_HOST as string,
+    uri: process.env.REDIS_HOST as string,
   },
 };
 
 export const checkEnvVariables = () => {
+  console.log(process.env.JWT_KEY);
   if (!env.mongoDb.uri) throw new Error('env:MONGO_URI must be defined');
   if (!env.jwt.secret) throw new Error('env:JWT_KEY must be defined');
   if (!env.expressSession.secret) return new Error('env:SESSION_SECRET must be defined');
-  if (!env.redis.redisHost) return new Error('env:REDIS_HOST must be defined');
+  if (!env.redis.uri) return new Error('env:REDIS_HOST must be defined');
 };
