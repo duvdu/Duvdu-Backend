@@ -17,7 +17,9 @@ app.use(
     resave: false,
     saveUninitialized: false,
     store:
-      env.environment !== 'test' && env.expressSession.allowUseStorage ? sessionStore(env.redis.uri) : undefined,
+      env.environment !== 'test' && env.expressSession.allowUseStorage
+        ? sessionStore(env.redis.uri)
+        : undefined,
     cookie: {
       sameSite: 'lax',
       secure: env.environment === 'production',

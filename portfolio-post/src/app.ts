@@ -26,7 +26,7 @@ app.use(
 );
 
 app.use('/', (req, res) => {
-  res.send('server runs');
+  res.send('portfolio-post server runs');
 });
 
 app.use(globalErrorHandlingMiddleware);

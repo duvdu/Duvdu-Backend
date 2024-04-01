@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: portfolio-post-mongo-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: portfolio-post-mongo
+  template:
+    metadata:
+      labels:
+        app: portfolio-post-mongo
+    spec:
+      containers:
+        - name: portfolio-post-mongo
+          image: mongo
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: portfolio-post-mongo-srv
+spec:
+  selector:
+    app: portfolio-post-mongo
+  ports:
+    - name: db
+      protocol: TCP
+      port: 27017
+      targetPort: 27017

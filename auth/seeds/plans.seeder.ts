@@ -1,11 +1,11 @@
-import { dbConnection } from '@duvdu-v1/duvdu';
+import { dbConnection, SystemRoles } from '@duvdu-v1/duvdu';
 import { config } from 'dotenv';
 import mongoose from 'mongoose';
 
-import { Plans } from '../models/Plan.model';
-import { Roles } from '../models/Role.model';
-import { Ifeatures } from '../../auth/src/types/Features';
-import { env } from '../config/env';
+import { Plans } from '@duvdu-v1/duvdu';
+import { Roles } from '@duvdu-v1/duvdu';
+import { PERMISSIONS } from '@duvdu-v1/duvdu';
+import { env } from '../src/config/env';
 
 config();
 
@@ -15,22 +15,22 @@ config();
   let role = await Roles.findOne({ key: 'not verified' });
   if (!role)
     role = await Roles.create({
-      key: 'not verified',
+      key: SystemRoles.unverified,
       system: true,
-      features: [Ifeatures.updateProfile],
+      features: [PERMISSIONS.updateProfile],
     });
 
-  const verifiedRole = await Roles.findOne({ key: 'verified' });
-  if (!verifiedRole) await Roles.create({ key: 'verified', system: true });
+  const verifiedRole = await Roles.findOne({ key: SystemRoles.verified });
+  if (!verifiedRole) await Roles.create({ key: SystemRoles.verified, system: true });
 
-  const plan = await Plans.findOne({ role: role?.id });
-  if (!plan) {
-    await Plans.create({ role: role?.id, key: 'free' });
-  }
+  // const plan = await Plans.findOne({ role: role?.id });
+  // if (!plan) {
+  //   await Plans.create({ role: role?.id, key: SystemRoles. });
+  // }
   // admin plan
-  let adminRole = await Roles.findOne({ key: 'admin' });
+  let adminRole = await Roles.findOne({ key: SystemRoles.admin });
   if (!adminRole) {
-    adminRole = await Roles.create({ key: 'admin', system: true });
+    adminRole = await Roles.create({ key: SystemRoles.admin, system: true });
   }
 
   await mongoose.connection.close();

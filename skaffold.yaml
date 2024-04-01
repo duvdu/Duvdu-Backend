@@ -31,6 +31,11 @@ build:
         manual:
           - src: "src/**/*.ts"
             dest: .
-
-
-
+    - image: duvdu/portfolio-post
+      context: portfolio-post
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .
