@@ -1,14 +1,9 @@
-import { dbConnection } from '@duvdu-v1/duvdu';
+import { dbConnection ,Users,Plans,Projects,Roles,PERMISSIONS } from '@duvdu-v1/duvdu';
 import mongoose from 'mongoose';
 
 import { SavedProjects } from './../src/models/Saved-Project.model';
-import { env } from '../config/env';
-import { Plans } from '../models/Plan.model';
-import { Projects } from '../models/Projects.model';
-import { Roles } from '../models/Role.model';
-import { Users } from '../models/User.model';
-import { Ifeatures } from '../types/Permissions';
-import { hashPassword } from '../utils/bcrypt';
+import { env } from '../src/config/env';
+import { hashPassword } from '../src/utils/bcrypt';
 
 (async () => {
   await dbConnection(env.mongoDb.uri);
@@ -30,7 +25,7 @@ import { hashPassword } from '../utils/bcrypt';
 
   await Roles.insertMany([
     { _id: roleAdminId, key: 'admin' },
-    { _id: roleUserId, key: 'user', features: Object.values(Ifeatures) },
+    { _id: roleUserId, key: 'user', features: Object.values(PERMISSIONS) },
   ]);
   const [planAdminId, planUserId] = [new mongoose.Types.ObjectId(), new mongoose.Types.ObjectId()];
   await Plans.insertMany([

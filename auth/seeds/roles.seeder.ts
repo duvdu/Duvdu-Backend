@@ -1,14 +1,12 @@
-import { dbConnection , PERMISSIONS , SystemRoles } from '@duvdu-v1/duvdu';
+import { dbConnection , PERMISSIONS , SystemRoles , Users , Roles } from '@duvdu-v1/duvdu';
 import mongoose from 'mongoose';
 
-import { Users } from './../src/models/User.model';
 import { env } from '../src/config/env';
-import { Roles } from '../src/models/Role.model';
 
 (async () => {
   await dbConnection(env.mongoDb.uri);
-  await Users.deleteMany({});
-  await Roles.deleteMany({});
+  await Users.collection.drop();
+  await Roles.collection.drop();
   if (!(await Roles.findOne({ key: SystemRoles.admin })))
     await Roles.create({ key: SystemRoles.admin, system: true, permissions: [] });
   if (!(await Roles.findOne({ key: SystemRoles.verified })))
@@ -29,6 +27,6 @@ import { Roles } from '../src/models/Role.model';
       system: true,
       permissions: [PERMISSIONS.changePassword, PERMISSIONS.updateProfile],
     });
-
+    
   await mongoose.connection.close();
 })();

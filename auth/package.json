@@ -12,7 +12,7 @@
     "lint:fix": "eslint --fix .",
     "format": "prettier --write .",
     "seeds": "ts-node seeds/plans.seeder.ts",
-    "seeds:dev": "ts-node seeds/development.seeder.ts"
+    "seeds:dev": "node seeds/roles.seeder.ts"
   },
   "jest": {
     "preset": "ts-jest",
