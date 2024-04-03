@@ -1,0 +1,103 @@
+version: "3"
+services:
+  mongo:
+    image: mongo:latest
+    logging:
+      driver: none
+  
+  mongo-express:
+    image: mongo-express
+    environment:
+      - ME_CONFIG_BASICAUTH_USERNAME=root
+      - ME_CONFIG_BASICAUTH_PASSWORD=example
+    ports:
+      - '8081:8081'
+
+  auth: 
+    build:
+      context: ./auth
+      dockerfile: Dockerfile
+    env_file:
+      - ./auth/.env
+    environment: 
+      - MONGO_URI=mongodb://mongo:27017/
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 1s
+      restart_policy:
+        condition: on-failure
+        delay: 2s
+    depends_on:
+      - mongo
+  
+  category: 
+    build:
+      context: ./category
+      dockerfile: Dockerfile
+    env_file:
+      - ./category/.env
+    environment: 
+      - MONGO_URI=mongodb://mongo:27017/
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 1s
+      restart_policy:
+        condition: on-failure
+        delay: 2s
+    depends_on:
+      - mongo
+  
+  chat: 
+    build:
+      context: ./chat
+      dockerfile: Dockerfile
+    env_file:
+      - ./chat/.env
+    environment: 
+      - MONGO_URI=mongodb://mongo:27017/
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 1s
+      restart_policy:
+        condition: on-failure
+        delay: 2s
+    depends_on:
+      - mongo
+  
+  portfolio-post: 
+    build:
+      context: ./portfolio-post
+      dockerfile: Dockerfile
+    env_file:
+      - ./portfolio-post/.env
+    environment: 
+      - MONGO_URI=mongodb://mongo:27017/
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 1s
+      restart_policy:
+        condition: on-failure
+        delay: 2s
+    depends_on:
+      - mongo
+      
+  nginx:
+    image: nginx:stable-alpine
+    ports:
+      - '80:80'
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - auth
+      - chat
+      - category
+      - portfolio-post
+

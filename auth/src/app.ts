@@ -1,6 +1,6 @@
 import 'express-async-errors';
 import './types/custom-definition';
-import { globalErrorHandlingMiddleware, sessionStore } from '@duvdu-v1/duvdu';
+import { globalErrorHandlingMiddleware } from '@duvdu-v1/duvdu';
 import express from 'express';
 import session from 'express-session';
 
@@ -16,10 +16,10 @@ app.use(
     secret: env.expressSession.secret,
     resave: false,
     saveUninitialized: false,
-    store:
-      env.environment !== 'test' && env.expressSession.allowUseStorage
-        ? sessionStore(env.redis.uri)
-        : undefined,
+    // store:
+    //   env.environment !== 'test' && env.expressSession.allowUseStorage
+    //     ? sessionStore(env.redis.uri)
+    //     : undefined,
     cookie: {
       sameSite: 'lax',
       secure: env.environment === 'production',
