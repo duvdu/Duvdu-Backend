@@ -5,6 +5,7 @@ import { comparePassword } from '../../utils/bcrypt';
 import { generateAccessToken, generateRefreshToken } from '../../utils/generateToken';
 
 export const signinHandler: SigninHandler = async (req, res, next) => {
+  
   const user = await Users.findOne({ username: req.body.username });
 
   if (!user || !(await comparePassword(req.body.password, user.password || '')))

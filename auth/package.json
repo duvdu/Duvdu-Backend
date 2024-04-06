@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npm run seeds && ts-node-dev src/index.ts",
+    "start": "ts-node-dev src/index.ts",
     "dev": "nodemon src/index.ts",
     "test": "jest --watchAll --no-cache --runInBand",
     "test:ci": "jest",
@@ -12,7 +12,7 @@
     "lint:fix": "eslint --fix .",
     "format": "prettier --write .",
     "seeds": "ts-node seeds/plans.seeder.ts",
-    "seeds:dev": "node seeds/roles.seeder.ts"
+    "seeds:dev": "ts-node seeds/roles.seeder.ts"
   },
   "jest": {
     "preset": "ts-jest",
