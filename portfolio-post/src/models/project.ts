@@ -1,6 +1,5 @@
+import { Iuser, MODELS } from '@duvdu-v1/duvdu';
 import { Schema, model, Types } from 'mongoose';
-
-import { MODELS } from '@duvdu-v1/duvdu';
 
 export interface Iproject {
   id: string;
@@ -12,16 +11,17 @@ export interface Iproject {
   address: string;
   tools: { name: string; fees: number }[];
   searchKeywords: string[];
-  creatives: { name: string; fees: number }[];
+  creatives: { creative: Types.ObjectId | Iuser; fees: number }[];
   tags: string[];
   projectBudget: number;
   category: Types.ObjectId;
   projectScale: { scale: number; time: 'minutes' | 'hours' };
   showOnHome: boolean;
+  cycle: number;
 }
 
 export const Projects = model<Iproject>(
-  MODELS.project,
+  'portfolio-post',
   new Schema<Iproject>(
     {
       user: Types.ObjectId,
@@ -32,13 +32,14 @@ export const Projects = model<Iproject>(
       address: String,
       tools: [{ name: String, fees: Number }],
       searchKeywords: [String],
-      creatives: [{ name: String, fees: Number }],
+      creatives: [{ creative: { type: Schema.Types.ObjectId, ref: MODELS.user }, fees: Number }],
       tags: [String],
       projectBudget: Number,
       category: Types.ObjectId,
       projectScale: { scale: Number, time: String },
       showOnHome: Boolean,
+      cycle: { type: Number, default: 1 },
     },
-    { timestamps: true, collection: MODELS.project }
-  ).index({ createdAt: 1, updatedAt: -1 })
+    { timestamps: true, collection: 'portfolio-post' },
+  ).index({ createdAt: 1, updatedAt: -1 }),
 );

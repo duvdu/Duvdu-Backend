@@ -1,4 +1,4 @@
-version: "3"
+version: "3.9"
 services:
   mongo:
     image: mongo:latest
@@ -12,6 +12,9 @@ services:
       - ME_CONFIG_BASICAUTH_PASSWORD=example
     ports:
       - '8081:8081'
+
+  redis:
+    image: redis:latest
 
   auth: 
     build:
@@ -85,7 +88,14 @@ services:
         delay: 1s
       restart_policy:
         condition: on-failure
-        delay: 2s
+        delay: 3s
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./portfolio-post/src
+          target: /app/src
+          ignore:
+            - node_modules/
     depends_on:
       - mongo
       

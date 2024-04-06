@@ -6,6 +6,7 @@ import session from 'express-session';
 
 import { env } from './config/env';
 import { sessionStore } from './config/redis';
+import { apiRoutes } from './routes';
 export const app = express();
 
 app.use(express.json());
@@ -22,11 +23,9 @@ app.use(
       secure: env.environment === 'production',
       httpOnly: true,
     },
-  })
+  }),
 );
 
-app.use('/', (req, res) => {
-  res.send('portfolio-post server runs');
-});
+app.use('/api/portfolio-post', apiRoutes);
 
 app.use(globalErrorHandlingMiddleware);
