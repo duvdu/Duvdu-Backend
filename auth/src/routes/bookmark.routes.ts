@@ -12,6 +12,7 @@ router
   .get(controllers.getBookmarksHandler)
   .post(val.createBookmark, controllers.createBookmarkHandler);
 
+  
 router
   .route('/:bookmarkId')
   .all(isauthenticated, isauthorized(PERMISSIONS.bookmarks))
