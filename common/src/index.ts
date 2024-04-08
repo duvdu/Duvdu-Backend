@@ -39,7 +39,6 @@ export * from './types/UrlQuery';
 export * from './types/User';
 export * from './types/success-response';
 
-
 export * from './models/Bookmark.model';
 export * from './models/Plan.model';
 export * from './models/Projects.model';
@@ -50,3 +49,6 @@ export * from './models/User.model';
 export * from './models/category.model';
 
 export * from './middlewares/redis-connection';
+
+export * as LocalFiles from './utils/file';
+export * as S3 from './utils/bucket';
