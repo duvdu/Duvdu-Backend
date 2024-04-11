@@ -85,10 +85,37 @@ services:
       restart_policy:
         condition: on-failure
         delay: 3s
+    # develop:
+    #   watch:
+    #     - action: sync+restart
+    #       path: ./portfolio-post/src
+    #       target: /app/src
+    #       ignore:
+    #         - node_modules/
+    depends_on:
+      - mongo
+      - redis
+  
+  equipment-rental: 
+    build:
+      context: ./equipment-rental
+      dockerfile: Dockerfile
+    env_file:
+      - ./equipment-rental/.env
+    environment: 
+      - MONGO_URI=mongodb://mongo:27017/
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 1s
+      restart_policy:
+        condition: on-failure
+        delay: 3s
     develop:
       watch:
         - action: sync+restart
-          path: ./portfolio-post/src
+          path: ./equipment-rental/src
           target: /app/src
           ignore:
             - node_modules/
@@ -107,4 +134,5 @@ services:
       - chat
       - category
       - portfolio-post
+      - equipment-rental
 

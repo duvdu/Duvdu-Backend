@@ -1,0 +1,32 @@
+import 'express-async-errors';
+import './types/custom-definition';
+import { globalErrorHandlingMiddleware, sessionStore } from '@duvdu-v1/duvdu';
+import express from 'express';
+import session from 'express-session';
+
+import { env } from './config/env';
+// import { apiRoutes } from './routes';
+export const app = express();
+
+app.use(express.json());
+
+app.use(
+  session({
+    secret: env.expressSession.secret,
+    resave: false,
+    saveUninitialized: false,
+    store:
+      env.environment !== 'test' && env.expressSession.allowUseStorage
+        ? sessionStore(env.redis.uri)
+        : undefined,
+    cookie: {
+      sameSite: 'lax',
+      secure: env.environment === 'production',
+      httpOnly: true,
+    },
+  }),
+);
+app.use('/api/equipment-rental', (req, res) => res.send('equipment-rental runs'));
+// app.use('/api/equipment-rental', apiRoutes);
+
+app.use(globalErrorHandlingMiddleware);
