@@ -7,4 +7,5 @@ export enum MODELS {
   bookmark = 'bookmarks',
   term = 'terms',
   ticket = 'tickets',
+  portfolioPost = 'portfolio-post',
 }

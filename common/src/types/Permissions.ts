@@ -1,34 +1,40 @@
 export enum PERMISSIONS {
-    resetPassword = 'resetPassword',
-    updatePhoneNumber = 'updatePhoneNumber',
-    changePassword = 'changePassword',
-    updateProfile = 'updateProfile',
-    bookmarks = 'bookmarks',
-    createCategory = 'create-category',
-    updateCategory = 'update-category',
-    removeCategory = 'remove-category',
-    getAdminCategories = 'get-gategories-admin',
-    createTicket = 'create ticket',
-    getAllTickets = 'get-all-tickets',
-    updateTicket = 'update-ticket',
-    removeTicket = 'remove-ticket',
-    getTicket = 'get-ticket',
-    createTerm = 'create-term',
-    updateTerm = 'update-term',
-    // plan
-    createPlanHandler = 'create plan',
-    updatePlanHandler = 'update plan',
-    getPlanHandler = 'get plan',
-    getAllPlansHandler = 'get all plans',
-    removePlanHandler = 'remove plan',
-    // roles
-    createRoleHandler = 'create role',
-    updateRoleHandler = 'update role',
-    getRolesHandler = 'get roles',
-    getRoleHandler = 'get role',
-    removeRoleHandler = 'remove role',
-  }
-  
+  resetPassword = 'resetPassword',
+  updatePhoneNumber = 'updatePhoneNumber',
+  changePassword = 'changePassword',
+  updateProfile = 'updateProfile',
+  bookmarks = 'bookmarks',
+  createCategory = 'create-category',
+  updateCategory = 'update-category',
+  removeCategory = 'remove-category',
+  getAdminCategories = 'get-gategories-admin',
+  createTicket = 'create ticket',
+  getAllTickets = 'get-all-tickets',
+  updateTicket = 'update-ticket',
+  removeTicket = 'remove-ticket',
+  getTicket = 'get-ticket',
+  createTerm = 'create-term',
+  updateTerm = 'update-term',
+  // plan
+  createPlanHandler = 'create plan',
+  updatePlanHandler = 'update plan',
+  getPlanHandler = 'get plan',
+  getAllPlansHandler = 'get all plans',
+  removePlanHandler = 'remove plan',
+  // roles
+  createRoleHandler = 'create role',
+  updateRoleHandler = 'update role',
+  getRolesHandler = 'get roles',
+  getRoleHandler = 'get role',
+  removeRoleHandler = 'remove role',
+  // portfolio-post
+  createProtfolioProjectHandler = 'create portfolio project',
+  updatePortfolioProjectHandler = 'update portfolio project',
+  removePortfolioProjectHandler = 'remove portfolio project',
+  getCrmPortfolioProjectsHandlers = 'get crm portfolio projects',
+  getAnalysisHandler = 'get analysis handler',
+}
+
 export const permissions = {
   auth: [
     PERMISSIONS.resetPassword,
@@ -67,5 +73,11 @@ export const permissions = {
     PERMISSIONS.updateRoleHandler,
     PERMISSIONS.removeRoleHandler,
   ],
+  portfolioPost: [
+    PERMISSIONS.createProtfolioProjectHandler,
+    PERMISSIONS.updatePortfolioProjectHandler,
+    PERMISSIONS.removePortfolioProjectHandler,
+    PERMISSIONS.getCrmPortfolioProjectsHandlers,
+    PERMISSIONS.getAnalysisHandler,
+  ],
 };
-  

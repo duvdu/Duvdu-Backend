@@ -3,39 +3,51 @@ import path from 'path';
 
 import aws from 'aws-sdk';
 
+import { FOLDERS } from '../types/folders';
+
 export class Bucket {
-  private s3;
-  constructor(
-    private bucket: string,
-    key: string,
-    secret: string,
-    region: string,
-  ) {
+  private s3: aws.S3;
+  private bucketName: string;
+  constructor() {
     this.s3 = new aws.S3({
-      accessKeyId: key,
-      secretAccessKey: secret,
-      region: region,
+      accessKeyId: process.env.BUCKET_ACESS_KEY,
+      secretAccessKey: process.env.BUCKET_SECRET_KEY,
+      region: process.env.BUCKET_REGION,
     });
+    this.bucketName = process.env.BUCKET_NAME as string;
   }
 
-  async upload(folder: string, files: Express.Multer.File[]) {
-    const uploadPromises = files.map((file) => {
-      const fileStream = fs.createWriteStream(path.join(__dirname, `../../media/${file.filename}`));
-      return this.s3
-        .upload({ Bucket: this.bucket, Key: file.filename, Body: fileStream })
-        .promise();
-    });
-
-    await Promise.all(uploadPromises);
+  async saveBucketFiles(folder: string, ...files: Express.Multer.File[]) {
+    for (const file of files) {
+      const fileStream = fs.createReadStream(
+        path.join(__dirname, `../../media/${folder}/${file.filename}`),
+      );
+      await new Promise((resolve, reject) => {
+        this.s3.putObject(
+          {
+            Bucket: this.bucketName,
+            Key: `${FOLDERS.portfolio_post}/${file.filename}`,
+            Body: fileStream,
+          },
+          (err, data) => {
+            if (err) reject(err);
+            else resolve(data);
+          },
+        );
+      });
+      fileStream.close();
+    }
   }
 
-  async remove(...filePaths: string[]) {
-    this.s3.deleteObjects(
-      { Bucket: this.bucket, Delete: { Objects: filePaths.map((el) => ({ Key: el })) } },
-      (err: Error) => {
-        console.error(err);
-        throw new Error(err.message);
-      },
-    );
+  async removeBucketFiles(...filePaths: string[]) {
+    await new Promise((resolve, reject) => {
+      this.s3.deleteObjects(
+        { Bucket: this.bucketName, Delete: { Objects: filePaths.map((el) => ({ Key: el })) } },
+        (err, data) => {
+          if (err) reject(err);
+          else resolve(data);
+        },
+      );
+    });
   }
 }

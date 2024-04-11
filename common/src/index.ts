@@ -9,9 +9,12 @@ export * from './errors/unauthenticated-error';
 export * from './errors/unauthorized-error';
 export * from './errors/validation-error';
 export * from './errors/generic-error';
+export * from './errors/not-allowed-error';
 
 export * from './utils/api-feature';
 export * from './utils/generateToken';
+export * from './utils/bucket';
+export * from './utils/file';
 
 export * from './middlewares/global-error-handling.middleware';
 export * from './middlewares/database-connection';
@@ -19,6 +22,10 @@ export * from './middlewares/global-validator.middleware';
 export * from './middlewares/auth.middleware';
 export * from './middlewares/global-upload.middleware';
 export * from './middlewares/isAuthorized.middleware';
+export * from './middlewares/check-required-files.middleware';
+export * from './middlewares/global-pagination.middleware';
+export * from './middlewares/upload-project-media.middleware';
+export * from './middlewares/redis-connection';
 
 export * from './types/JwtPayload';
 export * from './types/Permissions';
@@ -38,6 +45,9 @@ export * from './types/Ticket';
 export * from './types/UrlQuery';
 export * from './types/User';
 export * from './types/success-response';
+export * from './types/folders';
+export * from './types/pagination-response';
+export * from './types/portfolio-post-order';
 
 export * from './models/Bookmark.model';
 export * from './models/Plan.model';
@@ -47,8 +57,4 @@ export * from './models/Term.model';
 export * from './models/Ticket.model';
 export * from './models/User.model';
 export * from './models/category.model';
-
-export * from './middlewares/redis-connection';
-
-export * as LocalFiles from './utils/file';
-export * as S3 from './utils/bucket';
+export * from './models/portfolio-post.model';

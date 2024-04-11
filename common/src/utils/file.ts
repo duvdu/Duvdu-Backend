@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-export const saveFiles = (folder: string, ...files: (Express.Multer.File | undefined)[]) => {
+const saveFiles = (folder: string, ...files: (Express.Multer.File | undefined)[]) => {
   files.forEach((file) => {
     if (file)
       fs.writeFileSync(
@@ -11,8 +11,10 @@ export const saveFiles = (folder: string, ...files: (Express.Multer.File | undef
   });
 };
 
-export const removeFiles = (...filePaths: (string | undefined)[]) => {
+const removeFiles = (...filePaths: (string | undefined)[]) => {
   filePaths.forEach((filePath) => {
-    if (filePath) fs.unlinkSync(path.join(__dirname, '../../', filePath));
+    if (filePath) fs.unlinkSync(path.join(__dirname, '../../media', filePath));
   });
 };
+
+export const Files = { saveFiles, removeFiles };
