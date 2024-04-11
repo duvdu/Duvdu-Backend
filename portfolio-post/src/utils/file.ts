@@ -13,14 +13,14 @@ export const saveFiles = (folder: string, ...files: (Express.Multer.File | undef
 
 export const removeFiles = (...filePaths: (string | undefined)[]) => {
   filePaths.forEach((filePath) => {
-    if (filePath) fs.unlinkSync(path.join(__dirname, '../../', filePath));
+    if (filePath) fs.unlinkSync(path.join(__dirname, '../../media', filePath));
   });
 };
 
 export const createMediaFolders = () => {
   const folderPaths = [
     path.join(__dirname, '../../', 'media'),
-    path.join(__dirname, '../../', 'media/images'),
+    // path.join(__dirname, '../../', 'media/images'),
   ];
 
   for (const folder of folderPaths) {

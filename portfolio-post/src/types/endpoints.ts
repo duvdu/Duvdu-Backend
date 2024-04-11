@@ -1,6 +1,7 @@
 import { RequestHandler } from 'express';
-import { Iproject } from './Project';
+
 import { Iorder } from './Order';
+import { Iproject } from '../models/project';
 
 type successResponse<T> = T & {
   message: 'success';

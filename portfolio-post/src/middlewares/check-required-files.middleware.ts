@@ -18,7 +18,7 @@ export const checkRequiredFields = (options: Ioptions) => <RequestHandler>((req,
     } else if (options.fields) {
       if (!req.files) return next(new BadRequestError(`${options.fields.join(' ')} is required`));
       for (const field of options.fields) {
-        if (!(req.files as any)?.field) return next(new BadRequestError(`${field} is required`));
+        if (!(req.files as any)?.[field]) return next(new BadRequestError(`${field} is required`));
       }
     }
     next();
