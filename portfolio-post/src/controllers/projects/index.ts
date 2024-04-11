@@ -1,8 +1,7 @@
-import { RequestHandler } from 'express';
-import { Projects } from '../../models/project';
-
-export const createProjectHandler: RequestHandler = async (req, res, next) => {
-  //TODO: handle upload files
-  const category = await Categories;
-  const project = await Projects.create({ ...req.body, user: req.loggedUser.id });
-};
+export * from './create-project.controller';
+export * from './remove-project.controller';
+export * from './update-project.controller';
+export * from './get-project.controller';
+export * from './get-projects.controller';
+export * from './get-crm-projects.controller';
+export * from './get-project-analysis.controller';

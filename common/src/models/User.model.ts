@@ -9,7 +9,7 @@ const userSchema = new Schema<Iuser>(
     appleId: String,
     name: String,
     phoneNumber: { key: String, number: { type: String, unique: true, sparse: true } },
-    username: { type: String, unique: true },
+    username: { type: String, unique: true, sparce: true },
     password: String,
     verificationCode: { code: String, expireAt: Date, reason: String },
     isVerified: Boolean,
