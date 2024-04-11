@@ -4,7 +4,7 @@ export const globalPaginationMiddleware: RequestHandler = async (req, res, next)
   const limit = +(req.query.limit || 10);
   const page = +(req.query.page || 1);
   const skip = limit * (page - 1);
-  req.pagination = {
+  (req as any).pagination = {
     limit,
     page,
     skip,
