@@ -1,7 +1,5 @@
+import { IportfolioPost, PaginationResponse, PortfolioPosts } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
-
-import { Iproject, Projects } from '../../models/project';
-import { PaginationResponse } from '../../types/pagination-response';
 
 export const getProjectsPagination: RequestHandler<
   unknown,
@@ -51,13 +49,13 @@ export const getProjectsPagination: RequestHandler<
 
 export const getProjectsHandler: RequestHandler<
   unknown,
-  PaginationResponse<{ data: Iproject[] }>
+  PaginationResponse<{ data: IportfolioPost[] }>
 > = async (req, res) => {
-  const resultCount = await Projects.countDocuments({
+  const resultCount = await PortfolioPosts.countDocuments({
     ...req.pagination.filter,
     isDeleted: { $ne: true },
   });
-  const projects = await Projects.find({ ...req.pagination.filter, isDeleted: { $ne: true } })
+  const projects = await PortfolioPosts.find({ ...req.pagination.filter, isDeleted: { $ne: true } })
     .sort('-createdAt')
     .limit(req.pagination.limit)
     .skip(req.pagination.skip);

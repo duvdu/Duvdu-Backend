@@ -1,20 +1,27 @@
-import { SuccessResponse, Categories, NotFound, BadRequestError, Users } from '@duvdu-v1/duvdu';
+import {
+  SuccessResponse,
+  Categories,
+  NotFound,
+  BadRequestError,
+  Users,
+  PortfolioPosts,
+  Bucket,
+  Files,
+  IportfolioPost,
+  FOLDERS,
+} from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-import { Iproject, Projects } from '../../models/project';
 import { createInvitedUsers } from '../../services/create-invited-users';
-import { FOLDERS } from '../../types/folders';
-import { saveBucketFiles } from '../../utils/bucket';
-import { removeFiles } from '../../utils/file';
 
 export const createProjectHandler: RequestHandler<
   unknown,
-  SuccessResponse<{ data: Iproject }>,
+  SuccessResponse<{ data: IportfolioPost }>,
   Pick<
-    Iproject,
+    IportfolioPost,
     'title' | 'desc' | 'address' | 'category' | 'projectBudget' | 'projectScale' | 'showOnHome'
   > &
-    Partial<Pick<Iproject, 'creatives' | 'tools' | 'tags' | 'searchKeywords'>> & {
+    Partial<Pick<IportfolioPost, 'creatives' | 'tools' | 'tags' | 'searchKeywords'>> & {
       invitedCreatives?: [{ phoneNumber: { number: string }; fees: number }];
     }
 > = async (req, res, next) => {
@@ -35,16 +42,16 @@ export const createProjectHandler: RequestHandler<
   if (req.body.invitedCreatives)
     invitedCreatives = await createInvitedUsers(req.body.invitedCreatives);
 
-  const project = await Projects.create({
+  const project = await PortfolioPosts.create({
     ...req.body,
     creatives: [...(req.body.creatives || []), ...(invitedCreatives || [])],
     user: req.loggedUser.id,
   });
-  await saveBucketFiles(FOLDERS.portfolio_post, ...attachments, ...cover);
+  await new Bucket().saveBucketFiles(FOLDERS.portfolio_post, ...attachments, ...cover);
   project.cover = `${FOLDERS.portfolio_post}/${cover[0].filename}`;
   project.attachments = attachments.map((el) => `${FOLDERS.portfolio_post}/${el.filename}`);
   await project.save();
-  removeFiles(...project.attachments, project.cover);
+  Files.removeFiles(...project.attachments, project.cover);
 
   res.status(201).json({ message: 'success', data: project });
 };

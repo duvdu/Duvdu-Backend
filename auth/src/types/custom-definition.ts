@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-namespace */
-
-import { IjwtPayload , Ipagination } from '@duvdu-v1/duvdu';
+import { IjwtPayload, Ipagination } from '@duvdu-v1/duvdu';
 
 declare module 'express-session' {
   interface SessionData {

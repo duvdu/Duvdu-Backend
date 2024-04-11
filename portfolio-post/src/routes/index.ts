@@ -1,11 +1,14 @@
-import { isauthenticated, isauthorized } from '@duvdu-v1/duvdu';
+import {
+  isauthenticated,
+  checkRequiredFields,
+  globalPaginationMiddleware,
+  PERMISSIONS,
+  uploadProjectMedia,
+  isauthorized,
+} from '@duvdu-v1/duvdu';
 import { Router } from 'express';
 
 import * as handlers from '../controllers/projects';
-import { checkRequiredFields } from '../middlewares/check-required-files.middleware';
-import { globalPaginationMiddleware } from '../middlewares/global-pagination.middleware';
-import { uploadProjectMedia } from '../middlewares/upload-project-media.middleware';
-import { PERMISSIONS } from '../types/Permissions';
 import * as val from '../validators/project/project.validator';
 const router = Router();
 
@@ -19,7 +22,7 @@ router
   )
   .post(
     isauthenticated,
-    isauthorized(PERMISSIONS.createProtfolioProjectHandler as any),
+    isauthorized(PERMISSIONS.createProtfolioProjectHandler),
     uploadProjectMedia(),
     checkRequiredFields({ fields: ['cover', 'attachments'] }),
     val.create,

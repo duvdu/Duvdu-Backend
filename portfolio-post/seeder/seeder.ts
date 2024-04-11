@@ -1,7 +1,5 @@
-import { Categories, dbConnection, Users } from '@duvdu-v1/duvdu';
+import { Categories, dbConnection, PortfolioPosts, Users } from '@duvdu-v1/duvdu';
 import mongoose from 'mongoose';
-
-import { Projects } from './../src/models/project';
 
 const egyptianGovernorates = [
   'Alexandria',
@@ -39,7 +37,7 @@ const getRandomfrom = (list: any): any =>
 (async () => {
   console.log('start seeder');
   await dbConnection('mongodb://127.0.0.1:8080/test');
-  await Projects.deleteMany({});
+  await PortfolioPosts.deleteMany({});
   await Users.deleteMany({ username: { $regex: 'user_num', $options: 'i' } });
   await Categories.deleteMany({ username: { $regex: 'category_num', $options: 'i' } });
 
@@ -57,7 +55,7 @@ const getRandomfrom = (list: any): any =>
   );
   // projects
   for (const user of regularUsers) {
-    const projects = await Projects.create(
+    const projects = await PortfolioPosts.create(
       Array(Math.ceil(1 + Math.random() * 100))
         .fill({})
         .map((el, i) => ({

@@ -4,7 +4,7 @@ services:
     image: mongo:latest
     ports:
       - '8080:27017'
-    command: ["mongod", "--quiet"]
+    command: ["mongod", "--syslog"]
     
   redis:
     image: redis:latest

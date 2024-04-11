@@ -1,13 +1,11 @@
-import { NotFound, SuccessResponse } from '@duvdu-v1/duvdu';
+import { NotFound, SuccessResponse, IportfolioPost, PortfolioPosts } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
-
-import { Iproject, Projects } from '../../models/project';
 
 export const getProjectHandler: RequestHandler<
   { projectId: string },
-  SuccessResponse<{ data: Iproject }>
+  SuccessResponse<{ data: IportfolioPost }>
 > = async (req, res, next) => {
-  const project = await Projects.findOne({
+  const project = await PortfolioPosts.findOne({
     _id: req.params.projectId,
     isDeleted: { $ne: true },
   }).populate([

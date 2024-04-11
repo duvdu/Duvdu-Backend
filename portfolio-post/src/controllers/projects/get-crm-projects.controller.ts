@@ -1,14 +1,12 @@
+import { IportfolioPost, PaginationResponse, PortfolioPosts } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
-
-import { Iproject, Projects } from '../../models/project';
-import { PaginationResponse } from '../../types/pagination-response';
 
 export const getCrmProjectsHandler: RequestHandler<
   unknown,
-  PaginationResponse<{ data: Iproject[] }>
+  PaginationResponse<{ data: IportfolioPost[] }>
 > = async (req, res) => {
-  const resultCount = await Projects.countDocuments(req.pagination.filter);
-  const projects = await Projects.find(req.pagination.filter)
+  const resultCount = await PortfolioPosts.countDocuments(req.pagination.filter);
+  const projects = await PortfolioPosts.find(req.pagination.filter)
     .sort('-createdAt')
     .limit(req.pagination.limit)
     .skip(req.pagination.skip);

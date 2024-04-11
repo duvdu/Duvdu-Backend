@@ -1,8 +1,6 @@
-import { MODELS, SuccessResponse } from '@duvdu-v1/duvdu';
+import { MODELS, SuccessResponse, PortfolioPosts } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import { PipelineStage } from 'mongoose';
-
-import { Projects } from '../../models/project';
 
 export const getProjectAnalysis: RequestHandler<
   unknown,
@@ -18,7 +16,7 @@ export const getProjectAnalysis: RequestHandler<
     };
 
   // total count
-  const totalCount = await Projects.countDocuments(matchedPeriod);
+  const totalCount = await PortfolioPosts.countDocuments(matchedPeriod);
   // top users
   const topUsersPipelines: PipelineStage[] = [
     { $group: { _id: '$user', totalProjects: { $sum: 1 } } },
@@ -51,31 +49,30 @@ export const getProjectAnalysis: RequestHandler<
     { $limit: 10 },
   ];
   if (matchedPeriod.createdAt) topUsersPipelines.unshift({ $match: matchedPeriod });
-  const topUsers = await Projects.aggregate(topUsersPipelines);
+  const topUsers = await PortfolioPosts.aggregate(topUsersPipelines);
   // top addresses
   const topAddressesPipelines: PipelineStage[] = [
     { $group: { _id: '$address', totalProjects: { $sum: 1 } } },
     { $sort: { totalProjects: -1 } },
   ];
   if (matchedPeriod.createdAt) topAddressesPipelines.unshift({ $match: matchedPeriod });
-  const addressStats = await Projects.aggregate(topAddressesPipelines);
+  const addressStats = await PortfolioPosts.aggregate(topAddressesPipelines);
   // budget
   const budgetStatsPipelines: PipelineStage[] = [
     { $group: { _id: null, totalBudget: { $sum: '$projectBudget' }, count: { $sum: 1 } } },
   ];
   if (matchedPeriod.createdAt) budgetStatsPipelines.unshift({ $match: matchedPeriod });
-  const budgetStats = await Projects.aggregate(budgetStatsPipelines);
+  const budgetStats = await PortfolioPosts.aggregate(budgetStatsPipelines);
   const totalBudget = budgetStats.length > 0 ? budgetStats[0] : 0;
   // show on home
   const showOnHomeFilter: any = { showOnHome: true };
-  console.log('matchedPeriod', matchedPeriod);
   if (matchedPeriod.createdAt) showOnHomeFilter.createdAt = matchedPeriod.createdAt;
-  const showOnHomeCount = await Projects.countDocuments(showOnHomeFilter);
+  const showOnHomeCount = await PortfolioPosts.countDocuments(showOnHomeFilter);
   console.log(showOnHomeCount, showOnHomeFilter);
   // deleted accounts
   const deletedProjectFilter: any = { isDeleted: true };
   if (matchedPeriod.createdAt) deletedProjectFilter.createdAt = matchedPeriod.createdAt;
-  const deletedProjectsCount = await Projects.countDocuments(deletedProjectFilter);
+  const deletedProjectsCount = await PortfolioPosts.countDocuments(deletedProjectFilter);
 
   res.status(200).json({
     message: 'success',

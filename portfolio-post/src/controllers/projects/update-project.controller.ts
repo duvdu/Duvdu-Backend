@@ -1,18 +1,24 @@
-import { BadRequestError, Users, SuccessResponse, NotFound } from '@duvdu-v1/duvdu';
+import {
+  BadRequestError,
+  Users,
+  SuccessResponse,
+  NotFound,
+  Bucket,
+  FOLDERS,
+  IportfolioPost,
+  NotAllowedError,
+  PortfolioPosts,
+} from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-import { NotAllowedError } from '../../../errors/not-allowed-error';
-import { Iproject, Projects } from '../../models/project';
 import { createInvitedUsers } from '../../services/create-invited-users';
-import { FOLDERS } from '../../types/folders';
-import { removeBucketFiles, saveBucketFiles } from '../../utils/bucket';
 
 export const updateProjectHandler: RequestHandler<
   { projectId: string },
-  SuccessResponse<{ data: Iproject }>,
+  SuccessResponse<{ data: IportfolioPost }>,
   Partial<
     Pick<
-      Iproject,
+      IportfolioPost,
       | 'title'
       | 'desc'
       | 'address'
@@ -29,7 +35,7 @@ export const updateProjectHandler: RequestHandler<
   const attachments = <Express.Multer.File[] | undefined>(req.files as any)?.attachments;
   const cover = <Express.Multer.File[] | undefined>(req.files as any)?.cover;
 
-  const project = await Projects.findById(req.params.projectId);
+  const project = await PortfolioPosts.findById(req.params.projectId);
   if (!project) return next(new NotFound('project not found'));
 
   if (project.user.toString() !== req.loggedUser.id)
@@ -48,21 +54,26 @@ export const updateProjectHandler: RequestHandler<
       ? req.body.creatives.push(invitedCreatives as any)
       : (req.body.creatives = invitedCreatives as any);
   }
+  const s3 = new Bucket();
   if (attachments) {
-    await saveBucketFiles(FOLDERS.portfolio_post, ...attachments);
+    await s3.saveBucketFiles(FOLDERS.portfolio_post, ...attachments);
     (req.body as any).attachments = attachments.map(
       (el) => `${FOLDERS.portfolio_post}/${el.filename}`,
     );
-    await removeBucketFiles(...project.attachments);
+    await s3.removeBucketFiles(...project.attachments);
   }
   if (cover) {
-    await saveBucketFiles(FOLDERS.portfolio_post, ...cover);
+    await s3.saveBucketFiles(FOLDERS.portfolio_post, ...cover);
     (req.body as any).cover = `${FOLDERS.portfolio_post}/${cover[0].filename}`;
-    await removeBucketFiles(project.cover);
+    await s3.removeBucketFiles(project.cover);
   }
-  const newProject = <Iproject>await Projects.findByIdAndUpdate(req.params.projectId, req.body, {
-    new: true,
-  });
+  const newProject = <IportfolioPost>await PortfolioPosts.findByIdAndUpdate(
+    req.params.projectId,
+    req.body,
+    {
+      new: true,
+    },
+  );
 
   res.status(200).json({ message: 'success', data: newProject });
 };
