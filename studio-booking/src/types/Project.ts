@@ -16,4 +16,6 @@ export interface Iproject extends Document {
   insurance: number;
   showOnHome: boolean;
   category: Types.ObjectId;
+  cycle:number;
+  isDeleted: boolean;
 }

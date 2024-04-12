@@ -22,6 +22,15 @@ export const env = {
   redis: {
     uri: process.env.REDIS_HOST as string,
   },
+  aws: {
+    s3: {
+      access: process.env.BUCKET_ACESS_KEY as string,
+      secret: process.env.BUCKET_SECRET_KEY as string,
+      name: process.env.BUCKET_NAME as string,
+      region: process.env.BUCKET_REGION as string,
+      host: process.env.BUCKET_HOST as string,
+    },
+  },
 };
 
 export const checkEnvVariables = () => {
