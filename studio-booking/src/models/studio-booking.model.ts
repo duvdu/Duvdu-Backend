@@ -4,7 +4,7 @@ import mongoose, { model, Schema, Types } from 'mongoose';
 export interface IstudioBooking {
     id: string;
     user: Types.ObjectId;
-    attachments: [string];
+    attachments: string[];
     cover: string;
     studioName: string;
     studioNumber: string;
@@ -22,7 +22,7 @@ export interface IstudioBooking {
   }
   
 export const studioBooking = model<IstudioBooking>(
-  'studioBooking',
+  MODELS.studioBooking,
   new Schema({
     user:{
       type:mongoose.Schema.Types.ObjectId,
@@ -50,7 +50,7 @@ export const studioBooking = model<IstudioBooking>(
     isDeleted:{type:Boolean , default:false}
   },{
     timestamps:true,
-    collection:'studioBooking',
+    collection:MODELS.studioBooking,
     toJSON: {
       transform(doc, ret) {
         if (ret.cover) ret.cover = process.env.BUCKET_HOST + '/' + ret.cover;

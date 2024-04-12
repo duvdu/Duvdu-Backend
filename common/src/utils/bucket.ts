@@ -3,8 +3,6 @@ import path from 'path';
 
 import aws from 'aws-sdk';
 
-import { FOLDERS } from '../types/folders';
-
 export class Bucket {
   private s3: aws.S3;
   private bucketName: string;
@@ -20,13 +18,13 @@ export class Bucket {
   async saveBucketFiles(folder: string, ...files: Express.Multer.File[]) {
     for (const file of files) {
       const fileStream = fs.createReadStream(
-        path.join(__dirname, `../../media/${folder}/${file.filename}`),
+        path.join(__dirname, `../../../../../media/${folder}/${file.filename}`),
       );
       await new Promise((resolve, reject) => {
         this.s3.putObject(
           {
             Bucket: this.bucketName,
-            Key: `${FOLDERS.portfolio_post}/${file.filename}`,
+            Key: `${folder}/${file.filename}`,
             Body: fileStream,
           },
           (err, data) => {

@@ -1,6 +1,6 @@
 {
   "name": "@duvdu-v1/duvdu",
-  "version": "1.0.50",
+  "version": "1.1.0",
   "main": "./build/index.js",
   "types": "./build/index.d.ts",
   "files": [
@@ -9,6 +9,7 @@
   "scripts": {
     "clean": "rimraf ./build",
     "build": "npm run clean && tsc",
+    "fix:build": "mv ./build/common/src/* ./build && rm -rf ./build/auth ./build/portfolio-post ./build/common",
     "pub": "git add . && git commit -m \"updates\" && npm version patch && npm run build && npm publish",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
