@@ -3,8 +3,6 @@ import path from 'path';
 
 import aws from 'aws-sdk';
 
-import { FOLDERS } from '../types/folders';
-
 export class Bucket {
   private s3: aws.S3;
   private bucketName: string;
@@ -26,7 +24,7 @@ export class Bucket {
         this.s3.putObject(
           {
             Bucket: this.bucketName,
-            Key: `${FOLDERS.portfolio_post}/${file.filename}`,
+            Key: `${folder}/${file.filename}`,
             Body: fileStream,
           },
           (err, data) => {
