@@ -1,0 +1,7 @@
+{
+  "scripts": {
+  "start": "docker-compose up --build",
+  "start:equipment-rental": "docker-compose -f docker-compose-equipment-rental.yml up --build",
+  "watch:equipment-rental": "docker-compose -f docker-compose-equipment-rental.yml watch"
+  }
+}

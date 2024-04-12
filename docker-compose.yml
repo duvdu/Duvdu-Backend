@@ -84,14 +84,7 @@ services:
         delay: 1s
       restart_policy:
         condition: on-failure
-        delay: 3s
-    # develop:
-    #   watch:
-    #     - action: sync+restart
-    #       path: ./portfolio-post/src
-    #       target: /app/src
-    #       ignore:
-    #         - node_modules/
+        delay: 10s
     depends_on:
       - mongo
       - redis
@@ -111,14 +104,7 @@ services:
         delay: 1s
       restart_policy:
         condition: on-failure
-        delay: 3s
-    develop:
-      watch:
-        - action: sync+restart
-          path: ./equipment-rental/src
-          target: /app/src
-          ignore:
-            - node_modules/
+        delay: 10s 
     depends_on:
       - mongo
       - redis
