@@ -67,6 +67,7 @@ export const update = [
   body('tools.*.fees').isFloat({ gt: 0 }).toFloat(),
   body('tags').optional().isArray(),
   body('tags.*').isString().trim().isLength({ min: 3 }),
+  body('isDeleted').optional().isBoolean().toBoolean(),
   globalValidatorMiddleware,
 ];
 
