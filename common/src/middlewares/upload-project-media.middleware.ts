@@ -4,12 +4,11 @@ import path from 'path';
 import multer from 'multer';
 
 import { BadRequestError } from '../errors/bad-request-error';
-import { FOLDERS } from '../types/folders';
 
-export const uploadProjectMedia = () =>
+export const uploadProjectMedia = (folder: string) =>
   multer({
     storage: multer.diskStorage({
-      destination: path.join(__dirname, `../../../../../media/${FOLDERS.portfolio_post}`),
+      destination: path.join(__dirname, `../../../../../media/${folder}`),
       filename(req, file, callback) {
         callback(
           null,
