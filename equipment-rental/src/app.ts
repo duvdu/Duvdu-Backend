@@ -5,7 +5,7 @@ import express from 'express';
 import session from 'express-session';
 
 import { env } from './config/env';
-// import { apiRoutes } from './routes';
+import { apiRoutes } from './routes';
 export const app = express();
 
 app.use(express.json());
@@ -26,7 +26,7 @@ app.use(
     },
   }),
 );
-app.use('/api/equipment-rental', (req, res) => res.send('equipment-rental runs'));
-// app.use('/api/equipment-rental', apiRoutes);
+
+app.use('/api/equipment-rental', apiRoutes);
 
 app.use(globalErrorHandlingMiddleware);

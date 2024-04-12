@@ -112,6 +112,8 @@ services:
           target: /app
           ignore:
             - node_modules/
+            - package-lock.json
+            - yarn.lock
     depends_on:
       - mongo
       - redis
