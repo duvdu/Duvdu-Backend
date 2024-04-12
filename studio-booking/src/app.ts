@@ -1,8 +1,9 @@
-import { globalErrorHandlingMiddleware, isauthenticated, sessionStore } from '@duvdu-v1/duvdu';
+import { globalErrorHandlingMiddleware, sessionStore } from '@duvdu-v1/duvdu';
 import express from 'express';
 import session from 'express-session';
 
 import { env } from './config/env';
+import {router as studioBookingRoutes } from '../src/routes';
 
 export const app = express();
 
@@ -23,14 +24,6 @@ app.use(
     },
   }),
 );
-app.get('/api/studio-booking' , (req:express.Request, res:express.Response)=>{
-  res.send('studio booking work');
-});
-app.get('/api/studio-booking/test' , isauthenticated , (req:express.Request, res:express.Response)=>{
-  res.send('studio booking work');
-});
-// app.get('/test', (req:express.Request, res:express.Response) => {
-//   req.session.access = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZmYzMGQ1YmI5OTUwOTY1ZDQzZGVhZCIsImlzQmxvY2tlZCI6eyJ2YWx1ZSI6ZmFsc2V9LCJpc1ZlcmlmaWVkIjpmYWxzZSwicm9sZSI6eyJrZXkiOiJ1bnZlcmlmaWVkIiwicGVybWlzc2lvbnMiOlsiY2hhbmdlUGFzc3dvcmQiLCJ1cGRhdGVQcm9maWxlIl19LCJpYXQiOjE3MTEyMjI5OTcsImV4cCI6MTcxMTY1NDk5N30.aGkU73UQSr5h34WbA1raJrbYP6VsqYbMhnQl9tYScyw';
-//   res.send('Session cookie generated successfully.');
-// });
+
+app.use('/api/studio-booking' , studioBookingRoutes);
 app.use(globalErrorHandlingMiddleware);

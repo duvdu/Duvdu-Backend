@@ -1,7 +1,31 @@
+/* eslint-disable @typescript-eslint/no-namespace */
+
+
+import { IjwtPayload , Ipagination } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-import { Iorder } from './Order';
-import { Iproject } from './Project';
+import { IstudioBooking } from '../../models/studio-booking.model';
+import { Iorder } from '../Order';
+import { Iproject } from '../Project';
+
+
+
+
+declare module 'express-session' {
+  interface SessionData {
+    access: string;
+    refresh: string;
+  }
+}
+
+declare global {
+  namespace Express {
+    interface Request {
+      loggedUser: IjwtPayload;
+      pagination: Ipagination;
+    }
+  }
+}
 
 type successResponse<T> = T & {
   message: 'success';
@@ -10,7 +34,7 @@ type successResponse<T> = T & {
 export interface CreateProjectHandler
   extends RequestHandler<
     unknown,
-    successResponse<unknown>,
+    successResponse<{data:IstudioBooking}>,
     Pick<
       Iproject,
       | 'attachments'
@@ -25,6 +49,7 @@ export interface CreateProjectHandler
       | 'pricePerHour'
       | 'insurance'
       | 'showOnHome'
+      | 'category'
     >
   > {}
 

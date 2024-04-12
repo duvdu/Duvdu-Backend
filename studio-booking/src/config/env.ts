@@ -39,4 +39,9 @@ export const checkEnvVariables = () => {
   if (!env.jwt.secret) throw new Error('env:JWT_KEY must be defined');
   if (!env.expressSession.secret) return new Error('env:SESSION_SECRET must be defined');
   if (!env.redis.uri) return new Error('env:REDIS_HOST must be defined');
+  if (!env.aws.s3.access) return new Error('env:BUCKET_ACESS_KEY must be defined');
+  if (!env.aws.s3.secret) return new Error('env:BUCKET_SECRET_KEY must be defined');
+  if (!env.aws.s3.name) return new Error('env:BUCKET_NAME must be defined');
+  if (!env.aws.s3.region) return new Error('env:BUCKET_REGION must be defined');
+  if (!env.aws.s3.host) return new Error('env:BUCKET_HOST must be defined');
 };
