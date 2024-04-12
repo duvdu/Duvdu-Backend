@@ -9,7 +9,7 @@ import { FOLDERS } from '../types/folders';
 export const uploadProjectMedia = () =>
   multer({
     storage: multer.diskStorage({
-      destination: path.join(__dirname, `../../media/${FOLDERS.portfolio_post}`),
+      destination: path.join(__dirname, `../../../../../media/${FOLDERS.portfolio_post}`),
       filename(req, file, callback) {
         callback(
           null,
