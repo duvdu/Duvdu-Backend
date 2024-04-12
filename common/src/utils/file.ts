@@ -5,7 +5,7 @@ const saveFiles = (folder: string, ...files: (Express.Multer.File | undefined)[]
   files.forEach((file) => {
     if (file)
       fs.writeFileSync(
-        path.resolve(__dirname, `../../media/${folder}/${file.filename}`),
+        path.resolve(__dirname, `../../../../../media/${folder}/${file.filename}`),
         file.buffer,
       );
   });
@@ -13,7 +13,7 @@ const saveFiles = (folder: string, ...files: (Express.Multer.File | undefined)[]
 
 const removeFiles = (...filePaths: (string | undefined)[]) => {
   filePaths.forEach((filePath) => {
-    if (filePath) fs.unlinkSync(path.join(__dirname, '../../media', filePath));
+    if (filePath) fs.unlinkSync(path.join(__dirname, '../../../../../media', filePath));
   });
 };
 
