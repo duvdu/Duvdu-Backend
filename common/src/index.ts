@@ -58,3 +58,4 @@ export * from './models/Ticket.model';
 export * from './models/User.model';
 export * from './models/category.model';
 export * from './models/portfolio-post.model';
+export * from './models/copyrights.model';

@@ -33,6 +33,12 @@ export enum PERMISSIONS {
   removePortfolioProjectHandler = 'remove portfolio project',
   getCrmPortfolioProjectsHandlers = 'get crm portfolio projects',
   getAnalysisHandler = 'get analysis handler',
+  // copyrights
+  createCopyrightHandler = 'create copyright project',
+  updateCopyrightHandler = 'update copyright project',
+  removeCopyrightHandler = 'remove copyright project',
+  getCrmCopyrightsHandlers = 'get crm copyright projects',
+  getCopyrightAnalysisHandler = 'get copyright analysis handler',
 }
 
 export const permissions = {
@@ -79,5 +85,12 @@ export const permissions = {
     PERMISSIONS.removePortfolioProjectHandler,
     PERMISSIONS.getCrmPortfolioProjectsHandlers,
     PERMISSIONS.getAnalysisHandler,
+  ],
+  copyrights: [
+    PERMISSIONS.createCopyrightHandler,
+    PERMISSIONS.updateCopyrightHandler,
+    PERMISSIONS.removeCopyrightHandler,
+    PERMISSIONS.getCrmCopyrightsHandlers,
+    PERMISSIONS.getCopyrightAnalysisHandler,
   ],
 };
