@@ -1,7 +1,12 @@
-import { SuccessResponse, Categories, NotFound, BadRequestError } from '@duvdu-v1/duvdu';
+import {
+  SuccessResponse,
+  Categories,
+  NotFound,
+  BadRequestError,
+  CopyRights,
+  IcopyRights,
+} from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
-
-import { CopyRights, IcopyRights } from '../../models/copyrights.model';
 
 export const createProjectHandler: RequestHandler<
   unknown,

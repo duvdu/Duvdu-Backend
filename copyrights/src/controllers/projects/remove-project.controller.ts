@@ -1,7 +1,5 @@
-import { SuccessResponse, NotAllowedError } from '@duvdu-v1/duvdu';
+import { SuccessResponse, NotAllowedError, CopyRights } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
-
-import { CopyRights } from '../../models/copyrights.model';
 
 export const removeProjectHandler: RequestHandler<{ projectId: string }, SuccessResponse> = async (
   req,

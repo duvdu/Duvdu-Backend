@@ -1,7 +1,5 @@
-import { NotFound, SuccessResponse } from '@duvdu-v1/duvdu';
+import { NotFound, SuccessResponse, CopyRights, IcopyRights } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
-
-import { CopyRights, IcopyRights } from '../../models/copyrights.model';
 
 export const getProjectHandler: RequestHandler<
   { projectId: string },

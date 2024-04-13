@@ -1,7 +1,11 @@
-import { SuccessResponse, NotFound, NotAllowedError } from '@duvdu-v1/duvdu';
+import {
+  SuccessResponse,
+  NotFound,
+  NotAllowedError,
+  CopyRights,
+  IcopyRights,
+} from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
-
-import { CopyRights, IcopyRights } from '../../models/copyrights.model';
 
 export const updateProjectHandler: RequestHandler<
   { projectId: string },

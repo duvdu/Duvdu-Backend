@@ -1,7 +1,5 @@
-import { PaginationResponse } from '@duvdu-v1/duvdu';
+import { PaginationResponse, CopyRights, IcopyRights } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
-
-import { CopyRights, IcopyRights } from '../../models/copyrights.model';
 
 export const getCrmProjectsHandler: RequestHandler<
   unknown,

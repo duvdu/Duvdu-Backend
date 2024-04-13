@@ -1,4 +1,9 @@
-import { globalPaginationMiddleware, isauthenticated, isauthorized } from '@duvdu-v1/duvdu';
+import {
+  globalPaginationMiddleware,
+  isauthenticated,
+  isauthorized,
+  PERMISSIONS,
+} from '@duvdu-v1/duvdu';
 import { Router } from 'express';
 
 import * as handlers from '../controllers/projects';
@@ -15,7 +20,7 @@ router
   )
   .post(
     isauthenticated,
-    isauthorized('create copyrights post' as any),
+    isauthorized(PERMISSIONS.createCopyrightHandler),
     val.create,
     handlers.createProjectHandler,
   );
@@ -23,7 +28,7 @@ router
 router.get(
   '/crm',
   isauthenticated,
-  isauthorized('get crm copyrights' as any),
+  isauthorized(PERMISSIONS.getCrmCopyrightsHandlers),
   val.findAll,
   globalPaginationMiddleware,
   handlers.getProjectsPagination,
@@ -33,7 +38,7 @@ router.get(
 router.get(
   '/analysis',
   isauthenticated,
-  isauthorized('get copyrights analysis' as any),
+  isauthorized(PERMISSIONS.getCopyrightAnalysisHandler),
   handlers.getProjectAnalysis,
 );
 
@@ -42,13 +47,13 @@ router
   .get(val.get, handlers.getProjectHandler)
   .patch(
     isauthenticated,
-    isauthorized('update copyright post' as any),
+    isauthorized(PERMISSIONS.updateCopyrightHandler),
     val.update,
     handlers.updateProjectHandler,
   )
   .delete(
     isauthenticated,
-    isauthorized('remove copyright post' as any),
+    isauthorized(PERMISSIONS.removeCopyrightHandler),
     val.get,
     handlers.removeProjectHandler,
   );

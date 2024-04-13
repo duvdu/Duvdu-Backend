@@ -1,8 +1,6 @@
-import { SuccessResponse } from '@duvdu-v1/duvdu';
+import { SuccessResponse, CopyRights } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import { PipelineStage } from 'mongoose';
-
-import { CopyRights } from '../../models/copyrights.model';
 
 export const getProjectAnalysis: RequestHandler<
   unknown,
