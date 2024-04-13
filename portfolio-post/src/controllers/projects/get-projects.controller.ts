@@ -14,7 +14,7 @@ export const getProjectsPagination: RequestHandler<
     projectBudgetTo?: number;
     category?: string;
     creative?: string;
-    cycle?: string;
+    isDeleted?: boolean;
     startDate?: Date;
     endDate?: Date;
   }
@@ -38,12 +38,14 @@ export const getProjectsPagination: RequestHandler<
     ];
   }
   if (req.query.category) req.pagination.filter.category = req.query.category;
-  if (req.query.cycle) req.pagination.filter.cycle = req.query.cycle;
   if (req.query.startDate || req.query.endDate)
     req.pagination.filter.createdAt = {
       $gte: req.query.startDate || new Date(0),
       $lte: req.query.endDate || new Date(),
     };
+  if (req.query.isDeleted !== undefined) {
+    req.pagination.filter.isDeleted = req.query.isDeleted ? true : { $ne: true };
+  }
   next();
 };
 

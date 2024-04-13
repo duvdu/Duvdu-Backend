@@ -12,6 +12,7 @@ export const removeProjectHandler: RequestHandler<{ projectId: string }, Success
     {
       _id: req.params.projectId,
       user: req.loggedUser.id,
+      isDeleted: { $ne: true },
     },
     { isDeleted: true },
   );

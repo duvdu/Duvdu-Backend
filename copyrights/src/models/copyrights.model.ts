@@ -32,5 +32,7 @@ export const CopyRights = model<IcopyRights>(
       timestamps: true,
       collection: 'copyrights',
     },
-  ).index({ createdAt: 1, updatedAt: -1 }),
+  )
+    .index({ createdAt: 1, updatedAt: -1 })
+    .index({ searchKeywords: 'text' }),
 );

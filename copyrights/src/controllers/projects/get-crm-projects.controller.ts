@@ -1,12 +1,14 @@
-import { IportfolioPost, PaginationResponse, PortfolioPosts } from '@duvdu-v1/duvdu';
+import { PaginationResponse } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
+
+import { CopyRights, IcopyRights } from '../../models/copyrights.model';
 
 export const getCrmProjectsHandler: RequestHandler<
   unknown,
-  PaginationResponse<{ data: IportfolioPost[] }>
+  PaginationResponse<{ data: IcopyRights[] }>
 > = async (req, res) => {
-  const resultCount = await PortfolioPosts.countDocuments(req.pagination.filter);
-  const projects = await PortfolioPosts.find(req.pagination.filter)
+  const resultCount = await CopyRights.countDocuments(req.pagination.filter);
+  const projects = await CopyRights.find(req.pagination.filter)
     .sort('-createdAt')
     .limit(req.pagination.limit)
     .skip(req.pagination.skip);

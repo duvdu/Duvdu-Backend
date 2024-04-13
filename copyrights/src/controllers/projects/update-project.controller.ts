@@ -9,7 +9,7 @@ export const updateProjectHandler: RequestHandler<
   Partial<
     Pick<
       IcopyRights,
-      'category' | 'price' | 'duration' | 'address' | 'showOnHome' | 'searchKeywords'
+      'price' | 'duration' | 'address' | 'showOnHome' | 'searchKeywords' | 'isDeleted'
     >
   >
 > = async (req, res, next) => {

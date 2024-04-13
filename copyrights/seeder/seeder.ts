@@ -1,5 +1,7 @@
-import { Categories, dbConnection, PortfolioPosts, Users } from '@duvdu-v1/duvdu';
+import { Categories, dbConnection, Users } from '@duvdu-v1/duvdu';
 import mongoose from 'mongoose';
+
+import { CopyRights } from '../src/models/copyrights.model';
 
 const egyptianGovernorates = [
   'Alexandria',
@@ -37,13 +39,13 @@ const getRandomfrom = (list: any): any =>
 (async () => {
   console.log('start seeder');
   await dbConnection('mongodb://127.0.0.1:8080/test');
-  await PortfolioPosts.deleteMany({});
+  await CopyRights.deleteMany({});
   await Users.deleteMany({ username: { $regex: 'user_num', $options: 'i' } });
   await Categories.deleteMany({ username: { $regex: 'category_num', $options: 'i' } });
 
   // regular users
   const regularUsers = await Users.create(
-    Array(10)
+    Array(100)
       .fill({})
       .map((el, i) => ({ username: `user_num_${i}` })),
   );
@@ -51,25 +53,26 @@ const getRandomfrom = (list: any): any =>
   const categories = await Categories.create(
     Array(20)
       .fill({})
-      .map((el, i) => ({ title: 'category_num_' + i })),
+      .map((el, i) => ({ title: 'category_num' + i, cycle: 3 })),
   );
   // projects
   for (const user of regularUsers) {
-    const projects = await PortfolioPosts.create(
-      Array(Math.ceil(1 + Math.random() * 100))
+    // const projects =
+    await CopyRights.create(
+      Array(1)
         .fill({})
         .map((el, i) => ({
           user: user.id,
-          title: `dummy_project_${user.id}_num_${i}`,
+          title: `dummy_project_${user.username}_num_${i}`,
           address: getRandomfrom(egyptianGovernorates),
           category: getRandomfrom(categories).id,
-          projectBudget: Math.round(1 + Math.random() * 100000),
+          price: Math.round(1 + Math.random() * 100000),
           showOnHome: Math.floor(Math.random() * 10) > 0,
-          cycle: 1,
+          cycle: 3,
           isDeleted: Math.floor(Math.random() * 10) < 1,
         })),
     );
-    console.log(projects.length, 'created for user', user.username);
+    // console.log(projects.length, 'created for user', user.username);
   }
 
   await mongoose.connection.close();

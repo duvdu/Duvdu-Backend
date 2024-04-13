@@ -8,14 +8,19 @@ export const getProjectsPagination: RequestHandler<
   unknown,
   unknown,
   {
+    search?: string;
+    user?: string;
     address?: string;
     category?: string;
     priceFrom?: number;
     priceTo?: number;
+    isDeleted?: boolean;
     startDate?: Date;
     endDate?: Date;
   }
 > = (req, res, next) => {
+  if (req.query.search) req.pagination.filter.$text = { $search: req.query.search };
+  if (req.query.user) req.pagination.filter.user = req.query.user;
   if (req.query.address)
     req.pagination.filter.address = { $regex: req.query.address, $options: 'i' };
   if (req.query.priceFrom) req.pagination.filter.price = { $gte: req.query.priceFrom };
@@ -30,6 +35,9 @@ export const getProjectsPagination: RequestHandler<
       $gte: req.query.startDate || new Date(0),
       $lte: req.query.endDate || new Date(),
     };
+  if (req.query.isDeleted !== undefined) {
+    req.pagination.filter.isDeleted = req.query.isDeleted ? true : { $ne: true };
+  }
   next();
 };
 

@@ -14,60 +14,27 @@ export const create = [
 
 export const update = [
   param('projectId').isMongoId(),
-  body('title').optional().isString().trim().isLength({ min: 3 }),
-  body('desc').optional().isString().trim(),
+  body('price').optional().isFloat({ gt: 0 }),
+  body('duration').optional().isString(),
   body('address').optional().isString().trim(),
-  body('creatives').optional().isArray(),
-  body('creatives.*.creative').isMongoId(),
-  body('creatives.*.fees').isFloat({ gt: 0 }).toFloat(),
-  body('projectBudget').optional().isFloat({ gt: 0 }).toFloat(),
-  body('projectScale')
-    .optional()
-    .isObject()
-    .custom((val) => {
-      if (!val.scale || !val.time) throw new Error('');
-      return true;
-    }),
-  body('projectScale.scale').optional().isInt().toInt(),
-  body('projectScale.time')
-    .optional()
-    .isString()
-    .trim()
-    .custom((val) => {
-      if (['minute', 'hour'].includes(val)) return true;
-      throw new Error();
-    }),
   body('searchKeywords').optional().isArray(),
   body('searchKeywords.*').isString().trim().isLength({ min: 3 }),
   body('showOnHome').optional().isBoolean().toBoolean(),
-  body('tools').optional().isArray(),
-  body('tools.*.name').isString().trim().isLength({ min: 2 }),
-  body('tools.*.fees').isFloat({ gt: 0 }).toFloat(),
-  body('tags').optional().isArray(),
-  body('tags.*').isString().trim().isLength({ min: 3 }),
   globalValidatorMiddleware,
 ];
 
 export const findAll = [
   query('search').optional().isLength({ min: 3 }),
   query('address').optional().isLength({ min: 3 }),
-  query('tools')
-    .optional()
-    .isLength({ min: 3 })
-    .customSanitizer((val) => val.split(',')),
-  query('tags')
-    .optional()
-    .isLength({ min: 3 })
-    .customSanitizer((val) => val.split(',')),
-  query('projectBudgetFrom').optional().isFloat({ gt: 0 }).toFloat(),
-  query('projectBudgetTo').optional().isFloat({ gt: 0 }).toFloat(),
+  query('user').optional().isMongoId(),
+  query('priceFrom').optional().isFloat({ gt: 0 }).toFloat(),
+  query('priceTo').optional().isFloat({ gt: 0 }).toFloat(),
   query('category').optional().isMongoId(),
-  query('creative').optional().isMongoId(),
-  query('startAt')
+  query('startDate')
     .optional()
     .isISO8601()
     .customSanitizer((val) => (val ? new Date(val) : new Date(0))),
-  query('endAt')
+  query('endDate')
     .optional()
     .isISO8601()
     .customSanitizer((val) => (val ? new Date(val) : new Date())),

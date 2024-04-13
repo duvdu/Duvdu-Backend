@@ -1,4 +1,4 @@
-import { isauthenticated, isauthorized } from '@duvdu-v1/duvdu';
+import { globalPaginationMiddleware, isauthenticated, isauthorized } from '@duvdu-v1/duvdu';
 import { Router } from 'express';
 
 import * as handlers from '../controllers/projects';
@@ -7,12 +7,12 @@ const router = Router();
 
 router
   .route('/')
-  // .get(
-  //   val.findAll,
-  //   globalPaginationMiddleware,
-  //   handlers.getProjectsPagination,
-  //   handlers.getProjectsHandler,
-  // )
+  .get(
+    val.findAll,
+    globalPaginationMiddleware,
+    handlers.getProjectsPagination,
+    handlers.getProjectsHandler,
+  )
   .post(
     isauthenticated,
     isauthorized('create copyrights post' as any),
@@ -20,38 +20,37 @@ router
     handlers.createProjectHandler,
   );
 
-// router.get(
-//   '/crm',
-//   isauthenticated,
-//   isauthorized(PERMISSIONS.getCrmPortfolioProjectsHandlers as any),
-//   val.findAll,
-//   globalPaginationMiddleware,
-//   handlers.getProjectsPagination,
-//   handlers.getCrmProjectsHandler,
-// );
+router.get(
+  '/crm',
+  isauthenticated,
+  isauthorized('get crm copyrights' as any),
+  val.findAll,
+  globalPaginationMiddleware,
+  handlers.getProjectsPagination,
+  handlers.getCrmProjectsHandler,
+);
 
-// router.get(
-//   '/analysis',
-//   isauthenticated,
-//   isauthorized(PERMISSIONS.getAnalysisHandler as any),
-//   handlers.getProjectAnalysis,
-// );
+router.get(
+  '/analysis',
+  isauthenticated,
+  isauthorized('get copyrights analysis' as any),
+  handlers.getProjectAnalysis,
+);
 
-// router
-//   .route('/:projectId')
-//   .get(val.get, handlers.getProjectHandler)
-//   .patch(
-//     isauthenticated,
-//     isauthorized(PERMISSIONS.updatePortfolioProjectHandler as any),
-//     uploadProjectMedia(),
-//     val.update,
-//     handlers.updateProjectHandler,
-//   )
-//   .delete(
-//     isauthenticated,
-//     isauthorized(PERMISSIONS.removePortfolioProjectHandler as any),
-//     val.get,
-//     handlers.removeProjectHandler,
-//   );
+router
+  .route('/:projectId')
+  .get(val.get, handlers.getProjectHandler)
+  .patch(
+    isauthenticated,
+    isauthorized('update copyright post' as any),
+    val.update,
+    handlers.updateProjectHandler,
+  )
+  .delete(
+    isauthenticated,
+    isauthorized('remove copyright post' as any),
+    val.get,
+    handlers.removeProjectHandler,
+  );
 
 export const apiRoutes = router;

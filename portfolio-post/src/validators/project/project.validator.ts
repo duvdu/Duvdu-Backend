@@ -86,11 +86,11 @@ export const findAll = [
   query('projectBudgetTo').optional().isFloat({ gt: 0 }).toFloat(),
   query('category').optional().isMongoId(),
   query('creative').optional().isMongoId(),
-  query('startAt')
+  query('startDate')
     .optional()
     .isISO8601()
     .customSanitizer((val) => (val ? new Date(val) : new Date(0))),
-  query('endAt')
+  query('endDate')
     .optional()
     .isISO8601()
     .customSanitizer((val) => (val ? new Date(val) : new Date())),
