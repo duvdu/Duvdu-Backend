@@ -1,12 +1,16 @@
-import { IportfolioPost, PaginationResponse, PortfolioPosts } from '@duvdu-v1/duvdu';
+import { IstudioBooking, PaginationResponse, studioBooking } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 export const getCrmProjectsHandler: RequestHandler<
   unknown,
-  PaginationResponse<{ data: IportfolioPost[] }>
+  PaginationResponse<{ data: IstudioBooking[] }>
 > = async (req, res) => {
-  const resultCount = await PortfolioPosts.countDocuments(req.pagination.filter);
-  const projects = await PortfolioPosts.find(req.pagination.filter)
+  const resultCount = await studioBooking.countDocuments({
+    ...req.pagination.filter,
+    isDeleted: { $ne: true },
+  });
+  const studioBookings = await studioBooking
+    .find(req.pagination.filter)
     .sort('-createdAt')
     .limit(req.pagination.limit)
     .skip(req.pagination.skip);
@@ -18,6 +22,6 @@ export const getCrmProjectsHandler: RequestHandler<
       resultCount,
       totalPages: Math.ceil(resultCount / req.pagination.limit),
     },
-    data: projects,
+    data: studioBookings,
   });
 };

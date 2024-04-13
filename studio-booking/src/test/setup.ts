@@ -3,7 +3,6 @@ import mongoose from 'mongoose';
 
 import { env } from '../config/env';
 
-
 let mongo: any;
 
 beforeAll(async () => {

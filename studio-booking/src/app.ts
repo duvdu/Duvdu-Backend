@@ -3,7 +3,7 @@ import express from 'express';
 import session from 'express-session';
 
 import { env } from './config/env';
-import {router as studioBookingRoutes } from '../src/routes';
+import { router as studioBookingRoutes } from '../src/routes';
 
 export const app = express();
 
@@ -16,7 +16,9 @@ app.use(
     resave: false,
     saveUninitialized: false,
     store:
-      env.environment !== 'test' && env.expressSession.allowUseStorage ? sessionStore(env.redis.uri) : undefined,
+      env.environment !== 'test' && env.expressSession.allowUseStorage
+        ? sessionStore(env.redis.uri)
+        : undefined,
     cookie: {
       sameSite: 'lax',
       secure: env.environment === 'production',
@@ -25,5 +27,5 @@ app.use(
   }),
 );
 
-app.use('/api/studio-booking' , studioBookingRoutes);
+app.use('/api/studio-booking', studioBookingRoutes);
 app.use(globalErrorHandlingMiddleware);

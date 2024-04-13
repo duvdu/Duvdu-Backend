@@ -5,3 +5,6 @@ export * from './addEquipment.controller';
 export * from './deleteEquipment.controller';
 export * from './deleteProject.controller';
 export * from './getProject.controller';
+export * from './getProjects.controller';
+export * from './getProjectAnalysis.controller';
+export * from './getCrmProjects.controller';

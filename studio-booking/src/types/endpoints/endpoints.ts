@@ -1,15 +1,9 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 
-
-import { IjwtPayload , Ipagination } from '@duvdu-v1/duvdu';
+import { IjwtPayload, Ipagination, IstudioBooking } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-import { IstudioBooking } from '../../models/studio-booking.model';
 import { Iorder } from '../Order';
-import { Iproject } from '../Project';
-
-
-
 
 declare module 'express-session' {
   interface SessionData {
@@ -34,9 +28,9 @@ type successResponse<T> = T & {
 export interface CreateProjectHandler
   extends RequestHandler<
     unknown,
-    successResponse<{data:IstudioBooking}>,
+    successResponse<{ data: IstudioBooking }>,
     Pick<
-      Iproject,
+      IstudioBooking,
       | 'attachments'
       | 'cover'
       | 'studioName'
@@ -50,17 +44,17 @@ export interface CreateProjectHandler
       | 'insurance'
       | 'showOnHome'
       | 'category'
-    >
+      | 'creatives'
+    > & { invitedCreatives?: [{ phoneNumber: { number: string }; fees: number }] }
   > {}
 
-  
 export interface UpdateProjectHandler
   extends RequestHandler<
     { projectId: string },
-    successResponse<{data:IstudioBooking}>,
+    successResponse<{ data: IstudioBooking }>,
     Partial<
       Pick<
-        Iproject,
+        IstudioBooking,
         | 'attachments'
         | 'cover'
         | 'studioName'
@@ -72,28 +66,9 @@ export interface UpdateProjectHandler
         | 'pricePerHour'
         | 'insurance'
         | 'showOnHome'
-      >
+        | 'creatives'
+      > & { invitedCreatives?: [{ phoneNumber: { number: string }; fees: number }] }
     >
-  > {}
-
-export interface GetProjectsHandler
-  extends RequestHandler<
-    unknown,
-    successResponse<{
-      count: number;
-      data: Pick<Iproject, 'id' | 'cover' | 'studioName' | 'pricePerHour'> &
-        {
-          user: { id: string; name: string; profileImage: string };
-        }[];
-    }>,
-    unknown,
-    {
-      studioName: string;
-      user: string;
-      keywords: string[];
-      location: { lat: number; lng: number };
-      price: { from: number; to: number };
-    }
   > {}
 
 export interface GetProjectHandler
@@ -120,10 +95,24 @@ export interface BookProjectHandler
   > {}
 
 export interface UpdateEquipmentHandler
-  extends RequestHandler<{projectId:string ,equipmentId:string} , successResponse<{data:IstudioBooking}> , {name:string , fees:number} , unknown>{}
+  extends RequestHandler<
+    { projectId: string; equipmentId: string },
+    successResponse<{ data: IstudioBooking }>,
+    { name: string; fees: number },
+    unknown
+  > {}
 export interface AddEquipmentHandler
-  extends RequestHandler<{projectId:string} , successResponse<{data:IstudioBooking}> , {name:string , fees:number} , unknown>{}
-  
-export interface DeleteEquipmentHandler
-  extends RequestHandler<{projectId:string ,equipmentId:string} , successResponse<unknown> , unknown , unknown>{}
+  extends RequestHandler<
+    { projectId: string },
+    successResponse<{ data: IstudioBooking }>,
+    { name: string; fees: number },
+    unknown
+  > {}
 
+export interface DeleteEquipmentHandler
+  extends RequestHandler<
+    { projectId: string; equipmentId: string },
+    successResponse<unknown>,
+    unknown,
+    unknown
+  > {}
