@@ -33,7 +33,14 @@ export enum PERMISSIONS {
   removePortfolioProjectHandler = 'remove portfolio project',
   getCrmPortfolioProjectsHandlers = 'get crm portfolio projects',
   getAnalysisHandler = 'get analysis handler',
+  // studio-booking
+  createStudioProjectHandler = 'create studio project',
+  updateStudioProjectHandler = 'update studio project',
+  removeStudioProjectHandler = 'remove studio project',
+  getCrmStudioProjectsHandlers = 'get crm studio projects',
+  getStudioAnalysisHandler = 'get studio analysis handler',
 }
+
 
 export const permissions = {
   auth: [
@@ -79,5 +86,12 @@ export const permissions = {
     PERMISSIONS.removePortfolioProjectHandler,
     PERMISSIONS.getCrmPortfolioProjectsHandlers,
     PERMISSIONS.getAnalysisHandler,
+  ],
+  studioBooking: [
+    PERMISSIONS.createStudioProjectHandler,
+    PERMISSIONS.updateStudioProjectHandler,
+    PERMISSIONS.removeStudioProjectHandler,
+    PERMISSIONS.getCrmStudioProjectsHandlers,
+    PERMISSIONS.getStudioAnalysisHandler,
   ],
 };
