@@ -1,7 +1,5 @@
-import { Categories, dbConnection, Users } from '@duvdu-v1/duvdu';
+import { Categories, dbConnection, Users, CopyRights } from '@duvdu-v1/duvdu';
 import mongoose from 'mongoose';
-
-import { CopyRights } from '../src/models/copyrights.model';
 
 const egyptianGovernorates = [
   'Alexandria',
