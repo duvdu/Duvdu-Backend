@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@duvdu-v1/duvdu": "^1.0.50",
+    "@duvdu-v1/duvdu": "^1.1.5",
     "aws-sdk": "^2.1594.0",
     "connect-redis": "^7.1.1",
     "dotenv": "^16.3.2",
@@ -22,6 +22,8 @@
     "mongoose": "^8.2.4",
     "node-nats-streaming": "^0.3.2",
     "redis": "^4.6.13",
+    "@types/cors": "^2.8.17",
+    "cors": "^2.8.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.3"
   },

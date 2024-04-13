@@ -1,13 +1,14 @@
 import 'express-async-errors';
 import './types/custom-definition';
 import { globalErrorHandlingMiddleware, sessionStore } from '@duvdu-v1/duvdu';
+import cors from 'cors';
 import express from 'express';
 import session from 'express-session';
 
 import { env } from './config/env';
 import { apiRoutes } from './routes';
 export const app = express();
-
+app.use(cors({ origin: '*' }));
 app.use(express.json());
 
 app.use(

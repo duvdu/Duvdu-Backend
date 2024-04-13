@@ -1,20 +1,23 @@
+import 'express-async-errors';
 import { globalErrorHandlingMiddleware, sessionStore } from '@duvdu-v1/duvdu';
+import cors from 'cors';
 import express from 'express';
 import session from 'express-session';
 
 import { env } from './config/env';
 
-
 export const app = express();
-
+app.use(cors({ origin: '*' }));
 app.set('trust proxy', true);
 app.use(express.json());
-export const mySession =   session({
+export const mySession = session({
   secret: env.expressSession.secret,
   resave: false,
   saveUninitialized: false,
   store:
-    env.environment !== 'test' && env.expressSession.allowUseStorage ? sessionStore(env.redis.uri) : undefined,
+    env.environment !== 'test' && env.expressSession.allowUseStorage
+      ? sessionStore(env.redis.uri)
+      : undefined,
   cookie: {
     sameSite: 'lax',
     secure: env.environment === 'production',
