@@ -2,21 +2,13 @@ import { globalValidatorMiddleware } from '@duvdu-v1/duvdu';
 import { body, param, query } from 'express-validator';
 
 export const create = [
-  body('title').isString().trim().isLength({ min: 3 }),
-  body('desc').optional().isString().trim(),
-  body('address').optional().isString().trim(),
   body('category').isMongoId(),
+  body('price').isFloat({ gt: 0 }),
+  body('duration').isString(),
+  body('address').optional().isString().trim(),
   body('searchKeywords').optional().isArray(),
   body('searchKeywords.*').isString().trim().isLength({ min: 3 }),
   body('showOnHome').isBoolean().toBoolean(),
-  body('tools').isArray({ min: 1 }),
-  body('tools.*.name').isString().trim().isLength({ min: 2 }),
-  body('tools.*.fees').isFloat({ gt: 0 }).toFloat(),
-  body('tags').optional().isArray(),
-  body('tags.*').isString().trim().isLength({ min: 3 }),
-  body('canChangeAddress').isBoolean().toBoolean(),
-  body('pricePerHour').isFloat({ gt: 0 }).toFloat(),
-  body('insurance').isFloat({ min: 0 }).toFloat(),
   globalValidatorMiddleware,
 ];
 

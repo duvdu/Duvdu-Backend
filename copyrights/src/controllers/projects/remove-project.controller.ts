@@ -1,12 +1,14 @@
-import { SuccessResponse, NotAllowedError, PortfolioPosts } from '@duvdu-v1/duvdu';
+import { SuccessResponse, NotAllowedError } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
+
+import { CopyRights } from '../../models/copyrights.model';
 
 export const removeProjectHandler: RequestHandler<{ projectId: string }, SuccessResponse> = async (
   req,
   res,
   next,
 ) => {
-  const project = await PortfolioPosts.findOneAndUpdate(
+  const project = await CopyRights.findOneAndUpdate(
     {
       _id: req.params.projectId,
       user: req.loggedUser.id,

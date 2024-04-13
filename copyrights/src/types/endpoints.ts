@@ -10,14 +10,44 @@ export interface CreateProjectHandler
   extends RequestHandler<
     unknown,
     successResponse<unknown>,
-    Pick<Iproject, 'price' | 'duration' | 'address' | 'searchKeywords'>
+    Pick<
+      Iproject,
+      | 'attachments'
+      | 'canChangeAddress'
+      | 'cover'
+      | 'name'
+      | 'number'
+      | 'desc'
+      | 'address'
+      | 'equipments'
+      | 'searchKeywords'
+      | 'pricePerHour'
+      | 'insurance'
+      | 'showOnHome'
+    >
   > {}
 
 export interface UpdateProjectHandler
   extends RequestHandler<
     { projectId: string },
     successResponse<unknown>,
-    Partial<Pick<Iproject, 'price' | 'duration' | 'address' | 'searchKeywords'>>
+    Partial<
+      Pick<
+        Iproject,
+        | 'attachments'
+        | 'cover'
+        | 'canChangeAddress'
+        | 'name'
+        | 'number'
+        | 'desc'
+        | 'address'
+        | 'equipments'
+        | 'searchKeywords'
+        | 'pricePerHour'
+        | 'insurance'
+        | 'showOnHome'
+      >
+    >
   > {}
 
 export interface GetProjectsHandler
@@ -25,23 +55,17 @@ export interface GetProjectsHandler
     unknown,
     successResponse<{
       count: number;
-      data: Pick<Iproject, 'id' | 'price' | 'duration'> &
+      data: Pick<Iproject, 'id' | 'cover' | 'name' | 'pricePerHour'> &
         {
-          user: {
-            id: string;
-            name: string;
-            profileImage: string;
-            location: { lat: number; lng: number };
-            averageRate: number;
-            currentRank: string;
-          };
+          user: { id: string; name: string; profileImage: string };
         }[];
     }>,
     unknown,
     {
+      name: string;
       user: string;
-      price: { from: number; to: number };
       keywords: string[];
+      price: { from: number; to: number };
     }
   > {}
 
@@ -55,5 +79,15 @@ export interface BookProjectHandler
   extends RequestHandler<
     { projectId: string },
     successResponse<unknown>,
-    Pick<Iorder, 'jobDetails' | 'appointmentDate' | 'location' | 'attachments' | 'totalAmount'>
+    Pick<
+      Iorder,
+      | 'projectDetails'
+      | 'equipments'
+      | 'insurrance'
+      | 'numberOfHours'
+      | 'appointmentDate'
+      | 'isInstant'
+      | 'address'
+      | 'totalAmount'
+    >
   > {}

@@ -4,14 +4,10 @@ export interface Iorder extends Document {
   id: string;
   sourceUser: Types.ObjectId;
   targetUser: Types.ObjectId;
-  projectId: Types.ObjectId;
-  projectDetails: string;
-  equipments: { name: string; fees: number }[];
-  insurrance: number;
-  numberOfHours: number;
+  jobDetails: string;
   appointmentDate: Date;
-  isInstant: boolean;
+  location: { lat: string; lng: string };
+  attachments: string[];
   status: 'canceled' | 'pending' | 'paid';
-  address: string;
   totalAmount: number;
 }

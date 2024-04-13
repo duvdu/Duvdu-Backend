@@ -89,12 +89,12 @@ services:
       - mongo
       - redis
   
-  equipment-rental: 
+  copyrights: 
     build:
-      context: ./equipment-rental
+      context: ./copyrights
       dockerfile: Dockerfile
     env_file:
-      - ./equipment-rental/.env
+      - ./copyrights/.env
     environment: 
       - MONGO_URI=mongodb://mongo:27017/
     deploy:
@@ -120,5 +120,5 @@ services:
       - chat
       - category
       - portfolio-post
-      - equipment-rental
+      - copyrights
 

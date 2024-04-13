@@ -27,6 +27,6 @@ app.use(
   }),
 );
 
-app.use('/api/equipment-rental', apiRoutes);
+app.use('/api/copyrights', apiRoutes);
 
 app.use(globalErrorHandlingMiddleware);

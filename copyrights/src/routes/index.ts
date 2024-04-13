@@ -1,11 +1,4 @@
-import {
-  isauthenticated,
-  checkRequiredFields,
-  globalPaginationMiddleware,
-  PERMISSIONS,
-  uploadProjectMedia,
-  isauthorized,
-} from '@duvdu-v1/duvdu';
+import { isauthenticated, isauthorized } from '@duvdu-v1/duvdu';
 import { Router } from 'express';
 
 import * as handlers from '../controllers/projects';
@@ -22,9 +15,7 @@ router
   // )
   .post(
     isauthenticated,
-    isauthorized('create equipment-renatl post' as any),
-    uploadProjectMedia('equipment-rental'),
-    checkRequiredFields({ fields: ['cover', 'attachments'] }),
+    isauthorized('create copyrights post' as any),
     val.create,
     handlers.createProjectHandler,
   );
