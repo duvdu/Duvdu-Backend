@@ -31,6 +31,13 @@ spec:
                   name: portfolio-post-srv
                   port: 
                     number: 3000
+          - path: /api/studio-booking/?(.*)
+            pathType: Prefix
+            backend: 
+              service:
+                  name: studio-booking-srv
+                  port: 
+                    number: 3000
           - path: /?(.*)
             pathType: Prefix
             backend: 
@@ -38,6 +45,7 @@ spec:
                   name: chat-srv
                   port: 
                     number: 3000
+
 
 
 

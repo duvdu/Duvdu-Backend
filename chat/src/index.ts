@@ -2,7 +2,7 @@ import { dbConnection } from '@duvdu-v1/duvdu';
 import sharedSession from 'express-socket.io-session';
 import { Server } from 'socket.io';
 
-import { app , mySession } from './app';
+import { app, mySession } from './app';
 import { env, checkEnvVariables } from './config/env';
 import { IcustomHandshake } from './types/customSocket';
 const start = async () => {
@@ -19,17 +19,14 @@ const start = async () => {
   });
 
   io.use(sharedSession(mySession));
-  io.on('connection' , (socket:IcustomHandshake)=>{
+  io.on('connection', (socket: IcustomHandshake) => {
     if (socket.handshake.session.jwt) {
       console.log(socket.handshake.session);
       console.log('user connect with auth');
     } else {
       console.log('user connect without auth');
-      
     }
   });
-  
-
 };
 
 start();

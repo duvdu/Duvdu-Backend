@@ -17,7 +17,7 @@ spec:
           image: duvdu/chat
           env:
             - name: MONGO_URI
-              value: "mongodb://chat-mongo-srv:27017/duvdu_chat"
+              value: "mongodb://mongodb-service:27017/duvdu"
             - name: JWT_KEY
               valueFrom:
                 secretKeyRef:

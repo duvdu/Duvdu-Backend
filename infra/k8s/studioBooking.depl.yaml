@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: studio-booking-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: studio-booking
+  template:
+    metadata:
+      labels:
+        app: studio-booking
+    spec:
+      containers:
+        - name: studio-booking
+          image: duvdu/studio-booking
+          env:
+            - name: MONGO_URI
+              value: "mongodb://mongodb-service:27017/duvdu"
+            - name: JWT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret
+                  key: JWT_KEY
+            - name: SESSION_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: session-secret
+                  key: sessionSecret
+            - name: REDIS_HOST
+              value: redis://expiration-redis-srv:6379
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: studio-booking-srv
+spec:
+  selector:
+    app: studio-booking
+  ports:
+    - name: studio-booking
+      protocol: TCP 
+      port: 3000
+      targetPort: 3000

@@ -9,7 +9,7 @@ export const env = {
     uri: process.env.MONGO_URI as string,
   },
   redis: {
-    uri: process.env.REDIS_URI as string,
+    uri: process.env.REDIS_HOST as string,
   },
   expressSession: {
     secret: process.env.SESSION_SECRET as string,

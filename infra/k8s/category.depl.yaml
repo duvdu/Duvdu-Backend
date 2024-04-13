@@ -17,7 +17,7 @@ spec:
           image: duvdu/category
           env:
             - name: MONGO_URI
-              value: "mongodb://category-mongo-srv:27017/duvdu_category"
+              value: "mongodb://mongodb-service:27017/duvdu"
             - name: JWT_KEY
               valueFrom:
                 secretKeyRef:

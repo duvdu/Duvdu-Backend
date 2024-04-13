@@ -7,7 +7,7 @@ import session from 'express-session';
 import { env } from './config/env';
 
 export const app = express();
-app.use(cors({ origin: '*' }));
+app.use(cors({ origin: ['*', 'http://localhost:8080'] }));
 app.set('trust proxy', true);
 app.use(express.json());
 export const mySession = session({

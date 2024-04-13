@@ -8,7 +8,7 @@ import session from 'express-session';
 import { env } from './config/env';
 import { apiRoutes } from './routes';
 export const app = express();
-app.use(cors({ origin: '*' }));
+app.use(cors({ origin: ['*', 'http://localhost:8080'] }));
 app.use(express.json());
 
 app.use(

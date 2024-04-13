@@ -17,7 +17,7 @@ spec:
           image: duvdu/portfolio-post
           env:
             - name: MONGO_URI
-              value: "mongodb://portfolio-post-mongo-srv:27017/portfolio-post"
+              value: "mongodb://mongodb-service:27017/duvdu"
             - name: SESSION_SECRET
               valueFrom:
                 secretKeyRef:
