@@ -18,7 +18,7 @@ export const createProjectHandler:CreateProjectHandler = async (req,res,next)=>{
   if (category.cycle != 2)
     return next(new BadRequestError('this category not related to this cycle'));
 
-  const project = await studioBooking.create({...req.body , user:req.loggedUser.id}); 
+  const project = await studioBooking.create({...req.body}); 
   
   await new Bucket().saveBucketFiles(FOLDERS.studio_booking , ...attachments , ...cover);
   project.cover = `${FOLDERS.studio_booking}/${cover[0].filename}`;
@@ -26,5 +26,5 @@ export const createProjectHandler:CreateProjectHandler = async (req,res,next)=>{
   await project.save();
   Files.removeFiles(...project.attachments , project.cover);
 
-  res.status(201).json(<any>{message:'success' , attachments , cover});
+  res.status(201).json({message:'success' ,data:project});
 };

@@ -53,10 +53,11 @@ export interface CreateProjectHandler
     >
   > {}
 
+  
 export interface UpdateProjectHandler
   extends RequestHandler<
     { projectId: string },
-    successResponse<unknown>,
+    successResponse<{data:IstudioBooking}>,
     Partial<
       Pick<
         Iproject,
@@ -67,7 +68,6 @@ export interface UpdateProjectHandler
         | 'studioEmail'
         | 'desc'
         | 'location'
-        | 'equipments'
         | 'searchKeywords'
         | 'pricePerHour'
         | 'insurance'
@@ -97,7 +97,7 @@ export interface GetProjectsHandler
   > {}
 
 export interface GetProjectHandler
-  extends RequestHandler<{ projectId: string }, successResponse<{ data: Iproject }>> {}
+  extends RequestHandler<{ projectId: string }, successResponse<{ data: IstudioBooking }>> {}
 
 export interface RemoveProjectHandler
   extends RequestHandler<{ projectId: string }, successResponse<unknown>> {}
@@ -118,3 +118,12 @@ export interface BookProjectHandler
       | 'totalAmount'
     >
   > {}
+
+export interface UpdateEquipmentHandler
+  extends RequestHandler<{projectId:string ,equipmentId:string} , successResponse<{data:IstudioBooking}> , {name:string , fees:number} , unknown>{}
+export interface AddEquipmentHandler
+  extends RequestHandler<{projectId:string} , successResponse<{data:IstudioBooking}> , {name:string , fees:number} , unknown>{}
+  
+export interface DeleteEquipmentHandler
+  extends RequestHandler<{projectId:string ,equipmentId:string} , successResponse<unknown> , unknown , unknown>{}
+

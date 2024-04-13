@@ -10,9 +10,6 @@
     "skipLibCheck": true,
   },
   "include": [
-    "src/**/*.ts",
-    "custom.d.ts",
-    "../auth/src/types/custom-definition.ts",
-    "../portfolio-post/src/types/custom-definition.ts",
+    "src/**/*.ts"
   ],
 }
