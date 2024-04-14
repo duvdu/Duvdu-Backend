@@ -3,7 +3,7 @@ services:
   mongo:
     image: mongo:latest
     ports:
-      - '8080:27017'
+      - '4040:27017'
     command: ["mongod", "--syslog"]
     
   redis:
