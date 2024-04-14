@@ -14,5 +14,5 @@ export const createCategoryHandler: CreateCategoryHandler = async (req, res, nex
 
   if (!category) return next(new BadRequestError('can not create category'));
   saveFiles('images', image);
-  res.status(201).json({ message: 'success' });
+  res.status(201).json({ message: 'success' , data:category });
 };

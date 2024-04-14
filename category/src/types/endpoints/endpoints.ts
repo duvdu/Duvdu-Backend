@@ -11,7 +11,7 @@ type successResponse<T> = T & {
 export interface CreateCategoryHandler
   extends RequestHandler<
     unknown,
-    successResponse<unknown>,
+    successResponse<{data:Icategory}>,
     Pick<Icategory, 'title' | 'image' | 'cycle' | 'tags' | 'jobTitles' | 'status'>,
     unknown
   > {}
@@ -19,7 +19,7 @@ export interface CreateCategoryHandler
 export interface UpdateCategoryHandler
   extends RequestHandler<
     { categoryId: string },
-    successResponse<unknown>,
+    successResponse<{data:Icategory}>,
     Partial<Pick<Icategory, 'image' | 'cycle' | 'tags' | 'title' | 'jobTitles' | 'status'>>,
     unknown
   > {}

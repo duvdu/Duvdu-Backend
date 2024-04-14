@@ -5,6 +5,7 @@ import {
   PERMISSIONS,
   uploadProjectMedia,
   isauthorized,
+  FOLDERS,
 } from '@duvdu-v1/duvdu';
 import { Router } from 'express';
 
@@ -23,7 +24,7 @@ router
   .post(
     isauthenticated,
     isauthorized(PERMISSIONS.createProtfolioProjectHandler),
-    uploadProjectMedia(),
+    uploadProjectMedia(FOLDERS.portfolio_post),
     checkRequiredFields({ fields: ['cover', 'attachments'] }),
     val.create,
     handlers.createProjectHandler,
@@ -52,7 +53,7 @@ router
   .patch(
     isauthenticated,
     isauthorized(PERMISSIONS.updatePortfolioProjectHandler as any),
-    uploadProjectMedia(),
+    uploadProjectMedia(FOLDERS.portfolio_post),
     val.update,
     handlers.updateProjectHandler,
   )

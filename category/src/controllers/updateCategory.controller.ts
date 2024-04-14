@@ -16,6 +16,6 @@ export const updateCategoryHandler: UpdateCategoryHandler = async (req, res, nex
 
   saveFiles('images', image);
   removeFiles(image ? category.image : undefined);
-
-  res.status(200).json({ message: 'success' });
+  const updatedCategory = await category.save();
+  res.status(200).json({ message: 'success' , data:updatedCategory });
 };

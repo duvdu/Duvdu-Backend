@@ -1,14 +1,22 @@
 import { globalErrorHandlingMiddleware, sessionStore } from '@duvdu-v1/duvdu';
+import cors from 'cors';
 import express from 'express';
 import session from 'express-session';
 
 import { env } from './config/env';
 import { router as categoryRoutes } from './routes/index';
-
 export const app = express();
 
 app.set('trust proxy', true);
 app.use(express.json());
+
+app.use(
+  cors({
+    origin: ['*' , 'http://localhost:3000'],
+    credentials:true,
+    exposedHeaders: ['set-cookie']
+  }),
+);
 
 app.use(
   session({
