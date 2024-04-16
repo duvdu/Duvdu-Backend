@@ -9,5 +9,6 @@ export enum MODELS {
   ticket = 'tickets',
   portfolioPost = 'portfolio-post',
   studioBooking = 'studio-booking',
-  report = 'report'
+  report = 'report',
+  copyrights = 'copyrights'
 }

@@ -6,18 +6,12 @@ import express from 'express';
 import session from 'express-session';
 
 import { env } from './config/env';
-import { apiRoutes } from './routes';
+import { apiRoutes } from '../src/routes';
+
 export const app = express();
 app.use(cors({ origin: ['*', 'http://localhost:8080'] }));
-app.use(express.json());
 
-app.use(
-  cors({
-    origin: ['*' , 'http://localhost:3000'],
-    credentials:true,
-    exposedHeaders: ['set-cookie']
-  }),
-);
+app.use(express.json());
 
 app.use(
   session({
@@ -36,6 +30,6 @@ app.use(
   }),
 );
 
-app.use('/api/portfolio-post', apiRoutes);
+app.use('/api/copyrights', apiRoutes);
 
 app.use(globalErrorHandlingMiddleware);

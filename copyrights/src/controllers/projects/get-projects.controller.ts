@@ -1,4 +1,4 @@
-import { IportfolioPost, PaginationResponse, PortfolioPosts } from '@duvdu-v1/duvdu';
+import { PaginationResponse, CopyRights, IcopyRights } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 export const getProjectsPagination: RequestHandler<
@@ -7,36 +7,26 @@ export const getProjectsPagination: RequestHandler<
   unknown,
   {
     search?: string;
+    user?: string;
     address?: string;
-    tools?: string[];
-    tags?: string[];
-    projectBudgetFrom?: number;
-    projectBudgetTo?: number;
     category?: string;
-    creative?: string;
+    priceFrom?: number;
+    priceTo?: number;
     isDeleted?: boolean;
     startDate?: Date;
     endDate?: Date;
   }
 > = (req, res, next) => {
   if (req.query.search) req.pagination.filter.$text = { $search: req.query.search };
+  if (req.query.user) req.pagination.filter.user = req.query.user;
   if (req.query.address)
     req.pagination.filter.address = { $regex: req.query.address, $options: 'i' };
-  if (req.query.tools) req.pagination.filter.tools = { $elemMatch: { name: req.query.tools } };
-  if (req.query.tags) req.pagination.filter.tags = { $in: req.query.tags };
-  if (req.query.projectBudgetFrom)
-    req.pagination.filter.projectBudget = { $gte: req.query.projectBudgetFrom };
-  if (req.query.projectBudgetTo)
-    req.pagination.filter.projectBudget = {
+  if (req.query.priceFrom) req.pagination.filter.price = { $gte: req.query.priceFrom };
+  if (req.query.priceTo)
+    req.pagination.filter.price = {
       ...req.pagination.filter.projectBudget,
-      $lte: req.query.projectBudgetTo,
+      $lte: req.query.priceTo,
     };
-  if (req.query.creative) {
-    req.pagination.filter.$or = [
-      { user: req.query.creative },
-      { creatives: { $elemMatch: { creative: req.query.creative } } },
-    ];
-  }
   if (req.query.category) req.pagination.filter.category = req.query.category;
   if (req.query.startDate || req.query.endDate)
     req.pagination.filter.createdAt = {
@@ -51,13 +41,13 @@ export const getProjectsPagination: RequestHandler<
 
 export const getProjectsHandler: RequestHandler<
   unknown,
-  PaginationResponse<{ data: IportfolioPost[] }>
+  PaginationResponse<{ data: IcopyRights[] }>
 > = async (req, res) => {
-  const resultCount = await PortfolioPosts.countDocuments({
+  const resultCount = await CopyRights.countDocuments({
     ...req.pagination.filter,
     isDeleted: { $ne: true },
   });
-  const projects = await PortfolioPosts.find({ ...req.pagination.filter, isDeleted: { $ne: true } })
+  const projects = await CopyRights.find({ ...req.pagination.filter, isDeleted: { $ne: true } })
     .sort('-createdAt')
     .limit(req.pagination.limit)
     .skip(req.pagination.skip);
