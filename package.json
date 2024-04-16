@@ -1,7 +1,0 @@
-{
-  "scripts": {
-  "start": "docker-compose up --build",
-  "start:copyrights": "docker-compose -f docker-compose-copyrights.yml up --build",
-  "watch:copyrights": "docker-compose -f docker-compose-copyrights.yml watch"
-  }
-}
