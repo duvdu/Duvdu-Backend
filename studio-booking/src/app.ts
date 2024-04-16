@@ -1,4 +1,5 @@
 import { globalErrorHandlingMiddleware, sessionStore } from '@duvdu-v1/duvdu';
+import cors from 'cors';
 import express from 'express';
 import session from 'express-session';
 
@@ -6,6 +7,7 @@ import { env } from './config/env';
 import { router as studioBookingRoutes } from '../src/routes';
 
 export const app = express();
+app.use(cors({ origin: ['*', 'http://localhost:8080'] }));
 
 app.set('trust proxy', true);
 app.use(express.json());

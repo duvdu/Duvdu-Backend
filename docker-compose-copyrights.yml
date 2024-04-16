@@ -89,12 +89,12 @@ services:
   #     - mongo
   #     - redis
   
-  equipment-rental: 
+  copyrights: 
     build:
-      context: ./equipment-rental
+      context: ./copyrights
       dockerfile: Dockerfile
     env_file:
-      - ./equipment-rental/.env
+      - ./copyrights/.env
     environment: 
       - MONGO_URI=mongodb://mongo:27017/
     deploy:
@@ -108,7 +108,7 @@ services:
     develop:
       watch:
         - action: sync+restart
-          path: ./equipment-rental
+          path: ./copyrights
           target: /app
           ignore:
             - node_modules/
@@ -123,11 +123,11 @@ services:
     ports:
       - '3000:80'
     volumes:
-      - ./nginx/equipment-rental.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/copyrights.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - auth
       # - chat
       # - category
       # - portfolio-post
-      - equipment-rental
+      - copyrights
 

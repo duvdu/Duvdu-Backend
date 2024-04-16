@@ -1,32 +1,39 @@
+import 'express-async-errors';
 import { globalErrorHandlingMiddleware, sessionStore } from '@duvdu-v1/duvdu';
+import cors from 'cors';
 import express from 'express';
 import session from 'express-session';
 
 import { env } from './config/env';
-import { router as categoryRoutes } from './routes/index';
+import { router } from './routes';
 
 export const app = express();
-
+app.use(cors({ origin: ['*', 'http://localhost:8080'] }));
 app.set('trust proxy', true);
 app.use(express.json());
+export const mySession = session({
+  secret: env.expressSession.secret,
+  resave: false,
+  saveUninitialized: false,
+  store:
+    env.environment !== 'test' && env.expressSession.allowUseStorage
+      ? sessionStore(env.redis.uri)
+      : undefined,
+  cookie: {
+    sameSite: 'lax',
+    secure: env.environment === 'production',
+    httpOnly: true,
+  },
+});
 
-app.use(
-  session({
-    secret: env.expressSession.secret,
-    resave: false,
-    saveUninitialized: false,
-    store:
-      env.environment !== 'test' && env.expressSession.allowUseStorage ? sessionStore(env.redis.uri) : undefined,
-    cookie: {
-      sameSite: 'lax',
-      secure: env.environment === 'production',
-      httpOnly: true,
-    },
-  }),
-);
-// app.get('/test', (req:express.Request, res:express.Response) => {
-//   req.session.access = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZmYzMGQ1YmI5OTUwOTY1ZDQzZGVhZCIsImlzQmxvY2tlZCI6eyJ2YWx1ZSI6ZmFsc2V9LCJpc1ZlcmlmaWVkIjpmYWxzZSwicm9sZSI6eyJrZXkiOiJ1bnZlcmlmaWVkIiwicGVybWlzc2lvbnMiOlsiY2hhbmdlUGFzc3dvcmQiLCJ1cGRhdGVQcm9maWxlIl19LCJpYXQiOjE3MTEyMjI5OTcsImV4cCI6MTcxMTY1NDk5N30.aGkU73UQSr5h34WbA1raJrbYP6VsqYbMhnQl9tYScyw';
+app.use(mySession);
+
+app.use('/api/category', router);
+
+// app.use(mySession);
+// app.get('/test', (req, res) => {
+//   req.session.jwt = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZGUyYTA5YjMyYjlkZTE1ZDk2MzMwZCIsInBsYW5JZCI6IjY1ZGUyYTA5YjMyYjlkZTE1ZDk2MzMwZiIsImlhdCI6MTcwOTA1OTg4MX0.dLKNTuS_701l72jcs7thSchj1raK6548nxIkGHqEboE';
 //   res.send('Session cookie generated successfully.');
 // });
-app.use('/api/category', categoryRoutes);
+
 app.use(globalErrorHandlingMiddleware);

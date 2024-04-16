@@ -29,13 +29,17 @@ export const updateProjectHandler: RequestHandler<
       | 'showOnHome'
       | 'tools'
       | 'tags'
+      | 'isDeleted'
     > & { invitedCreatives: [{ phoneNumber: { number: string }; fees: number }] }
   >
 > = async (req, res, next) => {
   const attachments = <Express.Multer.File[] | undefined>(req.files as any)?.attachments;
   const cover = <Express.Multer.File[] | undefined>(req.files as any)?.cover;
 
-  const project = await PortfolioPosts.findById(req.params.projectId);
+  const project = await PortfolioPosts.findOne({
+    _id: req.params.projectId,
+    isDeleted: { $ne: true },
+  });
   if (!project) return next(new NotFound('project not found'));
 
   if (project.user.toString() !== req.loggedUser.id)
