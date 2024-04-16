@@ -2,13 +2,12 @@ import { NotFound, UnauthenticatedError, UnauthorizedError, Users, SuccessRespon
 import { RequestHandler } from 'express';
 
 import { AskUpdatePhoneNumberHandler } from '../../types/endpoints/user.endpoints';
-import { comparePassword } from '../../utils/bcrypt';
 import { hashVerificationCode } from '../../utils/crypto';
 import { generateRandom6Digit } from '../../utils/gitRandom6Dugut';
 
 export const askUpdatePhoneNumberHandler: AskUpdatePhoneNumberHandler = async (req, res, next) => {
   const currentUser = await Users.findById(req.loggedUser?.id);
-  if (!currentUser || !comparePassword(req.body.password!, currentUser.password || ''))
+  if (!currentUser)
     return next(new UnauthenticatedError());
 
   const randomCode = generateRandom6Digit();

@@ -38,7 +38,6 @@ export * from './types/Pagination';
 export * from './types/Plan';
 export * from './types/Projects';
 export * from './types/Rate';
-export * from './types/Report';
 export * from './types/Role';
 export * from './types/Terms';
 export * from './types/Ticket';

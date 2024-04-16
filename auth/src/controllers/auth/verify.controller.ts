@@ -29,6 +29,7 @@ export const verifyHandler: RequestHandler<
     user.isVerified = true;
     user.verificationCode.reason = undefined;
     const role = await Roles.findOne({ key: SystemRoles.verified });
+    
     user.role = role?.id;
   }
 
