@@ -1,7 +1,7 @@
 node_modules
 .todo
 .todo.md
-# .env
+.env
 package-lock.json
 yarn.lock
 projects
