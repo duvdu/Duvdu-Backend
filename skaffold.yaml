@@ -47,3 +47,11 @@ build:
         manual:
           - src: "src/**/*.ts"
             dest: .
+    - image: duvdu/copyright
+      context: copyrights
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .

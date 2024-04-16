@@ -9,7 +9,13 @@ import { env } from './config/env';
 import { apiRoutes } from '../src/routes';
 
 export const app = express();
-app.use(cors({ origin: ['*', 'http://localhost:8080'] }));
+app.use(
+  cors({
+    origin: ['*' , 'http://localhost:3000'],
+    credentials:true,
+    exposedHeaders: ['set-cookie']
+  }),
+);
 
 app.use(express.json());
 

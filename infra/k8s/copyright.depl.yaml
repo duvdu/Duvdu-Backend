@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: copyright-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: copyright
+  template:
+    metadata:
+      labels:
+        app: copyright
+    spec:
+      containers:
+        - name: copyright
+          image: duvdu/copyright
+          env:
+            - name: MONGO_URI
+              value: "mongodb://mongodb-service:27017/duvdu"
+            - name: JWT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret
+                  key: JWT_KEY
+            - name: SESSION_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: session-secret
+                  key: sessionSecret
+            - name: REDIS_HOST
+              value: redis://expiration-redis-srv:6379
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: copyright-srv
+spec:
+  selector:
+    app: copyright
+  ports:
+    - name: copyright
+      protocol: TCP 
+      port: 3000
+      targetPort: 3000

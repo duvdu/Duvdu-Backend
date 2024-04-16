@@ -19,7 +19,7 @@ app.use(
   }),
 );
 
-export const mySession =app.use(
+app.use(
   session({
     secret: env.expressSession.secret,
     resave: false,
@@ -34,7 +34,6 @@ export const mySession =app.use(
   }),
 );
 
-app.use(mySession);
 
 app.use('/api/category', categoryRoutes);
 

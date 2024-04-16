@@ -38,6 +38,13 @@ spec:
                   name: studio-booking-srv
                   port: 
                     number: 3000
+          - path: /api/copyrights/?(.*)
+            pathType: Prefix
+            backend: 
+              service:
+                  name: copyright-srv
+                  port: 
+                    number: 3000
           - path: /?(.*)
             pathType: Prefix
             backend: 
