@@ -36,7 +36,7 @@ const categorySchema = new mongoose.Schema<Icategory>(
     collection:MODELS.category,
     toJSON: {
       transform(doc, ret) {
-        if (ret.cover) ret.cover = process.env.BUCKET_HOST + '/' + ret.cover;
+        if (ret.image) ret.image = process.env.BUCKET_HOST + '/' + ret.cover;
       }
     },
   },
