@@ -28,6 +28,27 @@ spec:
                 secretKeyRef:
                   name: session-secret
                   key: sessionSecret
+            - name: BUCKET_ACESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: bucket-acess-key
+                  key: BUCKET_ACESS_KEY
+            - name: BUCKET_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: bucket-secret-key
+                  key: BUCKET_SECRET_KEY
+            - name: BUCKET_REGION
+              valueFrom:
+                secretKeyRef:
+                  name: bucket-region
+                  key: BUCKET_REGION
+            - name: BUCKET_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: bucket-name
+                  key: BUCKET_NAME
+            - name: BUCKET_HOST
             - name: REDIS_HOST
               value: redis://expiration-redis-srv:6379
 

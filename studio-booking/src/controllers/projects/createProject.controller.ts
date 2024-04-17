@@ -13,7 +13,6 @@ import { createInvitedUsers } from '../../services/create-invited-users';
 import { CreateProjectHandler } from '../../types/endpoints/endpoints';
 
 export const createProjectHandler: CreateProjectHandler = async (req, res, next) => {
-  console.log(true);
 
   const attachments = <Express.Multer.File[]>(req.files as any).attachments;
   const cover = <Express.Multer.File[]>(req.files as any).cover;

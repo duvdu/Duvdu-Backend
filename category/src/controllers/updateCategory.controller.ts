@@ -1,21 +1,25 @@
-import { NotFound, Categories } from '@duvdu-v1/duvdu';
+import { NotFound, Categories, Bucket, FOLDERS, Files } from '@duvdu-v1/duvdu';
 
 import { UpdateCategoryHandler } from '../types/endpoints/endpoints';
-import { saveFiles, removeFiles } from '../utils/file';
 
 export const updateCategoryHandler: UpdateCategoryHandler = async (req, res, next) => {
-  const files = <{ image?: [Express.Multer.File] }>req.files;
-  const image = files.image ? files.image[0] : undefined;
+  const cover = <Express.Multer.File[] | undefined>(req.files as any).cover;
+  const category = await Categories.findById(req.params.categoryId);
+  if (!category) 
+    return next(new NotFound('category not found'));
+  const s3 = new Bucket();
+  if (cover) {
+    await s3.saveBucketFiles(FOLDERS.category , ...cover);
+    req.body.image = `${FOLDERS.category}/${cover[0].filename}`;
+    await s3.removeBucketFiles(category.image);
+    Files.removeFiles(req.body.image);
+    delete req.body.cover;
+  }
 
-  const category = await Categories.findByIdAndUpdate(req.params.categoryId, {
-    ...req.body,
-    [image ? 'image' : (null as any)]: `/media/images/${image?.filename}`,
-  });
+  const newCategory = await Categories.findByIdAndUpdate(req.params.categoryId, req.body , {new:true});
 
-  if (!category) return next(new NotFound('can not update category'));
+  if (!newCategory) return next(new NotFound('can not update category'));
 
-  saveFiles('images', image);
-  removeFiles(image ? category.image : undefined);
-  const updatedCategory = await category.save();
-  res.status(200).json({ message: 'success' , data:updatedCategory });
+  res.status(200).json({ message: 'success' , data:newCategory });
 };
+
