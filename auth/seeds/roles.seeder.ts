@@ -3,6 +3,7 @@ import {  PERMISSIONS , SystemRoles , Roles } from '@duvdu-v1/duvdu';
 
 // import { env } from '../src/config/env';
 
+
 export const appInit = async () => {
   // await dbConnection(env.mongoDb.uri);
   if (!(await Roles.findOne({ key: SystemRoles.admin })))
