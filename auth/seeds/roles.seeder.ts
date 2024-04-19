@@ -5,7 +5,6 @@ import { env } from '../src/config/env';
 
 export const appInit = async () => {
   // await dbConnection(env.mongoDb.uri);
-  console.log(await Roles.find());
   if (!(await Roles.findOne({ key: SystemRoles.admin })))
     await Roles.create({ key: SystemRoles.admin, system: true, permissions: [] });
   if (!(await Roles.findOne({ key: SystemRoles.verified })))
