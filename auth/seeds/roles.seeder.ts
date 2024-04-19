@@ -1,7 +1,7 @@
-import { dbConnection , PERMISSIONS , SystemRoles , Roles } from '@duvdu-v1/duvdu';
-import mongoose from 'mongoose';
+import { PERMISSIONS , SystemRoles , Roles } from '@duvdu-v1/duvdu';
+// import mongoose from 'mongoose';
 
-import { env } from '../src/config/env';
+// import { env } from '../src/config/env';
 
 export const appInit = async () => {
   // await dbConnection(env.mongoDb.uri);
