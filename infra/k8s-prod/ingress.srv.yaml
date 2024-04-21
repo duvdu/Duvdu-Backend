@@ -4,6 +4,7 @@ metadata:
   name: ingress-service
   annotations:
     nginx.ingress.kubernetes.io/use-regex: 'true'
+    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   ingressClassName: nginx
   rules:
@@ -52,7 +53,56 @@ spec:
                   name: chat-srv
                   port: 
                     number: 3000
-
+    - host: duvdu.com
+      http:
+        paths:
+          - path: /api/users/?(.*)
+            pathType: Prefix
+            backend: 
+              service:
+                  name: auth-srv
+                  port: 
+                    number: 3000
+          - path: /api/category/?(.*)
+            pathType: Prefix
+            backend: 
+              service:
+                  name: category-srv
+                  port: 
+                    number: 3000
+          - path: /api/portfolio-post/?(.*)
+            pathType: Prefix
+            backend: 
+              service:
+                  name: portfolio-post-srv
+                  port: 
+                    number: 3000
+          - path: /api/studio-booking/?(.*)
+            pathType: Prefix
+            backend: 
+              service:
+                  name: studio-booking-srv
+                  port: 
+                    number: 3000
+          - path: /api/copyrights/?(.*)
+            pathType: Prefix
+            backend: 
+              service:
+                  name: copyright-srv
+                  port: 
+                    number: 3000
+          - path: /?(.*)
+            pathType: Prefix
+            backend: 
+              service:
+                  name: chat-srv
+                  port: 
+                    number: 3000
+  tls:
+    - hosts:
+        - www.duvdu.com
+        - duvdu.com
+      secretName: www-duvdu-com-tls
 
 ---
 apiVersion: v1
