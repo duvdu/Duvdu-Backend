@@ -34,7 +34,7 @@ export const mySession = session({
 });
 
 app.use(mySession);
-app.get('/api/chat/' , (req,res)=>{
+app.use('/api/chat/' , (req,res)=>{
   res.send({d:req.protocol , f:env.environment === 'production'});
 });
 
