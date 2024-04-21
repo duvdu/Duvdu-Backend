@@ -34,6 +34,10 @@ export const mySession = session({
 });
 
 app.use(mySession);
+app.get('/' , (req,res)=>{
+  console.log(req.protocol);
+  console.log(env.environment === 'production');
+});
 
 // app.get('/test', (req, res) => {
 //   req.session.jwt = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZGUyYTA5YjMyYjlkZTE1ZDk2MzMwZCIsInBsYW5JZCI6IjY1ZGUyYTA5YjMyYjlkZTE1ZDk2MzMwZiIsImlhdCI6MTcwOTA1OTg4MX0.dLKNTuS_701l72jcs7thSchj1raK6548nxIkGHqEboE';
