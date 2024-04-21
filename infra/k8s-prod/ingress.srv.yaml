@@ -46,7 +46,7 @@ spec:
                   name: copyright-srv
                   port: 
                     number: 3000
-          - path: /?(.*)
+          - path: /api/chat/?(.*)
             pathType: Prefix
             backend: 
               service:
@@ -91,7 +91,7 @@ spec:
                   name: copyright-srv
                   port: 
                     number: 3000
-          - path: /?(.*)
+          - path: /api/chat/?(.*)
             pathType: Prefix
             backend: 
               service:
