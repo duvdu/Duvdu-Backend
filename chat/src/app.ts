@@ -35,8 +35,7 @@ export const mySession = session({
 
 app.use(mySession);
 app.get('/' , (req,res)=>{
-  console.log(req.protocol);
-  console.log(env.environment === 'production');
+  res.send({d:req.protocol , f:env.environment === 'production'});
 });
 
 // app.get('/test', (req, res) => {
