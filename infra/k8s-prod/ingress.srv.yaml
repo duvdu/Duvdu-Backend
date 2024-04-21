@@ -11,6 +11,13 @@ spec:
     - host: www.duvdu.com
       http:
         paths:
+          - path: /api/chat/?(.*)
+            pathType: Prefix
+            backend: 
+              service:
+                  name: chat-srv
+                  port: 
+                    number: 3000
           - path: /api/users/?(.*)
             pathType: Prefix
             backend: 
@@ -46,16 +53,17 @@ spec:
                   name: copyright-srv
                   port: 
                     number: 3000
-          - path: /api/chat/?(.*)
-            pathType: Prefix
-            backend: 
-              service:
-                  name: chat-srv
-                  port: 
-                    number: 3000
+
     - host: duvdu.com
       http:
         paths:
+          - path: /api/chat/?(.*)
+            pathType: Prefix
+            backend: 
+              service:
+                  name: chat-srv
+                  port: 
+                    number: 3000
           - path: /api/users/?(.*)
             pathType: Prefix
             backend: 
@@ -91,13 +99,7 @@ spec:
                   name: copyright-srv
                   port: 
                     number: 3000
-          - path: /api/chat/?(.*)
-            pathType: Prefix
-            backend: 
-              service:
-                  name: chat-srv
-                  port: 
-                    number: 3000
+
   tls:
     - hosts:
         - www.duvdu.com
