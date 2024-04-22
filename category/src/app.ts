@@ -28,7 +28,7 @@ app.use(
     store:
       env.environment !== 'test' && env.expressSession.allowUseStorage ? sessionStore(env.redis.uri) : undefined,
     cookie: {
-      sameSite: 'lax',
+      sameSite: 'none',
       secure: env.environment === 'production',
       httpOnly: true,
     },
@@ -37,10 +37,6 @@ app.use(
 
 
 app.use('/api/category', categoryRoutes);
-app.use('*' , (req,res)=>{
-  res.send('doneeeeeee');
-});
-
 // app.use(mySession);
 // app.get('/test', (req, res) => {
 //   req.session.jwt = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZGUyYTA5YjMyYjlkZTE1ZDk2MzMwZCIsInBsYW5JZCI6IjY1ZGUyYTA5YjMyYjlkZTE1ZDk2MzMwZiIsImlhdCI6MTcwOTA1OTg4MX0.dLKNTuS_701l72jcs7thSchj1raK6548nxIkGHqEboE';
