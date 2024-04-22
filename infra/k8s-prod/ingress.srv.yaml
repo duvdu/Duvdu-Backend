@@ -116,7 +116,7 @@ metadata:
     service.beta.kubernetes.io/do-loadbalancer-enable-proxy-protocol: 'true'
     service.beta.kubernetes.io/do-loadbalancer-hostname: 'www.duvdu.com'
     service.beta.kubernetes.io/do-loadbalancer-size-unit: "6"
-    service.beta.kubernetes.io/do-loadbalancer-allow-rules: "ip:0.0.0.0/0"
+    service.beta.kubernetes.io/do-loadbalancer-allow-rules: "ip:164.92.158.68,ip:159.223.217.125,ip:188.166.11.66,ip:164.92.150.87,ip:164.92.158.12,ip:159.223.217.94"
 
   labels:
     helm.sh/chart: ingress-nginx-2.0.3
