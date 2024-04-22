@@ -2,6 +2,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: ingress-service
+  namespace: ingress-nginx
   annotations:
     nginx.ingress.kubernetes.io/use-regex: 'true'
     cert-manager.io/cluster-issuer: letsencrypt-prod
@@ -116,7 +117,7 @@ metadata:
     service.beta.kubernetes.io/do-loadbalancer-enable-proxy-protocol: 'true'
     service.beta.kubernetes.io/do-loadbalancer-hostname: 'www.duvdu.com'
     service.beta.kubernetes.io/do-loadbalancer-size-unit: "6"
-    
+
   labels:
     helm.sh/chart: ingress-nginx-2.0.3
     app.kubernetes.io/name: ingress-nginx
