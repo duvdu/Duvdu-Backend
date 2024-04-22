@@ -7,9 +7,8 @@ import { env } from './config/env';
 import { router as studioBookingRoutes } from '../src/routes';
 
 export const app = express();
-
-app.set('trust proxy', true);
 app.use(express.json());
+app.set('trust proxy', true);
 
 app.use(
   cors({
