@@ -9,6 +9,8 @@ import { env } from './config/env';
 import { apiRoutes } from '../src/routes';
 
 export const app = express();
+app.use(express.json());
+app.set('trust proxy', true);
 app.use(
   cors({
     origin: ['*' , 'http://localhost:3000'],
@@ -17,7 +19,6 @@ app.use(
   }),
 );
 
-app.use(express.json());
 
 app.use(
   session({
