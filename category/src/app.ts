@@ -37,6 +37,9 @@ app.use(
 
 
 app.use('/api/category', categoryRoutes);
+app.use('*' , (req,res)=>{
+  res.send('doneeeeeee');
+});
 
 // app.use(mySession);
 // app.get('/test', (req, res) => {
