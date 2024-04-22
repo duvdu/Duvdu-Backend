@@ -8,7 +8,6 @@ import { env } from './config/env';
 import { router as categoryRoutes } from './routes/index';
 
 export const app = express();
-app.set('trust proxy', true);
 app.use(express.json());
 
 app.use(
@@ -18,6 +17,7 @@ app.use(
     exposedHeaders: ['set-cookie']
   }),
 );
+
 
 app.use(
   session({

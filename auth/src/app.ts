@@ -10,7 +10,6 @@ import { passport } from './controllers/auth/passport.controller';
 import { apiRoutes } from './routes';
 export const app = express();
 
-app.use(cors({ origin: ['*', 'http://localhost:8080'] }));
 app.use(express.json());
 
 app.use(
