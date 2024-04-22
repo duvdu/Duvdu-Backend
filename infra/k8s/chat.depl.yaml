@@ -60,7 +60,6 @@ metadata:
 spec:
   selector:
     app: chat
-    namespace: ingress-nginx
   ports:
     - name: chat
       protocol: TCP 
