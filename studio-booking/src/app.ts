@@ -28,7 +28,7 @@ app.use(
         ? sessionStore(env.redis.uri)
         : undefined,
     cookie: {
-      sameSite: 'lax',
+      sameSite: 'none',
       secure: env.environment === 'production',
       httpOnly: true,
     },
