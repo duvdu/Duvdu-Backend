@@ -60,3 +60,4 @@ export * from './models/portfolio-post.model';
 export * from './models/copyrights.model';
 export * from './models/studio-booking.model';
 export * from './models/allProjects.model';
+export * from './models/report.model';
