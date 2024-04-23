@@ -15,7 +15,7 @@ export const Project = model<Iproject>(MODELS.projects , new Schema<Iproject>({
   project:{
     type:{
       type:Schema.Types.ObjectId,
-      ref:'Any'
+      refPath: 'project.ref'
     },
     ref:String
   }
