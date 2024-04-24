@@ -31,6 +31,6 @@ export const appInit = async () => {
     });
 
   if (!(await Users.findOne({role:adminRole._id}))) 
-    await Users.create({username: 'a7mds3d', password: '@A7md123' , role:adminRole?._id , isVerified:true});
+    await Users.create({username: 'metoooo', password: '@A7md123' , role:adminRole?._id , isVerified:true});
   // await mongoose.connection.close();
 };
