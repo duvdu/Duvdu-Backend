@@ -1,3 +1,4 @@
+import 'express-async-errors';
 import { IstudioBooking, PaginationResponse, studioBooking } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 

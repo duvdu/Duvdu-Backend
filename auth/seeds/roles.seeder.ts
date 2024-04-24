@@ -1,5 +1,5 @@
 
-import {  PERMISSIONS , SystemRoles , Roles } from '@duvdu-v1/duvdu';
+import {  PERMISSIONS , SystemRoles , Roles, Users } from '@duvdu-v1/duvdu';
 
 // import mongoose from 'mongoose';
 
@@ -8,8 +8,9 @@ import {  PERMISSIONS , SystemRoles , Roles } from '@duvdu-v1/duvdu';
 
 export const appInit = async () => {
   // await dbConnection(env.mongoDb.uri);
-  if (!(await Roles.findOne({ key: SystemRoles.admin })))
-    await Roles.create({ key: SystemRoles.admin, system: true, permissions: [] });
+  let adminRole = await Roles.findOne({ key: SystemRoles.admin });
+  if (!adminRole)
+    adminRole = await Roles.create({ key: SystemRoles.admin, system: true, permissions: [] });
   if (!(await Roles.findOne({ key: SystemRoles.verified })))
     await Roles.create({
       key: SystemRoles.verified,
@@ -28,6 +29,8 @@ export const appInit = async () => {
       system: true,
       permissions: [PERMISSIONS.changePassword, PERMISSIONS.updateProfile],
     });
-    
+
+  if (!(await Users.findOne({role:adminRole._id}))) 
+    await Users.create({username: 'a7mds3d', password: '@A7md123' , role:adminRole?._id , isVerified:true});
   // await mongoose.connection.close();
 };

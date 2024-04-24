@@ -1,3 +1,5 @@
+import 'express-async-errors';
+
 import { NotAllowedError, studioBooking } from '@duvdu-v1/duvdu';
 
 import { RemoveProjectHandler } from '../../types/endpoints/endpoints';

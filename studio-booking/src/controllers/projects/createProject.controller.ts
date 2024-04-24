@@ -1,10 +1,13 @@
+import 'express-async-errors';
 import {
   BadRequestError,
   Bucket,
   Categories,
   Files,
   FOLDERS,
+  MODELS,
   NotFound,
+  Project,
   studioBooking,
   Users,
 } from '@duvdu-v1/duvdu';
@@ -45,6 +48,11 @@ export const createProjectHandler: CreateProjectHandler = async (req, res, next)
   project.attachments = attachments.map((el) => `${FOLDERS.studio_booking}/${el.filename}`);
   await project.save();
   Files.removeFiles(...project.attachments, project.cover);
+
+  await Project.create({project:{
+    type:project.id,
+    ref:MODELS.studioBooking
+  } , ref:MODELS.studioBooking});
 
   res.status(201).json({ message: 'success', data: project });
 };
