@@ -45,6 +45,13 @@ spec:
                   name: copyright-srv
                   port: 
                     number: 3000
+          - path: /api/analysis/?(.*)
+            pathType: Prefix
+            backend: 
+              service:
+                  name: analysis-srv
+                  port: 
+                    number: 3000
           - path: /?(.*)
             pathType: Prefix
             backend: 

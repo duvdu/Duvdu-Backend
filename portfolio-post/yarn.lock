@@ -310,10 +310,10 @@
   dependencies:
     "@jridgewell/trace-mapping" "0.3.9"
 
-"@duvdu-v1/duvdu@^1.1.4", "@duvdu-v1/duvdu@^1.1.6":
-  version "1.1.6"
-  resolved "https://registry.npmjs.org/@duvdu-v1/duvdu/-/duvdu-1.1.6.tgz"
-  integrity sha512-m6IUCl3PkzxG9o5XUaUshJXP8Y5Vge18vlC34OMboxGjC9N8lxkNRhQWQlvm4GyMg23hBlgEWFOL7SD2A9VDJg==
+"@duvdu-v1/duvdu@^1.1.15", "@duvdu-v1/duvdu@^1.1.4":
+  version "1.1.15"
+  resolved "https://registry.npmjs.org/@duvdu-v1/duvdu/-/duvdu-1.1.15.tgz"
+  integrity sha512-FrzpnZlLhjradJqlniBnYN8bdTmpipBttFCo50jfi1PHXjYAnS2S4kbADTrlQd42v0VV0j+rRCtizf8ycvF/7A==
   dependencies:
     "@duvdu-v1/duvdu" "^1.1.4"
     "@types/express" "^4.17.21"

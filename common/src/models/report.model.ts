@@ -1,28 +1,26 @@
-import { Iproject, Iuser, MODELS } from '@duvdu-v1/duvdu';
 import { Schema , Types, model } from 'mongoose';
+
+import { MODELS } from '../types/model-names';
+import { Iuser } from '../types/User';
 
 
 
 export interface Ireport {
     sourceUser: Types.ObjectId | Iuser;
-    targetUser: Types.ObjectId | Iuser;
-    project: Types.ObjectId | Iproject;
+    project: Types.ObjectId,
     desc: string;
     attachments: [string];
     state: { isClosed: boolean; closedBy: Types.ObjectId; feedback: string };
 }
 
-export const Report = model<Ireport>('report' , new Schema<Ireport>({
+export const Report = model<Ireport>(MODELS.report , new Schema<Ireport>({
   sourceUser:{
     type:Schema.Types.ObjectId,
     ref:MODELS.user
   },
-  targetUser:{
-    type:Schema.Types.ObjectId,
-    ref:MODELS.user
-  },
-  project:{
-    type:Schema.Types.ObjectId,
+  project: {
+    type: Schema.Types.ObjectId,
+    ref:MODELS.projects
   },
   desc:String,
   attachments:[String],
@@ -37,7 +35,7 @@ export const Report = model<Ireport>('report' , new Schema<Ireport>({
     },
     feedback:String
   }
-} , {timestamps:true , collection:'report' , toJSON: {
+} , {timestamps:true , collection:MODELS.report , toJSON: {
   transform(doc, ret) {
     if (ret.attachments)
       ret.attachments = ret.attachments.map(

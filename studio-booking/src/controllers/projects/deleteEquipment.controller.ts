@@ -1,3 +1,4 @@
+import 'express-async-errors';
 import { NotFound, NotAllowedError, studioBooking } from '@duvdu-v1/duvdu';
 
 import { DeleteEquipmentHandler } from '../../types/endpoints/endpoints';
