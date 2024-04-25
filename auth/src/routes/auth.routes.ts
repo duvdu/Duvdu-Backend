@@ -28,7 +28,7 @@ router.patch(
 router
   .route('/update-phone')
   .all(isauthenticated, isauthorized(PERMISSIONS.updatePhoneNumber))
-  .get(val.askUpdatePhoneVal, handlers.askUpdatePhoneNumberHandler)
+  .get(handlers.askUpdatePhoneNumberHandler)
   .patch(val.updatePhoneNumberVal, handlers.updatePhoneNumberHandler);
 
 router

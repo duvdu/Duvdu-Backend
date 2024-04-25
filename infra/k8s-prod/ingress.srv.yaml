@@ -1,0 +1,162 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-service
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true" 
+    nginx.ingress.kubernetes.io/use-regex: 'true'
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: www.duvdu.com
+      http:
+        paths:
+          - path: /api/users/?(.*)
+            pathType: Prefix
+            backend: 
+              service:
+                  name: auth-srv
+                  port: 
+                    number: 3000
+          - path: /api/category/?(.*)
+            pathType: Prefix
+            backend: 
+              service:
+                  name: category-srv
+                  port: 
+                    number: 3000
+          - path: /api/portfolio-post/?(.*)
+            pathType: Prefix
+            backend: 
+              service:
+                  name: portfolio-post-srv
+                  port: 
+                    number: 3000
+          - path: /api/studio-booking/?(.*)
+            pathType: Prefix
+            backend: 
+              service:
+                  name: studio-booking-srv
+                  port: 
+                    number: 3000
+          - path: /api/copyrights/?(.*)
+            pathType: Prefix
+            backend: 
+              service:
+                  name: copyright-srv
+                  port: 
+                    number: 3000
+          - path: /api/analysis/?(.*)
+            pathType: Prefix
+            backend: 
+              service:
+                  name: analysis-srv
+                  port: 
+                    number: 3000
+          - path: /api/chat/?(.*)
+            pathType: Prefix
+            backend: 
+              service:
+                  name: chat-srv
+                  port: 
+                    number: 3000
+
+    - host: duvdu.com
+      http:
+        paths:
+          - path: /api/users/?(.*)
+            pathType: Prefix
+            backend: 
+              service:
+                  name: auth-srv
+                  port: 
+                    number: 3000
+          - path: /api/category/?(.*)
+            pathType: Prefix
+            backend: 
+              service:
+                  name: category-srv
+                  port: 
+                    number: 3000
+          - path: /api/portfolio-post/?(.*)
+            pathType: Prefix
+            backend: 
+              service:
+                  name: portfolio-post-srv
+                  port: 
+                    number: 3000
+          - path: /api/studio-booking/?(.*)
+            pathType: Prefix
+            backend: 
+              service:
+                  name: studio-booking-srv
+                  port: 
+                    number: 3000
+          - path: /api/copyrights/?(.*)
+            pathType: Prefix
+            backend: 
+              service:
+                  name: copyright-srv
+                  port: 
+                    number: 3000
+          - path: /api/analysis/?(.*)
+            pathType: Prefix
+            backend: 
+              service:
+                  name: analysis-srv
+                  port: 
+                    number: 3000
+          - path: /api/chat/?(.*)
+            pathType: Prefix
+            backend: 
+              service:
+                  name: chat-srv
+                  port: 
+                    number: 3000
+
+  tls:
+    - hosts:
+        - duvdu.com
+        - www.duvdu.com
+      secretName: duvdu-tls-secret
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    service.beta.kubernetes.io/do-loadbalancer-enable-proxy-protocol: 'true'
+    service.beta.kubernetes.io/do-loadbalancer-hostname: 'www.duvdu.com'
+    service.beta.kubernetes.io/do-loadbalancer-size-unit: "5"
+
+  labels:
+    helm.sh/chart: ingress-nginx-2.0.3
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/version: 0.32.0
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: controller
+  name: ingress-nginx-controller
+  namespace: ingress-nginx
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: http
+    - name: https
+      port: 443
+      protocol: TCP
+      targetPort: https
+  selector:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/component: controller
+
+
+
+

@@ -1,3 +1,4 @@
+import 'express-async-errors';
 import { IstudioBooking, NotAllowedError, NotFound, studioBooking } from '@duvdu-v1/duvdu';
 
 import { UpdateEquipmentHandler } from '../../types/endpoints/endpoints';

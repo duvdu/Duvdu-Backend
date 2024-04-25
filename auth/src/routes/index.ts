@@ -4,6 +4,7 @@ import { authRoutes } from './auth.routes';
 import { bookmarkRoutes } from './bookmark.routes';
 import { oauthRoutes } from './oauth.routes';
 import { planRoutes } from './plan.routes';
+import { router as reportRoutes } from './report.routes';
 import { roleRoutes } from './role.routes';
 import { termsRoutes } from './term.routes';
 import { ticketsRoutes } from './ticket.routes';
@@ -17,5 +18,6 @@ router.use('/terms', termsRoutes);
 router.use('/tickets', ticketsRoutes);
 router.use('/plans', planRoutes);
 router.use('/roles', roleRoutes);
+router.use('/report', reportRoutes );
 
 export const apiRoutes = router;

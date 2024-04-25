@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: analysis-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: analysis
+  template:
+    metadata:
+      labels:
+        app: analysis
+    spec:
+      containers:
+        - name: analysis
+          image: duvdu/analysis
+          env:
+            - name: MONGO_URI
+              value: "mongodb://mongodb-service:27017/duvdu"
+            - name: JWT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret
+                  key: JWT_KEY
+            - name: CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: google-client-id
+                  key: clientId
+            - name: CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: google-client-secret
+                  key: clientSecret
+            - name: SESSION_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: session-secret
+                  key: sessionSecret
+            - name: BUCKET_ACESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: bucket-acess-key
+                  key: BUCKET_ACESS_KEY
+            - name: BUCKET_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: bucket-secret-key
+                  key: BUCKET_SECRET_KEY
+            - name: BUCKET_REGION
+              valueFrom:
+                secretKeyRef:
+                  name: bucket-region
+                  key: BUCKET_REGION
+            - name: BUCKET_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: bucket-name
+                  key: BUCKET_NAME
+            - name: BUCKET_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: bucket-host
+                  key: BUCKET_HOST
+            - name: NODE_ENV
+              valueFrom:
+                secretKeyRef:
+                  name: node-env
+                  key: NODE_ENV
+            - name: REDIS_HOST
+              value: redis://expiration-redis-srv:6379
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: analysis-srv
+spec:
+  selector:
+    app: analysis
+  ports:
+    - name: analysis
+      protocol: TCP 
+      port: 3000
+      targetPort: 3000
+  type: NodePort

@@ -5,31 +5,38 @@ import express from 'express';
 import session from 'express-session';
 
 import { env } from './config/env';
-import { router } from './routes';
+import { router as categoryRoutes } from './routes/index';
 
 export const app = express();
-app.use(cors({ origin: ['*', 'http://localhost:8080'] }));
-app.set('trust proxy', true);
 app.use(express.json());
-export const mySession = session({
-  secret: env.expressSession.secret,
-  resave: false,
-  saveUninitialized: false,
-  store:
-    env.environment !== 'test' && env.expressSession.allowUseStorage
-      ? sessionStore(env.redis.uri)
-      : undefined,
-  cookie: {
-    sameSite: 'lax',
-    secure: env.environment === 'production',
-    httpOnly: true,
-  },
-});
+app.set('trust proxy', true);
 
-app.use(mySession);
+app.use(
+  cors({
+    origin: ['*' , 'http://localhost:3000'],
+    credentials:true,
+    exposedHeaders: ['set-cookie']
+  }),
+);
 
-app.use('/api/category', router);
 
+app.use(
+  session({
+    secret: env.expressSession.secret,
+    resave: false,
+    saveUninitialized: false,
+    store:
+      env.environment !== 'test' && env.expressSession.allowUseStorage ? sessionStore(env.redis.uri) : undefined,
+    cookie: {
+      sameSite: 'none',
+      secure: env.environment === 'production',
+      httpOnly: true,
+    },
+  }),
+);
+
+
+app.use('/api/category', categoryRoutes);
 // app.use(mySession);
 // app.get('/test', (req, res) => {
 //   req.session.jwt = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZGUyYTA5YjMyYjlkZTE1ZDk2MzMwZCIsInBsYW5JZCI6IjY1ZGUyYTA5YjMyYjlkZTE1ZDk2MzMwZiIsImlhdCI6MTcwOTA1OTg4MX0.dLKNTuS_701l72jcs7thSchj1raK6548nxIkGHqEboE';

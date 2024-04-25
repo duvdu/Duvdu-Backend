@@ -1,3 +1,5 @@
+
+import 'express-async-errors';
 import { MODELS, studioBooking, SuccessResponse } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import { PipelineStage } from 'mongoose';

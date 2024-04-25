@@ -1,3 +1,5 @@
+import 'express-async-errors';
+
 import { NotFound, studioBooking } from '@duvdu-v1/duvdu';
 
 import { GetProjectHandler } from '../../types/endpoints/endpoints';

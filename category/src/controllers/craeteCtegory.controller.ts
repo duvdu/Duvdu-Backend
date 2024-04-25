@@ -1,18 +1,16 @@
-import { BadRequestError , Categories } from '@duvdu-v1/duvdu';
+import { BadRequestError , Bucket, Categories, Files, FOLDERS } from '@duvdu-v1/duvdu';
 
 import { CreateCategoryHandler } from '../types/endpoints/endpoints';
-import { saveFiles } from '../utils/file';
 
 export const createCategoryHandler: CreateCategoryHandler = async (req, res, next) => {
-  const files = <{ image?: [Express.Multer.File] }>req.files;
-  const image = files.image ? files.image[0] : undefined;
+  const cover = <Express.Multer.File[]>(req.files as any).cover;
 
-  const category = await Categories.create({
-    ...req.body,
-    [image ? 'image' : (null as any)]: `/media/images/${image?.filename}`,
-  });
+  const category = await Categories.create(req.body);
 
   if (!category) return next(new BadRequestError('can not create category'));
-  saveFiles('images', image);
-  res.status(201).json({ message: 'success' });
+  await new Bucket().saveBucketFiles(FOLDERS.category , ...cover);
+  category.image = `${FOLDERS.category}/${cover[0].filename}`;
+  await category.save();
+  Files.removeFiles(category.image);
+  res.status(201).json({ message: 'success' , data:category });
 };

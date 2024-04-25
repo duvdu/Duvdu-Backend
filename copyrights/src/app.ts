@@ -9,9 +9,16 @@ import { env } from './config/env';
 import { apiRoutes } from '../src/routes';
 
 export const app = express();
-app.use(cors({ origin: ['*', 'http://localhost:8080'] }));
-
 app.use(express.json());
+app.set('trust proxy', true);
+app.use(
+  cors({
+    origin: ['*' , 'http://localhost:3000'],
+    credentials:true,
+    exposedHeaders: ['set-cookie']
+  }),
+);
+
 
 app.use(
   session({
@@ -23,7 +30,7 @@ app.use(
         ? sessionStore(env.redis.uri)
         : undefined,
     cookie: {
-      sameSite: 'lax',
+      sameSite: 'none',
       secure: env.environment === 'production',
       httpOnly: true,
     },

@@ -45,6 +45,11 @@ export enum PERMISSIONS {
   removeStudioProjectHandler = 'remove studio project',
   getCrmStudioProjectsHandlers = 'get crm studio projects',
   getStudioAnalysisHandler = 'get studio analysis handler',
+  // reports
+  getAllReportsHandler = 'get all reports',
+  getReportHandler = 'get report',
+  updateReportHandler = 'update report',
+  deleteReportHandler = 'delete report'
 }
 
 export const permissions = {

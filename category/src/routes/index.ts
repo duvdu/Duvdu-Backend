@@ -1,4 +1,4 @@
-import { globalUploadMiddleware  , isauthorized , PERMISSIONS , isauthenticated} from '@duvdu-v1/duvdu';
+import { isauthorized , PERMISSIONS , isauthenticated, FOLDERS, uploadProjectMedia, checkRequiredFields} from '@duvdu-v1/duvdu';
 import express from 'express';
 
 import * as handler from '../controllers';
@@ -18,12 +18,8 @@ router
   .post(
     isauthenticated,
     isauthorized(PERMISSIONS.createCategory),
-    globalUploadMiddleware({ fileType: 'image' }).fields([
-      {
-        name: 'image',
-        maxCount: 1,
-      },
-    ]),
+    uploadProjectMedia(FOLDERS.category),
+    checkRequiredFields({ fields: ['cover'] }),
     val.createCategoryVal,
     handler.createCategoryHandler,
   )
@@ -35,12 +31,7 @@ router
   .put(
     isauthenticated,
     isauthorized(PERMISSIONS.updateCategory),
-    globalUploadMiddleware({ fileType: 'image' }).fields([
-      {
-        name: 'image',
-        maxCount: 1,
-      },
-    ]),
+    uploadProjectMedia(FOLDERS.category),
     val.updateCategoryVal,
     handler.updateCategoryHandler,
   )
@@ -50,3 +41,5 @@ router
     val.removeCategoryVal,
     handler.removeCategoryHandler,
   );
+
+
