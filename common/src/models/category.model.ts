@@ -1,4 +1,3 @@
-
 import mongoose from 'mongoose';
 
 import { Icategory } from '../types/Category';
@@ -10,10 +9,10 @@ const categorySchema = new mongoose.Schema<Icategory>(
       default: 0,
     },
     title: {
-      ar: String,
-      en: String,
+      ar: { type: String, default: null },
+      en: { type: String, default: null },
     },
-    image: String,
+    image: { type: String, defulat: null },
     jobTitles: {
       type: [String],
     },
@@ -33,14 +32,13 @@ const categorySchema = new mongoose.Schema<Icategory>(
   },
   {
     timestamps: true,
-    collection:MODELS.category,
+    collection: MODELS.category,
     toJSON: {
       transform(doc, ret) {
         if (ret.image) ret.image = process.env.BUCKET_HOST + '/' + ret.image;
-      }
+      },
     },
   },
 );
-
 
 export const Categories = mongoose.model<Icategory>(MODELS.category, categorySchema);

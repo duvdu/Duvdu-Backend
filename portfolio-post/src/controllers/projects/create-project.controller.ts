@@ -9,11 +9,12 @@ import {
   Files,
   IportfolioPost,
   FOLDERS,
+  Project,
+  MODELS,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 import { createInvitedUsers } from '../../services/create-invited-users';
-
 
 export const createProjectHandler: RequestHandler<
   unknown,
@@ -54,6 +55,12 @@ export const createProjectHandler: RequestHandler<
   await project.save();
   Files.removeFiles(...project.attachments, project.cover);
 
+  await Project.create({
+    project: {
+      type: project.id,
+      ref: MODELS.portfolioPost,
+    },
+    ref: MODELS.portfolioPost,
+  });
   res.status(201).json({ message: 'success', data: project });
 };
-

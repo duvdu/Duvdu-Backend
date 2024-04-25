@@ -7,7 +7,7 @@ export const Roles = model<Irole>(
   MODELS.role,
   new Schema<Irole>(
     {
-      key: { type: String, unique: true },
+      key: { type: String, unique: true, required: true },
       permissions: [String],
       system: {
         type: Boolean,

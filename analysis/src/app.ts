@@ -1,3 +1,5 @@
+import 'express-async-errors';
+import './types/custom-definition';
 import { globalErrorHandlingMiddleware, sessionStore } from '@duvdu-v1/duvdu';
 import cors from 'cors';
 import express from 'express';
@@ -11,9 +13,9 @@ app.set('trust proxy', true);
 
 app.use(
   cors({
-    origin: ['*' , 'http://localhost:3000'],
-    credentials:true,
-    exposedHeaders: ['set-cookie']
+    origin: ['*', 'http://localhost:3000'],
+    credentials: true,
+    exposedHeaders: ['set-cookie'],
   }),
 );
 

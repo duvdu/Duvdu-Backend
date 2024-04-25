@@ -50,7 +50,6 @@ export * from './types/portfolio-post-order';
 
 export * from './models/Bookmark.model';
 export * from './models/Plan.model';
-export * from './models/Projects.model';
 export * from './models/Role.model';
 export * from './models/Term.model';
 export * from './models/Ticket.model';
