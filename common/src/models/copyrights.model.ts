@@ -14,6 +14,7 @@ export interface IcopyRights {
   searchKeywords: string[];
   showOnHome: boolean;
   cycle: number;
+  rate: { ratersCounter: number; totalRates: number };
   isDeleted: boolean;
 }
 
@@ -21,15 +22,19 @@ export const CopyRights = model<IcopyRights>(
   MODELS.copyrights,
   new Schema<IcopyRights>(
     {
-      user: { type: Schema.Types.ObjectId, ref: MODELS.user, unique: true },
+      user: { type: Schema.Types.ObjectId, ref: MODELS.user },
       category: { type: Schema.Types.ObjectId, ref: MODELS.category },
-      price: Number,
-      duration: String,
-      address: String,
+      price: { type: Number, default: 0 },
+      duration: { type: String, default: null },
+      address: { type: String, default: null },
       searchKeywords: [String],
-      showOnHome: Boolean,
+      showOnHome: { type: Boolean, default: true },
       cycle: { type: Number, default: 3 },
       isDeleted: { type: Boolean, default: false },
+      rate: {
+        ratersCounter: { type: Number, default: 0 },
+        totalRates: { type: Number, default: 0 },
+      },
     },
     {
       timestamps: true,

@@ -14,16 +14,16 @@ app.use(express.json());
 app.set('trust proxy', true);
 app.use(
   cors({
-    origin: ['*' , 'http://localhost:3000'],
-    credentials:true,
-    exposedHeaders: ['set-cookie']
+    origin: ['*', 'http://localhost:3000'],
+    credentials: true,
+    exposedHeaders: ['set-cookie'],
   }),
 );
 
 app.use(
   session({
     secret: env.expressSession.secret,
-    resave: false,
+    resave: true,
     saveUninitialized: false,
     store:
       env.environment !== 'test' && env.expressSession.allowUseStorage

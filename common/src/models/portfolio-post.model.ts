@@ -20,9 +20,9 @@ export interface IportfolioPost {
   projectScale: { scale: number; time: 'minutes' | 'hours' };
   showOnHome: boolean;
   cycle: number;
+  rate: { ratersCounter: number; totalRates: number };
   isDeleted: boolean;
 }
-
 
 export const PortfolioPosts = model<IportfolioPost>(
   MODELS.portfolioPost,
@@ -30,20 +30,29 @@ export const PortfolioPosts = model<IportfolioPost>(
     {
       user: { type: Schema.Types.ObjectId, ref: MODELS.user },
       attachments: [String],
-      cover: String,
-      title: String,
-      desc: String,
-      address: String,
-      tools: [{ name: String, fees: Number }],
+      cover: { type: String, default: null },
+      title: { type: String, default: null },
+      desc: { type: String, default: null },
+      address: { type: String, default: null },
+      tools: [{ name: { type: String, default: null }, fees: { type: Number, default: 0 } }],
       searchKeywords: [String],
-      creatives: [{ creative: { type: Schema.Types.ObjectId, ref: MODELS.user }, fees: Number }],
+      creatives: [
+        {
+          creative: { type: Schema.Types.ObjectId, ref: MODELS.user },
+          fees: { type: Number, default: null },
+        },
+      ],
       tags: [String],
-      projectBudget: Number,
-      category: Types.ObjectId,
-      projectScale: { scale: Number, time: String },
-      showOnHome: Boolean,
+      projectBudget: { type: Number, default: null },
+      category: { type: Schema.Types.ObjectId, ref: MODELS.category, required: true },
+      projectScale: { scale: { type: Number, default: 0 }, time: { type: String, default: null } },
+      showOnHome: { type: Boolean, default: true },
       cycle: { type: Number, default: 1 },
       isDeleted: { type: Boolean, default: false },
+      rate: {
+        ratersCounter: { type: Number, default: 0 },
+        totalRates: { type: Number, default: 0 },
+      },
     },
     {
       timestamps: true,

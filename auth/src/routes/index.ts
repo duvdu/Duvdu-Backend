@@ -18,6 +18,6 @@ router.use('/terms', termsRoutes);
 router.use('/tickets', ticketsRoutes);
 router.use('/plans', planRoutes);
 router.use('/roles', roleRoutes);
-router.use('/report', reportRoutes );
+router.use('/report', reportRoutes);
 
 export const apiRoutes = router;

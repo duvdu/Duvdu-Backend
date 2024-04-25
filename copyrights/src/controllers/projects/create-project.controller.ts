@@ -5,6 +5,8 @@ import {
   BadRequestError,
   CopyRights,
   IcopyRights,
+  Project,
+  MODELS,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
@@ -22,6 +24,14 @@ export const createProjectHandler: RequestHandler<
   const project = await CopyRights.create({
     ...req.body,
     user: req.loggedUser.id,
+  });
+
+  await Project.create({
+    project: {
+      type: project.id,
+      ref: MODELS.copyrights,
+    },
+    ref: MODELS.copyrights,
   });
   res.status(201).json({ message: 'success', data: project });
 };

@@ -1,4 +1,4 @@
-import { NotFound, UnauthenticatedError , MODELS  , Users , Irole} from '@duvdu-v1/duvdu';
+import { NotFound, UnauthenticatedError, Users, Irole } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import { verify } from 'jsonwebtoken';
 
@@ -10,7 +10,7 @@ export const askRefreshTokenHandler: RequestHandler = async (req, res, next) => 
   let payload: { id: string };
   try {
     payload = <{ id: string }>verify(req.session.refresh, env.jwt.secret);
-    const user = await Users.findById(payload.id).populate(MODELS.role);
+    const user = await Users.findById(payload.id).populate('role');
     if (!user) return next(new NotFound('user not found'));
     const role = <Irole>user.role;
     const token = generateAccessToken({
@@ -20,7 +20,9 @@ export const askRefreshTokenHandler: RequestHandler = async (req, res, next) => 
       role: { key: role.key, permissions: role.permissions },
     });
     req.session.access = token;
+    res.status(200).json({ message: 'success' });
   } catch (error) {
+    console.error(error);
     return res.status(423).json({ message: 'refresh token expired' });
   }
 };
