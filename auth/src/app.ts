@@ -23,7 +23,7 @@ app.use(
 app.use(
   session({
     secret: env.expressSession.secret,
-    resave: false,
+    resave: true,
     saveUninitialized: false,
     store:
       env.environment !== 'test' && env.expressSession.allowUseStorage
