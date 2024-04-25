@@ -9,3 +9,4 @@ old_structure
 nginx
 docker-compose.yml
 docker-compose-copyrights.yml
+docker-compose-analysis.yml
