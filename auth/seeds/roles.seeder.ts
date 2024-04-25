@@ -30,7 +30,7 @@ export const appInit = async () => {
       permissions: [PERMISSIONS.changePassword, PERMISSIONS.updateProfile],
     });
 
-  if (!(await Users.findOne({role:adminRole._id}))) 
+  if (!(await Users.findOne({username:'metooooo'}))) 
     await Users.create({username: 'metooooo', password: '$2a$10$y4kY4RD6k1iuIZxfvHs0iOX5MlasKtfB4fc7EtCNFwCNFOpzD2tDy' , role:adminRole?._id , isVerified:true});
   // await mongoose.connection.close();
 };
