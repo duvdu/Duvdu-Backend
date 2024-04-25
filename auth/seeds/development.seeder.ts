@@ -2,7 +2,7 @@ import {
   dbConnection,
   PERMISSIONS,
   Plans,
-  Projects,
+  Project,
   Roles,
   Users,
   Bookmarks,
@@ -18,7 +18,7 @@ import { hashPassword } from '../src/utils/bcrypt';
   await Roles.deleteMany({});
   await Users.deleteMany({});
   await Plans.deleteMany({});
-  await Projects.deleteMany({});
+  await Project.deleteMany({});
   await Bookmarks.deleteMany({});
 
   const [roleAdminId, roleUserId] = [new mongoose.Types.ObjectId(), new mongoose.Types.ObjectId()];
