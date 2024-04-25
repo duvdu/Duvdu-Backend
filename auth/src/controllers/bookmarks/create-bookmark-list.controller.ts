@@ -1,9 +1,9 @@
-import { NotFound, Bookmarks, Projects } from '@duvdu-v1/duvdu';
+import { NotFound, Bookmarks, Project } from '@duvdu-v1/duvdu';
 
 import { CreateBookmarkHandler } from '../../types/endpoints/saved-projects.endpoints';
 
 export const createBookmarkHandler: CreateBookmarkHandler = async (req, res, next) => {
-  const project = await Projects.findOne({ _id: req.body.projects[0] });
+  const project = await Project.findOne({ _id: req.body.projects[0] });
   if (!project) return next(new NotFound());
 
   await Bookmarks.create({
