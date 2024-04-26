@@ -1,4 +1,4 @@
-import {  globalUploadMiddleware, isauthenticated, isauthorized, PERMISSIONS } from '@duvdu-v1/duvdu';
+import {  FOLDERS, isauthenticated, isauthorized, PERMISSIONS, uploadProjectMedia } from '@duvdu-v1/duvdu';
 import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
 
@@ -44,10 +44,7 @@ router
   .get(handlers.getLoggedUserProfileHandler)
   .patch(
     isauthorized(PERMISSIONS.updateProfile),
-    globalUploadMiddleware({ fileType: 'image' }).fields([
-      { name: 'profileImage', maxCount: 1 },
-      { name: 'coverImage', maxCount: 1 },
-    ]),
+    uploadProjectMedia(FOLDERS.auth),
     val.updateProfileVal,
     handlers.updateProfileHandler,
   );

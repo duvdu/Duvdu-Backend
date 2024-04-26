@@ -14,6 +14,7 @@ import {
 import { createInvitedUsers } from '../../services/create-invited-users';
 import { UpdateProjectHandler } from '../../types/endpoints/endpoints';
 
+
 export const updateProjectHandler: UpdateProjectHandler = async (req, res, next) => {
   const { projectId } = req.params;
   const attachments = <Express.Multer.File[] | undefined>(req.files as any)?.attachments;
