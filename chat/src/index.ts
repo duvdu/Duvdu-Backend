@@ -6,6 +6,8 @@ import { app, mySession } from './app';
 import { env, checkEnvVariables } from './config/env';
 import { IcustomHandshake } from './types/customSocket';
 const start = async () => {
+  console.log('test deploy');
+  
   checkEnvVariables();
   await dbConnection(env.mongoDb.uri);
   const server = app.listen(3000, () => {
