@@ -3,18 +3,6 @@ import { body } from 'express-validator';
 
 export const updateProfileVal = [
   body('name').optional().isString().isLength({ min: 3 }),
-  body('profileImage')
-    .optional()
-    .custom((val, { req }) => {
-      if (req.files.profileImage) return true;
-      throw new Error();
-    }),
-  body('coverImage')
-    .optional()
-    .custom((val, { req }) => {
-      if (req.files.coverImage) return true;
-      throw new Error();
-    }),
   body('location')
     .optional()
     .isObject()

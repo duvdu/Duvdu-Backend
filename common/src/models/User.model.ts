@@ -36,7 +36,14 @@ const userSchema = new Schema<Iuser>(
       reason: { type: String, default: null },
     },
   },
-  { timestamps: true, collection: MODELS.user },
+  { timestamps: true,
+    collection: MODELS.user,
+    toJSON: {
+      transform(doc, ret) {
+        if (ret.coverImage) ret.coverImage = process.env.BUCKET_HOST + '/' + ret.coverImage;
+        if (ret.profileImage) ret.profileImage = process.env.BUCKET_HOST + '/' + ret.profileImage;
+      },
+    }, },
 );
 
 export const Users = model<Iuser>(MODELS.user, userSchema);
