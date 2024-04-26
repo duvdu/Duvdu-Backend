@@ -86,7 +86,7 @@ export interface ResendVerificationCodeHandler
 export interface UpdateProfileHandler
   extends RequestHandler<
     unknown,
-    successResponse<unknown>,
+    successResponse<{data:Iuser}>,
     Partial<
       Pick<
         Iuser,
