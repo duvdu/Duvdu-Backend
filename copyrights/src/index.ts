@@ -4,7 +4,6 @@ import { app } from './app';
 import { env, checkEnvVariables } from './config/env';
 
 const start = async () => {
-  console.log('test deploy');
   checkEnvVariables();
   await dbConnection(env.mongoDb.uri);
   app.listen(3000, () => {
