@@ -20,7 +20,7 @@ const userSchema = new Schema<Iuser>(
     profileImage: { type: String, default: null },
     coverImage: { type: String, default: null },
     location: { lat: { type: Number, default: null }, lng: { type: Number, default: null } },
-    category: { type: Schema.Types.ObjectId, ref: MODELS.category, required: true },
+    category: { type: Schema.Types.ObjectId, ref: MODELS.category },
     acceptedProjectsCounter: { type: Number, default: 0 },
     profileViews: { type: Number, default: 0 },
     about: { type: String, default: null },
