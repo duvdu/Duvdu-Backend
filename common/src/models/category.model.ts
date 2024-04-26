@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 
 import { Icategory } from '../types/Category';
+import { CYCLES } from '../types/cycles';
 import { MODELS } from '../types/model-names';
 const categorySchema = new mongoose.Schema<Icategory>(
   {
@@ -18,12 +19,18 @@ const categorySchema = new mongoose.Schema<Icategory>(
     },
     cycle: {
       type: Number,
-      enum: [1, 2, 3, 4],
-      default: 1,
+      enum: CYCLES,
+      required: true,
     },
-    tags: {
-      type: [String],
-    },
+    // tags: {
+    //   type: [String],
+    // },
+    subCategories: [
+      {
+        title: { ar: { type: String, default: null }, en: { type: String, default: null } },
+        tags: [{ ar: { type: String, default: null }, en: { type: String, default: null } }],
+      },
+    ],
     status: {
       type: Number,
       enum: [0, 1],
