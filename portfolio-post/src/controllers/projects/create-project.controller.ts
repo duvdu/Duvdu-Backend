@@ -11,6 +11,7 @@ import {
   FOLDERS,
   Project,
   MODELS,
+  CYCLES,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
@@ -32,7 +33,7 @@ export const createProjectHandler: RequestHandler<
 
   const category = await Categories.findOne({ _id: req.body.category });
   if (!category) return next(new NotFound('category not found'));
-  if (category.cycle !== 1)
+  if (category.cycle !== CYCLES.portfolioPost)
     return next(new BadRequestError('this category not related to this cycle'));
 
   const creativesCount = await Users.countDocuments({

@@ -24,7 +24,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@duvdu-v1/duvdu": "^1.1.21",
+    "@duvdu-v1/duvdu": "^1.1.22",
     "@jridgewell/sourcemap-codec": "^1.4.15",
     "@types/bcryptjs": "^2.4.5",
     "@types/cors": "^2.8.17",
@@ -56,9 +56,9 @@
     "typescript": "^5.3.3"
   },
   "devDependencies": {
+    "@types/dotenv": "^8.2.0",
     "@types/jest": "^29.5.11",
     "@types/supertest": "^2.0.16",
-    "@types/dotenv": "^8.2.0",
     "@typescript-eslint/eslint-plugin": "^6.19.0",
     "@typescript-eslint/parser": "^6.19.0",
     "del-cli": "^5.1.0",

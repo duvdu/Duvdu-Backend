@@ -1,4 +1,4 @@
-export * from './craeteCtegory.controller';
+export * from './create-category.controller';
 export * from './updateCategory.controller';
 export * from './removeCategory.controller';
 export * from './getCategories.controller';
