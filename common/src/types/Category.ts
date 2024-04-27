@@ -1,3 +1,5 @@
+import { CYCLES } from './cycles';
+
 export interface Icategory {
   id: string;
   creativesCounter: number;
@@ -6,6 +8,6 @@ export interface Icategory {
   tags?: string[];
   subCategories?: { title: { en: string; ar: string }; tags: { en: string; ar: string }[] }[];
   jobTitles?: string[];
-  cycle: 1 | 2 | 3 | 4;
-  status: 0 | 1;
+  cycle: CYCLES;
+  status: boolean;
 }

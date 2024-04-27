@@ -14,17 +14,17 @@ const categorySchema = new mongoose.Schema<Icategory>(
       en: { type: String, default: null },
     },
     image: { type: String, defulat: null },
-    jobTitles: {
-      type: [String],
-    },
+    jobTitles: [
+      {
+        ar: { type: String, default: null },
+        en: { type: String, default: null },
+      },
+    ],
     cycle: {
-      type: Number,
+      type: String,
       enum: CYCLES,
       required: true,
     },
-    // tags: {
-    //   type: [String],
-    // },
     subCategories: [
       {
         title: { ar: { type: String, default: null }, en: { type: String, default: null } },
@@ -32,9 +32,8 @@ const categorySchema = new mongoose.Schema<Icategory>(
       },
     ],
     status: {
-      type: Number,
-      enum: [0, 1],
-      default: 1,
+      type: Boolean,
+      default: true,
     },
   },
   {

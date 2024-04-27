@@ -47,6 +47,7 @@ export * from './types/success-response';
 export * from './types/folders';
 export * from './types/pagination-response';
 export * from './types/portfolio-post-order';
+export * from './types/cycles';
 
 export * from './models/Bookmark.model';
 export * from './models/Plan.model';
