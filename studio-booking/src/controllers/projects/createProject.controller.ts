@@ -10,6 +10,7 @@ import {
   Project,
   studioBooking,
   Users,
+  CYCLES
 } from '@duvdu-v1/duvdu';
 
 import { createInvitedUsers } from '../../services/create-invited-users';
@@ -22,7 +23,7 @@ export const createProjectHandler: CreateProjectHandler = async (req, res, next)
 
   const category = await Categories.findById(req.body.category);
   if (!category) return next(new NotFound(`category not found ${req.body.category}`));
-  if (category.cycle != 2)
+  if (category.cycle != CYCLES.studioBooking)
     return next(new BadRequestError('this category not related to this cycle'));
 
   if (req.body.creatives) {

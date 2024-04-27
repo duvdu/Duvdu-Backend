@@ -7,6 +7,7 @@ import {
   IcopyRights,
   Project,
   MODELS,
+  CYCLES,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
@@ -18,7 +19,7 @@ export const createProjectHandler: RequestHandler<
 > = async (req, res, next) => {
   const category = await Categories.findOne({ _id: req.body.category });
   if (!category) return next(new NotFound('category not found'));
-  if (category.cycle !== 3)
+  if (category.cycle !== CYCLES.copyRights)
     return next(new BadRequestError('this category not related to this cycle'));
 
   const project = await CopyRights.create({

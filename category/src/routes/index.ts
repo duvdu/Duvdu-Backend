@@ -1,4 +1,11 @@
-import { isauthorized , PERMISSIONS , isauthenticated, FOLDERS, uploadProjectMedia, checkRequiredFields} from '@duvdu-v1/duvdu';
+import {
+  isauthorized,
+  PERMISSIONS,
+  isauthenticated,
+  FOLDERS,
+  uploadProjectMedia,
+  checkRequiredFields,
+} from '@duvdu-v1/duvdu';
 import express from 'express';
 
 import * as handler from '../controllers';
@@ -41,5 +48,3 @@ router
     val.removeCategoryVal,
     handler.removeCategoryHandler,
   );
-
-
