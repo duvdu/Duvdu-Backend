@@ -9,7 +9,7 @@ import {  mySession } from '../app';
 import { env } from '../config/env';
 import { IcustomHandshake } from '../types/customSocket';
 
-class SocketServer {
+export class SocketServer {
   io: Server;
 
   constructor(server: HTTPServer) {
@@ -26,8 +26,6 @@ class SocketServer {
   private setupMiddleware() {
     this.io.use(sharedSession(mySession));
     this.io.use(async (socket: IcustomHandshake, next) => {
-      console.log(socket.handshake.session);
-      
       if (!socket.handshake.session.access)
         return next();
       try {
@@ -63,11 +61,9 @@ class SocketServer {
         await Users.findByIdAndUpdate(userId , {isOnline:false} , {new :true});
       }else{
         console.log('make implementation by guest');
-        
       }
     
     });
   }
 }
 
-export default SocketServer;
