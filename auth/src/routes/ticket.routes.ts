@@ -11,6 +11,7 @@ router
   .post(isauthenticated, val.createTicketVal, handler.createTicketHandler)
   .get(isauthenticated, isauthorized(PERMISSIONS.getAllTickets), handler.getTicketsHandler);
 
+router.post('/visitor', val.createTicketVal, handler.createTicketHandler);
 router
   .route('/:ticketId')
   .put(
