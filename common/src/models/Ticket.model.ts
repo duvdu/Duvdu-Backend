@@ -8,7 +8,6 @@ const ticketSchema = new mongoose.Schema<Iticket>(
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: MODELS.user,
-      required: true,
     },
     name: {
       type: String,
