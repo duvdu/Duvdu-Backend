@@ -16,7 +16,7 @@ const ticketSchema = new mongoose.Schema<Iticket>(
     },
     phoneNumber: {
       key: { type: String, default: null },
-      number: { type: String, default: null, unique: true, sparse: true },
+      number: { type: String, default: null },
     },
     message: { type: String, default: null },
     state: {

@@ -27,6 +27,7 @@ export * from './middlewares/global-pagination.middleware';
 export * from './middlewares/upload-project-media.middleware';
 export * from './middlewares/redis-connection';
 export * from './middlewares/language-header.middleware';
+export * from './middlewares/optional-auth.middleware';
 
 export * from './types/JwtPayload';
 export * from './types/Permissions';

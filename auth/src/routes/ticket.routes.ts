@@ -1,4 +1,4 @@
-import { isauthenticated, isauthorized, PERMISSIONS } from '@duvdu-v1/duvdu';
+import { isauthenticated, isauthorized, PERMISSIONS, optionalAuthenticated } from '@duvdu-v1/duvdu';
 import express from 'express';
 
 import * as handler from '../controllers/ticket';
@@ -8,10 +8,10 @@ const router = express.Router();
 router.get('/loggedUserTicket', isauthenticated, handler.getUserTickets);
 router
   .route('/')
-  .post(isauthenticated, val.createTicketVal, handler.createTicketHandler)
+  .post(optionalAuthenticated, val.createTicketVal, handler.createTicketHandler)
   .get(isauthenticated, isauthorized(PERMISSIONS.getAllTickets), handler.getTicketsHandler);
 
-router.post('/visitor', val.createTicketVal, handler.createTicketHandler);
+// router.post('/visitor', val.createTicketVal, handler.createTicketHandler);
 router
   .route('/:ticketId')
   .put(
