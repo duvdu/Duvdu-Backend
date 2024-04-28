@@ -51,4 +51,9 @@ export const Message = model<ImessageDoc>('Messages' , new Schema<ImessageDoc>({
     type:Boolean,
     default:false
   }
-},{timestamps:true , collection:'Messages'}));
+},{timestamps:true , collection:'Messages' , toJSON: {
+  transform(doc, ret) {
+    if (ret.media.url) ret.media.url = process.env.BUCKET_HOST + '/' + ret.media.url;
+  }
+}
+}));
