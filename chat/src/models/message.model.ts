@@ -1,21 +1,22 @@
-import { MODELS } from '@duvdu-v1/duvdu';
+import { MODELS , Iuser } from '@duvdu-v1/duvdu';
 import  { model, Schema , Types } from 'mongoose';
 
 
 interface Ireaction {
   type: string;
-  user: Types.ObjectId;
+  user: Types.ObjectId | Iuser;
 }
 
-interface ImessageDoc {
-    sender: Types.ObjectId;
-    receiver: Types.ObjectId;
+export interface ImessageDoc {
+    sender: Types.ObjectId | Iuser;
+    receiver: Types.ObjectId | Iuser;
     content?: string;
     media?: {
       type: string; 
       url: string;
     };
     reactions: Ireaction[];
+    watched: boolean;
   }
 
 const reactionSchema = new Schema({
@@ -45,6 +46,9 @@ export const Message = model<ImessageDoc>('Messages' , new Schema<ImessageDoc>({
       enum: ['image', 'video', 'audio'],
     },
     url: String,
+  },
+  watched:{
+    type:Boolean,
+    default:false
   }
-
 },{timestamps:true , collection:'Messages'}));
