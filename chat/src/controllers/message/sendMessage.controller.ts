@@ -1,12 +1,32 @@
 import 'express-async-errors';
+import { Bucket, Files, FOLDERS, NotFound, Users } from '@duvdu-v1/duvdu';
+
+import { Message } from '../../models/message.model';
 import { SendMessageHandler } from '../../types/endpoints';
 
 
 
 export const sendMessageHandler:SendMessageHandler = async (req,res,next)=>{
-    console.log(true);
-    
-  const attachments = <Express.Multer.File[] | undefined>(req.files as any)?.attachments;
-  console.log(attachments);
-    
+
+  const receiver = await Users.findById(req.body.receiver);
+  if (!receiver) 
+    return next(new NotFound(`no receiver in this id ${req.body.receiver}`));
+
+  const attachments = <Express.Multer.File[] | undefined>(req.files as any)?.attachments;  
+  if (attachments) {
+    (req.body as any).media = {};
+    const s3 = new Bucket();
+    await s3.saveBucketFiles(FOLDERS.chat, ...attachments);
+    (req.body as any).media['url'] = `${FOLDERS.chat}/${attachments[0].filename}`;
+    (req.body as any).media['type'] = attachments[0].mimetype;
+    Files.removeFiles((req.body as any).media['url']);
+  }
+
+  const message = await Message.create({
+    ...req.body,
+    sender:req.loggedUser.id
+  });
+
+  const populatedMessage = await message.populate([{path:'sender' , select:'profileImage isOnline username name'}]);
+  res.status(201).json({message:'success' , data:populatedMessage});
 };

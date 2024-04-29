@@ -24,16 +24,16 @@ const reactionSchema = new Schema({
   user: { type: Schema.Types.ObjectId, ref: MODELS.user, required: true },
 });
 
-export const Message = model<ImessageDoc>('Messages' , new Schema<ImessageDoc>({
+export const Message = model<ImessageDoc>(MODELS.messages , new Schema<ImessageDoc>({
   sender:{
     type:Schema.Types.ObjectId,
     ref:MODELS.user,
-    required:true
+    // required:true
   },
   receiver:{
     type:Schema.Types.ObjectId,
     ref:MODELS.user,
-    required:true
+    // required:true
   },
   content:{
     type:String,
@@ -42,8 +42,7 @@ export const Message = model<ImessageDoc>('Messages' , new Schema<ImessageDoc>({
   reactions:[reactionSchema],
   media: {
     type: {
-      type: String,
-      enum: ['image', 'video', 'audio' , 'pdf'],
+      type: String
     },
     url: String,
   },
@@ -51,7 +50,7 @@ export const Message = model<ImessageDoc>('Messages' , new Schema<ImessageDoc>({
     type:Boolean,
     default:false
   }
-},{timestamps:true , collection:'Messages' , toJSON: {
+},{timestamps:true , collection:MODELS.messages , toJSON: {
   transform(doc, ret) {
     if (ret.media.url) ret.media.url = process.env.BUCKET_HOST + '/' + ret.media.url;
   }
