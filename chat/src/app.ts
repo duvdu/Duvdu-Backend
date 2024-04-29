@@ -5,6 +5,7 @@ import express from 'express';
 import session from 'express-session';
 
 import { env } from './config/env';
+import { moutnRoutes } from './routes';
 
 export const app = express();
 app.set('trust proxy', true);
@@ -34,13 +35,6 @@ export const mySession = session({
 });
 
 app.use(mySession);
-app.use('/api/chat/' , (req,res)=>{
-  res.send({d:req.protocol , f:env.environment === 'production'});
-});
-
-// app.get('/test', (req, res) => {
-//   req.session.jwt = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZGUyYTA5YjMyYjlkZTE1ZDk2MzMwZCIsInBsYW5JZCI6IjY1ZGUyYTA5YjMyYjlkZTE1ZDk2MzMwZiIsImlhdCI6MTcwOTA1OTg4MX0.dLKNTuS_701l72jcs7thSchj1raK6548nxIkGHqEboE';
-//   res.send('Session cookie generated successfully.');
-// });
+moutnRoutes(app);
 
 app.use(globalErrorHandlingMiddleware);

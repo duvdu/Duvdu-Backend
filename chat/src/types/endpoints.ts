@@ -6,7 +6,7 @@ import { ImessageDoc } from '../models/message.model';
 
 
 export interface SendMessageHandler
-extends RequestHandler<{receiver:string} , SuccessResponse<{data:ImessageDoc}> , Partial<Pick<ImessageDoc , 'content' | 'media' | 'receiver'>> , unknown>{}
+extends RequestHandler<unknown , SuccessResponse<{data:ImessageDoc}> , Partial<Pick<ImessageDoc , 'content' | 'media' | 'receiver'>> , unknown>{}
 
 export interface updateMessageHandler
 extends RequestHandler<{receiver:string , message:string} , SuccessResponse<{data:ImessageDoc}> , Partial<Pick<ImessageDoc , 'content' | 'media'>> , unknown >{}

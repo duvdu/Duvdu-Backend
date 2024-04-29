@@ -43,7 +43,7 @@ export const Message = model<ImessageDoc>('Messages' , new Schema<ImessageDoc>({
   media: {
     type: {
       type: String,
-      enum: ['image', 'video', 'audio'],
+      enum: ['image', 'video', 'audio' , 'pdf'],
     },
     url: String,
   },
