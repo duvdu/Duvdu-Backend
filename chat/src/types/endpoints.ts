@@ -3,7 +3,6 @@ import { SuccessResponse , IjwtPayload , Ipagination, PaginationResponse } from 
 import { RequestHandler } from 'express';
 
 import { ImessageDoc } from '../models/message.model';
-import { UnreadMessageCount } from '../services/countUnReadMessage.service';
 
 
 
@@ -41,10 +40,10 @@ export interface DeleteChatHandler
 extends RequestHandler<{receiver:string} , SuccessResponse<unknown> , unknown , unknown>{}
 
 export interface GetSpecificChatHandler
-extends RequestHandler<{receiver:string} , PaginationResponse<{data:ImessageDoc[] , unreadMessage:UnreadMessageCount[]}> , unknown , {limit?:number , page?:number}>{}
+extends RequestHandler<{receiver:string} , PaginationResponse<{data:ImessageDoc[]}> , unknown , {limit?:number , page?:number}>{}
 
 export interface GetChatFromUserToUserHandler
-extends RequestHandler<{sender:string , receiver:string} , PaginationResponse<{data:ImessageDoc[] , unreadMessage:UnreadMessageCount[]}> , unknown , {limit?:number , page?:number , toDate?:Date , fromDate?:Date}>{}
+extends RequestHandler<{sender:string , receiver:string} , PaginationResponse<{data:ImessageDoc[]}> , unknown , {limit?:number , page?:number , toDate?:Date , fromDate?:Date}>{}
 
 export interface MarkMessageAsWatchedHandler
 extends RequestHandler<{receiver:string} , SuccessResponse<unknown> , {messages:[string]} , unknown>{}
