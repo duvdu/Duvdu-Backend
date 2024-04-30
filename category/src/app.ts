@@ -43,6 +43,7 @@ app.use(
 
 app.use(languageHeaderMiddleware);
 
+
 app.use('/api/category', categoryRoutes);
 
 app.use(globalErrorHandlingMiddleware);
