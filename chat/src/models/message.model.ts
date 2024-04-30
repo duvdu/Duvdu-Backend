@@ -52,7 +52,7 @@ export const Message = model<ImessageDoc>(MODELS.messages , new Schema<ImessageD
   }
 },{timestamps:true , collection:MODELS.messages , toJSON: {
   transform(doc, ret) {
-    if (ret.media.url) ret.media.url = process.env.BUCKET_HOST + '/' + ret.media.url;
+    if (ret.media?.url) ret.media.url = process.env.BUCKET_HOST + '/' + ret.media.url;
   }
 }
 }));

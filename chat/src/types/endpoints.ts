@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-namespace */
-import { SuccessResponse , IjwtPayload , Ipagination } from '@duvdu-v1/duvdu';
+import { SuccessResponse , IjwtPayload , Ipagination, PaginationResponse } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 import { ImessageDoc } from '../models/message.model';
+import { UnreadMessageCount } from '../services/countUnReadMessage.service';
 
 
 
@@ -24,9 +25,6 @@ declare global {
 }
 
 
-
-
-
 export interface SendMessageHandler
 extends RequestHandler<unknown , SuccessResponse<{data:ImessageDoc}> , Partial<Pick<ImessageDoc , 'content' | 'receiver'>> , unknown>{}
 
@@ -34,7 +32,7 @@ export interface UpdateMessageHandler
 extends RequestHandler<{message:string} , SuccessResponse<{data:ImessageDoc}> , Partial<Pick<ImessageDoc , 'content' | 'reactions'>> , unknown >{}
 
 export interface GetLoggedUserChatsHandler
-extends RequestHandler<unknown , SuccessResponse<{data:[ImessageDoc[]]}> , unknown , {limit?:number , page?:number}>{}
+extends RequestHandler<unknown , PaginationResponse<{data:ImessageDoc[][]}> , unknown , {limit?:number , page?:number}>{}
 
 export interface DeleteMessageHandler
 extends RequestHandler<{message:string} , SuccessResponse<unknown> , unknown , unknown>{}
@@ -42,12 +40,13 @@ extends RequestHandler<{message:string} , SuccessResponse<unknown> , unknown , u
 export interface DeleteChatHandler
 extends RequestHandler<{receiver:string} , SuccessResponse<unknown> , unknown , unknown>{}
 
-export interface getSpecificChatHandler
-extends RequestHandler<{receiver:string} , SuccessResponse<{data:ImessageDoc[]}> , unknown , {limit?:number , page?:number}>{}
+export interface GetSpecificChatHandler
+extends RequestHandler<{receiver:string} , PaginationResponse<{data:ImessageDoc[] , unreadMessage:UnreadMessageCount[]}> , unknown , {limit?:number , page?:number}>{}
 
-export interface markMessageAsWatchedHandler
-extends RequestHandler<{message:string} , SuccessResponse<unknown> , {messages:[string]} , unknown>{}
+export interface GetChatFromUserToUserHandler
+extends RequestHandler<{sender:string , receiver:string} , PaginationResponse<{data:ImessageDoc[] , unreadMessage:UnreadMessageCount[]}> , unknown , {limit?:number , page?:number , toDate?:Date , fromDate?:Date}>{}
 
-export interface getChatFromUserToUserHandler
-extends RequestHandler<{sender:string , receiver:string} , SuccessResponse<{data:ImessageDoc[]}> , unknown , {limit?:number , page?:number}>{}
+export interface MarkMessageAsWatchedHandler
+extends RequestHandler<{receiver:string} , SuccessResponse<unknown> , {messages:[string]} , unknown>{}
+
 

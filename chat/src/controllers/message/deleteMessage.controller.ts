@@ -1,6 +1,5 @@
 import 'express-async-errors';
 import { Bucket, NotFound, UnauthorizedError } from '@duvdu-v1/duvdu';
-import { Types } from 'mongoose';
 
 import { Message } from '../../models/message.model';
 import { DeleteMessageHandler } from '../../types/endpoints';
@@ -12,7 +11,7 @@ export const deleteMessageHandler:DeleteMessageHandler = async (req,res,next)=>{
   if (!message) 
     return next(new NotFound(`message not found ${req.params.message}`));
 
-  if ([message.sender , message.receiver].includes(new Types.ObjectId(req.loggedUser.id))) 
+  if (message.sender.toString() != req.loggedUser.id) 
     return next(new UnauthorizedError(`user dont owner for this message ${req.params.message}`));
 
   if (message.media?.url) {

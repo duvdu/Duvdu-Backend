@@ -27,6 +27,11 @@ export const sendMessageHandler:SendMessageHandler = async (req,res,next)=>{
     sender:req.loggedUser.id
   });
 
-  const populatedMessage = await message.populate([{path:'sender' , select:'profileImage isOnline username name'}]);
+  const populatedMessage = await message
+    .populate([
+      {path:'sender' , select:'profileImage isOnline username name'},
+      {path:'receiver' , select:'profileImage isOnline username name'},
+      { path: 'reactions.user', select: 'profileImage isOnline username name' }
+    ]);
   res.status(201).json({message:'success' , data:populatedMessage});
 };
