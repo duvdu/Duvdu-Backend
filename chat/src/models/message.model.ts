@@ -12,8 +12,8 @@ export interface ImessageDoc {
     receiver: Types.ObjectId | Iuser;
     content?: string;
     media?: {
-      type: string; 
-      url: string;
+      type: string | null; 
+      url: string | null;
     };
     reactions: Ireaction[];
     watched: boolean;
@@ -42,13 +42,17 @@ export const Message = model<ImessageDoc>(MODELS.messages , new Schema<ImessageD
   reactions:[reactionSchema],
   media: {
     type: {
-      type: String
+      type: String,
+      default:null
     },
-    url: String,
+    url: {
+      type:String,
+      default:null
+    }
   },
   watched:{
     type:Boolean,
-    default:false
+    default:false 
   }
 },{timestamps:true , collection:MODELS.messages , toJSON: {
   transform(doc, ret) {
