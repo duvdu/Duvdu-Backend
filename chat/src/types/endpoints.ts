@@ -1,64 +1,52 @@
 /* eslint-disable @typescript-eslint/no-namespace */
-import { IjwtPayload } from '@duvdu-v1/duvdu';
+import { SuccessResponse , IjwtPayload , Ipagination, PaginationResponse } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-import { Imessage } from './Message';
-import { Inotification } from './Notification';
-import { Iuser } from './User';
-type successResponse<T> = T & {
-  message: 'success';
-};
+import { ImessageDoc } from '../models/message.model';
+import { UnreadMessageCount } from '../services/countUnReadMessage.service';
+
+
+
 
 declare module 'express-session' {
   interface SessionData {
-    jwt?: string;
+    access: string;
+    refresh: string;
   }
 }
 
 declare global {
   namespace Express {
     interface Request {
-      loggedUser?: IjwtPayload;
+      loggedUser: IjwtPayload;
+      pagination: Ipagination;
     }
   }
 }
-// emit event (new_message) to the target user
+
+
 export interface SendMessageHandler
-  extends RequestHandler<
-    unknown,
-    successResponse<unknown>,
-    Pick<Imessage, 'targetUser' | 'message' | 'attachment'>,
-    unknown
-  > {}
+extends RequestHandler<unknown , SuccessResponse<{data:ImessageDoc}> , Partial<Pick<ImessageDoc , 'content' | 'receiver'>> , unknown>{}
 
-// get all messages with between two users ordered by createdAt
-// update all messages to be watched and noticed
-// message_watched fired to every message updated to watched
-export interface GetMessagesHandler
-  extends RequestHandler<
-    { targetUser: string },
-    successResponse<{
-      data: Imessage[];
-    }>,
-    unknown,
-    { limit: number; page: number; skip: number }
-  > {}
+export interface UpdateMessageHandler
+extends RequestHandler<{message:string} , SuccessResponse<{data:ImessageDoc}> , Partial<Pick<ImessageDoc , 'content' | 'reactions'>> , unknown >{}
 
-export interface GetChatsHandler
-  extends RequestHandler<
-    unknown,
-    successResponse<{ targetUser: Iuser & { lastMessage: string; messageCounter: number }[] }>,
-    unknown,
-    { limit: number; page: number; skip: number }
-  > {}
+export interface GetLoggedUserChatsHandler
+extends RequestHandler<unknown , PaginationResponse<{data:ImessageDoc[][]}> , unknown , {limit?:number , page?:number}>{}
 
-export interface GetNotificationsHandler
-  extends RequestHandler<
-    unknown,
-    successResponse<{ data: Inotification[] }>,
-    unknown,
-    { limit: number; skip: number; page: number }
-  > {}
+export interface DeleteMessageHandler
+extends RequestHandler<{message:string} , SuccessResponse<unknown> , unknown , unknown>{}
 
-export interface CreateNotificationHandler
-  extends RequestHandler<unknown, successResponse<unknown>, Inotification> {}
+export interface DeleteChatHandler
+extends RequestHandler<{receiver:string} , SuccessResponse<unknown> , unknown , unknown>{}
+
+export interface GetSpecificChatHandler
+extends RequestHandler<{receiver:string} , PaginationResponse<{data:ImessageDoc[] , unreadMessage:UnreadMessageCount[]}> , unknown , {limit?:number , page?:number}>{}
+
+export interface GetChatFromUserToUserHandler
+extends RequestHandler<{sender:string , receiver:string} , PaginationResponse<{data:ImessageDoc[] , unreadMessage:UnreadMessageCount[]}> , unknown , {limit?:number , page?:number , toDate?:Date , fromDate?:Date}>{}
+
+export interface MarkMessageAsWatchedHandler
+extends RequestHandler<{receiver:string} , SuccessResponse<unknown> , {messages:[string]} , unknown>{}
+
+

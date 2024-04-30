@@ -23,6 +23,23 @@ export const appInit = async () => {
         PERMISSIONS.updateProfile,
       ],
     });
+  else
+    await Roles.findOneAndUpdate({key:SystemRoles.verified} ,{
+      permissions:[
+        PERMISSIONS.bookmarks,
+        PERMISSIONS.changePassword,
+        PERMISSIONS.resetPassword,
+        PERMISSIONS.updatePhoneNumber,
+        PERMISSIONS.updateProfile,
+        PERMISSIONS.createCopyrightHandler,
+        PERMISSIONS.createProtfolioProjectHandler,
+        PERMISSIONS.createStudioProjectHandler,
+        PERMISSIONS.updatePortfolioProjectHandler,
+        PERMISSIONS.updateStudioProjectHandler,
+        PERMISSIONS.updateCopyrightHandler,
+        PERMISSIONS.createTicket,
+      ]
+    });
   if (!(await Roles.findOne({ key: SystemRoles.unverified })))
     await Roles.create({
       key: SystemRoles.unverified,

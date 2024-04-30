@@ -1,11 +1,11 @@
 import {
-  isauthenticated,
   checkRequiredFields,
   globalPaginationMiddleware,
   PERMISSIONS,
   uploadProjectMedia,
   isauthorized,
   FOLDERS,
+  isauthenticated,
 } from '@duvdu-v1/duvdu';
 import { Router } from 'express';
 

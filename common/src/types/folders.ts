@@ -3,5 +3,6 @@ export enum FOLDERS {
   studio_booking = 'studio-booking',
   report = 'report',
   category = 'category',
-  auth = 'auth'
+  auth = 'auth',
+  chat = 'chat'
 }
