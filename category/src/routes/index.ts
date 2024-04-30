@@ -12,7 +12,6 @@ import * as handler from '../controllers';
 import * as val from '../validators/categoryVal';
 
 export const router = express.Router();
-
 router.get(
   '/crm',
   isauthenticated,
