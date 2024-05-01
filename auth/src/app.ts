@@ -27,7 +27,7 @@ app.use(
     saveUninitialized: false,
     store:
       env.environment !== 'test' && env.expressSession.allowUseStorage
-        ? sessionStore('redis://redis-13741.c84.us-east-1-2.ec2.redns.redis-cloud.com:13741')
+        ? sessionStore('redis://expiration-redis-srv:6379')
         : undefined,
     cookie: {
       sameSite: 'none',
