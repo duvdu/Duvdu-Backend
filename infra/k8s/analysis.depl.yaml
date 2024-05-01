@@ -76,11 +76,6 @@ spec:
                 secretKeyRef:
                   name: redis-host
                   key: REDIS_HOST
-            - name: REDIS_PORT
-              valueFrom:
-                secretKeyRef:
-                  name: redis-port
-                  key: REDIS_PORT
             - name: REDIS_PASS
               valueFrom:
                 secretKeyRef:

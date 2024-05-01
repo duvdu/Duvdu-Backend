@@ -22,7 +22,6 @@ export const env = {
   redis: {
     uri: process.env.REDIS_HOST as string,
     pass: process.env.RESIS_PASS as string,
-    port: process.env.RESIS_PORT ,
   },
   aws: {
     s3: {
@@ -42,7 +41,6 @@ export const checkEnvVariables = () => {
   if (!env.expressSession.secret) return new Error('env:SESSION_SECRET must be defined');
   if (!env.redis.uri) return new Error('env:REDIS_HOST must be defined');
   if (!env.redis.pass) return new Error('env:REDIS_PASS must be defined');
-  if (!env.redis.port) return new Error('env:REDIS_PORT must be defined');
   if (!env.aws.s3.access) return new Error('env:BUCKET_ACESS_KEY must be defined');
   if (!env.aws.s3.secret) return new Error('env:BUCKET_SECRET_KEY must be defined');
   if (!env.aws.s3.name) return new Error('env:BUCKET_NAME must be defined');
