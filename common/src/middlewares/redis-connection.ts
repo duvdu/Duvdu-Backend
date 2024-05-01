@@ -4,8 +4,14 @@ import { createClient } from 'redis';
 import { DatabaseConnectionError } from '../errors/data-base-connections';
 
 
-export const redisConnection = (url: string) => {
-  const client = createClient({ url });
+export const redisConnection = (url: string , password:string , port:number) => {
+  const client = createClient({
+    password,
+    socket:{
+      host:url,
+      port
+    }
+  });
   client
     .connect()
     .then(() => console.log(`redis connected in : ${url}`))
@@ -15,4 +21,4 @@ export const redisConnection = (url: string) => {
   return client;
 };
 
-export const sessionStore = (url: string) => new RedisStore({ client: redisConnection(url) });
+export const sessionStore = (url: string , password:string , port:number) => new RedisStore({ client: redisConnection(url, password , port) });

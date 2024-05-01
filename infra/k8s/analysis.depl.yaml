@@ -72,7 +72,15 @@ spec:
                   name: node-env
                   key: NODE_ENV
             - name: REDIS_HOST
-              value: redis://expiration-redis-srv:6379
+              valueFrom:
+                secretKeyRef:
+                  name: redis-host
+                  key: REDIS_HOST
+            - name: REDIS_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: redis-pass
+                  key: REDIS_PASS
 
 
 ---

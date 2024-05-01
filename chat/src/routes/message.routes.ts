@@ -8,7 +8,7 @@ import * as val from '../validation/message.val';
 
 export const router = express.Router();
 
-// router.use(isauthenticated);
+router.use(isauthenticated);
 
 router.get('/:receiver/chat/:sender',globalPaginationMiddleware,val.getChatFromToVal, handler.getChatFromToHandler);
 
@@ -25,4 +25,3 @@ router.route('/:receiver/chat')
 router.route('/:message')
   .patch(uploadProjectMedia(FOLDERS.chat),val.updateMessageVal , handler.updateMessageHandler)
   .delete( val.deleteMessageVal , handler.deleteMessageHandler);
-
