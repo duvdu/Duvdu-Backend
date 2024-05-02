@@ -25,7 +25,7 @@ export const mySession = session({
   saveUninitialized: false,
   store:
     env.environment !== 'test' && env.expressSession.allowUseStorage
-      ? sessionStore('redis://expiration-redis-srv:6379')
+      ? sessionStore(env.redis.uri , env.redis.pass)
       : undefined,
   cookie: {
     sameSite: 'none',

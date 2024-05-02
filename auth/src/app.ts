@@ -1,6 +1,6 @@
 import 'express-async-errors';
 import './types/custom-definition';
-import { globalErrorHandlingMiddleware, sessionStore } from '@duvdu-v1/duvdu';
+import {  globalErrorHandlingMiddleware, sessionStore } from '@duvdu-v1/duvdu';
 import cors from 'cors';
 import express from 'express';
 import session from 'express-session';
@@ -20,6 +20,9 @@ app.use(
   }),
 );
 
+
+
+
 app.use(
   session({
     secret: env.expressSession.secret,
@@ -27,7 +30,7 @@ app.use(
     saveUninitialized: false,
     store:
       env.environment !== 'test' && env.expressSession.allowUseStorage
-        ? sessionStore('redis://expiration-redis-srv:6379')
+        ? sessionStore(env.redis.uri , env.redis.pass)
         : undefined,
     cookie: {
       sameSite: 'none',
