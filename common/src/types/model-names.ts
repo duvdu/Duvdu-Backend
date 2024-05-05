@@ -12,5 +12,6 @@ export enum MODELS {
   report = 'report',
   copyrights = 'copyrights',
   projects = 'allProjects',
-  messages = 'messages'
+  messages = 'messages',
+  notifications = 'notifications'
 }
