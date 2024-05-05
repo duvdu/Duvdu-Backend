@@ -1,6 +1,6 @@
 import 'express-async-errors';
 import './types/custom-definition';
-import { globalErrorHandlingMiddleware, sessionStore } from '@duvdu-v1/duvdu';
+import { globalErrorHandlingMiddleware, languageHeaderMiddleware, sessionStore } from '@duvdu-v1/duvdu';
 import cors from 'cors';
 import express from 'express';
 import session from 'express-session';
@@ -37,6 +37,7 @@ app.use(
   }),
 );
 
+app.use(languageHeaderMiddleware);
 app.use('/api/portfolio-post', apiRoutes);
 
 app.use(globalErrorHandlingMiddleware);
