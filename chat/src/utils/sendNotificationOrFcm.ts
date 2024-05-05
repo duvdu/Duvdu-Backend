@@ -1,8 +1,7 @@
-import { NotFound, Users } from '@duvdu-v1/duvdu';
+import { Inotification, NotFound, Users } from '@duvdu-v1/duvdu';
 import SocketIO from 'socket.io';
 
 import admin from './fireBaseConfig';
-import { Inotification } from '../models/notification.model';
 
 
 
