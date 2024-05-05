@@ -1,5 +1,5 @@
+import { Message } from '@duvdu-v1/duvdu';
 import { Types } from 'mongoose';
-import { Message } from '../models/message.model';
 
 export interface UnreadMessageCount {
   _id: string;

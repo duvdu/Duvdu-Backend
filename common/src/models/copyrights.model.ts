@@ -11,11 +11,14 @@ export interface IcopyRights {
   price: number;
   duration: string;
   address: string;
+  location: { lat: number; lng: number };
   searchKeywords: string[];
   showOnHome: boolean;
   cycle: number;
   rate: { ratersCounter: number; totalRates: number };
   isDeleted: boolean;
+  tags: {ar:string , en:string}[];
+  subCategory:{ar:string , en:string};
 }
 
 export const CopyRights = model<IcopyRights>(
@@ -35,6 +38,15 @@ export const CopyRights = model<IcopyRights>(
         ratersCounter: { type: Number, default: 0 },
         totalRates: { type: Number, default: 0 },
       },
+      tags: [{ ar: { type: String, default: null }, en: { type: String, default: null } }],
+      subCategory:{
+        ar:String,
+        en:String
+      },
+      location: {
+        lat: { type: Number, default: null },
+        lng: { type: Number, default: null },
+      }
     },
     {
       timestamps: true,

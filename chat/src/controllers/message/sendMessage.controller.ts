@@ -1,8 +1,11 @@
 import 'express-async-errors';
-import { Bucket, Files, FOLDERS, NotFound, Users } from '@duvdu-v1/duvdu';
+import { Bucket, Files, FOLDERS, Message, NotFound, Notification, Users } from '@duvdu-v1/duvdu';
 
-import { Message } from '../../models/message.model';
-import { SendMessageHandler } from '../../types/endpoints';
+import { SendMessageHandler } from '../../types/endpoints/mesage.endpoints';
+import { NotificationType } from '../../types/notification.type';
+import { NotificationDetails } from '../../types/notificationDetails';
+import { Channels } from '../../types/socketChannels';
+import { sendNotificationOrFCM } from '../../utils/sendNotificationOrFcm';
 
 
 
@@ -33,5 +36,21 @@ export const sendMessageHandler:SendMessageHandler = async (req,res,next)=>{
       {path:'receiver' , select:'profileImage isOnline username name'},
       { path: 'reactions.user', select: 'profileImage isOnline username name' }
     ]);
+
+  const notification = await Notification.create({
+    targetUser:req.body.receiver,
+    sourceUser:req.loggedUser.id,
+    target:message._id,
+    type:NotificationType.new_message,
+    message:NotificationDetails.newMessage.message,
+    title:NotificationDetails.newMessage.title
+  });
+
+  const io = req.app.get('socketio');
+  const populatedNotification = await (
+    await notification.save()
+  ).populate('sourceUser', 'name username profileImage');
+
+  await sendNotificationOrFCM(io , Channels.new_message , notification.targetUser.toString() , {title:notification.title , message:notification.message},populatedNotification);
   res.status(201).json({message:'success' , data:populatedMessage});
 };

@@ -17,6 +17,8 @@ export const getProjectsPagination: RequestHandler<
     showOnHome?: boolean;
     startDate?: Date;
     endDate?: Date;
+    tags?:string;
+    subCategory?:string;
   }
 > = (req, res, next) => {
   req.pagination.filter = {};
@@ -63,6 +65,12 @@ export const getProjectsPagination: RequestHandler<
       $lte: req.query.endDate || new Date(),
     };
   }
+  if (req.query.subCategory) {
+    req.pagination.filter[`subCategory.${req.lang}`] = req.query.subCategory;
+  }
+  if (req.query.tags) {
+    req.pagination.filter['tags.' + req.lang] = req.query.tags;
+  }
   next();
 };
 
@@ -74,14 +82,48 @@ export const getProjectsHandler: RequestHandler<
     ...req.pagination.filter,
     isDeleted: { $ne: true },
   });
-  const studioBookings = await studioBooking
-    .find({
-      ...req.pagination.filter,
-      isDeleted: { $ne: true },
-    })
-    .sort('-createdAt')
-    .limit(req.pagination.limit)
-    .skip(req.pagination.skip);
+
+  const studioBookings = await studioBooking.aggregate([
+    {
+      $match: {
+        ...req.pagination.filter,
+        isDeleted: { $ne: true },
+      }
+    },
+    {
+      $sort: { createdAt: -1 }
+    },
+    {
+      $limit: req.pagination.limit
+    },
+    {
+      $skip: req.pagination.skip
+    },
+    {
+      $addFields: {
+        subCategory: {
+          $cond: {
+            if: { $eq: ['ar', req.lang] },
+            then: '$subCategory.ar',
+            else: '$subCategory.en'
+          }
+        },
+        tags: {
+          $map: {
+            input: '$tags',
+            as: 'tag',
+            in: {
+              $cond: {
+                if: { $eq: ['ar', req.lang] },
+                then: '$$tag.ar',
+                else: '$$tag.en'
+              }
+            }
+          }
+        }
+      }
+    }
+  ]);
 
   res.status(200).json({
     message: 'success',

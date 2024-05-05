@@ -19,6 +19,6 @@ export const signupVal = [
     minUppercase: 1,
     minNumbers: 1,
   }),
-
+  body('notificationToken').optional().isString(),
   globalValidatorMiddleware,
 ];

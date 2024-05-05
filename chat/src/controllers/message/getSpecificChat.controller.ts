@@ -1,9 +1,8 @@
 import 'express-async-errors';
-import { NotFound } from '@duvdu-v1/duvdu';
+import { Message, NotFound } from '@duvdu-v1/duvdu';
 
-import { Message } from '../../models/message.model';
 import { getUnreadMessageCounts } from '../../services/countUnReadMessage.service';
-import { GetSpecificChatHandler } from '../../types/endpoints';
+import { GetSpecificChatHandler } from '../../types/endpoints/mesage.endpoints';
 
 
 export const getSpecificChatHandler:GetSpecificChatHandler = async (req,res,next)=>{

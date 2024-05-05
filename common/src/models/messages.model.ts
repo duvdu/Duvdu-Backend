@@ -1,5 +1,7 @@
-import { MODELS , Iuser } from '@duvdu-v1/duvdu';
 import  { model, Schema , Types } from 'mongoose';
+
+import { MODELS } from '../types/model-names';
+import { Iuser } from '../types/User';
 
 
 interface Ireaction {
@@ -17,6 +19,7 @@ export interface ImessageDoc {
     };
     reactions: Ireaction[];
     watched: boolean;
+    updated:boolean
   }
 
 const reactionSchema = new Schema({
@@ -28,12 +31,12 @@ export const Message = model<ImessageDoc>(MODELS.messages , new Schema<ImessageD
   sender:{
     type:Schema.Types.ObjectId,
     ref:MODELS.user,
-    // required:true
+    required:true
   },
   receiver:{
     type:Schema.Types.ObjectId,
     ref:MODELS.user,
-    // required:true
+    required:true
   },
   content:{
     type:String,
@@ -42,11 +45,19 @@ export const Message = model<ImessageDoc>(MODELS.messages , new Schema<ImessageD
   reactions:[reactionSchema],
   media: {
     type: {
-      type: String
+      type: String,
+      default:null
     },
-    url: String,
+    url: {
+      type:String,
+      default:null
+    },
   },
   watched:{
+    type:Boolean,
+    default:false
+  },
+  updated:{
     type:Boolean,
     default:false
   }
@@ -56,3 +67,12 @@ export const Message = model<ImessageDoc>(MODELS.messages , new Schema<ImessageD
   }
 }
 }));
+
+Message.schema.set('toJSON', {
+  transform: function (doc, ret) {
+    if (ret.media?.url) {
+      ret.media.url = process.env.BUCKET_HOST + '/' + ret.media.url;
+    }
+    return ret;
+  }
+});

@@ -14,7 +14,8 @@ export interface IportfolioPost {
   tools: { name: string; fees: number }[];
   searchKeywords: string[];
   creatives: { creative: Types.ObjectId | Iuser; fees: number }[];
-  tags: string[];
+  tags: {ar:string , en:string}[];
+  subCategory:{ar:string , en:string};
   projectBudget: number;
   category: Types.ObjectId;
   projectScale: { scale: number; time: 'minutes' | 'hours' };
@@ -42,7 +43,11 @@ export const PortfolioPosts = model<IportfolioPost>(
           fees: { type: Number, default: null },
         },
       ],
-      tags: [String],
+      tags:[{ ar: { type: String, default: null }, en: { type: String, default: null } }],
+      subCategory:{
+        ar:String,
+        en:String
+      },
       projectBudget: { type: Number, default: null },
       category: { type: Schema.Types.ObjectId, ref: MODELS.category, required: true },
       projectScale: { scale: { type: Number, default: 0 }, time: { type: String, default: null } },
@@ -71,3 +76,15 @@ export const PortfolioPosts = model<IportfolioPost>(
     .index({ createdAt: 1, updatedAt: -1 })
     .index({ title: 'text', desc: 'text', tools: 'text', searchKeywords: 'text' }),
 );
+
+PortfolioPosts.schema.set('toJSON', {
+  transform: function (doc, ret) {
+    if (ret.cover) {
+      ret.cover = process.env.BUCKET_HOST + '/' + ret.cover;
+    }
+    if (ret.attachments) {
+      ret.attachments = ret.attachments.map((el: string) => process.env.BUCKET_HOST + '/' + el);
+    }
+    return ret;
+  }
+});

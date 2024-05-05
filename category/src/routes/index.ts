@@ -5,6 +5,7 @@ import {
   FOLDERS,
   uploadProjectMedia,
   checkRequiredFields,
+  globalPaginationMiddleware,
 } from '@duvdu-v1/duvdu';
 import express from 'express';
 
@@ -16,6 +17,9 @@ router.get(
   '/crm',
   isauthenticated,
   isauthorized(PERMISSIONS.getAdminCategories),
+  val.getCategoriesForCrmVal,
+  globalPaginationMiddleware,
+  handler.getCategoriesAdminPagination,
   handler.getCatogriesAdminHandler,
 );
 
@@ -29,7 +33,7 @@ router
     val.createCategoryVal,
     handler.createCategoryHandler,
   )
-  .get(handler.getCategoriesHandler);
+  .get(val.getCategoriesVal , globalPaginationMiddleware , handler.getCategoriesPagination,handler.getCategoriesHandler);
 
 router
   .route('/:categoryId')

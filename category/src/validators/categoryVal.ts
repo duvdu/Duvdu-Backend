@@ -1,5 +1,5 @@
 import { globalValidatorMiddleware, CYCLES } from '@duvdu-v1/duvdu';
-import { body, param } from 'express-validator';
+import { body, check, param } from 'express-validator';
 
 export const createCategoryVal = [
   body('title').isObject(),
@@ -92,3 +92,18 @@ export const updateCategoryVal = [
 export const removeCategoryVal = [param('categoryId').isMongoId(), globalValidatorMiddleware];
 
 export const getCatogryVal = [param('categoryId').isMongoId(), globalValidatorMiddleware];
+
+export const getCategoriesForCrmVal = [
+  check('search').optional().isString().notEmpty(),
+  check('title').optional().isString().notEmpty(),
+  check('cycle').optional().isString().notEmpty(),
+  check('status').optional().isBoolean().toBoolean(),
+  globalValidatorMiddleware
+];
+
+export const getCategoriesVal = [
+  check('search').optional().isString().notEmpty(),
+  check('title').optional().isString().notEmpty(),
+  check('cycle').optional().isString().notEmpty(),
+  globalValidatorMiddleware
+];

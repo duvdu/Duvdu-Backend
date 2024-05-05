@@ -28,6 +28,7 @@ export const signinHandler: SigninHandler = async (req, res, next) => {
   req.session.access = accessToken;
   req.session.refresh = refreshToken;
   user.token = refreshToken;
+  user.notificationToken = req.body.notificationToken?req.body.notificationToken:null;
 
   await user.save();
   res.status(200).json({ message: 'success' });

@@ -63,3 +63,6 @@ export * from './models/copyrights.model';
 export * from './models/studio-booking.model';
 export * from './models/allProjects.model';
 export * from './models/report.model';
+export * from './models/messages.model';
+export * from './models/notification.model';
+export * from './services/category.service';

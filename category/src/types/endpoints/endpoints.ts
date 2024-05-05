@@ -1,7 +1,26 @@
 /* eslint-disable @typescript-eslint/no-namespace */
-import { Icategory } from '@duvdu-v1/duvdu';
+import { Icategory, IjwtPayload, Ipagination } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
+
+
+
+declare module 'express-session' {
+  interface SessionData {
+    access: string;
+    refresh: string;
+  }
+}
+
+declare global {
+  namespace Express {
+    interface Request {
+      loggedUser: IjwtPayload;
+      pagination: Ipagination;
+      lang: 'en' | 'ar';
+    }
+  }
+}
 
 
 type successResponse<T> = T & {

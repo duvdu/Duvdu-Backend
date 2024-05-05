@@ -1,9 +1,8 @@
 import 'express-async-errors';
 
-import { BadRequestError } from '@duvdu-v1/duvdu';
+import { BadRequestError, Message } from '@duvdu-v1/duvdu';
 
-import { Message } from '../../models/message.model';
-import { MarkMessageAsWatchedHandler } from '../../types/endpoints';
+import { MarkMessageAsWatchedHandler } from '../../types/endpoints/mesage.endpoints';
 
 
 export const markMessageAsWatchedHandler:MarkMessageAsWatchedHandler = async (req,res , next)=>{

@@ -17,6 +17,7 @@ declare global {
     interface Request {
       loggedUser: IjwtPayload;
       pagination: Ipagination;
+      lang: 'ar'|'en'
     }
   }
 }
@@ -45,7 +46,7 @@ export interface CreateProjectHandler
       | 'showOnHome'
       | 'category'
       | 'creatives'
-    > & { invitedCreatives?: [{ phoneNumber: { number: string }; fees: number }] }
+    > & { invitedCreatives?: [{ phoneNumber: { number: string }; fees: number }] , tags:string[]; subCategory:string; }
   > {}
 
 export interface UpdateProjectHandler

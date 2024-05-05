@@ -1,8 +1,7 @@
 import 'express-async-errors';
-import { Bucket, NotFound, UnauthorizedError } from '@duvdu-v1/duvdu';
+import { Bucket, Message, NotFound, UnauthorizedError } from '@duvdu-v1/duvdu';
 
-import { Message } from '../../models/message.model';
-import { DeleteMessageHandler } from '../../types/endpoints';
+import { DeleteMessageHandler } from '../../types/endpoints/mesage.endpoints';
 
 
 

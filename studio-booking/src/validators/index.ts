@@ -24,6 +24,9 @@ export const createProjectVal = [
   check('invitedCreatives.*.phoneNumber').isObject(),
   check('invitedCreatives.*.phoneNumber.number').isMobilePhone('ar-EG'),
   check('invitedCreatives.*.fees').isFloat({ gt: 0 }).toFloat(),
+  check('tags').isArray(),
+  check('tags.*').isString().trim().isLength({ min: 3 }),
+  check('subCategory').isMongoId(),
   globalValidatorMiddleware,
 ];
 
@@ -87,5 +90,7 @@ export const getAllProjectsVal = [
   check('showOnHome').optional().isBoolean(),
   check('startDate').optional().isISO8601(),
   check('endDate').optional().isISO8601(),
+  check('tags').optional().isString(),
+  check('subCategory').optional().isString(),
   globalValidatorMiddleware,
 ];

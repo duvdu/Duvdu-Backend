@@ -35,6 +35,10 @@ const userSchema = new Schema<Iuser>(
       value: { type: Boolean, default: false },
       reason: { type: String, default: null },
     },
+    notificationToken:{
+      type:String,
+      default:null
+    }
   },
   { timestamps: true,
     collection: MODELS.user,

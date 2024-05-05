@@ -1,8 +1,8 @@
 import 'express-async-errors';
+import { Message } from '@duvdu-v1/duvdu';
 import { Types } from 'mongoose';
 
-import { Message } from '../../models/message.model';
-import { GetLoggedUserChatsHandler } from '../../types/endpoints';
+import { GetLoggedUserChatsHandler } from '../../types/endpoints/mesage.endpoints';
 
 
 

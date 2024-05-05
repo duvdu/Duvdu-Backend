@@ -47,4 +47,13 @@ const categorySchema = new mongoose.Schema<Icategory>(
   },
 );
 
+categorySchema.set('toJSON', {
+  transform: function (doc, ret) {
+    if (ret.image) ret.image = process.env.BUCKET_HOST + '/' + ret.image;
+    return ret;
+  }
+});
+
+
+
 export const Categories = mongoose.model<Icategory>(MODELS.category, categorySchema);

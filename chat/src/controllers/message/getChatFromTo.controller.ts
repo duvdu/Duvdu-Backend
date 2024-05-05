@@ -1,9 +1,8 @@
 import 'express-async-errors';
-import { NotFound } from '@duvdu-v1/duvdu';
+import { Message, NotFound } from '@duvdu-v1/duvdu';
 
-import { Message } from '../../models/message.model';
 import { getUnreadMessageCounts } from '../../services/countUnReadMessage.service';
-import { GetChatFromUserToUserHandler } from '../../types/endpoints';
+import { GetChatFromUserToUserHandler } from '../../types/endpoints/mesage.endpoints';
 
 
 export const getChatFromToHandler:GetChatFromUserToUserHandler = async (req ,res ,next)=>{
@@ -34,7 +33,6 @@ export const getChatFromToHandler:GetChatFromUserToUserHandler = async (req ,res
     return next(new NotFound(`no chat created between to users ${req.params.receiver} ${req.params.sender}`));
 
   const unreadMessage = await getUnreadMessageCounts(req.params.receiver , req.params.sender);
-  console.log(unreadMessage);
   
   const resultCount = await Message.countDocuments(req.pagination.filter);
 

@@ -29,8 +29,9 @@ export const create = [
   body('tools').optional().isArray(),
   body('tools.*.name').isString().trim().isLength({ min: 2 }),
   body('tools.*.fees').isFloat({ gt: 0 }).toFloat(),
-  body('tags').optional().isArray(),
+  body('tags').isArray(),
   body('tags.*').isString().trim().isLength({ min: 3 }),
+  body('subCategory').isMongoId(),
   globalValidatorMiddleware,
 ];
 
@@ -94,6 +95,8 @@ export const findAll = [
     .optional()
     .isISO8601()
     .customSanitizer((val) => (val ? new Date(val) : new Date())),
+  query('tags').optional().isString(),
+  query('subCategory').optional().isString(),
   globalValidatorMiddleware,
 ];
 
