@@ -1,9 +1,8 @@
 import 'express-validator';
-import { BadRequestError, Bucket, Files, FOLDERS, NotFound, UnauthorizedError } from '@duvdu-v1/duvdu';
+import { BadRequestError, Bucket, Files, FOLDERS, Message, NotFound, UnauthorizedError } from '@duvdu-v1/duvdu';
 import { Types } from 'mongoose';
 
-import { Message } from '../../models/message.model';
-import { UpdateMessageHandler } from '../../types/endpoints';
+import { UpdateMessageHandler } from '../../types/endpoints/mesage.endpoints';
 
 
 
@@ -30,8 +29,9 @@ export const updateMessageHandler:UpdateMessageHandler = async (req,res,next)=>{
   if (req.body.reactions) 
     req.body.reactions[0].user = new Types.ObjectId(req.loggedUser.id);
 
-  const updatedMessage = await Message.findByIdAndUpdate(req.params.message , req.body , {new:true});
+  const updatedMessage = await Message.findByIdAndUpdate(req.params.message , {...req.body , updated:true} , {new:true});
   if (!updatedMessage) 
     return next(new BadRequestError(`failed to update this message ${req.params.message}`));
+
   res.status(200).json({message:'success' , data:updatedMessage});
 };

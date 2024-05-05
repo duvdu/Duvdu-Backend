@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-namespace */
-import { SuccessResponse , IjwtPayload , Ipagination, PaginationResponse } from '@duvdu-v1/duvdu';
+import { SuccessResponse , IjwtPayload , Ipagination, PaginationResponse, ImessageDoc } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-import { ImessageDoc } from '../models/message.model';
-import { UnreadMessageCount } from '../services/countUnReadMessage.service';
+import { UnreadMessageCount } from '../../services/countUnReadMessage.service';
 
 
 

@@ -1,8 +1,7 @@
 import 'express-async-errors';
-import { BadRequestError, Bucket } from '@duvdu-v1/duvdu';
+import { BadRequestError, Bucket, Message } from '@duvdu-v1/duvdu';
 
-import { Message } from '../../models/message.model';
-import { DeleteChatHandler } from '../../types/endpoints';
+import { DeleteChatHandler } from '../../types/endpoints/mesage.endpoints';
 
 
 

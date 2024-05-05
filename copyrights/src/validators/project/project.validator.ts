@@ -4,7 +4,7 @@ import { body, param, query } from 'express-validator';
 export const create = [
   body('category').isMongoId(),
   body('price').isFloat({ gt: 0 }),
-  body('duration').isString(),
+  body('duration').isInt(),
   body('address').optional().isString().trim(),
   body('searchKeywords').optional().isArray(),
   body('searchKeywords.*').isString().trim().isLength({ min: 3 }),
@@ -15,7 +15,7 @@ export const create = [
 export const update = [
   param('projectId').isMongoId(),
   body('price').optional().isFloat({ gt: 0 }),
-  body('duration').optional().isString(),
+  body('duration').optional().isInt(),
   body('address').optional().isString().trim(),
   body('searchKeywords').optional().isArray(),
   body('searchKeywords.*').isString().trim().isLength({ min: 3 }),

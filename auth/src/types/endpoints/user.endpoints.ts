@@ -17,7 +17,7 @@ export interface SigninHandler
   extends RequestHandler<
     unknown,
     successResponse<unknown>,
-    { username: string; password: string },
+    { username: string; password: string , notificationToken?:string },
     unknown
   > {}
 
@@ -30,6 +30,7 @@ export interface SignupHandler
       phoneNumber: { key: string; number: string };
       username: string;
       password: string;
+      notificationToken?:string;
     },
     unknown
   > {}
