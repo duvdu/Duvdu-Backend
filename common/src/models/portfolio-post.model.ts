@@ -14,7 +14,7 @@ export interface IportfolioPost {
   tools: { name: string; fees: number }[];
   searchKeywords: string[];
   creatives: { creative: Types.ObjectId | Iuser; fees: number }[];
-  tags: string[];
+  tags: {ar:string , en:string}[];
   subCategory:{ar:string , en:string};
   projectBudget: number;
   category: Types.ObjectId;
@@ -43,7 +43,7 @@ export const PortfolioPosts = model<IportfolioPost>(
           fees: { type: Number, default: null },
         },
       ],
-      tags: [String],
+      tags:[{ ar: { type: String, default: null }, en: { type: String, default: null } }],
       subCategory:{
         ar:String,
         en:String

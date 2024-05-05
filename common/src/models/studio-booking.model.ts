@@ -23,7 +23,7 @@ export interface IstudioBooking {
   rate: { ratersCounter: number; totalRates: number };
   isDeleted: boolean;
   creatives: { creative: Types.ObjectId | Iuser; fees: number }[];
-  tags: string[];
+  tags: {ar:string , en:string}[];
   subCategory:{ar:string , en:string};
 }
 
@@ -69,7 +69,7 @@ export const studioBooking = model<IstudioBooking>(
         ratersCounter: { type: Number, default: 0 },
         totalRates: { type: Number, default: 0 },
       },
-      tags: [String],
+      tags: [{ ar: { type: String, default: null }, en: { type: String, default: null } }],
       subCategory:{
         ar:String,
         en:String
