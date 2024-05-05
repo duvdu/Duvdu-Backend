@@ -1,6 +1,7 @@
 import 'express-async-errors';
 
-import { Notification } from '../../models/notification.model';
+import { Notification } from '@duvdu-v1/duvdu';
+
 import { UpdateWatchNotificationHandler } from '../../types/endpoints/notification.endpoint';
 
 

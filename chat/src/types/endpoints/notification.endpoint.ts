@@ -1,12 +1,5 @@
-import { SuccessResponse ,PaginationResponse } from '@duvdu-v1/duvdu';
+import { SuccessResponse ,PaginationResponse, Inotification } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
-
-import { Inotification } from '../../models/notification.model';
-
-
-
-
-
 
 
 export interface GetLoggedUserNotificationHandler

@@ -1,8 +1,8 @@
 import 'express-async-errors';
 
+import { Notification } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-import { Notification } from '../../models/notification.model';
 import { GetNotificationsCrmHandler } from '../../types/endpoints/notification.endpoint';
 
 

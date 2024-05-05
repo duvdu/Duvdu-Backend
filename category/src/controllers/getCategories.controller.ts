@@ -27,7 +27,6 @@ export const getCategoriesPagination: RequestHandler<unknown, unknown, unknown, 
     req.pagination.filter.cycle = req.query.cycle;
   }
   next();
-
 };
 
 

@@ -5,10 +5,10 @@ import {
   Project,
   MODELS,
   CYCLES,
+  filterTagsForCategory,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-import { filterTagsForCategory } from '../../services/category.service';
 
 export const createProjectHandler: RequestHandler<
   unknown,
