@@ -42,4 +42,5 @@ export interface Iuser {
   currentRank: string;
   isBlocked: { value: boolean; reason: string };
   followCount: { following: number; followers: number };
+  notificationToken:string
 }
