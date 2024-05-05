@@ -15,6 +15,7 @@ export interface IportfolioPost {
   searchKeywords: string[];
   creatives: { creative: Types.ObjectId | Iuser; fees: number }[];
   tags: string[];
+  subCategory:{ar:string , en:string};
   projectBudget: number;
   category: Types.ObjectId;
   projectScale: { scale: number; time: 'minutes' | 'hours' };
@@ -43,6 +44,10 @@ export const PortfolioPosts = model<IportfolioPost>(
         },
       ],
       tags: [String],
+      subCategory:{
+        ar:String,
+        en:String
+      },
       projectBudget: { type: Number, default: null },
       category: { type: Schema.Types.ObjectId, ref: MODELS.category, required: true },
       projectScale: { scale: { type: Number, default: 0 }, time: { type: String, default: null } },
