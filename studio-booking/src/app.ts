@@ -1,4 +1,4 @@
-import { globalErrorHandlingMiddleware, sessionStore } from '@duvdu-v1/duvdu';
+import { globalErrorHandlingMiddleware, languageHeaderMiddleware, sessionStore } from '@duvdu-v1/duvdu';
 import cors from 'cors';
 import express from 'express';
 import session from 'express-session';
@@ -34,6 +34,8 @@ app.use(
     },
   }),
 );
+
+app.use(languageHeaderMiddleware);
 
 app.use('/api/studio-booking', studioBookingRoutes);
 app.use(globalErrorHandlingMiddleware);
