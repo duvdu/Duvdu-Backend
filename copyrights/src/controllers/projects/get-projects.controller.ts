@@ -15,6 +15,8 @@ export const getProjectsPagination: RequestHandler<
     isDeleted?: boolean;
     startDate?: Date;
     endDate?: Date;
+    tags?:string;
+    subCategory?:string
   }
 > = (req, res, next) => {
   if (req.query.search) req.pagination.filter.$text = { $search: req.query.search };
@@ -36,6 +38,12 @@ export const getProjectsPagination: RequestHandler<
   if (req.query.isDeleted !== undefined) {
     req.pagination.filter.isDeleted = req.query.isDeleted ? true : { $ne: true };
   }
+  if (req.query.subCategory) {
+    req.pagination.filter[`subCategory.${req.lang}`] = req.query.subCategory;
+  }
+  if (req.query.tags) {
+    req.pagination.filter['tags.' + req.lang] = req.query.tags;
+  }
   next();
 };
 
@@ -47,10 +55,46 @@ export const getProjectsHandler: RequestHandler<
     ...req.pagination.filter,
     isDeleted: { $ne: true },
   });
-  const projects = await CopyRights.find({ ...req.pagination.filter, isDeleted: { $ne: true } })
-    .sort('-createdAt')
-    .limit(req.pagination.limit)
-    .skip(req.pagination.skip);
+
+  const projects = await CopyRights.aggregate([
+    {
+      $match: { ...req.pagination.filter, isDeleted: { $ne: true } }
+    },
+    {
+      $sort: { createdAt: -1 }
+    },
+    {
+      $limit: req.pagination.limit
+    },
+    {
+      $skip: req.pagination.skip
+    },
+    {
+      $addFields: {
+        tags: {
+          $map: {
+            input: '$tags',
+            as: 'tag',
+            in: {
+              $cond: {
+                if: {$eq: ['ar', req.lang] },
+                then: '$$tag.ar',
+                else: '$$tag.en'
+              }
+            }
+          }
+        },
+        subCategory: {
+          $cond: {
+            if: { $eq: ['ar', req.lang] },
+            then: '$subCategory.ar',
+            else: '$subCategory.en'
+          }
+        }
+      }
+    }
+  ]);
+    
 
   res.status(200).json({
     message: 'success',
