@@ -67,3 +67,12 @@ export const Message = model<ImessageDoc>(MODELS.messages , new Schema<ImessageD
   }
 }
 }));
+
+Message.schema.set('toJSON', {
+  transform: function (doc, ret) {
+    if (ret.media?.url) {
+      ret.media.url = process.env.BUCKET_HOST + '/' + ret.media.url;
+    }
+    return ret;
+  }
+});
