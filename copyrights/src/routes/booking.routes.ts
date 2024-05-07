@@ -1,7 +1,12 @@
-import { isauthenticated } from '@duvdu-v1/duvdu';
+import {
+  isauthenticated,
+  isauthorized,
+  PERMISSIONS,
+  globalUploadMiddleware,
+  FOLDERS,
+} from '@duvdu-v1/duvdu';
 import { Router } from 'express';
 
-import { isauthorized, PERMISSIONS, globalUploadMiddleware, FOLDERS } from '../../../common/src';
 import { bookProjectHandler } from '../controllers/booking/book-project.controller';
 import { updateBookedProjectHandler } from '../controllers/booking/update-booked-project.controller';
 import * as val from '../validators/booking/booking.validator';

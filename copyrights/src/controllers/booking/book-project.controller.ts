@@ -1,7 +1,13 @@
-import { BadRequestError, Bucket, CopyRights, NotFound, SuccessResponse } from '@duvdu-v1/duvdu';
+import {
+  BadRequestError,
+  Bucket,
+  CopyRights,
+  NotFound,
+  SuccessResponse,
+  FOLDERS,
+} from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-import { FOLDERS } from '../../../../common/src';
 import { CopyrightsBooking, IcopyrightsBooking } from '../../models/copyrights-booking.model';
 
 export const bookProjectHandler: RequestHandler<

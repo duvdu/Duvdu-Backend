@@ -1,7 +1,5 @@
-import { IcopyRights, Iuser } from '@duvdu-v1/duvdu';
+import { IcopyRights, Iuser, MODELS } from '@duvdu-v1/duvdu';
 import { model, Schema, Types } from 'mongoose';
-
-import { MODELS } from '../../../common/src';
 
 export enum BookingState {
   canceled = 'canceled',

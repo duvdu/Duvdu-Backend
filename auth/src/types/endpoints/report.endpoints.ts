@@ -1,8 +1,5 @@
-import { PaginationResponse } from '@duvdu-v1/duvdu';
+import { PaginationResponse, Ireport } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
-
-import { Ireport } from '../../../../common/src/models/report.model';
-
 
 type successResponse<T> = T & {
   message: 'success';
@@ -11,12 +8,16 @@ type successResponse<T> = T & {
 export interface CreateReportHandler
   extends RequestHandler<
     unknown,
-    successResponse<{data:Ireport}>,
-    Pick<Ireport,  'project' | 'desc' | 'attachments'>
+    successResponse<{ data: Ireport }>,
+    Pick<Ireport, 'project' | 'desc' | 'attachments'>
   > {}
 
 export interface UpdateReportHandler
-  extends RequestHandler<{ reportId: string }, successResponse<{data:Ireport}>, {feedback:string}> {}
+  extends RequestHandler<
+    { reportId: string },
+    successResponse<{ data: Ireport }>,
+    { feedback: string }
+  > {}
 
 export interface RemoveReportHandler
   extends RequestHandler<{ reportId: string }, successResponse<unknown>> {}
