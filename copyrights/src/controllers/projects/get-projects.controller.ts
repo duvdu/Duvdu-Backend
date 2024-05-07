@@ -1,4 +1,4 @@
-import { PaginationResponse, CopyRights, IcopyRights } from '@duvdu-v1/duvdu';
+import { PaginationResponse, CopyRights, IcopyRights, MODELS } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 export const getProjectsPagination: RequestHandler<
@@ -55,20 +55,12 @@ export const getProjectsHandler: RequestHandler<
     ...req.pagination.filter,
     isDeleted: { $ne: true },
   });
-
+    
   const projects = await CopyRights.aggregate([
-    {
-      $match: { ...req.pagination.filter, isDeleted: { $ne: true } }
-    },
-    {
-      $sort: { createdAt: -1 }
-    },
-    {
-      $limit: req.pagination.limit
-    },
-    {
-      $skip: req.pagination.skip
-    },
+    { $match: { ...req.pagination.filter, isDeleted: { $ne: true } } },
+    { $sort: { createdAt: -1 } },
+    { $limit: req.pagination.limit },
+    { $skip: req.pagination.skip },
     {
       $addFields: {
         tags: {
@@ -77,7 +69,7 @@ export const getProjectsHandler: RequestHandler<
             as: 'tag',
             in: {
               $cond: {
-                if: {$eq: ['ar', req.lang] },
+                if: { $eq: ['ar', req.lang] },
                 then: '$$tag.ar',
                 else: '$$tag.en'
               }
@@ -92,9 +84,55 @@ export const getProjectsHandler: RequestHandler<
           }
         }
       }
+    },
+    {
+      $lookup: {
+        from: MODELS.user,
+        localField: 'user',
+        foreignField: '_id',
+        as: 'userDetails'
+      }
+    },
+    {
+      $addFields: {
+        user: {
+          $cond: {
+            if: { $eq: [{ $size: '$userDetails' }, 0] },
+            then: null,
+            else: {
+              $arrayElemAt: [
+                '$userDetails',
+                0
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      $project: {
+        _id: 1,
+        user: {
+          acceptedProjectsCounter: '$user.acceptedProjectsCounter',
+          profileImage: '$user.profileImage',
+          name: '$user.name',
+          username: '$user.username',
+          isOnline: '$user.isOnline'
+        },
+        category: 1,
+        price: 1,
+        duration: 1,
+        address: 1,
+        location: 1,
+        searchKeywords: 1,
+        showOnHome: 1,
+        cycle: 1,
+        rate: 1,
+        tags: 1,
+        subCategory: 1
+      }
     }
   ]);
-    
 
   res.status(200).json({
     message: 'success',
