@@ -10,9 +10,9 @@ const userSchema = new Schema<Iuser>(
     name: { type: String, default: null },
     phoneNumber: {
       key: { type: String, default: null },
-      number: { type: String, unique: true, default: null, sparse: true },
+      number: { type: String, unique: true, sparse: true },
     },
-    username: { type: String, unique: true, sparse: true, default: null },
+    username: { type: String, unique: true, sparse: true },
     password: String,
     verificationCode: { code: String, expireAt: Date, reason: { type: String, default: null } },
     isVerified: { type: Boolean, default: false },
@@ -35,19 +35,21 @@ const userSchema = new Schema<Iuser>(
       value: { type: Boolean, default: false },
       reason: { type: String, default: null },
     },
-    notificationToken:{
-      type:String,
-      default:null
-    }
+    notificationToken: {
+      type: String,
+      default: null,
+    },
   },
-  { timestamps: true,
+  {
+    timestamps: true,
     collection: MODELS.user,
     toJSON: {
       transform(doc, ret) {
         if (ret.coverImage) ret.coverImage = process.env.BUCKET_HOST + '/' + ret.coverImage;
         if (ret.profileImage) ret.profileImage = process.env.BUCKET_HOST + '/' + ret.profileImage;
       },
-    }, },
+    },
+  },
 );
 
 export const Users = model<Iuser>(MODELS.user, userSchema);

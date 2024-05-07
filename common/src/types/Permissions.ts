@@ -49,7 +49,9 @@ export enum PERMISSIONS {
   getAllReportsHandler = 'get all reports',
   getReportHandler = 'get report',
   updateReportHandler = 'update report',
-  deleteReportHandler = 'delete report'
+  deleteReportHandler = 'delete report',
+  // book project
+  booking = 'booking',
 }
 
 export const permissions = {
@@ -111,4 +113,5 @@ export const permissions = {
     PERMISSIONS.getCrmStudioProjectsHandlers,
     PERMISSIONS.getStudioAnalysisHandler,
   ],
+  booking: [PERMISSIONS.booking],
 };
