@@ -1,4 +1,4 @@
-import { Schema, model, Types } from 'mongoose';
+import { Schema, model, Types, Query } from 'mongoose';
 
 import { MODELS } from '../types/model-names';
 import { Iuser } from '../types/User';
@@ -89,13 +89,16 @@ PortfolioPostSchema.pre('save', function(next) {
   transformDocument(this);
   next();
 });
-  
-PortfolioPostSchema.pre('findOneAndUpdate', function(next) {
-  const update = this.getUpdate() as Partial<IportfolioPost>;
-  if (update && typeof update.id === 'string') {
-    transformDocument(update as IportfolioPost);
-  }
-  next();
+
+PortfolioPostSchema.pre(/^find/, function(next) {
+  const query = this  as Query<IportfolioPost[], IportfolioPost>;
+
+  query.then((documents : IportfolioPost[]) => {
+    documents.forEach((doc) => {
+      transformDocument(doc);
+    });
+    next();
+  }).catch(next);
 });
 
 export const PortfolioPosts = model<IportfolioPost>(  MODELS.portfolioPost, PortfolioPostSchema);
