@@ -26,66 +26,76 @@ export interface IportfolioPost {
 }
 
 
-export const PortfolioPosts = model<IportfolioPost>(
-  MODELS.portfolioPost,
-  new Schema<IportfolioPost>(
-    {
-      user: { type: Schema.Types.ObjectId, ref: MODELS.user },
-      attachments: [String],
-      cover: { type: String, default: null },
-      title: { type: String, default: null },
-      desc: { type: String, default: null },
-      address: { type: String, default: null },
-      tools: [{ name: { type: String, default: null }, fees: { type: Number, default: 0 } }],
-      searchKeywords: [String],
-      creatives: [
-        {
-          creative: { type: Schema.Types.ObjectId, ref: MODELS.user },
-          fees: { type: Number, default: null },
-        },
-      ],
-      tags:[{ ar: { type: String, default: null }, en: { type: String, default: null } }],
-      subCategory:{
-        ar:String,
-        en:String
+const PortfolioPostSchema = new Schema<IportfolioPost>(
+  {
+    user: { type: Schema.Types.ObjectId, ref: MODELS.user },
+    attachments: [String],
+    cover: { type: String, default: null },
+    title: { type: String, default: null },
+    desc: { type: String, default: null },
+    address: { type: String, default: null },
+    tools: [{ name: { type: String, default: null }, fees: { type: Number, default: 0 } }],
+    searchKeywords: [String],
+    creatives: [
+      {
+        creative: { type: Schema.Types.ObjectId, ref: MODELS.user },
+        fees: { type: Number, default: null },
       },
-      projectBudget: { type: Number, default: null },
-      category: { type: Schema.Types.ObjectId, ref: MODELS.category, required: true },
-      projectScale: { scale: { type: Number, default: 0 }, time: { type: String, default: null } },
-      showOnHome: { type: Boolean, default: true },
-      cycle: { type: Number, default: 1 },
-      isDeleted: { type: Boolean, default: false },
-      rate: {
-        ratersCounter: { type: Number, default: 0 },
-        totalRates: { type: Number, default: 0 },
+    ],
+    tags:[{ ar: { type: String, default: null }, en: { type: String, default: null } }],
+    subCategory:{
+      ar:String,
+      en:String
+    },
+    projectBudget: { type: Number, default: null },
+    category: { type: Schema.Types.ObjectId, ref: MODELS.category, required: true },
+    projectScale: { scale: { type: Number, default: 0 }, time: { type: String, default: null } },
+    showOnHome: { type: Boolean, default: true },
+    cycle: { type: Number, default: 1 },
+    isDeleted: { type: Boolean, default: false },
+    rate: {
+      ratersCounter: { type: Number, default: 0 },
+      totalRates: { type: Number, default: 0 },
+    },
+  },
+  {
+    timestamps: true,
+    collection: MODELS.portfolioPost,
+    toJSON: {
+      transform(doc, ret) {
+        if (ret.cover) ret.cover = process.env.BUCKET_HOST + '/' + ret.cover;
+        if (ret.attachments)
+          ret.attachments = ret.attachments.map(
+            (el: string) => process.env.BUCKET_HOST + '/' + el,
+          );
       },
     },
-    {
-      timestamps: true,
-      collection: MODELS.portfolioPost,
-      toJSON: {
-        transform(doc, ret) {
-          if (ret.cover) ret.cover = process.env.BUCKET_HOST + '/' + ret.cover;
-          if (ret.attachments)
-            ret.attachments = ret.attachments.map(
-              (el: string) => process.env.BUCKET_HOST + '/' + el,
-            );
-        },
-      },
-    },
-  )
-    .index({ createdAt: 1, updatedAt: -1 })
-    .index({ title: 'text', desc: 'text', tools: 'text', searchKeywords: 'text' }),
-);
+  },
+)
+  .index({ createdAt: 1, updatedAt: -1 })
+  .index({ title: 'text', desc: 'text', tools: 'text', searchKeywords: 'text' });
 
-PortfolioPosts.schema.set('toJSON', {
-  transform: function (doc, ret) {
-    if (ret.cover) {
-      ret.cover = process.env.BUCKET_HOST + '/' + ret.cover;
-    }
-    if (ret.attachments) {
-      ret.attachments = ret.attachments.map((el: string) => process.env.BUCKET_HOST + '/' + el);
-    }
-    return ret;
+
+function transformDocument(doc : IportfolioPost) {
+  if (doc.cover) {
+    doc.cover = process.env.BUCKET_HOST + '/' + doc.cover;
   }
+  if (doc.attachments) {
+    doc.attachments = doc.attachments.map(el => process.env.BUCKET_HOST + '/' + el);
+  }
+}
+
+PortfolioPostSchema.pre('save', function(next) {
+  transformDocument(this);
+  next();
 });
+  
+PortfolioPostSchema.pre('findOneAndUpdate', function(next) {
+  const update = this.getUpdate() as Partial<IportfolioPost>;
+  if (update && typeof update.id === 'string') {
+    transformDocument(update as IportfolioPost);
+  }
+  next();
+});
+
+export const PortfolioPosts = model<IportfolioPost>(  MODELS.portfolioPost, PortfolioPostSchema);
