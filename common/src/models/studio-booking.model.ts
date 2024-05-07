@@ -5,7 +5,7 @@ import { Iuser } from '../types/User';
 
 export interface IstudioBooking {
   id: string;
-  user: Types.ObjectId;
+  user: Types.ObjectId | Iuser;
   attachments: string[];
   cover: string;
   studioName: string;
