@@ -10,11 +10,11 @@ export const getProjectHandler: RequestHandler<
     isDeleted: { $ne: true },
   }).lean();
   if (!project) return next(new NotFound('project not found'));
-  (project.user as any) = await Users.findById(project.user, 'username profileImage isOnline').lean();
+  (project.user as any) = await Users.findById(project.user, 'username profileImage isOnline acceptedProjectsCounter name').lean();
 
   for (let i = 0; i < project.creatives.length; i++) {
     const creativeId = project.creatives[i].creative;
-    (project.creatives[i].creative as any) = await Users.findById(creativeId, 'username profileImage isOnline').lean();
+    (project.creatives[i].creative as any) = await Users.findById(creativeId, 'username profileImage isOnline acceptedProjectsCounter name').lean();
   }
 
   (project.subCategory as any) = project.subCategory[req.lang];
