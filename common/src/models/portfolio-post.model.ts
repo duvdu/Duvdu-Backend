@@ -25,6 +25,7 @@ export interface IportfolioPost {
   isDeleted: boolean;
 }
 
+
 export const PortfolioPosts = model<IportfolioPost>(
   MODELS.portfolioPost,
   new Schema<IportfolioPost>(

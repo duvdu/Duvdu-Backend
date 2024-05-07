@@ -1,4 +1,4 @@
-import { NotFound, SuccessResponse, IportfolioPost, PortfolioPosts, Users } from '@duvdu-v1/duvdu';
+import { NotFound, SuccessResponse, IportfolioPost, Users, PortfolioPosts } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 export const getProjectHandler: RequestHandler<
@@ -10,11 +10,11 @@ export const getProjectHandler: RequestHandler<
     isDeleted: { $ne: true },
   }).lean();
   if (!project) return next(new NotFound('project not found'));
-  (project.user as any) = await Users.findById(project.user, 'username profileImage isOnline').lean();
+  (project.user as any) = await Users.findById(project.user, 'username profileImage isOnline acceptedProjectsCounter name rate').lean();
 
   for (let i = 0; i < project.creatives.length; i++) {
     const creativeId = project.creatives[i].creative;
-    (project.creatives[i].creative as any) = await Users.findById(creativeId, 'username profileImage isOnline').lean();
+    (project.creatives[i].creative as any) = await Users.findById(creativeId, 'username profileImage isOnline acceptedProjectsCounter name rate').lean();
   }
 
   (project.subCategory as any) = project.subCategory[req.lang];

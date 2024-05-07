@@ -1,4 +1,4 @@
-import { IportfolioPost, PaginationResponse, PortfolioPosts } from '@duvdu-v1/duvdu';
+import { IportfolioPost, MODELS, PaginationResponse, PortfolioPosts } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 export const getCrmProjectsHandler: RequestHandler<
@@ -6,10 +6,8 @@ export const getCrmProjectsHandler: RequestHandler<
   PaginationResponse<{ data: IportfolioPost[] }>
 > = async (req, res) => {
   const resultCount = await PortfolioPosts.countDocuments(req.pagination.filter);
-  // const projects = await PortfolioPosts.find(req.pagination.filter)
-  //   .sort('-createdAt')
-  //   .limit(req.pagination.limit)
-  //   .skip(req.pagination.skip);
+
+
   const projects = await PortfolioPosts.aggregate([
     {
       $match: req.pagination.filter
@@ -46,8 +44,61 @@ export const getCrmProjectsHandler: RequestHandler<
           }
         }
       }
+    },
+    {
+      $lookup: {
+        from: MODELS.user, 
+        localField: 'user',
+        foreignField: '_id',
+        as: 'userDetails'
+      }
+    },
+    {
+      $addFields: {
+        user: {
+          $cond: {
+            if: { $eq: [{ $size: '$userDetails' }, 0] }, 
+            then: null,
+            else: {
+              $arrayElemAt: [
+                '$userDetails',
+                0
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      $project: {
+        user: {
+          isOnline: '$user.isOnline',
+          username: '$user.username',
+          name: '$user.name',
+          profileImage: '$user.profileImage',
+          acceptedProjectsCounter: '$user.acceptedProjectsCounter',
+          rate:'$user.rate'
+        },
+        attachments: 1,
+        cover: 1,
+        title:1,
+        desc:1,
+        address:1,
+        tools:1,
+        searchKeywords:1,
+        creatives:1,
+        tags:1,
+        subCategory:1,
+        projectBudget:1,
+        category:1,
+        projectScale:1,
+        showOnHome:1,
+        cycle:1,
+        rate:1
+      }
     }
   ]);
+  
     
 
   res.status(200).json({
