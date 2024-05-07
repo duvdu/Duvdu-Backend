@@ -117,7 +117,8 @@ export const getProjectsHandler: RequestHandler<
           profileImage: '$user.profileImage',
           name: '$user.name',
           username: '$user.username',
-          isOnline: '$user.isOnline'
+          isOnline: '$user.isOnline',
+          rate:'$user.rate'
         },
         category: 1,
         price: 1,

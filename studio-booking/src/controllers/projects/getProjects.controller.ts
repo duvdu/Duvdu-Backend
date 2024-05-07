@@ -154,7 +154,8 @@ export const getProjectsHandler: RequestHandler<
           profileImage: '$user.profileImage',
           isOnline: '$user.isOnline',
           acceptedProjectsCounter: '$user.acceptedProjectsCounter',
-          name: '$user.name'
+          name: '$user.name',
+          rate:'$user.rate'
         },
         attachments: 1,
         cover: 1,

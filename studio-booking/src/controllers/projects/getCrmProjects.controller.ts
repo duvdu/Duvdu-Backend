@@ -80,9 +80,9 @@ export const getCrmProjectsHandler: RequestHandler<
           profileImage: '$user.profileImage',
           isOnline: '$user.isOnline',
           acceptedProjectsCounter: '$user.acceptedProjectsCounter',
-          name: '$user.name'
+          name: '$user.name',
+          rate:'$user.rate'
         },
-        // Include other fields from the studioBooking document
         attachments: 1,
         cover: 1,
         studioName: 1,

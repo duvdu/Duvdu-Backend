@@ -76,7 +76,8 @@ export const getCrmProjectsHandler: RequestHandler<
           username: '$user.username',
           name: '$user.name',
           profileImage: '$user.profileImage',
-          acceptedProjectsCounter: '$user.acceptedProjectsCounter'
+          acceptedProjectsCounter: '$user.acceptedProjectsCounter',
+          rate:'$user.rate'
         },
         attachments: 1,
         cover: 1,
