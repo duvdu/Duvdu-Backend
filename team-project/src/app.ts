@@ -4,6 +4,7 @@ import express from 'express';
 import session from 'express-session';
 
 import { env } from './config/env';
+import { moutnRoutes } from './routes';
 
 export const app = express();
 app.use(express.json());
@@ -35,5 +36,5 @@ app.use(
 );
 
 app.use(languageHeaderMiddleware);
-
+moutnRoutes(app);
 app.use(globalErrorHandlingMiddleware);

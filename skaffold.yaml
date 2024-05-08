@@ -64,3 +64,11 @@ build:
         manual:
           - src: "src/**/*.ts"
             dest: .
+    - image: duvdu/team-project
+      context: team-project
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .
