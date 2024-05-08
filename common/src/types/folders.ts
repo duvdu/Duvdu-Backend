@@ -4,5 +4,6 @@ export enum FOLDERS {
   report = 'report',
   category = 'category',
   auth = 'auth',
-  chat = 'chat'
+  chat = 'chat',
+  copyrights = 'copyrights',
 }

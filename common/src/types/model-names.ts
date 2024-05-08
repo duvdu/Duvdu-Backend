@@ -11,7 +11,8 @@ export enum MODELS {
   studioBooking = 'studio-booking',
   report = 'report',
   copyrights = 'copyrights',
+  copyrightsBooking = 'copyrights-booking',
   projects = 'allProjects',
   messages = 'messages',
-  notifications = 'notifications'
+  notifications = 'notifications',
 }

@@ -1,6 +1,10 @@
 import 'express-async-errors';
 import './types/custom-definition';
-import { globalErrorHandlingMiddleware, languageHeaderMiddleware, sessionStore } from '@duvdu-v1/duvdu';
+import {
+  globalErrorHandlingMiddleware,
+  languageHeaderMiddleware,
+  sessionStore,
+} from '@duvdu-v1/duvdu';
 import cors from 'cors';
 import express from 'express';
 import session from 'express-session';
@@ -26,7 +30,7 @@ app.use(
     saveUninitialized: false,
     store:
       env.environment !== 'test' && env.expressSession.allowUseStorage
-        ? sessionStore(env.redis.uri , env.redis.pass)
+        ? sessionStore(env.redis.uri, env.redis.pass)
         : undefined,
     cookie: {
       sameSite: 'none',
@@ -37,7 +41,6 @@ app.use(
 );
 
 app.use(languageHeaderMiddleware);
-
 
 app.use('/api/copyrights', apiRoutes);
 
