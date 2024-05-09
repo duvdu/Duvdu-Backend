@@ -8,7 +8,7 @@ import * as val from '../validation/message.val';
 
 export const router = express.Router();
 
-router.use(isauthenticated);
+// router.use(isauthenticated);
 
 router.get('/:receiver/chat/:sender',globalPaginationMiddleware,val.getChatFromToVal, handler.getChatFromToHandler);
 

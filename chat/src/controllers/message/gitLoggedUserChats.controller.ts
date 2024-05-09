@@ -1,5 +1,5 @@
 import 'express-async-errors';
-import { Message } from '@duvdu-v1/duvdu';
+import { Message, MODELS } from '@duvdu-v1/duvdu';
 import { Types } from 'mongoose';
 
 import { GetLoggedUserChatsHandler } from '../../types/endpoints/mesage.endpoints';
@@ -38,8 +38,76 @@ export const getLoggedUserChatsHandler:GetLoggedUserChatsHandler = async (req,re
       }
     },
     {
+      $match: {
+        messages: { $ne: null }
+      }
+    },
+    {
+      $unwind: '$messages'
+    },
+    {
       $sort: {
         'messages.createdAt': -1
+      }
+    },
+    {
+      $group: {
+        _id: '$_id',
+        newestMessage: { $first: '$messages' },
+        allMessages: { $push: '$messages' } 
+      }
+    },
+    {
+      $lookup: {
+        from: MODELS.user, 
+        localField: 'newestMessage.sender',
+        foreignField: '_id',
+        as: 'sender'
+      }
+    },
+    {
+      $project: {
+        _id: 1,
+        newestMessage: {
+          $mergeObjects: [
+            '$newestMessage',
+            {
+              sender: {
+                $cond: [
+                  { $eq: [{ $size: '$sender' }, 0] },
+                  null,
+                  {
+                    $let: {
+                      vars: {
+                        senderDoc: { $arrayElemAt: ['$sender', 0] }
+                      },
+                      in: {
+                        profileImage: '$$senderDoc.profileImage',
+                        isOnline: '$$senderDoc.isOnline',
+                        username: '$$senderDoc.username',
+                        name: '$$senderDoc.name'
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        unreadMessageCount: {
+          $size: {
+            $filter: {
+              input: '$allMessages',
+              as: 'message',
+              cond: {
+                $and: [
+                  { $eq: ['$$message.receiver', userId] },
+                  { $eq: ['$$message.watched', false] }
+                ]
+              }
+            }
+          }
+        }
       }
     },
     {
@@ -47,35 +115,6 @@ export const getLoggedUserChatsHandler:GetLoggedUserChatsHandler = async (req,re
     },
     {
       $limit: req.pagination.limit
-    },
-    {
-      $facet: {
-        chats: [
-          { $skip: req.pagination.skip },
-          { $limit: req.pagination.limit }
-        ],
-        unreadCounts: [
-          {
-            $project: {
-              otherUser: '$_id',
-              unreadCount: {
-                $size: {
-                  $filter: {
-                    input: '$messages',
-                    as: 'message',
-                    cond: {
-                      $and: [
-                        { $eq: ['$$message.receiver', userId] },
-                        { $eq: ['$$message.watched', false] }
-                      ]
-                    }
-                  }
-                }
-              }
-            }
-          }
-        ]
-      }
     }
   ]);
 
