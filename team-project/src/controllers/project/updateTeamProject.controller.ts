@@ -1,8 +1,7 @@
 import 'express-async-errors';
 
-import { Bucket, Files, FOLDERS, NotAllowedError, NotFound } from '@duvdu-v1/duvdu';
+import { Bucket, Files, FOLDERS, IteamProject, NotAllowedError, NotFound, TeamProject } from '@duvdu-v1/duvdu';
 
-import { IteamProject, TeamProject } from '../../models/teamProject.model';
 import { UpdateProjectHandler } from '../../types/endpoints';
 
 

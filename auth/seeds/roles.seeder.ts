@@ -38,6 +38,9 @@ export const appInit = async () => {
         PERMISSIONS.updateStudioProjectHandler,
         PERMISSIONS.updateCopyrightHandler,
         PERMISSIONS.createTicket,
+        PERMISSIONS.createTeamProjectHandler,
+        PERMISSIONS.updateTeamProjectCreativeHandler,
+        PERMISSIONS.deleteTeamProjectHandler
       ]
     });
   if (!(await Roles.findOne({ key: SystemRoles.unverified })))

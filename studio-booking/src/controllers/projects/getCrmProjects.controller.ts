@@ -46,6 +46,14 @@ export const getCrmProjectsHandler: RequestHandler<
               }
             }
           }
+        },
+        cover: { $concat: [process.env.BUCKET_HOST + '/', '$cover'] },
+        attachments: {
+          $map: {
+            input: '$attachments',
+            as: 'attachment',
+            in: { $concat: [process.env.BUCKET_HOST + '/', '$$attachment'] }
+          }
         }
       }
     },
@@ -74,14 +82,24 @@ export const getCrmProjectsHandler: RequestHandler<
       }
     },
     {
+      $addFields: {
+        'user.profileImage': {
+          $concat: [
+            process.env.BUCKET_HOST + '/',
+            '$user.profileImage'
+          ]
+        }
+      }
+    },
+    {
       $project: {
         user: {
           username: '$user.username',
-          profileImage: '$user.profileImage',
+          profileImage:  '$user.profileImage',
           isOnline: '$user.isOnline',
           acceptedProjectsCounter: '$user.acceptedProjectsCounter',
           name: '$user.name',
-          rate:'$user.rate'
+          rate: '$user.rate'
         },
         attachments: 1,
         cover: 1,
@@ -104,6 +122,7 @@ export const getCrmProjectsHandler: RequestHandler<
       }
     }
   ]);
+  
   
   res.status(200).json({
     message: 'success',

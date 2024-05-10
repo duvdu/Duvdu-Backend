@@ -82,3 +82,12 @@ export const projectAnalysisVal = [
   query('endDate').optional().isISO8601().toDate(),
   globalValidatorMiddleware
 ];
+
+export const updateCreativeVal = [
+  param('projectId').isMongoId(),
+  body('user').isMongoId(),
+  body('category').isMongoId(),
+  body('workHours').optional().isInt({min:1}),
+  body('totalAmount').optional().isInt({min:1}),
+  globalValidatorMiddleware
+];

@@ -1,8 +1,7 @@
-import { dbConnection } from '@duvdu-v1/duvdu';
+import { dbConnection, Message } from '@duvdu-v1/duvdu';
 import mongoose, { Types } from 'mongoose';
 
 import { env } from '../src/config/env';
-import { Message } from '../src/models/message.model';
 
 const user1 = new Types.ObjectId('65d46504d0e034a10a845d4f');
 const user2 = new Types.ObjectId('65d46504d0e034a10a845d52');

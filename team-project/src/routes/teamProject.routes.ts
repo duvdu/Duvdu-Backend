@@ -1,4 +1,4 @@
-import { checkRequiredFields, FOLDERS, globalPaginationMiddleware, uploadProjectMedia } from '@duvdu-v1/duvdu';
+import { checkRequiredFields, FOLDERS, globalPaginationMiddleware, isauthenticated, isauthorized, PERMISSIONS, uploadProjectMedia } from '@duvdu-v1/duvdu';
 import express from 'express';
 
 
@@ -9,15 +9,19 @@ import * as val from '../validators/teamProject.val';
 
 export const router = express.Router();
 
-router.get('/crm' , val.getProjectsVal , globalPaginationMiddleware , handler.getProjectsCrmHandler);
-router.get('/analysis' , val.projectAnalysisVal , globalPaginationMiddleware , handler.getProjectAnalysis);
+
+router.get('/crm' , isauthenticated , isauthorized(PERMISSIONS.getCrmTeamProjectHandler) , val.getProjectsVal , globalPaginationMiddleware , handler.getProjectsCrmHandler);
+router.get('/analysis' , isauthenticated , isauthorized(PERMISSIONS.getTeamProjectAnalysisHandler) , val.projectAnalysisVal , globalPaginationMiddleware , handler.getProjectAnalysis);
 
 router.route('/:projectId/user')
-  .patch( val.actionTeamProjectVal , handler.actionTeamProjectHandler)
-  .delete(val.deleteCreativeVal , handler.deleteCreativeHandler);
+  .patch( val.actionTeamProjectVal , isauthenticated , handler.actionTeamProjectHandler)
+  .delete(val.deleteCreativeVal , isauthenticated , handler.deleteCreativeHandler)
+  .put(val.updateCreativeVal , isauthenticated  , handler.updateCreativeHandler);
 
 router.route('/')
   .post(
+    isauthenticated,
+    isauthorized(PERMISSIONS.createTeamProjectHandler),
     uploadProjectMedia(FOLDERS.team_project),
     checkRequiredFields({ fields: ['cover', 'attachments'] }),
     val.createProjectVal,
@@ -26,8 +30,8 @@ router.route('/')
   .get(val.getProjectsVal, globalPaginationMiddleware , handler.getProjectsPagination , handler.getProjectsHandler);
 
 router.route('/:projectId')
-  .patch(uploadProjectMedia(FOLDERS.team_project) , val.updateProjectVal , handler.updateProjectHandler)
-  .delete(val.deleteProjectVal , handler.removeProjectHandler)
+  .patch(isauthenticated , isauthorized(PERMISSIONS.updateTeamProjectHandler),uploadProjectMedia(FOLDERS.team_project) , val.updateProjectVal , handler.updateProjectHandler)
+  .delete(isauthenticated , isauthorized(PERMISSIONS.deleteTeamProjectHandler) , val.deleteProjectVal , handler.removeProjectHandler)
   .get(val.getProjectVal ,handler.getProjectHandler);
 
 

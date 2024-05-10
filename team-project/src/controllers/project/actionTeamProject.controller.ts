@@ -1,8 +1,7 @@
 import 'express-async-errors';
 
-import { BadRequestError, NotFound } from '@duvdu-v1/duvdu';
+import { BadRequestError, NotFound, TeamProject } from '@duvdu-v1/duvdu';
 
-import { TeamProject } from '../../models/teamProject.model';
 import { ActionTeamProjectOffer } from '../../types/endpoints';
 
 

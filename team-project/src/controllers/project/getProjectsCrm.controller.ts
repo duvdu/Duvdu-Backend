@@ -1,6 +1,7 @@
 import 'express-async-errors';
 
-import { TeamProject } from '../../models/teamProject.model';
+import { TeamProject } from '@duvdu-v1/duvdu';
+
 import { GetProjectsCrmHandler } from '../../types/endpoints';
 
 

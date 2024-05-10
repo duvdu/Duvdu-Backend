@@ -53,16 +53,31 @@ export const getSpecificChatHandler:GetSpecificChatHandler = async (req,res)=>{
         from: 'users',
         localField: 'allMessages.sender',
         foreignField: '_id',
-        as: 'sender'
+        as: 'senderDetails'
+      }
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'allMessages.receiver',
+        foreignField: '_id',
+        as: 'receiverDetails'
       }
     },
     {
       $addFields: {
         'allMessages.sender': {
           $cond: [
-            { $eq: [{ $size: '$sender' }, 0] },
+            { $eq: [{ $size: '$senderDetails' }, 0] },
             null,
-            { $arrayElemAt: ['$sender', 0] }
+            { $arrayElemAt: ['$senderDetails', 0] }
+          ]
+        },
+        'allMessages.receiver': {
+          $cond: [
+            { $eq: [{ $size: '$receiverDetails' }, 0] },
+            null,
+            { $arrayElemAt: ['$receiverDetails', 0] }
           ]
         }
       }
@@ -74,11 +89,28 @@ export const getSpecificChatHandler:GetSpecificChatHandler = async (req,res)=>{
             { $eq: ['$allMessages.sender', null] },
             null,
             {
-              profileImage: '$allMessages.sender.profileImage',
+              profileImage: {
+                $concat: [process.env.BUCKET_HOST, '/', '$allMessages.sender.profileImage']
+              },
               isOnline: '$allMessages.sender.isOnline',
               username: '$allMessages.sender.username',
               name: '$allMessages.sender.name',
               _id: '$allMessages.sender._id'
+            }
+          ]
+        },
+        'allMessages.receiver': {
+          $cond: [
+            { $eq: ['$allMessages.receiver', null] },
+            null,
+            {
+              profileImage: {
+                $concat: [process.env.BUCKET_HOST, '/', '$allMessages.receiver.profileImage']
+              },
+              isOnline: '$allMessages.receiver.isOnline',
+              username: '$allMessages.receiver.username',
+              name: '$allMessages.receiver.name',
+              _id: '$allMessages.receiver._id'
             }
           ]
         }
@@ -93,7 +125,8 @@ export const getSpecificChatHandler:GetSpecificChatHandler = async (req,res)=>{
     {
       $limit: req.pagination.limit
     }
-  ]);  
+  ]);
+  
   
 
   const resultCount = await Message.countDocuments({
