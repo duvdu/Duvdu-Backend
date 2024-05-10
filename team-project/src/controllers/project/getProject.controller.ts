@@ -1,8 +1,7 @@
 import 'express-async-errors';
 
-import { NotFound } from '@duvdu-v1/duvdu';
+import { NotFound, TeamProject } from '@duvdu-v1/duvdu';
 
-import { TeamProject } from '../../models/teamProject.model';
 import { GetProjectHandler } from '../../types/endpoints';
 
 

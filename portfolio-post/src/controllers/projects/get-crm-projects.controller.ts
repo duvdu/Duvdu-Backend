@@ -42,12 +42,20 @@ export const getCrmProjectsHandler: RequestHandler<
               }
             }
           }
+        },
+        cover: { $concat: [process.env.BUCKET_HOST + '/', '$cover'] },
+        attachments: {
+          $map: {
+            input: '$attachments',
+            as: 'attachment',
+            in: { $concat: [process.env.BUCKET_HOST + '/', '$$attachment'] }
+          }
         }
       }
     },
     {
       $lookup: {
-        from: MODELS.user, 
+        from: MODELS.user,
         localField: 'user',
         foreignField: '_id',
         as: 'userDetails'
@@ -57,7 +65,7 @@ export const getCrmProjectsHandler: RequestHandler<
       $addFields: {
         user: {
           $cond: {
-            if: { $eq: [{ $size: '$userDetails' }, 0] }, 
+            if: { $eq: [{ $size: '$userDetails' }, 0] },
             then: null,
             else: {
               $arrayElemAt: [
@@ -70,6 +78,16 @@ export const getCrmProjectsHandler: RequestHandler<
       }
     },
     {
+      $addFields: {
+        'user.profileImage': {
+          $concat: [
+            process.env.BUCKET_HOST + '/',
+            '$user.profileImage'
+          ]
+        }
+      }
+    },
+    {
       $project: {
         user: {
           isOnline: '$user.isOnline',
@@ -77,27 +95,28 @@ export const getCrmProjectsHandler: RequestHandler<
           name: '$user.name',
           profileImage: '$user.profileImage',
           acceptedProjectsCounter: '$user.acceptedProjectsCounter',
-          rate:'$user.rate'
+          rate: '$user.rate'
         },
         attachments: 1,
         cover: 1,
-        title:1,
-        desc:1,
-        address:1,
-        tools:1,
-        searchKeywords:1,
-        creatives:1,
-        tags:1,
-        subCategory:1,
-        projectBudget:1,
-        category:1,
-        projectScale:1,
-        showOnHome:1,
-        cycle:1,
-        rate:1
+        title: 1,
+        desc: 1,
+        address: 1,
+        tools: 1,
+        searchKeywords: 1,
+        creatives: 1,
+        tags: 1,
+        subCategory: 1,
+        projectBudget: 1,
+        category: 1,
+        projectScale: 1,
+        showOnHome: 1,
+        cycle: 1,
+        rate: 1
       }
     }
   ]);
+  
   
     
 

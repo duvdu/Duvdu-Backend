@@ -91,14 +91,4 @@ export const studioBooking = model<IstudioBooking>(
   ),
 );
 
-studioBooking.schema.set('toJSON', {
-  transform: function (doc, ret) {
-    if (ret.cover) {
-      ret.cover = process.env.BUCKET_HOST + '/' + ret.cover;
-    }
-    if (ret.attachments) {
-      ret.attachments = ret.attachments.map((el: string) => process.env.BUCKET_HOST + '/' + el);
-    }
-    return ret;
-  }
-});
+

@@ -1,5 +1,6 @@
-import { MODELS } from '@duvdu-v1/duvdu';
 import { Document, model, Schema, Types } from 'mongoose';
+
+import { MODELS } from '../types/model-names';
 
 export interface IteamProject extends Document {
   user:Types.ObjectId;

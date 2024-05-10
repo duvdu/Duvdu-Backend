@@ -1,8 +1,7 @@
-import { MODELS, SuccessResponse } from '@duvdu-v1/duvdu';
+import { MODELS, SuccessResponse, TeamProject } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import { PipelineStage } from 'mongoose';
 
-import { TeamProject } from '../../models/teamProject.model';
 
 export const getProjectAnalysis: RequestHandler<
   unknown,

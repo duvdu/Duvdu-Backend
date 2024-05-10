@@ -2,14 +2,15 @@ import 'express-async-errors';
 
 import { BadRequestError, NotAllowedError, NotFound, TeamProject } from '@duvdu-v1/duvdu';
 
-import { DeleteCreativeHandler } from '../../types/endpoints';
+import { UpdateCreativeHandler } from '../../types/endpoints';
 
 
-export const deleteCreativeHandler:DeleteCreativeHandler = async (req,res,next)=>{
-  const project = await TeamProject.findOne({_id:req.params.projectId , isDeleted:{$ne:true}});
+
+
+export const updateCreativeHandler:UpdateCreativeHandler = async (req,res,next)=>{
+  const project = await TeamProject.findById(req.params.projectId);
   if (!project) 
     return next(new NotFound('project not found'));
-
   if (project.user.toString()!= req.loggedUser.id) 
     return next(new NotAllowedError('user not owner for this project'));
 
@@ -21,9 +22,16 @@ export const deleteCreativeHandler:DeleteCreativeHandler = async (req,res,next)=
   if (userIndex === -1)
     return next(new BadRequestError('This user was not found in this project'));
 
-  project.creatives[creativeIndex].users.splice(userIndex, 1);
+  if (req.body.totalAmount) 
+    project.creatives[creativeIndex].users[userIndex].totalAmount = req.body.totalAmount;
 
-  await project.save();
+  if (req.body.workHours) 
+    project.creatives[creativeIndex].users[userIndex].workHours = req.body.workHours;
+  
+  const populatedProject = await (await project.save()).populate([
+    {path:'user' , select:'isOnline profileImage username'},
+    {path:'creatives.users.user' , select:'isOnline profileImage username'}
+  ]);
 
-  res.status(204).json({message:'success'});
+  res.status(200).json({message:'success' , data:populatedProject});
 };

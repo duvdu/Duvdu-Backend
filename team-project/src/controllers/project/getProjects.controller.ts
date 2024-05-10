@@ -1,10 +1,10 @@
 import 'express-async-errors';
 
 
+import { TeamProject } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import { Types } from 'mongoose';
 
-import { TeamProject } from '../../models/teamProject.model';
 import { GetProjectsHandler } from '../../types/endpoints';
 
 

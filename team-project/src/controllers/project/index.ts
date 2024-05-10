@@ -7,3 +7,4 @@ export * from './deleteCreative.controller';
 export * from './getProjects.controller';
 export * from './getProjectsCrm.controller';
 export * from './projectAnalysis.controller';
+export * from './updateCreative.controller';

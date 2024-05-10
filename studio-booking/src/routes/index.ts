@@ -38,8 +38,8 @@ router
 
 router.get(
   '/crm',
-  isauthenticated,
-  isauthorized(PERMISSIONS.getCrmStudioProjectsHandlers),
+  // isauthenticated,
+  // isauthorized(PERMISSIONS.getCrmStudioProjectsHandlers),
   val.getAllProjectsVal,
   globalPaginationMiddleware,
   handler.getProjectsPagination,

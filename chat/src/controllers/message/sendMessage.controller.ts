@@ -4,8 +4,6 @@ import { Bucket, Files, FOLDERS, Message, NotFound, Notification, Users } from '
 import { SendMessageHandler } from '../../types/endpoints/mesage.endpoints';
 import { NotificationType } from '../../types/notification.type';
 import { NotificationDetails } from '../../types/notificationDetails';
-import { Channels } from '../../types/socketChannels';
-import { sendNotificationOrFCM } from '../../utils/sendNotificationOrFcm';
 
 
 
