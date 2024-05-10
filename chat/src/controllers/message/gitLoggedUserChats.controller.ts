@@ -9,7 +9,7 @@ import { GetLoggedUserChatsHandler } from '../../types/endpoints/mesage.endpoint
 
 export const getLoggedUserChatsHandler:GetLoggedUserChatsHandler = async (req,res)=>{
 
-  const userId = new Types.ObjectId('65d46504d0e034a10a845d52');
+  const userId = new Types.ObjectId(req.loggedUser?.id);
  
   const allChats = await Message.aggregate([
     {

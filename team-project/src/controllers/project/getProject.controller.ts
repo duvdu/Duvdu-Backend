@@ -1,0 +1,19 @@
+import 'express-async-errors';
+
+import { NotFound } from '@duvdu-v1/duvdu';
+
+import { TeamProject } from '../../models/teamProject.model';
+import { GetProjectHandler } from '../../types/endpoints';
+
+
+export const getProjectHandler:GetProjectHandler = async (req,res,next)=>{
+  const project = await TeamProject.findOne({
+    _id:req.params.projectId,
+    isDeleted : {$ne:true}
+  });
+    
+  if (!project) 
+    return next(new NotFound('project not found'));
+
+  res.status(200).json({message:'success' , data:project});
+};

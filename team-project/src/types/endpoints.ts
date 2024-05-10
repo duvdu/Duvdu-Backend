@@ -49,14 +49,13 @@ export interface CreateProjectHandler
 export interface UpdateProjectHandler
   extends RequestHandler<
     { projectId: string },
-    successResponse<unknown>,
+    successResponse<{data:IteamProject}>,
     Partial<
       Pick<
       IteamProject,
         | 'attachments'
         | 'cover'
         | 'title'
-        | 'category'
         | 'budget'
         | 'desc'
         | 'location'
@@ -83,4 +82,7 @@ export interface RemoveProjectHandler
   extends RequestHandler<{ projectId: string }, successResponse<unknown> , unknown , unknown> {}
 
 export interface ActionTeamProjectOffer
-  extends RequestHandler<{ projectId: string }, successResponse<unknown>, { accept: boolean , category:string , user:string } , unknown> {}
+  extends RequestHandler<{ projectId: string }, successResponse<unknown>, { accept: boolean , category:string } , unknown> {}
+
+export interface DeleteCreativeHandler
+  extends RequestHandler<{projectId:string} , successResponse<unknown> , {category:string , user:string} , unknown>{}

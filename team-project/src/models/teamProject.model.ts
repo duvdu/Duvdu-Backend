@@ -27,6 +27,7 @@ export interface IteamProject extends Document {
       ];
     }
   ];
+  isDeleted:boolean;
 }
 
 const UserSchema = new Schema<IteamProject['creatives'][0]['users'][0]>({
@@ -119,7 +120,11 @@ export const TeamProject = model<IteamProject>(MODELS.teamProject , new Schema<I
     enum:['pending' , 'completed'],
     default:'pending'
   },
-  creatives: [CreativeSchema]
+  creatives: [CreativeSchema],
+  isDeleted:{
+    type:Boolean,
+    default:false
+  }
 } , {timestamps:true , collection:MODELS.teamProject , toJSON: {
   transform(doc, ret) {
     if (ret.cover) ret.cover = process.env.BUCKET_HOST + '/' + ret.cover;
