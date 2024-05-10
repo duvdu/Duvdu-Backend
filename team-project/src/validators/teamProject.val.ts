@@ -1,5 +1,5 @@
 import { globalValidatorMiddleware } from '@duvdu-v1/duvdu';
-import { body, check } from 'express-validator';
+import { body, check, param } from 'express-validator';
 
 
 export const createProjectVal = [
@@ -24,7 +24,7 @@ export const createProjectVal = [
 ];
 
 export const updateProjectVal = [
-  body('projectId').isMongoId(),
+  param('projectId').isMongoId(),
   body('title').optional().trim().isString().notEmpty(),
   body('budget').optional().isInt({min:1}),
   body('desc').optional().trim().isString().notEmpty(),
