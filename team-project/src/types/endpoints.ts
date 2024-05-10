@@ -1,6 +1,27 @@
+/* eslint-disable @typescript-eslint/no-namespace */
+import { IjwtPayload, Ipagination } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
-import { Iproject } from './Project';
-import { Iorder } from './Order';
+
+import { IteamProject } from '../models/teamProject.model';
+
+
+declare module 'express-session' {
+  interface SessionData {
+    access: string;
+    refresh: string;
+  }
+}
+
+declare global {
+  namespace Express {
+    interface Request {
+      loggedUser: IjwtPayload;
+      pagination: Ipagination;
+      lang: 'ar'|'en'
+    }
+  }
+}
+
 
 type successResponse<T> = T & {
   message: 'success';
@@ -9,9 +30,9 @@ type successResponse<T> = T & {
 export interface CreateProjectHandler
   extends RequestHandler<
     unknown,
-    successResponse<unknown>,
+    successResponse<{data:IteamProject}>,
     Pick<
-      Iproject,
+      IteamProject,
       | 'cover'
       | 'title'
       | 'category'
@@ -28,21 +49,20 @@ export interface CreateProjectHandler
 export interface UpdateProjectHandler
   extends RequestHandler<
     { projectId: string },
-    successResponse<unknown>,
+    successResponse<{data:IteamProject}>,
     Partial<
       Pick<
-        Iproject,
+      IteamProject,
         | 'attachments'
         | 'cover'
         | 'title'
-        | 'category'
         | 'budget'
         | 'desc'
         | 'location'
         | 'attachments'
         | 'shootingDays'
         | 'startDate'
-        | 'creatives'
+        | 'address'
       >
     >
   > {}
@@ -50,20 +70,19 @@ export interface UpdateProjectHandler
 export interface GetProjectsHandler
   extends RequestHandler<
     { userId: string },
-    successResponse<{
-      count: number;
-      data: Iproject[];
-    }>
+    successResponse<{ data: IteamProject[] }>,
+    unknown,
+    unknown
   > {}
 
 export interface GetProjectHandler
-  extends RequestHandler<{ projectId: string }, successResponse<{ data: Iproject }>> {}
+  extends RequestHandler<{ projectId: string }, successResponse<{ data: IteamProject }> , unknown , unknown> {}
 
 export interface RemoveProjectHandler
-  extends RequestHandler<{ projectId: string }, successResponse<unknown>> {}
-
-export interface BookProjectHandler
-  extends RequestHandler<{ projectId: string }, successResponse<unknown>> {}
+  extends RequestHandler<{ projectId: string }, successResponse<unknown> , unknown , unknown> {}
 
 export interface ActionTeamProjectOffer
-  extends RequestHandler<{ projectId: string }, successResponse<unknown>, { accept: boolean }> {}
+  extends RequestHandler<{ projectId: string }, successResponse<unknown>, { accept: boolean , category:string } , unknown> {}
+
+export interface DeleteCreativeHandler
+  extends RequestHandler<{projectId:string} , successResponse<unknown> , {category:string , user:string} , unknown>{}

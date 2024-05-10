@@ -15,4 +15,5 @@ export enum MODELS {
   projects = 'allProjects',
   messages = 'messages',
   notifications = 'notifications',
+  teamProject = 'teamProjects'
 }

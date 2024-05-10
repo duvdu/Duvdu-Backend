@@ -1,0 +1,25 @@
+import 'express-async-errors';
+
+import { BadRequestError, NotFound } from '@duvdu-v1/duvdu';
+
+import { TeamProject } from '../../models/teamProject.model';
+import { ActionTeamProjectOffer } from '../../types/endpoints';
+
+
+export const actionTeamProjectHandler:ActionTeamProjectOffer = async (req,res,next)=>{
+  const project = await TeamProject.findById(req.params.projectId);
+  if (!project) 
+    return next(new NotFound('project not found'));
+
+  const creative = project.creatives.filter((creative : any)=> creative._id.toString() === req.body.category);
+  if (creative.length === 0) 
+    return next(new NotFound(`category not found ${req.body.category}`));
+
+  const user = creative[0].users.filter(user => user.user.toString() === req.loggedUser.id);
+  if (user.length === 0) 
+    return next(new BadRequestError(`this user not invited in this team ${req.loggedUser.id}`));
+  user[0].status = req.body.accept ? 'accepted' : 'rejected';
+
+  await project.save();
+  res.status(200).json({message:'success'});
+};

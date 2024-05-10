@@ -1,44 +1,115 @@
 import 'express-async-errors';
-import { Message, NotFound } from '@duvdu-v1/duvdu';
 
-import { getUnreadMessageCounts } from '../../services/countUnReadMessage.service';
+import { Message } from '@duvdu-v1/duvdu';
+import { Types } from 'mongoose';
+
 import { GetSpecificChatHandler } from '../../types/endpoints/mesage.endpoints';
 
 
-export const getSpecificChatHandler:GetSpecificChatHandler = async (req,res,next)=>{
 
-  const chat = await Message.find({
-    $or: [
-      { sender: req.params.receiver, receiver: req.loggedUser.id },
-      { sender: req.loggedUser.id, receiver: req.params.receiver }
-    ]
-  })
-    .sort({ createdAt: -1 }).populate([
-      {path:'sender' , select:'profileImage isOnline username name'},
-      {path:'receiver' , select:'profileImage isOnline username name'},
-      { path: 'reactions.user', select: 'profileImage isOnline username name' }
-    ]).limit(req.pagination.limit).skip(req.pagination.skip);
+export const getSpecificChatHandler:GetSpecificChatHandler = async (req,res)=>{
 
-  if (chat.length === 0)
-    return next(new NotFound(`user dont have chat with this user ${req.params.receiver}`));
+  const userTwo = new Types.ObjectId(req.loggedUser.id);
+  const userOne = new Types.ObjectId(req.params.receiver);
+
+  const chat = await Message.aggregate([
+    {
+      $match: {
+        $or: [
+          { sender: userOne, receiver: userTwo },
+          { sender: userTwo, receiver: userOne }
+        ]
+      }
+    },
+    {
+      $group: {
+        _id: null,
+        allMessages: { $push: '$$ROOT' }
+      }
+    },
+    {
+      $addFields: {
+        unreadMessageCount: {
+          $size: {
+            $filter: {
+              input: '$allMessages',
+              as: 'message',
+              cond: {
+                $and: [
+                  { $eq: ['$$message.receiver', userTwo] },
+                  { $eq: ['$$message.watched', false] }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      $unwind: '$allMessages'
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'allMessages.sender',
+        foreignField: '_id',
+        as: 'sender'
+      }
+    },
+    {
+      $addFields: {
+        'allMessages.sender': {
+          $cond: [
+            { $eq: [{ $size: '$sender' }, 0] },
+            null,
+            { $arrayElemAt: ['$sender', 0] }
+          ]
+        }
+      }
+    },
+    {
+      $addFields: {
+        'allMessages.sender': {
+          $cond: [
+            { $eq: ['$allMessages.sender', null] },
+            null,
+            {
+              profileImage: '$allMessages.sender.profileImage',
+              isOnline: '$allMessages.sender.isOnline',
+              username: '$allMessages.sender.username',
+              name: '$allMessages.sender.name',
+              _id: '$allMessages.sender._id'
+            }
+          ]
+        }
+      }
+    },
+    {
+      $replaceRoot: { newRoot: { $mergeObjects: ['$allMessages', { unreadMessageCount: '$unreadMessageCount' }] } }
+    },
+    {
+      $skip: req.pagination.skip
+    },
+    {
+      $limit: req.pagination.limit
+    }
+  ]);  
+  
 
   const resultCount = await Message.countDocuments({
     $or: [
-      { sender: req.params.receiver, receiver: req.loggedUser.id },
-      { sender: req.loggedUser.id, receiver: req.params.receiver }
+      { sender: userOne, receiver: userTwo },
+      { sender: userTwo, receiver: userOne }
     ]
   });
 
-  const unreadMessage = await getUnreadMessageCounts(req.loggedUser.id , req.params.receiver);
-
   res.status(200).json({
-    message:'success' ,
+    message:'success',
     pagination: {
       currentPage: req.pagination.page,
       resultCount,
       totalPages: Math.ceil(resultCount / req.pagination.limit),
     },
-    data:chat,
-    unreadMessage
+    data:chat
   });
 };

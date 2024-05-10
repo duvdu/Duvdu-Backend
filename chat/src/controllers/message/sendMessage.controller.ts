@@ -9,6 +9,8 @@ import { sendNotificationOrFCM } from '../../utils/sendNotificationOrFcm';
 
 
 
+
+
 export const sendMessageHandler:SendMessageHandler = async (req,res,next)=>{
 
   const receiver = await Users.findById(req.body.receiver);
@@ -37,20 +39,21 @@ export const sendMessageHandler:SendMessageHandler = async (req,res,next)=>{
       { path: 'reactions.user', select: 'profileImage isOnline username name' }
     ]);
 
+
   const notification = await Notification.create({
-    targetUser:req.body.receiver,
     sourceUser:req.loggedUser.id,
-    target:message._id,
+    targetUser:req.body.receiver,
     type:NotificationType.new_message,
+    target:message._id,
     message:NotificationDetails.newMessage.message,
     title:NotificationDetails.newMessage.title
   });
 
-  const io = req.app.get('socketio');
   const populatedNotification = await (
     await notification.save()
-  ).populate('sourceUser', 'name username profileImage');
+  ).populate('sourceUser', 'isOnline profileImage username');
 
-  await sendNotificationOrFCM(io , Channels.new_message , notification.targetUser.toString() , {title:notification.title , message:notification.message},populatedNotification);
+  const io = req.app.get('socketio');
+  sendNotificationOrFCM(io , Channels.new_message , notification.targetUser.toString() , {title:notification.title , message:notification.message} , populatedNotification );
   res.status(201).json({message:'success' , data:populatedMessage});
 };

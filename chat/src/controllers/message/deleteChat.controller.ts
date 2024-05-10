@@ -6,9 +6,13 @@ import { DeleteChatHandler } from '../../types/endpoints/mesage.endpoints';
 
 
 
+
 export const deleteChatHandler:DeleteChatHandler = async (req,res,next)=>{
 
-  const messages = await Message.find({receiver:req.params.receiver , sender:req.loggedUser.id});
+  const messages = await Message.find({$or:[
+    { sender: req.loggedUser.id, receiver: req.params.receiver },
+    { sender: req.params.receiver, receiver: req.loggedUser.id }
+  ]});
   if (!messages) 
     return next(new BadRequestError(`user dont have any chat with this ${req.params.receiver}`));
  

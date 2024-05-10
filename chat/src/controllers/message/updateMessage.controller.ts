@@ -6,6 +6,7 @@ import { UpdateMessageHandler } from '../../types/endpoints/mesage.endpoints';
 
 
 
+
 export const updateMessageHandler:UpdateMessageHandler = async (req,res,next)=>{
   const message = await Message.findById(req.params.message);
   if (!message)
@@ -29,9 +30,8 @@ export const updateMessageHandler:UpdateMessageHandler = async (req,res,next)=>{
   if (req.body.reactions) 
     req.body.reactions[0].user = new Types.ObjectId(req.loggedUser.id);
 
-  const updatedMessage = await Message.findByIdAndUpdate(req.params.message , {...req.body , updated:true} , {new:true});
+  const updatedMessage = await Message.findByIdAndUpdate(req.params.message , req.body , {new:true});
   if (!updatedMessage) 
     return next(new BadRequestError(`failed to update this message ${req.params.message}`));
-
   res.status(200).json({message:'success' , data:updatedMessage});
 };

@@ -5,6 +5,7 @@ import { DeleteMessageHandler } from '../../types/endpoints/mesage.endpoints';
 
 
 
+
 export const deleteMessageHandler:DeleteMessageHandler = async (req,res,next)=>{
   const message = await Message.findById(req.params.message);
   if (!message) 

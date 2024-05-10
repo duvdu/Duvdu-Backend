@@ -5,6 +5,8 @@ import { BadRequestError, Message } from '@duvdu-v1/duvdu';
 import { MarkMessageAsWatchedHandler } from '../../types/endpoints/mesage.endpoints';
 
 
+
+
 export const markMessageAsWatchedHandler:MarkMessageAsWatchedHandler = async (req,res , next)=>{
 
   const messageCount = await Message.countDocuments({
