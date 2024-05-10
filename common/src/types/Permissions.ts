@@ -52,6 +52,14 @@ export enum PERMISSIONS {
   deleteReportHandler = 'delete report',
   // book project
   booking = 'booking',
+  // team project
+  getCrmTeamProjectHandler = 'get crm team project crm',
+  getTeamProjectAnalysisHandler = 'get team project analysis',
+  deleteTeamProjectCreativeHandler = 'delete team project creative',
+  updateTeamProjectCreativeHandler = 'update team project creative',
+  createTeamProjectHandler = 'create team project',
+  updateTeamProjectHandler = 'update team project',
+  deleteTeamProjectHandler = 'delete team project',
 }
 
 export const permissions = {
