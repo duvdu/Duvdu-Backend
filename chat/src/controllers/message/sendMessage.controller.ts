@@ -40,7 +40,7 @@ export const sendMessageHandler:SendMessageHandler = async (req,res,next)=>{
     ]);
 
 
-  const notification = await Notification.create({
+  await Notification.create({
     sourceUser:req.loggedUser.id,
     targetUser:req.body.receiver,
     type:NotificationType.new_message,
@@ -49,11 +49,11 @@ export const sendMessageHandler:SendMessageHandler = async (req,res,next)=>{
     title:NotificationDetails.newMessage.title
   });
 
-  const populatedNotification = await (
-    await notification.save()
-  ).populate('sourceUser', 'isOnline profileImage username');
+  // const populatedNotification = await (
+  //   await notification.save()
+  // ).populate('sourceUser', 'isOnline profileImage username');
 
-  const io = req.app.get('socketio');
-  sendNotificationOrFCM(io , Channels.new_message , notification.targetUser.toString() , {title:notification.title , message:notification.message} , populatedNotification );
+  // // const io = req.app.get('socketio');
+  // // sendNotificationOrFCM(io , Channels.new_message , notification.targetUser.toString() , {title:notification.title , message:notification.message} , populatedNotification );
   res.status(201).json({message:'success' , data:populatedMessage});
 };

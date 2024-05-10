@@ -3,3 +3,7 @@ export * from './updateTeamProject.controller';
 export * from './deleteProject.controller';
 export * from './actionTeamProject.controller';
 export * from './getProject.controller';
+export * from './deleteCreative.controller';
+export * from './getProjects.controller';
+export * from './getProjectsCrm.controller';
+export * from './projectAnalysis.controller';
