@@ -1,4 +1,4 @@
-import { checkRequiredFields, FOLDERS, uploadProjectMedia } from '@duvdu-v1/duvdu';
+import { checkRequiredFields, FOLDERS, globalPaginationMiddleware, uploadProjectMedia } from '@duvdu-v1/duvdu';
 import express from 'express';
 
 
@@ -9,7 +9,12 @@ import * as val from '../validators/teamProject.val';
 
 export const router = express.Router();
 
-router.patch('/:projectId/user-action' , val.actionTeamProjectVal , handler.actionTeamProjectHandler);
+router.get('/crm' , val.getProjectsVal , globalPaginationMiddleware , handler.getProjectsCrmHandler);
+router.get('/analysis' , val.projectAnalysisVal , globalPaginationMiddleware , handler.getProjectAnalysis);
+
+router.route('/:projectId/user')
+  .patch( val.actionTeamProjectVal , handler.actionTeamProjectHandler)
+  .delete(val.deleteCreativeVal , handler.deleteCreativeHandler);
 
 router.route('/')
   .post(
@@ -17,11 +22,12 @@ router.route('/')
     checkRequiredFields({ fields: ['cover', 'attachments'] }),
     val.createProjectVal,
     handler.createProjectHandler
-  );
+  )
+  .get(val.getProjectsVal, globalPaginationMiddleware , handler.getProjectsPagination , handler.getProjectsHandler);
 
 router.route('/:projectId')
   .patch(uploadProjectMedia(FOLDERS.team_project) , val.updateProjectVal , handler.updateProjectHandler)
   .delete(val.deleteProjectVal , handler.removeProjectHandler)
-  .get(val.getProjectHandler,handler.getProjectHandler);
+  .get(val.getProjectVal ,handler.getProjectHandler);
 
 

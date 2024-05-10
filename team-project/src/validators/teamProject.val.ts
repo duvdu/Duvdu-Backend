@@ -1,5 +1,5 @@
 import { globalValidatorMiddleware } from '@duvdu-v1/duvdu';
-import { body, check, param } from 'express-validator';
+import { body, param, query } from 'express-validator';
 
 
 export const createProjectVal = [
@@ -20,6 +20,7 @@ export const createProjectVal = [
   body('creatives.*.users.*.user').isMongoId(),
   body('creatives.*.users.*.workHours').isInt({min:1}),
   body('creatives.*.users.*.totalAmount').isInt({min:1}),
+  body('showOnHome').isBoolean(),
   globalValidatorMiddleware
 ];
 
@@ -33,22 +34,51 @@ export const updateProjectVal = [
   body('address').optional().trim().isString().notEmpty(),
   body('shootingDays').optional().isInt({min:1}),
   body('startDate').optional().isISO8601().toDate(),
+  body('showOnHome').optional().isBoolean(),
   globalValidatorMiddleware
 ];
 
 export const deleteProjectVal = [
-  check('projectId').isMongoId(),
+  param('projectId').isMongoId(),
   globalValidatorMiddleware
 ];
 
-export const getProjectHandler = [
-  check('projectId').isMongoId(),
+export const getProjectVal = [
+  param('projectId').isMongoId(),
   globalValidatorMiddleware
 ];
 
 export const actionTeamProjectVal = [
-  check('projectId').isMongoId(),
-  check('category').isMongoId(),
-  check('accept').isBoolean(),
+  param('projectId').isMongoId(),
+  body('category').isMongoId(),
+  body('status').isBoolean(),
+  globalValidatorMiddleware
+];
+
+export const deleteCreativeVal = [
+  param('projectId').isMongoId(),
+  body('user').isMongoId(),
+  body('category').isMongoId(),
+  globalValidatorMiddleware
+];
+
+
+export const getProjectsVal = [
+  query('searchKeywords').optional().isArray(),
+  query('location.lat').optional().isFloat({ min: -90, max: 90 }),
+  query('location.lng').optional().isFloat({ min: -180, max: 180 }),
+  query('category').optional().isMongoId(),
+  query('pricePerHourFrom').optional().isInt({min:1}),
+  query('pricePerHourTo').optional().isInt({min:1}),
+  query('showOnHome').optional().isBoolean(),
+  query('startDate').optional().isISO8601(),
+  query('endDate').optional().isISO8601(),
+  query('user').optional().isMongoId(),
+  globalValidatorMiddleware
+];
+
+export const projectAnalysisVal = [
+  query('startDate').optional().isISO8601().toDate(),
+  query('endDate').optional().isISO8601().toDate(),
   globalValidatorMiddleware
 ];

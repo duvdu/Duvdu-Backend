@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-namespace */
-import { IjwtPayload, Ipagination } from '@duvdu-v1/duvdu';
+import { IjwtPayload, Ipagination, PaginationResponse } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 import { IteamProject } from '../models/teamProject.model';
@@ -43,6 +43,7 @@ export interface CreateProjectHandler
       | 'shootingDays'
       | 'startDate'
       | 'creatives'
+      | 'showOnHome'
     >
   > {}
 
@@ -63,14 +64,23 @@ export interface UpdateProjectHandler
         | 'shootingDays'
         | 'startDate'
         | 'address'
+        | 'showOnHome'
       >
     >
   > {}
 
 export interface GetProjectsHandler
   extends RequestHandler<
-    { userId: string },
-    successResponse<{ data: IteamProject[] }>,
+    unknown,
+    PaginationResponse<{ data: IteamProject[] }>,
+    unknown,
+    unknown
+  > {}
+
+export interface GetProjectsCrmHandler
+  extends RequestHandler<
+    unknown,
+    PaginationResponse<{ data: IteamProject[] }>,
     unknown,
     unknown
   > {}
@@ -82,7 +92,7 @@ export interface RemoveProjectHandler
   extends RequestHandler<{ projectId: string }, successResponse<unknown> , unknown , unknown> {}
 
 export interface ActionTeamProjectOffer
-  extends RequestHandler<{ projectId: string }, successResponse<unknown>, { accept: boolean , category:string } , unknown> {}
+  extends RequestHandler<{ projectId: string }, successResponse<unknown>, { status: boolean , category:string } , unknown> {}
 
 export interface DeleteCreativeHandler
   extends RequestHandler<{projectId:string} , successResponse<unknown> , {category:string , user:string} , unknown>{}

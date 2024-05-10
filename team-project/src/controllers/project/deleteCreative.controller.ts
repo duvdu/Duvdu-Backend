@@ -7,19 +7,19 @@ import { DeleteCreativeHandler } from '../../types/endpoints';
 
 
 export const deleteCreativeHandler:DeleteCreativeHandler = async (req,res,next)=>{
-  const project = await TeamProject.findById(req.params.projectId);
+  const project = await TeamProject.findOne({_id:req.params.projectId , isDeleted:{$ne:true}});
   if (!project) 
     return next(new NotFound('project not found'));
 
-  const creative = project.creatives.filter((creative:any)=> creative._id.toString() === req.body.category);
-  if (creative.length === 0) 
-    return next(new NotFound(`category not found ${req.body.category}`));
-    
-  const userIndex = creative[0].users.findIndex(user => user.user.toString() === req.body.user );
-  if (userIndex === -1)
-    return next(new BadRequestError('this user not found in this project'));
+  const creativeIndex = project.creatives.findIndex((creative: any) => creative._id.toString() === req.body.category);
+  if (creativeIndex === -1) 
+    return next(new NotFound(`Category not found: ${req.body.category}`));
 
-  creative[0].users.slice(userIndex , 1);
+  const userIndex = project.creatives[creativeIndex].users.findIndex((user: any) => user.user.toString() === req.body.user);
+  if (userIndex === -1)
+    return next(new BadRequestError('This user was not found in this project'));
+
+  project.creatives[creativeIndex].users.splice(userIndex, 1);
 
   await project.save();
 
