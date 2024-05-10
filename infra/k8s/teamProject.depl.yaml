@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: teamProject-depl
+  name: team-project-depl
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: teamProject
+      app: team-project
   template:
     metadata:
       labels:
-        app: teamProject
+        app: team-project
     spec:
       containers:
-        - name: teamProject
+        - name: team-project
           image: duvdu/team-project
           env:
             - name: MONGO_URI
@@ -88,12 +88,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: teamProject-srv
+  name: team-project-srv
 spec:
   selector:
-    app: teamProject
+    app: team-project
   ports:
-    - name: teamProject
+    - name: team-project
       protocol: TCP 
       port: 3000
       targetPort: 3000

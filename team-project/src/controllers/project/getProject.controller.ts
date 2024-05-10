@@ -10,7 +10,10 @@ export const getProjectHandler:GetProjectHandler = async (req,res,next)=>{
   const project = await TeamProject.findOne({
     _id:req.params.projectId,
     isDeleted : {$ne:true}
-  });
+  }).populate([
+    {path:'user' , select:'isOnline profileImage username'},
+    {path:'creatives.users.user' , select:'isOnline profileImage username'}
+  ]);
     
   if (!project) 
     return next(new NotFound('project not found'));
