@@ -1,7 +1,6 @@
-import { BadRequestError, NotFound, SuccessResponse, Users } from '@duvdu-v1/duvdu';
+import { BadRequestError, BookingState, NotFound, SuccessResponse, Users } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-import { BookingState } from '../../../../common/src';
 import { CopyrightsBooking, IcopyrightsBooking } from '../../models/copyrights-booking.model';
 
 // canceled .. by cronjob if project created from 24 hours

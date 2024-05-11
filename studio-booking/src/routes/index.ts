@@ -9,7 +9,9 @@ import {
 } from '@duvdu-v1/duvdu';
 import express from 'express';
 
+import { bookProjectHandler } from '../controllers/booking/book-project.controller';
 import * as handler from '../controllers/projects';
+import { bookProject as bookProjectVal } from '../validators/booking/booking.validator';
 import * as val from '../validators/index';
 
 export const router = express.Router();
@@ -69,3 +71,11 @@ router
     handler.removeProjectHandler,
   )
   .get(val.deleteProjectVal, handler.getProjectHandler);
+
+router.post(
+  '/book/:projectId',
+  isauthenticated,
+  isauthorized(PERMISSIONS.booking),
+  bookProjectVal,
+  bookProjectHandler,
+);
