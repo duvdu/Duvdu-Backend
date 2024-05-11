@@ -6,7 +6,7 @@ import { BookingState } from '../../models/copyrights-booking.model';
 export const bookProject = [
   param('projectId').isMongoId(),
   body('jobDetails').isString(),
-  body('date').isISO8601(),
+  body('deadline').isISO8601(),
   body('address').isString(),
   body('location').isObject(),
   body('location.lat').isFloat({ min: -90, max: 90 }),
