@@ -8,7 +8,7 @@ import {
 import { Router } from 'express';
 
 import { bookProjectHandler } from '../controllers/booking/book-project.controller';
-import { updateBookedProjectHandler } from '../controllers/booking/update-booked-project.controller';
+// import { updateBookedProjectHandler } from '../controllers/booking/update-booked-project.controller';
 import * as val from '../validators/booking/booking.validator';
 
 const router = Router();
@@ -24,12 +24,12 @@ router.post(
   val.bookProject,
   bookProjectHandler,
 );
-router.patch(
-  '/:bookingId',
-  isauthenticated,
-  isauthorized(PERMISSIONS.booking),
-  val.updateProject,
-  updateBookedProjectHandler,
-);
+// router.patch(
+//   '/:bookingId',
+//   isauthenticated,
+//   isauthorized(PERMISSIONS.booking),
+//   val.updateProject,
+//   updateBookedProjectHandler,
+// );
 
 export const bookingRoutes = router;
