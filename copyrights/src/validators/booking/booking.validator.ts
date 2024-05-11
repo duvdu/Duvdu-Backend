@@ -1,7 +1,5 @@
-import { globalValidatorMiddleware } from '@duvdu-v1/duvdu';
+import { BookingState, globalValidatorMiddleware } from '@duvdu-v1/duvdu';
 import { body, param } from 'express-validator';
-
-import { BookingState } from '../../models/copyrights-booking.model';
 
 export const bookProject = [
   param('projectId').isMongoId(),

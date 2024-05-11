@@ -12,7 +12,7 @@ export interface IstudioBooking {
   studioNumber: string;
   studioEmail: string;
   desc: string;
-  equipments: { name: string; fees: number }[];
+  equipments: { id: string; name: string; fees: number }[];
   location: { lat: number; lng: number };
   searchKeywords: string[];
   pricePerHour: number;
@@ -23,8 +23,8 @@ export interface IstudioBooking {
   rate: { ratersCounter: number; totalRates: number };
   isDeleted: boolean;
   creatives: { creative: Types.ObjectId | Iuser; fees: number }[];
-  tags: {ar:string , en:string}[];
-  subCategory:{ar:string , en:string};
+  tags: { ar: string; en: string }[];
+  subCategory: { ar: string; en: string };
 }
 
 export const studioBooking = model<IstudioBooking>(
@@ -70,9 +70,9 @@ export const studioBooking = model<IstudioBooking>(
         totalRates: { type: Number, default: 0 },
       },
       tags: [{ ar: { type: String, default: null }, en: { type: String, default: null } }],
-      subCategory:{
-        ar:String,
-        en:String
+      subCategory: {
+        ar: String,
+        en: String,
       },
     },
     {
@@ -90,5 +90,3 @@ export const studioBooking = model<IstudioBooking>(
     },
   ),
 );
-
-

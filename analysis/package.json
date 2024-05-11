@@ -1,5 +1,5 @@
 {
-  "name": "studio-booking",
+  "name": "analysis",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -24,7 +24,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@duvdu-v1/duvdu": "^1.1.44",
+    "@duvdu-v1/duvdu": "^1.1.48",
     "@jridgewell/sourcemap-codec": "^1.4.15",
     "@types/bcryptjs": "^2.4.5",
     "@types/cors": "^2.8.17",

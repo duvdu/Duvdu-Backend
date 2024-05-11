@@ -1,11 +1,7 @@
-import { BadRequestError, NotFound, SuccessResponse, Users } from '@duvdu-v1/duvdu';
+import { BadRequestError, BookingState, NotFound, SuccessResponse, Users } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-import {
-  BookingState,
-  CopyrightsBooking,
-  IcopyrightsBooking,
-} from '../../models/copyrights-booking.model';
+import { CopyrightsBooking, IcopyrightsBooking } from '../../models/copyrights-booking.model';
 
 // canceled .. by cronjob if project created from 24 hours
 // pending .. targetUser can update to ongoing or rejected
