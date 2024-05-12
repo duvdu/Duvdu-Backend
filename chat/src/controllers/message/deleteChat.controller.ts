@@ -19,8 +19,10 @@ export const deleteChatHandler:DeleteChatHandler = async (req,res,next)=>{
   const s3 = new Bucket();
 
   await Promise.all(messages.map(async (message) => {
-    if (message.media?.url) {
-      await s3.removeBucketFiles(message.media.url);
+    if (message.media && message.media.length > 0) {
+      for (const attach of message.media) {
+        await s3.removeBucketFiles(attach.url);
+      }
     }
   }));
 
