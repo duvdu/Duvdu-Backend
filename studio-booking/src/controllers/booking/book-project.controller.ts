@@ -21,7 +21,6 @@ export const bookProjectHandler: RequestHandler<
     .collection(MODELS.studioBooking)
     .findOne({ _id: new mongoose.Types.ObjectId(req.params.projectId), isDeleted: { $ne: true } });
   // const project = await studioBooking.findOne({ _id: req.params.projectId, isDeleted: true });
-  console.log(project);
   if (!project) return next(new NotFound('Project not found'));
   const equipmentsWithFees: { name: string; fees: number }[] = [];
   // assert equipments

@@ -7,8 +7,15 @@ export const bookProject = [
   body('deadline').isISO8601(),
   body('address').isString(),
   body('location').isObject(),
-  body('location.lat').isFloat({ min: -90, max: 90 }),
-  body('location.lng').isFloat({ min: -180, max: 180 }),
+  body('location.lat').isFloat({ min: -90, max: 90 }).bail().toFloat(),
+  body('location.lng').isFloat({ min: -180, max: 180 }).bail().toFloat(),
+  body('totalPrice').isFloat({ gt: 0 }).bail().toFloat(),
+  body('deadline')
+    .isISO8601()
+    .custom((val) => {
+      if (new Date(val).getTime() <= Date.now()) throw new Error();
+      return true;
+    }),
   // body('isInstant').isBoolean().bail().toBoolean(),
   globalValidatorMiddleware,
 ];

@@ -9,7 +9,6 @@ import {
 import { RequestHandler } from 'express';
 
 import { CopyrightsBooking, IcopyrightsBooking } from '../../models/copyrights-booking.model';
-
 export const bookProjectHandler: RequestHandler<
   { projectId: string },
   SuccessResponse<{ data: IcopyrightsBooking }>
@@ -25,6 +24,8 @@ export const bookProjectHandler: RequestHandler<
     req.body.attachments = attachments.map((el) => FOLDERS.copyrights + '/' + el.filename);
     await new Bucket().saveBucketFiles(FOLDERS.copyrights, ...attachments);
   }
+
+  await new Bucket().saveBucketFiles(FOLDERS.copyrights, ...attachments);
 
   // create booking
   const booking = await CopyrightsBooking.create({
