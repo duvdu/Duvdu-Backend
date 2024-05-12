@@ -13,10 +13,10 @@ export interface ImessageDoc {
     sender: Types.ObjectId | Iuser;
     receiver: Types.ObjectId | Iuser;
     content?: string;
-    media?: {
+    media?: [{
       type: string; 
       url: string;
-    };
+    }];
     reactions: Ireaction[];
     watched: boolean;
     updated:boolean
