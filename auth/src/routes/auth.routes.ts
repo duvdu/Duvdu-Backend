@@ -1,4 +1,11 @@
-import {  FOLDERS, isauthenticated, isauthorized, PERMISSIONS, uploadProjectMedia } from '@duvdu-v1/duvdu';
+import {
+  FOLDERS,
+  globalPaginationMiddleware,
+  isauthenticated,
+  isauthorized,
+  PERMISSIONS,
+  uploadProjectMedia,
+} from '@duvdu-v1/duvdu';
 import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
 
@@ -6,9 +13,17 @@ import * as handlers from '../controllers/auth';
 import * as val from '../validators/auth';
 
 const router = Router();
+router
+  .route('/find')
+  .get(val.findUsers, globalPaginationMiddleware, handlers.filterUsers, handlers.findUsers);
 router.post('/signin', val.signinVal, handlers.signinHandler);
 router.post('/signup', val.signupVal, handlers.signupHandler);
-router.post('/complete-sginup' , isauthenticated, val.completeSginUpVal, handlers.completeSginupHandler);
+router.post(
+  '/complete-sginup',
+  isauthenticated,
+  val.completeSginUpVal,
+  handlers.completeSginupHandler,
+);
 router.post(
   '/retreive-username',
   rateLimit({

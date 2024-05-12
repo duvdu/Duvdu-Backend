@@ -8,6 +8,7 @@ export interface IcopyrightsBooking {
   project: IcopyRights | Types.ObjectId;
   jobDetails: string;
   deadline: Date;
+  totalPrice: number;
   location: { lat: string; lng: string };
   attachments: string[];
   address: string;
@@ -24,6 +25,7 @@ export const CopyrightsBooking = model<IcopyrightsBooking>(
       project: { type: Schema.Types.ObjectId, ref: MODELS.user, required: true },
       jobDetails: { type: String, default: null },
       deadline: { type: Date, required: true },
+      totalPrice: { type: Number, required: true },
       address: { type: String, default: null },
       location: { lat: { type: String, required: true }, lng: { type: String, required: true } },
       attachments: [String],

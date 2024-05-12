@@ -9,7 +9,9 @@ import {
 } from '@duvdu-v1/duvdu';
 import { Router } from 'express';
 
+import { bookProjectHandler } from '../controllers/booking/book-project.controller';
 import * as handlers from '../controllers/projects';
+import { bookProject as bookProjectVal } from '../validators/booking/booking.validator';
 import * as val from '../validators/project/project.validator';
 const router = Router();
 
@@ -63,5 +65,13 @@ router
     val.get,
     handlers.removeProjectHandler,
   );
+
+router.post(
+  '/book/:projectId',
+  isauthenticated,
+  isauthorized(PERMISSIONS.booking),
+  bookProjectVal,
+  bookProjectHandler,
+);
 
 export const apiRoutes = router;
