@@ -43,7 +43,7 @@ export const Message = model<ImessageDoc>(MODELS.messages , new Schema<ImessageD
     default:null
   },
   reactions:[reactionSchema],
-  media: {
+  media: [{
     type: {
       type: String,
       default:null
@@ -52,7 +52,7 @@ export const Message = model<ImessageDoc>(MODELS.messages , new Schema<ImessageD
       type:String,
       default:null
     },
-  },
+  }],
   watched:{
     type:Boolean,
     default:false
