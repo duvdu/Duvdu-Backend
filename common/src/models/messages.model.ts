@@ -13,10 +13,10 @@ export interface ImessageDoc {
     sender: Types.ObjectId | Iuser;
     receiver: Types.ObjectId | Iuser;
     content?: string;
-    media?: {
+    media?: [{
       type: string; 
       url: string;
-    };
+    }];
     reactions: Ireaction[];
     watched: boolean;
     updated:boolean
@@ -43,7 +43,7 @@ export const Message = model<ImessageDoc>(MODELS.messages , new Schema<ImessageD
     default:null
   },
   reactions:[reactionSchema],
-  media: {
+  media: [{
     type: {
       type: String,
       default:null
@@ -52,7 +52,7 @@ export const Message = model<ImessageDoc>(MODELS.messages , new Schema<ImessageD
       type:String,
       default:null
     },
-  },
+  }],
   watched:{
     type:Boolean,
     default:false
