@@ -38,7 +38,7 @@ export const bookProjectHandler: RequestHandler<
 
   const booking = await StudioBookingBook.create({
     ...req.body,
-    sourceUser: req.loggedUser.id,
+    // sourceUser: req.loggedUser.id,
     targetUser: project.user,
     project: project.id,
     equipments: equipmentsWithFees,
