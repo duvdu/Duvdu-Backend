@@ -11,3 +11,4 @@ export * from './forget-password.controller';
 export * from './verify.controller';
 export * from './ask-refresh-token.controller';
 export * from './completeSginUp.controller';
+export * from './find-users.controller';
