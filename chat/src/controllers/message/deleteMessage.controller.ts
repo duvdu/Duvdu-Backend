@@ -14,9 +14,11 @@ export const deleteMessageHandler:DeleteMessageHandler = async (req,res,next)=>{
   if (message.sender.toString() != req.loggedUser.id) 
     return next(new UnauthorizedError(`user dont owner for this message ${req.params.message}`));
 
-  if (message.media?.url) {
+  if (message.media && message.media.length > 0) {
     const s3 = new Bucket();
-    await s3.removeBucketFiles(message.media.url);
+    for (const attach of message.media) {
+      await s3.removeBucketFiles(attach.url);
+    }
   }
 
   await Message.findByIdAndDelete(req.params.message);

@@ -20,11 +20,18 @@ export const sendMessageHandler:SendMessageHandler = async (req,res,next)=>{
     (req.body as any).media = {};
     const s3 = new Bucket();
     await s3.saveBucketFiles(FOLDERS.chat, ...attachments);
-    (req.body as any).media['url'] = `${FOLDERS.chat}/${attachments[0].filename}`;
-    (req.body as any).media['type'] = attachments[0].mimetype;
-    Files.removeFiles((req.body as any).media['url']);
+    const mediaArray = [];
+    for (const attach of attachments) {
+      const media = {
+        url:`${FOLDERS.chat}/${attach.filename}`,
+        type:attach.mimetype
+      };
+      Files.removeFiles(`${FOLDERS.chat}/${attach.filename}`);
+      mediaArray.push(media);
+    }
+    (req.body as any).media = mediaArray;
   }
-
+  
   const message = await Message.create({
     ...req.body,
     sender:req.loggedUser.id

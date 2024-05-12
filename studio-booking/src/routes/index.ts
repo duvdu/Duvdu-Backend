@@ -74,8 +74,8 @@ router
 
 router.post(
   '/book/:projectId',
-  isauthenticated,
-  isauthorized(PERMISSIONS.booking),
+  // isauthenticated,
+  // isauthorized(PERMISSIONS.booking),
   bookProjectVal,
   bookProjectHandler,
 );
