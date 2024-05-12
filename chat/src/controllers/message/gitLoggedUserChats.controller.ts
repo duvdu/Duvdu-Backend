@@ -11,6 +11,7 @@ export const getLoggedUserChatsHandler:GetLoggedUserChatsHandler = async (req,re
 
   const userId = new Types.ObjectId(req.loggedUser?.id);
  
+
   const allChats = await Message.aggregate([
     {
       $match: {
@@ -18,22 +19,6 @@ export const getLoggedUserChatsHandler:GetLoggedUserChatsHandler = async (req,re
           { sender: userId },
           { receiver: userId }
         ]
-      }
-    },
-    {
-      $lookup: {
-        from: MODELS.user,
-        localField: 'sender',
-        foreignField: '_id',
-        as: 'senderDetails'
-      }
-    },
-    {
-      $lookup: {
-        from: MODELS.user,
-        localField: 'receiver',
-        foreignField: '_id',
-        as: 'receiverDetails'
       }
     },
     {
@@ -53,27 +38,18 @@ export const getLoggedUserChatsHandler:GetLoggedUserChatsHandler = async (req,re
     {
       $group: {
         _id: '$otherUser',
-        messages: { $push: '$message' }
+        newestMessage: { $first: '$message' },
+        allMessages: { $push: '$message' }
       }
     },
     {
       $match: {
-        messages: { $ne: null }
+        newestMessage: { $exists: true }
       }
-    },
-    {
-      $unwind: '$messages'
     },
     {
       $sort: {
-        'messages.createdAt': -1
-      }
-    },
-    {
-      $group: {
-        _id: '$_id',
-        newestMessage: { $first: '$messages' },
-        allMessages: { $push: '$messages' }
+        'newestMessage.createdAt': -1
       }
     },
     {
@@ -95,55 +71,35 @@ export const getLoggedUserChatsHandler:GetLoggedUserChatsHandler = async (req,re
     {
       $project: {
         _id: 1,
-        sender: 1,
-        receiver: 1,
+        sender: '$newestMessage.sender',
+        receiver: '$newestMessage.receiver',
         newestMessage: {
           $mergeObjects: [
             '$newestMessage',
             {
               sender: {
-                $cond: [
-                  { $eq: [{ $size: '$senderDetails' }, 0] },
-                  null,
-                  {
-                    $let: {
-                      vars: {
-                        senderDoc: { $arrayElemAt: ['$senderDetails', 0] }
-                      },
-                      in: {
-                        _id: '$newestMessage.sender',
-                        profileImage: {
-                          $concat: [process.env.BUCKET_HOST, '/', '$$senderDoc.profileImage']
-                        },
-                        isOnline: '$$senderDoc.isOnline',
-                        username: '$$senderDoc.username',
-                        name: '$$senderDoc.name'
-                      }
-                    }
-                  }
-                ]
+                _id: { $ifNull: [{ $arrayElemAt: ['$senderDetails._id', 0] }, null] },
+                profileImage: {
+                  $ifNull: [
+                    { $concat: [process.env.BUCKET_HOST, '/', { $arrayElemAt: ['$senderDetails.profileImage', 0] }] },
+                    null
+                  ]
+                },
+                isOnline: { $ifNull: [{ $arrayElemAt: ['$senderDetails.isOnline', 0] }, null] },
+                username: { $ifNull: [{ $arrayElemAt: ['$senderDetails.username', 0] }, null] },
+                name: { $ifNull: [{ $arrayElemAt: ['$senderDetails.name', 0] }, null] }
               },
               receiver: {
-                $cond: [
-                  { $eq: [{ $size: '$receiverDetails' }, 0] },
-                  null,
-                  {
-                    $let: {
-                      vars: {
-                        receiverDoc: { $arrayElemAt: ['$receiverDetails', 0] }
-                      },
-                      in: {
-                        _id: '$newestMessage.receiver',
-                        profileImage: {
-                          $concat: [process.env.BUCKET_HOST, '/', '$$receiverDoc.profileImage']
-                        },
-                        isOnline: '$$receiverDoc.isOnline',
-                        username: '$$receiverDoc.username',
-                        name: '$$receiverDoc.name'
-                      }
-                    }
-                  }
-                ]
+                _id: { $ifNull: [{ $arrayElemAt: ['$receiverDetails._id', 0] }, null] },
+                profileImage: {
+                  $ifNull: [
+                    { $concat: [process.env.BUCKET_HOST, '/', { $arrayElemAt: ['$receiverDetails.profileImage', 0] }] },
+                    null
+                  ]
+                },
+                isOnline: { $ifNull: [{ $arrayElemAt: ['$receiverDetails.isOnline', 0] }, null] },
+                username: { $ifNull: [{ $arrayElemAt: ['$receiverDetails.username', 0] }, null] },
+                name: { $ifNull: [{ $arrayElemAt: ['$receiverDetails.name', 0] }, null] }
               }
             }
           ]
@@ -173,8 +129,7 @@ export const getLoggedUserChatsHandler:GetLoggedUserChatsHandler = async (req,re
   ]);
   
   
-  
-  
+
 
   const countPipeline = [
     {
