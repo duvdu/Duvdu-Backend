@@ -6,6 +6,7 @@ import {
   isauthorized,
   FOLDERS,
   isauthenticated,
+  globalUploadMiddleware
 } from '@duvdu-v1/duvdu';
 import { Router } from 'express';
 
@@ -68,6 +69,7 @@ router
 
 router.post(
   '/book/:projectId',
+  globalUploadMiddleware(FOLDERS.portfolio_post).array('attachments', 10),
   isauthenticated,
   isauthorized(PERMISSIONS.booking),
   bookProjectVal,
