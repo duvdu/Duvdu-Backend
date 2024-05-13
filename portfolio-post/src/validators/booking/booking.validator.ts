@@ -20,12 +20,14 @@ export const bookProject = [
       if (new Date(val).getTime() <= Date.now()) throw new Error();
       return true;
     }),
-  body('deadline')
+  body('startDate')
     .isISO8601()
-    .custom((val, { req }) => {
-      if (new Date(val).getTime() <= new Date(req.body.appointmentDate).getTime())
-        throw new Error();
+    .custom((val) => {
+      if (new Date(val).getTime() <= Date.now()) throw new Error();
       return true;
     }),
+  body('customRequirement').isObject(),
+  body('customRequirement.measure').isInt({min:1}),
+  body('customRequirement.unit').isString(),
   globalValidatorMiddleware,
 ];
