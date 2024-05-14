@@ -4,9 +4,9 @@ import { body, param } from 'express-validator';
 export const bookProject = [
   param('projectId').isMongoId(),
   body('jobDetails').isString(),
-  body('tools').isArray(),
+  body('tools').optional().isArray(),
   body('tools.*').isMongoId(),
-  body('creatives').isArray(),
+  body('creatives').isArray({ min: 1 }),
   body('creatives.*').isMongoId(),
   body('jobDetails').isString(),
   body('location').isObject(),
@@ -27,7 +27,7 @@ export const bookProject = [
       return true;
     }),
   body('customRequirement').isObject(),
-  body('customRequirement.measure').isInt({min:1}),
+  body('customRequirement.measure').isInt({ min: 1 }),
   body('customRequirement.unit').isString(),
   globalValidatorMiddleware,
 ];
