@@ -5,7 +5,7 @@ import { Iuser } from '../types/User';
 
 export interface IportfolioPost {
   id: string;
-  user: Types.ObjectId;
+  user: Types.ObjectId | Iuser;
   attachments: string[];
   cover: string;
   title: string;

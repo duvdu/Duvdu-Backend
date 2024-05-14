@@ -6,6 +6,7 @@ export const getCrmProjectsHandler: RequestHandler<
   PaginationResponse<{ data: IcopyRights[] }>
 > = async (req, res) => {
   const resultCount = await CopyRights.countDocuments(req.pagination.filter);
+  
 
   const projects = await CopyRights.aggregate([
     { $match: req.pagination.filter },
@@ -57,6 +58,10 @@ export const getCrmProjectsHandler: RequestHandler<
               ]
             }
           }
+        },
+        // Add process.env.BUCKET_HOST before profileImage
+        profileImage: {
+          $concat: [process.env.BUCKET_HOST, '$user.profileImage']
         }
       }
     },
@@ -65,11 +70,11 @@ export const getCrmProjectsHandler: RequestHandler<
         _id: 1,
         user: {
           acceptedProjectsCounter: '$user.acceptedProjectsCounter',
-          profileImage: '$user.profileImage',
+          profileImage: 1, // Use the modified profileImage field
           name: '$user.name',
           username: '$user.username',
           isOnline: '$user.isOnline',
-          rate:'$user.rate'
+          rate: '$user.rate'
         },
         category: 1,
         price: 1,
