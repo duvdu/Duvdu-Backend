@@ -5,6 +5,7 @@ import {
   NotFound,
   SuccessResponse,
   FOLDERS,
+  Files,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
@@ -15,7 +16,7 @@ export const bookProjectHandler: RequestHandler<
 > = async (req, res, next) => {
   // assert data
   if (req.body.targetUser === req.loggedUser.id.toString()) return next(new BadRequestError(''));
-  const project = await CopyRights.findById(req.params.projectId, { _id: 1, user: 1 });
+  const project = await CopyRights.findById(req.params.projectId);
   if (!project) return next(new NotFound('Project not found'));
 
   // deal with media
@@ -23,13 +24,15 @@ export const bookProjectHandler: RequestHandler<
   if (attachments) {
     req.body.attachments = attachments.map((el) => FOLDERS.copyrights + '/' + el.filename);
     await new Bucket().saveBucketFiles(FOLDERS.copyrights, ...attachments);
+    Files.removeFiles(...req.body.attachments);
   }
-
-  await new Bucket().saveBucketFiles(FOLDERS.copyrights, ...attachments);
 
   // create booking
   const booking = await CopyrightsBooking.create({
     ...req.body,
+    // TODO: fix create copytight days then update deadline calculation
+    deadline: new Date(new Date(req.body.startDate).getTime() + 20 * 24 * 60 * 60 * 1000),
+    totalPrice: project.price,
     targetUser: project.user,
     sourceUser: req.loggedUser.id,
     project: req.params.projectId,

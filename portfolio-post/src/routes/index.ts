@@ -6,7 +6,7 @@ import {
   isauthorized,
   FOLDERS,
   isauthenticated,
-  globalUploadMiddleware
+  globalUploadMiddleware,
 } from '@duvdu-v1/duvdu';
 import { Router } from 'express';
 
@@ -55,14 +55,14 @@ router
   .get(val.get, handlers.getProjectHandler)
   .patch(
     isauthenticated,
-    isauthorized(PERMISSIONS.updatePortfolioProjectHandler as any),
+    isauthorized(PERMISSIONS.updatePortfolioProjectHandler),
     uploadProjectMedia(FOLDERS.portfolio_post),
     val.update,
     handlers.updateProjectHandler,
   )
   .delete(
     isauthenticated,
-    isauthorized(PERMISSIONS.removePortfolioProjectHandler as any),
+    isauthorized(PERMISSIONS.removePortfolioProjectHandler),
     val.get,
     handlers.removeProjectHandler,
   );
