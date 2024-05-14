@@ -8,16 +8,18 @@ export interface IportfolioPostBooking {
   project: IcopyRights | Types.ObjectId;
   tools: { name: string; fees: number }[];
   creatives: { creative: Iuser | Types.ObjectId; fees: number }[];
-  totalPrice: number;
-  jobDetails: string;
-  deadline: Date;
-  location: { lat: number; lng: number };
   attachments: string[];
+  jobDetails: string;
+  location: { lat: number; lng: number };
   address: string;
+  customRequirements: { measure: number; unit: 'minute' | 'hour' };
+  shootingDays: number;
+  appointmentDate: Date;
+  startDate: Date;
   submitFiles: { link: string; notes: string };
   state: BookingState;
-  numberOfHours: number;
-  appointmentDate: Date;
+  totalPrice: number;
+  deadline: Date;
 }
 
 export const PortfolioPostBooking = model<IportfolioPostBooking>(
@@ -33,15 +35,20 @@ export const PortfolioPostBooking = model<IportfolioPostBooking>(
         fees: { type: Number, required: true },
       },
     ],
-    totalPrice: { type: Number, required: true },
-    jobDetails: { type: String, default: null },
-    deadline: Date,
-    location: { lat: { type: Number, required: true }, lng: { type: Number, required: true } },
     attachments: [String],
+    location: { lat: { type: Number, required: true }, lng: { type: Number, required: true } },
     address: { type: String, default: null },
+    jobDetails: { type: String, default: null },
+    customRequirements: {
+      measure: { type: Number, default: 0 },
+      unit: { type: String, enum: ['minute', 'hour'] },
+    },
+    shootingDays: Number,
+    appointmentDate: { type: Date },
+    startDate: { type: Date },
     submitFiles: { link: { type: String, default: null }, notes: { type: String, default: null } },
     state: { type: String, enum: BookingState, default: BookingState.pending },
-    numberOfHours: { type: Number },
-    appointmentDate: Date,
+    totalPrice: { type: Number, required: true },
+    deadline: Date,
   }),
 );
