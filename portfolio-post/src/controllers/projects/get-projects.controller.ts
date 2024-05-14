@@ -68,15 +68,9 @@ export const getProjectsHandler: RequestHandler<
     {
       $match: { ...req.pagination.filter, isDeleted: { $ne: true } }
     },
-    {
-      $sort: { createdAt: -1 }
-    },
-    {
-      $limit: req.pagination.limit
-    },
-    {
-      $skip: req.pagination.skip
-    },
+    { $sort: { createdAt: -1 } },
+    { $limit: req.pagination.limit },
+    { $skip: req.pagination.skip },
     {
       $addFields: {
         subCategory: {
@@ -116,10 +110,7 @@ export const getProjectsHandler: RequestHandler<
             if: { $eq: [{ $size: '$userDetails' }, 0] },
             then: null,
             else: {
-              $arrayElemAt: [
-                '$userDetails',
-                0
-              ]
+              $arrayElemAt: ['$userDetails', 0]
             }
           }
         }
@@ -128,11 +119,11 @@ export const getProjectsHandler: RequestHandler<
     {
       $addFields: {
         'user.profileImage': {
-          $concat: [
-            process.env.BUCKET_HOST + '/',
-            '$user.profileImage'
-          ]
-        }
+          $concat: [process.env.BUCKET_HOST + '/', '$user.profileImage']
+        },
+        // Add process.env.BUCKET_HOST before cover and attachments
+        'cover': { $concat: [process.env.BUCKET_HOST + '/', '$cover'] },
+        'attachments': { $map: { input: '$attachments', as: 'att', in: { $concat: [process.env.BUCKET_HOST + '/', '$$att'] } } }
       }
     },
     {
@@ -164,6 +155,9 @@ export const getProjectsHandler: RequestHandler<
       }
     }
   ]);
+  
+
+
   
   res.status(200).json({
     message: 'success',

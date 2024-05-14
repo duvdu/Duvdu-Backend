@@ -6,21 +6,13 @@ export const getCrmProjectsHandler: RequestHandler<
   PaginationResponse<{ data: IportfolioPost[] }>
 > = async (req, res) => {
   const resultCount = await PortfolioPosts.countDocuments(req.pagination.filter);
-
-
   const projects = await PortfolioPosts.aggregate([
     {
       $match: req.pagination.filter
     },
-    {
-      $sort: { createdAt: -1 }
-    },
-    {
-      $limit: req.pagination.limit
-    },
-    {
-      $skip: req.pagination.skip
-    },
+    { $sort: { createdAt: -1 } },
+    { $limit: req.pagination.limit },
+    { $skip: req.pagination.skip },
     {
       $addFields: {
         subCategory: {
@@ -68,10 +60,7 @@ export const getCrmProjectsHandler: RequestHandler<
             if: { $eq: [{ $size: '$userDetails' }, 0] },
             then: null,
             else: {
-              $arrayElemAt: [
-                '$userDetails',
-                0
-              ]
+              $arrayElemAt: ['$userDetails', 0]
             }
           }
         }
@@ -117,8 +106,8 @@ export const getCrmProjectsHandler: RequestHandler<
     }
   ]);
   
-  
-    
+
+ 
 
   res.status(200).json({
     message: 'success',

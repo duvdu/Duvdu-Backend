@@ -86,7 +86,7 @@ export const studioBooking = model<IstudioBooking>(
               (el: string) => process.env.BUCKET_HOST + '/' + el,
             );
         },
-      },
+      }
     },
   ),
 );
