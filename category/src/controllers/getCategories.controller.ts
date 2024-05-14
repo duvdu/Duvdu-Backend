@@ -32,6 +32,7 @@ export const getCategoriesPagination: RequestHandler<unknown, unknown, unknown, 
 
 
 export const getCategoriesHandler: GetCategoriesHandler = async (req, res) => {
+
   const category = await Categories.aggregate([
     { $match: req.pagination.filter },
     {
@@ -95,7 +96,17 @@ export const getCategoriesHandler: GetCategoriesHandler = async (req, res) => {
         },
       },
     },
+    {
+      $addFields: {
+        image: {
+          $concat: [process.env.BUCKET_HOST, '/', '$image']
+        }
+      }
+    },
   ]);
+  
+
+  
 
   res.status(200).json({ message: 'success', data: category });
 };

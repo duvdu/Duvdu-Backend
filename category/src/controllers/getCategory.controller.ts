@@ -18,7 +18,6 @@ export const getCategoryHandler: GetCategoryHandler = async (req, res, next) => 
         },
         _id: 1,
         creativesCounter: 1,
-        jobTitles: 1,
         cycle: 1,
         subCategories: {
           $map: {
@@ -49,14 +48,29 @@ export const getCategoryHandler: GetCategoryHandler = async (req, res, next) => 
             },
           },
         },
+        jobTitles: {
+          $map: {
+            input: '$jobTitles',
+            as: 'title',
+            in: {
+              $cond: {
+                if: { $eq: ['ar', req.lang] },
+                then: '$$title.ar',
+                else: '$$title.en',
+              },
+            },
+          },
+        },
         status: 1,
         createdAt: 1,
         updatedAt: 1,
         __v: 1,
-        image: 1,
+        image: { $concat: [process.env.BUCKET_HOST, '/', '$image'] },
       },
     },
   ]);
+  
+  
   if (!category) return next(new NotFound('category not found'));
   res.status(200).json({ message: 'success', data: category[0] });
 };

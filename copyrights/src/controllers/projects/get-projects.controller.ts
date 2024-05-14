@@ -57,7 +57,12 @@ export const getProjectsHandler: RequestHandler<
   });
     
   const projects = await CopyRights.aggregate([
-    { $match: { ...req.pagination.filter, isDeleted: { $ne: true } } },
+    {
+      $match: {
+        ...req.pagination.filter,
+        isDeleted: { $ne: true }
+      }
+    },
     { $sort: { createdAt: -1 } },
     { $limit: req.pagination.limit },
     { $skip: req.pagination.skip },
@@ -100,12 +105,13 @@ export const getProjectsHandler: RequestHandler<
             if: { $eq: [{ $size: '$userDetails' }, 0] },
             then: null,
             else: {
-              $arrayElemAt: [
-                '$userDetails',
-                0
-              ]
+              $arrayElemAt: ['$userDetails', 0]
             }
           }
+        },
+        // Add process.env.BUCKET_HOST before profileImage
+        profileImage: {
+          $concat: [process.env.BUCKET_HOST, '$user.profileImage']
         }
       }
     },
@@ -114,11 +120,11 @@ export const getProjectsHandler: RequestHandler<
         _id: 1,
         user: {
           acceptedProjectsCounter: '$user.acceptedProjectsCounter',
-          profileImage: '$user.profileImage',
+          profileImage: 1, // Use the modified profileImage field
           name: '$user.name',
           username: '$user.username',
           isOnline: '$user.isOnline',
-          rate:'$user.rate'
+          rate: '$user.rate'
         },
         category: 1,
         price: 1,
@@ -134,6 +140,7 @@ export const getProjectsHandler: RequestHandler<
       }
     }
   ]);
+  
 
   res.status(200).json({
     message: 'success',
