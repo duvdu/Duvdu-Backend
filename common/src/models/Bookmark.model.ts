@@ -7,7 +7,7 @@ const bookmarksSchema = new Schema<Ibookmark>(
   {
     user: { type: Schema.Types.ObjectId, ref: MODELS.user },
     title: String,
-    projects: [{ type: Schema.Types.ObjectId, ref: MODELS.project }],
+    projects: [{ type: Schema.Types.ObjectId, ref: MODELS.projects }],
   },
   { collection: MODELS.bookmark },
 );
