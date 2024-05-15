@@ -7,7 +7,7 @@ export const getBookmarksHandler: GetBookmarksHandler = async (req, res, next) =
     .select('user title')
     .populate({
       path: 'projects',
-      populate: 'project',
+      populate: 'project.type',
       options: { limit: 3, sort: { createdAt: -1 } },
     });
 
