@@ -1,10 +1,8 @@
-
-import {  PERMISSIONS , SystemRoles , Roles, Users } from '@duvdu-v1/duvdu';
+import { PERMISSIONS, SystemRoles, Roles, Users } from '@duvdu-v1/duvdu';
 
 // import mongoose from 'mongoose';
 
 // import { env } from '../src/config/env';
-
 
 export const appInit = async () => {
   // await dbConnection(env.mongoDb.uri);
@@ -24,25 +22,29 @@ export const appInit = async () => {
       ],
     });
   else
-    await Roles.findOneAndUpdate({key:SystemRoles.verified} ,{
-      permissions:[
-        PERMISSIONS.bookmarks,
-        PERMISSIONS.changePassword,
-        PERMISSIONS.resetPassword,
-        PERMISSIONS.updatePhoneNumber,
-        PERMISSIONS.updateProfile,
-        PERMISSIONS.createCopyrightHandler,
-        PERMISSIONS.createProtfolioProjectHandler,
-        PERMISSIONS.createStudioProjectHandler,
-        PERMISSIONS.updatePortfolioProjectHandler,
-        PERMISSIONS.updateStudioProjectHandler,
-        PERMISSIONS.updateCopyrightHandler,
-        PERMISSIONS.createTicket,
-        PERMISSIONS.createTeamProjectHandler,
-        PERMISSIONS.updateTeamProjectCreativeHandler,
-        PERMISSIONS.deleteTeamProjectHandler
-      ]
-    });
+    await Roles.findOneAndUpdate(
+      { key: SystemRoles.verified },
+      {
+        permissions: [
+          PERMISSIONS.bookmarks,
+          PERMISSIONS.changePassword,
+          PERMISSIONS.resetPassword,
+          PERMISSIONS.updatePhoneNumber,
+          PERMISSIONS.updateProfile,
+          PERMISSIONS.createCopyrightHandler,
+          PERMISSIONS.createProtfolioProjectHandler,
+          PERMISSIONS.createStudioProjectHandler,
+          PERMISSIONS.updatePortfolioProjectHandler,
+          PERMISSIONS.updateStudioProjectHandler,
+          PERMISSIONS.updateCopyrightHandler,
+          PERMISSIONS.createTicket,
+          PERMISSIONS.createTeamProjectHandler,
+          PERMISSIONS.updateTeamProjectCreativeHandler,
+          PERMISSIONS.deleteTeamProjectHandler,
+          PERMISSIONS.booking,
+        ],
+      },
+    );
   if (!(await Roles.findOne({ key: SystemRoles.unverified })))
     await Roles.create({
       key: SystemRoles.unverified,
@@ -50,7 +52,13 @@ export const appInit = async () => {
       permissions: [PERMISSIONS.changePassword, PERMISSIONS.updateProfile],
     });
 
-  if (!(await Users.findOne({username:'metoooooo'}))) 
-    await Users.create({username: 'metoooooo', password: '$2a$10$y4kY4RD6k1iuIZxfvHs0iOX5MlasKtfB4fc7EtCNFwCNFOpzD2tDy' , role:adminRole?._id , isVerified:true , category:'65e6ea22517343b4041334dc'});
+  if (!(await Users.findOne({ username: 'metoooooo' })))
+    await Users.create({
+      username: 'metoooooo',
+      password: '$2a$10$y4kY4RD6k1iuIZxfvHs0iOX5MlasKtfB4fc7EtCNFwCNFOpzD2tDy',
+      role: adminRole?._id,
+      isVerified: true,
+      category: '65e6ea22517343b4041334dc',
+    });
   // await mongoose.connection.close();
 };
