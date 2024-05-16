@@ -1,10 +1,11 @@
-import { NotFound , Bookmarks } from '@duvdu-v1/duvdu';
+import { Bookmarks, NotFound, Project } from '@duvdu-v1/duvdu';
 
 import { AddProjectToBookmarkHandler } from '../../types/endpoints/saved-projects.endpoints';
 
 export const addProjectToBookmarksHandler: AddProjectToBookmarkHandler = async (req, res, next) => {
+  const project = await Project.findOne({ 'project.type': req.params.projectId }, { _id: 1 });
   const bookmark = await Bookmarks.findByIdAndUpdate(req.params.bookmarkId, {
-    $addToSet: { projects: req.params.projectId },
+    $addToSet: { projects: project?._id },
   });
   if (!bookmark) return next(new NotFound());
   res.status(200).json({ message: 'success' });

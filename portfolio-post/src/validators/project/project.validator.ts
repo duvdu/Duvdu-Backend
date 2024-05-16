@@ -2,36 +2,39 @@ import { globalValidatorMiddleware } from '@duvdu-v1/duvdu';
 import { body, param, query } from 'express-validator';
 
 export const create = [
-  body('title').isString().trim().isLength({ min: 3 }),
-  body('desc').optional().isString().trim(),
-  body('address').optional().isString().trim(),
-  body('category').isMongoId(),
+  body('title').isString().bail().trim().isLength({ min: 3 }),
+  body('desc').optional().isString().bail().trim(),
+  body('tools').optional().isArray(),
+  body('tools.*.name').isString().bail().trim().isLength({ min: 2 }),
+  body('tools.*.fees').isFloat({ gt: 0 }).bail().toFloat(),
+  body('address').optional().isString().bail().trim(),
   body('creatives').optional().isArray(),
   body('creatives.*.creative').isMongoId(),
-  body('creatives.*.fees').isFloat({ gt: 0 }).toFloat(),
-  body('invitedCreatives').optional().isArray(),
-  body('invitedCreatives.*.phoneNumber').isObject(),
-  body('invitedCreatives.*.phoneNumber.number').isMobilePhone('ar-EG'),
-  body('invitedCreatives.*.fees').isFloat({ gt: 0 }).toFloat(),
-  body('projectBudget').isFloat({ gt: 0 }).toFloat(),
+  body('creatives.*.fees').isFloat({ gt: 0 }).bail().toFloat(),
+  body('projectBudget').isFloat({ gt: 0 }).bail().toFloat(),
+  body('category').isMongoId(),
+  body('subCategory').isMongoId(),
+  body('tags').isArray({ min: 1 }),
+  body('tags.*').isString().bail().trim().isLength({ min: 3 }),
+  body('location.lat').isFloat({ min: -90, max: 90 }).bail().toFloat(),
+  body('location.lng').isFloat({ min: -180, max: 180 }).bail().toFloat(),
+  body('searchKeywords').optional().isArray(),
+  body('searchKeywords.*').isString().trim().isLength({ min: 3 }),
   body('projectScale').isObject(),
-  body('projectScale.scale').isInt().toInt(),
+  body('projectScale.scale').isInt().bail().toInt(),
   body('projectScale.time')
     .isString()
+    .bail()
     .trim()
     .custom((val) => {
       if (['minute', 'hour'].includes(val)) return true;
       throw new Error();
     }),
-  body('searchKeywords').optional().isArray(),
-  body('searchKeywords.*').isString().trim().isLength({ min: 3 }),
+  body('invitedCreatives').optional().isArray(),
+  body('invitedCreatives.*.phoneNumber').isObject(),
+  body('invitedCreatives.*.phoneNumber.number').isMobilePhone('ar-EG'),
+  body('invitedCreatives.*.fees').isFloat({ gt: 0 }).toFloat(),
   body('showOnHome').isBoolean().toBoolean(),
-  body('tools').optional().isArray(),
-  body('tools.*.name').isString().trim().isLength({ min: 2 }),
-  body('tools.*.fees').isFloat({ gt: 0 }).toFloat(),
-  body('tags').isArray(),
-  body('tags.*').isString().trim().isLength({ min: 3 }),
-  body('subCategory').isMongoId(),
   globalValidatorMiddleware,
 ];
 

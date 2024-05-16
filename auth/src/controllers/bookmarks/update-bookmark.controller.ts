@@ -1,4 +1,4 @@
-import { NotFound , Bookmarks } from '@duvdu-v1/duvdu';
+import { Bookmarks, NotFound } from '@duvdu-v1/duvdu';
 
 import { UpdateBookmarkHandler } from '../../types/endpoints/saved-projects.endpoints';
 

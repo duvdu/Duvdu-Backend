@@ -31,7 +31,6 @@ export const findUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser
   req,
   res,
 ) => {
-  console.log(console.log(req.query), req.pagination.filter);
   const count = await Users.countDocuments(req.pagination.filter);
   const users = await Users.find(req.pagination.filter)
     .skip(req.pagination.skip)

@@ -4,13 +4,11 @@ import { body, param } from 'express-validator';
 export const bookProject = [
   param('projectId').isMongoId(),
   body('jobDetails').isString(),
-  body('deadline').isISO8601(),
   body('address').isString(),
   body('location').isObject(),
   body('location.lat').isFloat({ min: -90, max: 90 }).bail().toFloat(),
   body('location.lng').isFloat({ min: -180, max: 180 }).bail().toFloat(),
-  body('totalPrice').isFloat({ gt: 0 }).bail().toFloat(),
-  body('deadline')
+  body('startDate')
     .isISO8601()
     .custom((val) => {
       if (new Date(val).getTime() <= Date.now()) throw new Error();

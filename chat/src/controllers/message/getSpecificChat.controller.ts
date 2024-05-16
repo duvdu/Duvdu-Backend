@@ -90,12 +90,15 @@ export const getSpecificChatHandler:GetSpecificChatHandler = async (req,res)=>{
             null,
             {
               profileImage: {
-                $concat: [process.env.BUCKET_HOST, '/', '$allMessages.sender.profileImage']
+                $ifNull: [
+                  { $concat: [process.env.BUCKET_HOST, '/', '$allMessages.sender.profileImage'] },
+                  null
+                ]
               },
-              isOnline: '$allMessages.sender.isOnline',
-              username: '$allMessages.sender.username',
-              name: '$allMessages.sender.name',
-              _id: '$allMessages.sender._id'
+              isOnline: { $ifNull: ['$allMessages.sender.isOnline', null] },
+              username: { $ifNull: ['$allMessages.sender.username', null] },
+              name: { $ifNull: ['$allMessages.sender.name', null] },
+              _id: { $ifNull: ['$allMessages.sender._id', null] }
             }
           ]
         },
@@ -105,12 +108,15 @@ export const getSpecificChatHandler:GetSpecificChatHandler = async (req,res)=>{
             null,
             {
               profileImage: {
-                $concat: [process.env.BUCKET_HOST, '/', '$allMessages.receiver.profileImage']
+                $ifNull: [
+                  { $concat: [process.env.BUCKET_HOST, '/', '$allMessages.receiver.profileImage'] },
+                  null
+                ]
               },
-              isOnline: '$allMessages.receiver.isOnline',
-              username: '$allMessages.receiver.username',
-              name: '$allMessages.receiver.name',
-              _id: '$allMessages.receiver._id'
+              isOnline: { $ifNull: ['$allMessages.receiver.isOnline', null] },
+              username: { $ifNull: ['$allMessages.receiver.username', null] },
+              name: { $ifNull: ['$allMessages.receiver.name', null] } ,
+              _id: { $ifNull: ['$allMessages.receiver._id', null] }
             }
           ]
         }

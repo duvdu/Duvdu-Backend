@@ -1,6 +1,5 @@
-import { Ibookmark } from '@duvdu-v1/duvdu';
+import { Ibookmark, PaginationResponse } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
-
 
 type successResponse<T> = T & {
   message: 'success';
@@ -21,7 +20,7 @@ export interface RemoveProjectFromBookmarkHandler
   extends RequestHandler<{ bookmarkId: string; projectId: string }, successResponse<unknown>> {}
 
 export interface GetBookmarkHandler
-  extends RequestHandler<{ bookmarkId: string }, successResponse<{ data: Ibookmark }>> {}
+  extends RequestHandler<{ bookmarkId: string }, PaginationResponse<{ data: Ibookmark }>> {}
 
 export interface GetBookmarksHandler
   extends RequestHandler<unknown, successResponse<{ data: Ibookmark[] }>> {}
