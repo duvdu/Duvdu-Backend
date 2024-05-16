@@ -1,4 +1,4 @@
-import {  FOLDERS, globalPaginationMiddleware, globalUploadMiddleware, isauthenticated } from '@duvdu-v1/duvdu';
+import {  FOLDERS, globalPaginationMiddleware, globalUploadMiddleware, isauthenticated, isauthorized, PERMISSIONS } from '@duvdu-v1/duvdu';
 import express from 'express';
 
 import * as handler from '../controllers/booking';
@@ -10,13 +10,14 @@ export const router = express.Router();
 router.use(isauthenticated);
 router.route('/')
   .post(
+    isauthorized(PERMISSIONS.booking),
     globalUploadMiddleware(FOLDERS.portfolio_post ,{
       maxSize: 50 * 1024 * 1024,
       fileTypes: ['image', 'video', 'application/pdf', 'text/plain'],
     }).array('attachments' , 10) , val.createContractVal , handler.createContarctHandler)
-  .get(val.getContractsVal,globalPaginationMiddleware , handler.getContractsPagination,handler.getContractsHandler);
+  .get(isauthorized(PERMISSIONS.getProducersContractCrm),val.getContractsVal,globalPaginationMiddleware , handler.getContractsPagination,handler.getContractsHandler);
 
 router.route('/:contractId')
-  .post(val.createAppointmentVal , handler.createAppointmentBooking)
+  .post(isauthorized(PERMISSIONS.booking),val.createAppointmentVal , handler.createAppointmentBooking)
   .get(val.getContractVal , handler.getContractHandler)
   .patch(val.updateContractVal , handler.updateContractHandler);

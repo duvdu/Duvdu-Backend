@@ -1,8 +1,7 @@
 import 'express-async-errors';
 
-import { NotAllowedError, NotFound } from '@duvdu-v1/duvdu';
+import { NotAllowedError, NotFound, ProducerBooking } from '@duvdu-v1/duvdu';
 
-import { ProducerBooking } from '../../models/producers.model';
 import { UpdateContractHandler } from '../../types/endpoints';
 
 

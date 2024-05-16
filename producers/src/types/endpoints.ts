@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-namespace */
-import { IjwtPayload, Ipagination, PaginationResponse, SuccessResponse } from '@duvdu-v1/duvdu';
+import { IjwtPayload, Ipagination, Iproducer, IproducerBooking, PaginationResponse, SuccessResponse } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-import { Iproducer, IproducerBooking } from '../models/producers.model';
 
 
 
@@ -48,7 +47,7 @@ extends RequestHandler<{contractId:string} , SuccessResponse<{data:IproducerBook
 
 
 export interface GetProducersHandler
-extends RequestHandler<unknown , SuccessResponse<{data:Iproducer[]}> , unknown , unknown>{}
+extends RequestHandler<unknown , PaginationResponse<{data:Iproducer[]}> , unknown , unknown>{}
 
 export interface GetProducerHandler
 extends RequestHandler<{producerId:string} , SuccessResponse<{data:Iproducer}> , unknown , unknown>{}

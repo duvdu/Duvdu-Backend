@@ -1,8 +1,7 @@
 import 'express-async-errors';
 
-import { Bucket, Files, FOLDERS, NotFound } from '@duvdu-v1/duvdu';
+import { Bucket, Files, FOLDERS, NotFound, Producer, ProducerBooking } from '@duvdu-v1/duvdu';
 
-import { Producer, ProducerBooking } from '../../models/producers.model';
 import { CreateContractHandler } from '../../types/endpoints';
 
 
@@ -18,8 +17,7 @@ export const createContarctHandler:CreateContractHandler = async (req , res , ne
 
   const booking = await ProducerBooking.create({
     ...req.body,
-    user:'662c9ac0cf033b86395d6e0b'
-    // user:req.loggedUser?.id
+    user:req.loggedUser?.id
   });
 
   await new Bucket().saveBucketFiles(FOLDERS.portfolio_post, ...attachments);

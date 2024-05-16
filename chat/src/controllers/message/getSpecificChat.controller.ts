@@ -130,7 +130,10 @@ export const getSpecificChatHandler:GetSpecificChatHandler = async (req,res)=>{
     },
     {
       $limit: req.pagination.limit
-    }
+    },
+    {
+      $sort: { createdAt: 1 }
+    },
   ]);
   
   

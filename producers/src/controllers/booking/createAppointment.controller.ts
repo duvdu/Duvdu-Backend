@@ -1,8 +1,7 @@
 import 'express-async-errors';
 
-import { BadRequestError, NotAllowedError, NotFound } from '@duvdu-v1/duvdu';
+import { BadRequestError, NotAllowedError, NotFound, ProducerBooking } from '@duvdu-v1/duvdu';
 
-import { ProducerBooking } from '../../models/producers.model';
 import { CreateAppointmentBookingHandler } from '../../types/endpoints';
 
 

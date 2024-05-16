@@ -1,9 +1,9 @@
 import 'express-async-errors';
 
+import { ProducerBooking } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import { Types } from 'mongoose';
 
-import { ProducerBooking } from '../../models/producers.model';
 import { GetContractsHandler } from '../../types/endpoints';
 
 
@@ -67,7 +67,7 @@ export const getContractsHandler:GetContractsHandler = async (req,res)=>{
   const contracts = await ProducerBooking.find(req.pagination.filter).populate([
     {path:'user' , select:'profileImage username location rate'},
     {path:'producer' , select:'profileImage username location rate'}
-  ]).limit(req.pagination.limit).skip(req.pagination.skip);
+  ]).limit(req.pagination.limit).skip(req.pagination.skip).sort({ createdAt: -1 });
 
   const resultCount = await ProducerBooking.find(req.pagination.filter).countDocuments();
   res.status(200).json({

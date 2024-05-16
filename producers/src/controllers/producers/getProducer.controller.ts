@@ -1,8 +1,7 @@
 import 'express-async-errors';
 
-import { NotFound } from '@duvdu-v1/duvdu';
+import { NotFound, Producer } from '@duvdu-v1/duvdu';
 
-import { Producer } from '../../models/producers.model';
 import { GetProducerHandler } from '../../types/endpoints';
 
 
