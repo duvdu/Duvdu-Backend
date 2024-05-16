@@ -11,6 +11,7 @@ import {
 import { Router } from 'express';
 
 import { bookProjectHandler } from '../controllers/booking/book-project.controller';
+import { payBooking } from '../controllers/booking/pay.controller';
 import * as handlers from '../controllers/projects';
 import { bookProject as bookProjectVal } from '../validators/booking/booking.validator';
 import * as val from '../validators/project/project.validator';
@@ -49,6 +50,8 @@ router.get(
   isauthorized(PERMISSIONS.getAnalysisHandler as any),
   handlers.getProjectAnalysis,
 );
+
+router.get('/pay', payBooking);
 
 router
   .route('/:projectId')

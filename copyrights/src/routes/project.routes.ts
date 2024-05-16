@@ -44,7 +44,7 @@ router.get(
 
 router
   .route('/:projectId')
-  .get(val.get, handlers.getProjectHandler)
+  // .get(val.get, handlers.getProjectHandler)
   .patch(
     isauthenticated,
     isauthorized(PERMISSIONS.updateCopyrightHandler),

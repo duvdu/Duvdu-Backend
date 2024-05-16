@@ -1,11 +1,13 @@
+import crypto from 'crypto';
+
 import { Bucket, FOLDERS, NotFound, PortfolioPosts, SuccessResponse } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-import { IportfolioPostBooking, PortfolioPostBooking } from '../../models/booking.model';
+import { PortfolioPostBooking } from '../../models/booking.model';
 
 export const bookProjectHandler: RequestHandler<
   { projectId: string },
-  SuccessResponse<{ data: IportfolioPostBooking }>,
+  SuccessResponse<{ data: { paymentLink: string } }>,
   {
     attachments?: string[];
     tools?: string[];
@@ -73,7 +75,13 @@ export const bookProjectHandler: RequestHandler<
     tools: toolsWithFees,
     creatives: creativesWithFees,
     totalPrice: totalPrice,
+    paymentSession: crypto.randomBytes(16).toString('hex'),
   });
 
-  return res.status(200).json({ message: 'success', data: booking });
+  return res.status(200).json({
+    message: 'success',
+    data: {
+      paymentLink: `${req.protocol}://${req.hostname}/api/portfolio-post/pay/?session=${booking.paymentSession}`,
+    },
+  });
 };

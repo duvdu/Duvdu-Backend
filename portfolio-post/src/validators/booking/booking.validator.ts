@@ -5,7 +5,7 @@ export const bookProject = [
   param('projectId').isMongoId(),
   body('tools').optional().isArray(),
   body('tools.*').isMongoId(),
-  body('creatives').isArray({ min: 1 }),
+  body('creatives').optional().isArray({}),
   body('creatives.*').isMongoId(),
   body('jobDetails').isString(),
   body('location.lat').isFloat({ min: -90, max: 90 }).bail().toFloat(),

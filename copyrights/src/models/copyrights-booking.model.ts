@@ -1,4 +1,4 @@
-import { IcopyRights, Iuser, MODELS, BookingState } from '@duvdu-v1/duvdu';
+import { BookingState, IcopyRights, Iuser, MODELS } from '@duvdu-v1/duvdu';
 import { model, Schema, Types } from 'mongoose';
 
 export interface IcopyrightsBooking {
@@ -14,6 +14,7 @@ export interface IcopyrightsBooking {
   address: string;
   submitFiles: { link: string; notes: string };
   state: BookingState;
+  paymentSession: string;
 }
 
 export const CopyrightsBooking = model<IcopyrightsBooking>(
@@ -33,7 +34,8 @@ export const CopyrightsBooking = model<IcopyrightsBooking>(
         link: { type: String, default: null },
         notes: { type: String, default: null },
       },
-      state: { type: String, enum: BookingState, default: BookingState.pending, required: true },
+      state: { type: String, enum: BookingState, default: BookingState.unpaid, required: true },
+      paymentSession: String,
     },
     {
       timestamps: true,

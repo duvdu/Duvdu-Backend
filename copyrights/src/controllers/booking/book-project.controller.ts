@@ -1,3 +1,5 @@
+import crypto from 'crypto';
+
 import {
   BadRequestError,
   Bucket,
@@ -9,10 +11,11 @@ import {
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-import { CopyrightsBooking, IcopyrightsBooking } from '../../models/copyrights-booking.model';
+import { CopyrightsBooking } from '../../models/copyrights-booking.model';
+// TODO: prevent user from booking from himself
 export const bookProjectHandler: RequestHandler<
   { projectId: string },
-  SuccessResponse<{ data: IcopyrightsBooking }>
+  SuccessResponse<{ data: { paymentLink: string } }>
 > = async (req, res, next) => {
   // assert data
   if (req.body.targetUser === req.loggedUser.id.toString()) return next(new BadRequestError(''));
@@ -36,8 +39,14 @@ export const bookProjectHandler: RequestHandler<
     targetUser: project.user,
     sourceUser: req.loggedUser.id,
     project: req.params.projectId,
+    paymentSession: crypto.randomBytes(16).toString('hex'),
   });
   // TODO: send notification for target user with booking
 
-  res.status(201).json({ message: 'success', data: booking });
+  res.status(201).json({
+    message: 'success',
+    data: {
+      paymentLink: `${req.protocol}://${req.hostname}/api/copyrights/book/pay/?session=${booking.paymentSession}`,
+    },
+  });
 };

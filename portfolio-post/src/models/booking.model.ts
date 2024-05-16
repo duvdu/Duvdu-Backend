@@ -1,4 +1,4 @@
-import { IcopyRights, Iuser, BookingState, MODELS } from '@duvdu-v1/duvdu';
+import { BookingState, IcopyRights, Iuser, MODELS } from '@duvdu-v1/duvdu';
 import { model, Schema, Types } from 'mongoose';
 
 export interface IportfolioPostBooking {
@@ -20,6 +20,7 @@ export interface IportfolioPostBooking {
   state: BookingState;
   totalPrice: number;
   deadline: Date;
+  paymentSession: string;
 }
 
 export const PortfolioPostBooking = model<IportfolioPostBooking>(
@@ -47,8 +48,9 @@ export const PortfolioPostBooking = model<IportfolioPostBooking>(
     appointmentDate: { type: Date },
     startDate: { type: Date },
     submitFiles: { link: { type: String, default: null }, notes: { type: String, default: null } },
-    state: { type: String, enum: BookingState, default: BookingState.pending },
+    state: { type: String, enum: BookingState, default: BookingState.unpaid },
     totalPrice: { type: Number, required: true },
     deadline: Date,
+    paymentSession: String,
   }),
 );
