@@ -4,21 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": " ts-node src/index.ts",
+    "start": "node build/src/index.js",
     "dev": "ts-node-dev src/index.ts",
     "test": "jest --watchAll --no-cache --runInBand",
     "test:ci": "jest",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
     "format": "prettier --write .",
-    "seeds": "ts-node seeds/plans.seeder.ts"
-  },
-  "jest": {
-    "preset": "ts-jest",
-    "testEnvironment": "node",
-    "setupFilesAfterEnv": [
-      "./src/test/setup.ts"
-    ]
+    "seeds": "ts-node seeds/plans.seeder.ts",
+    "build":"tsc"
   },
   "keywords": [],
   "author": "",
