@@ -24,15 +24,7 @@ export const updateProject = [
     .isString()
     .bail()
     .custom((val) => {
-      if (
-        [
-          BookingState.canceled,
-          BookingState.completed,
-          BookingState.ongoing,
-          BookingState.rejected,
-        ].includes(val)
-      )
-        return true;
+      if ([BookingState.paid, BookingState.unpaid].includes(val)) return true;
       throw new Error('');
     }),
   globalValidatorMiddleware,

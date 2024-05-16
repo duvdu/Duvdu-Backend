@@ -10,6 +10,7 @@ import {
 import express from 'express';
 
 import { bookProjectHandler } from '../controllers/booking/book-project.controller';
+import { payBooking } from '../controllers/booking/pay.controller';
 import * as handler from '../controllers/projects';
 import { bookProject as bookProjectVal } from '../validators/booking/booking.validator';
 import * as val from '../validators/index';
@@ -53,6 +54,8 @@ router.get(
   isauthorized(PERMISSIONS.getStudioAnalysisHandler),
   handler.getProjectAnalysis,
 );
+
+router.get('/pay', payBooking);
 
 router
   .route('/:projectId')

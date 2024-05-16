@@ -1,19 +1,22 @@
+import crypto from 'crypto';
+
 import { MODELS, NotFound, SuccessResponse } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import mongoose from 'mongoose';
 
-import { IstudioBookingBook, StudioBookingBook } from '../../models/studio-booking-book.model';
+import { StudioBookingBook } from '../../models/studio-booking-book.model';
 import { generateCode } from '../../utils/crypto';
 
 export const bookProjectHandler: RequestHandler<
   { projectId: string },
-  SuccessResponse<{ data: IstudioBookingBook }>,
+  SuccessResponse<{ data: { paymentLink: string } }>,
   {
     jobDetails: string;
     equipments: string[];
     address: string;
     location: { lat: number; lng: number };
     bookingHours: number;
+    appointmentDate: Date;
     deadline: Date;
   }
 > = async (req, res, next) => {
@@ -35,16 +38,27 @@ export const bookProjectHandler: RequestHandler<
     project.insurance +
     project.pricePerHour * req.body.bookingHours;
 
+  const deadline = new Date(
+    new Date(req.body.appointmentDate).getTime() + req.body.bookingHours * 60 * 60 * 1000,
+  );
+
   const booking = await StudioBookingBook.create({
     ...req.body,
-    // sourceUser: req.loggedUser.id,
+    sourceUser: req.loggedUser.id,
     targetUser: project.user,
     project: project.id,
     equipments: equipmentsWithFees,
     totalPrice,
+    deadline,
     qrToken: await generateCode(16),
+    paymentSession: crypto.randomBytes(16).toString('hex'),
   });
 
   booking.qrToken = undefined as any;
-  res.status(200).json({ message: 'success', data: booking });
+  res.status(200).json({
+    message: 'success',
+    data: {
+      paymentLink: `${req.protocol}://${req.hostname}/api/studio-booking/pay/?session=${booking.paymentSession}`,
+    },
+  });
 };
