@@ -1,5 +1,5 @@
 import 'express-async-errors';
-import { BadRequestError, Bucket, Categories, CYCLES, Files, FOLDERS, MODELS, NotFound, Project, TeamProject, Users } from '@duvdu-v1/duvdu';
+import { BadRequestError, Bucket, Files, FOLDERS, MODELS, Project, TeamProject, Users } from '@duvdu-v1/duvdu';
 
 import { CreateProjectHandler } from '../../types/endpoints';
 
@@ -7,13 +7,6 @@ import { CreateProjectHandler } from '../../types/endpoints';
 export const createProjectHandler:CreateProjectHandler = async (req,res,next)=>{  
   const attachments = <Express.Multer.File[]>(req.files as any).attachments;
   const cover = <Express.Multer.File[]>(req.files as any).cover;
-
-  const category = await Categories.findById(req.body.category);
-  if (!category) 
-    return next(new NotFound('category not found'));
-    
-  if (category.cycle != CYCLES.teamProject) 
-    return next(new BadRequestError('This category is not related to this cycle'));
 
   const users = req.body.creatives.flatMap((creative:any) => creative.users.map((user:any) => user.user));
   

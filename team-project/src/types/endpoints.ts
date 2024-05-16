@@ -34,7 +34,6 @@ export interface CreateProjectHandler
       IteamProject,
       | 'cover'
       | 'title'
-      | 'category'
       | 'budget'
       | 'desc'
       | 'location'

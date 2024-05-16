@@ -72,3 +72,11 @@ build:
         manual:
           - src: "src/**/*.ts"
             dest: .
+    - image: duvdu/producer
+      context: producers
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .
