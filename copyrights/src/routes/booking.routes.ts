@@ -9,9 +9,12 @@ import { Router } from 'express';
 
 import { bookProjectHandler } from '../controllers/booking/book-project.controller';
 // import { updateBookedProjectHandler } from '../controllers/booking/update-booked-project.controller';
+import { payBooking } from '../controllers/booking/pay.controller';
 import * as val from '../validators/booking/booking.validator';
 
 const router = Router();
+
+router.get('/pay', payBooking);
 
 router.post(
   '/:projectId',

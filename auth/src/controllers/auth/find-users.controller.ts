@@ -13,6 +13,7 @@ export const filterUsers: RequestHandler<
     priceFrom?: number;
     priceTo?: number;
     hasVerificationPadge?: boolean;
+    isBlocked?: boolean;
   }
 > = (req, res, next) => {
   if (req.query.search) req.pagination.filter.$text = { $search: req.query.search };
@@ -24,6 +25,7 @@ export const filterUsers: RequestHandler<
     req.pagination.filter.price = { ...req.pagination.filter.price, $lte: req.query.priceTo };
   if (req.query.hasVerificationPadge !== undefined)
     req.pagination.filter.hasVerificationBadge = req.query.hasVerificationPadge;
+  req.pagination.filter.isBlocked = req.query.isBlocked || false;
   next();
 };
 
@@ -32,7 +34,17 @@ export const findUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser
   res,
 ) => {
   const count = await Users.countDocuments(req.pagination.filter);
-  const users = await Users.find(req.pagination.filter)
+  const users = await Users.find(req.pagination.filter, {
+    name: 1,
+    username: 1,
+    profileImage: 1,
+    about: 1,
+    isOnline: 1,
+    isAvaliableToInstantProjects: 1,
+    pricePerHour: 1,
+    hasVerificationBadge: 1,
+    rate: 1,
+  })
     .skip(req.pagination.skip)
     .limit(req.pagination.limit);
 

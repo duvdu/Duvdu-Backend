@@ -11,6 +11,7 @@ export const bookProject = [
   body('location.lat').isFloat({ min: -90, max: 90 }),
   body('location.lng').isFloat({ min: -180, max: 180 }),
   body('bookingHours').isInt(),
+  body('appointmentDate').isISO8601(),
   body('deadline').isISO8601(),
   globalValidatorMiddleware,
 ];
