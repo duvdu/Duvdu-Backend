@@ -13,7 +13,7 @@
     "format": "prettier --write .",
     "seeds": "ts-node seeds/plans.seeder.ts",
     "seeds:dev": "ts-node seeds/roles.seeder.ts",
-    "build":"tsc"
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",
