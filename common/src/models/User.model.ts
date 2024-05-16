@@ -50,6 +50,6 @@ const userSchema = new Schema<Iuser>(
       },
     },
   },
-).index({ name: 'text', username: 'text' });
+).index({ name: 'text' });
 
 export const Users = model<Iuser>(MODELS.user, userSchema);
