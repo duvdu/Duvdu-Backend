@@ -66,5 +66,8 @@ export * from './models/allProjects.model';
 export * from './models/report.model';
 export * from './models/messages.model';
 export * from './models/notification.model';
-export * from './services/category.service';
 export * from './models/teamProject.model';
+export * from './models/producer.model';
+
+
+export * from './services/category.service';
