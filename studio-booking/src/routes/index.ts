@@ -40,8 +40,8 @@ router
 
 router.get(
   '/crm',
-  // isauthenticated,
-  // isauthorized(PERMISSIONS.getCrmStudioProjectsHandlers),
+  isauthenticated,
+  isauthorized(PERMISSIONS.getCrmStudioProjectsHandlers),
   val.getAllProjectsVal,
   globalPaginationMiddleware,
   handler.getProjectsPagination,
@@ -74,8 +74,8 @@ router
 
 router.post(
   '/book/:projectId',
-  // isauthenticated,
-  // isauthorized(PERMISSIONS.booking),
+  isauthenticated,
+  isauthorized(PERMISSIONS.booking),
   bookProjectVal,
   bookProjectHandler,
 );
