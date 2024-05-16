@@ -1,10 +1,10 @@
 {
-  "name": "auth",
+  "name": "studio-booking",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node build/src/index.js",
+    "start": "node build/index.js",
     "dev": "nodemon src/index.ts",
     "test": "jest --watchAll --no-cache --runInBand",
     "test:ci": "jest",
