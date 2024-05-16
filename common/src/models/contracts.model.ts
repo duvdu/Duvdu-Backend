@@ -28,6 +28,9 @@ export interface Icontract {
   startDate: Date;
   deadline: Date;
   status: ContractStatus;
+  submitedAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export const Contracts = model<Icontract>(
@@ -47,6 +50,7 @@ export const Contracts = model<Icontract>(
         required: true,
         default: ContractStatus.pending,
       },
+      submitedAt: Date,
     },
     { timestamps: true, collection: MODELS.contracts },
   ),
