@@ -1,4 +1,9 @@
-import { isauthenticated, isauthorized, PERMISSIONS } from '@duvdu-v1/duvdu';
+import {
+  globalPaginationMiddleware,
+  isauthenticated,
+  isauthorized,
+  PERMISSIONS,
+} from '@duvdu-v1/duvdu';
 import { Router } from 'express';
 
 import * as controllers from '../controllers/bookmarks';
@@ -12,11 +17,10 @@ router
   .get(controllers.getBookmarksHandler)
   .post(val.createBookmark, controllers.createBookmarkHandler);
 
-  
 router
   .route('/:bookmarkId')
   .all(isauthenticated, isauthorized(PERMISSIONS.bookmarks))
-  .get(val.bookmarkParam, controllers.getBookmarkHandler)
+  .get(val.bookmarkParam, globalPaginationMiddleware, controllers.getBookmarkHandler)
   .put(val.updateBookmark, controllers.updateBookmarkHandler)
   .delete(val.bookmarkParam, controllers.removeBookmarkHandler);
 
