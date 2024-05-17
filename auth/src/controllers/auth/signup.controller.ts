@@ -10,7 +10,6 @@ import {
 import { SignupHandler } from '../../types/endpoints/user.endpoints';
 import { hashPassword } from '../../utils/bcrypt';
 import { hashVerificationCode } from '../../utils/crypto';
-import { generateAccessToken, generateRefreshToken } from '../../utils/generateToken';
 import { generateRandom6Digit } from '../../utils/gitRandom6Dugut';
 
 export const signupHandler: SignupHandler = async (req, res, next) => {
@@ -31,17 +30,7 @@ export const signupHandler: SignupHandler = async (req, res, next) => {
     },
   });
 
-  const accessToken = generateAccessToken({
-    id: newUser.id,
-    isBlocked: { value: false },
-    isVerified: false,
-    role: { key: role.key, permissions: role.permissions },
-  });
-  const refreshToken = generateRefreshToken({ id: newUser.id });
-  newUser.token = accessToken;
   await newUser.save();
-  req.session.access = accessToken;
-  req.session.refresh = refreshToken;
 
   await Bookmarks.create({
     user: newUser.id,

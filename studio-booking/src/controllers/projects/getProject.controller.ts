@@ -11,7 +11,7 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
       isDeleted: { $ne: true },
     }).populate([
       {path:'user' , select:'isOnline profileImage username'},
-      {path:'creatives.creative' , select:'isOnline profileImage username'}
+      {path:'creatives.creative' , select:'isOnline profileImage username name'}
     ]);
 
   if (!project) return next(new NotFound('project not found'));

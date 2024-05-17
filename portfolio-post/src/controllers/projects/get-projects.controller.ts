@@ -92,6 +92,41 @@ export const getProjectsHandler: RequestHandler<
               }
             }
           }
+        },
+        'cover': { $concat: [process.env.BUCKET_HOST, '/', '$cover'] },
+        'attachments': {
+          $map: {
+            input: '$attachments',
+            as: 'att',
+            in: { $concat: [process.env.BUCKET_HOST, '/', '$$att'] }
+          }
+        }
+      }
+    },
+    {
+      $lookup: {
+        from: MODELS.user,
+        localField: 'creatives.creative',
+        foreignField: '_id',
+        as: 'creatives'
+      }
+    },
+    {
+      $addFields: {
+        creatives: {
+          $map: {
+            input: '$creatives',
+            as: 'creative',
+            in: {
+              _id: '$$creative._id',
+              username: '$$creative.username',
+              name: '$$creative.name',
+              profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$$creative.profileImage'] },
+              isOnline: '$$creative.isOnline',
+              acceptedProjectsCounter: '$$creative.acceptedProjectsCounter',
+              rate: '$$creative.rate'
+            }
+          }
         }
       }
     },
@@ -105,36 +140,26 @@ export const getProjectsHandler: RequestHandler<
     },
     {
       $addFields: {
-        user: {
-          $cond: {
-            if: { $eq: [{ $size: '$userDetails' }, 0] },
-            then: null,
-            else: {
-              $arrayElemAt: ['$userDetails', 0]
-            }
-          }
+        'user': {
+          $arrayElemAt: ['$userDetails', 0]
         }
       }
     },
     {
       $addFields: {
-        'user.profileImage': {
-          $concat: [process.env.BUCKET_HOST + '/', '$user.profileImage']
-        },
-        // Add process.env.BUCKET_HOST before cover and attachments
-        'cover': { $concat: [process.env.BUCKET_HOST + '/', '$cover'] },
-        'attachments': { $map: { input: '$attachments', as: 'att', in: { $concat: [process.env.BUCKET_HOST + '/', '$$att'] } } }
+        'user.profileImage': { $concat: [process.env.BUCKET_HOST, '/', '$user.profileImage'] },
       }
     },
     {
       $project: {
         user: {
-          isOnline: '$user.isOnline',
+          _id: '$user._id',
           username: '$user.username',
           name: '$user.name',
-          profileImage: '$user.profileImage',
+          isOnline: '$user.isOnline',
           acceptedProjectsCounter: '$user.acceptedProjectsCounter',
-          rate: '$user.rate'
+          rate: '$user.rate',
+          profileImage: '$user.profileImage',
         },
         attachments: 1,
         cover: 1,
@@ -157,8 +182,6 @@ export const getProjectsHandler: RequestHandler<
   ]);
   
 
-
-  
   res.status(200).json({
     message: 'success',
     pagination: {

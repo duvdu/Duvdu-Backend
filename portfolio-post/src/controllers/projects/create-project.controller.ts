@@ -41,6 +41,7 @@ export const createProjectHandler: RequestHandler<
   const attachments = <Express.Multer.File[]>(req.files as any).attachments;
   const cover = <Express.Multer.File>(req.files as any).cover[0];
 
+    
   // handle category
   const { filteredTags, subCategoryTitle } = await filterTagsForCategory(
     req.body.category.toString(),
@@ -73,7 +74,8 @@ export const createProjectHandler: RequestHandler<
     subCategory: subCategoryTitle,
     tags: filteredTags,
     creatives: [...(req.body.creatives || []), ...(invitedCreatives || [])],
-    user: req.loggedUser.id,
+    user: '662c9ac0cf033b86395d6e0b'
+    // user: req.loggedUser.id
   });
 
   await Project.create({

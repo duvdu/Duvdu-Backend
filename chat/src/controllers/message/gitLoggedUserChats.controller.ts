@@ -12,6 +12,7 @@ export const getLoggedUserChatsHandler:GetLoggedUserChatsHandler = async (req,re
   const userId = new Types.ObjectId(req.loggedUser?.id);
  
 
+
   const allChats = await Message.aggregate([
     {
       $match: {
@@ -19,6 +20,11 @@ export const getLoggedUserChatsHandler:GetLoggedUserChatsHandler = async (req,re
           { sender: userId },
           { receiver: userId }
         ]
+      },
+    },
+    {
+      $sort: {
+        createdAt: -1
       }
     },
     {

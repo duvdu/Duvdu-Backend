@@ -82,7 +82,7 @@ export const getProjectsHandler: RequestHandler<
     ...req.pagination.filter,
     isDeleted: { $ne: true },
   });
-
+  
   const studioBookings = await studioBooking.aggregate([
     {
       $match: {
@@ -146,10 +146,7 @@ export const getProjectsHandler: RequestHandler<
             if: { $eq: [{ $size: '$userDetails' }, 0] },
             then: null,
             else: {
-              $arrayElemAt: [
-                '$userDetails',
-                0
-              ]
+              $arrayElemAt: ['$userDetails', 0]
             }
           }
         }
@@ -158,10 +155,34 @@ export const getProjectsHandler: RequestHandler<
     {
       $addFields: {
         'user.profileImage': {
-          $concat: [
-            process.env.BUCKET_HOST + '/',
-            '$user.profileImage'
-          ]
+          $concat: [process.env.BUCKET_HOST + '/', '$user.profileImage']
+        }
+      }
+    },
+    {
+      $lookup: {
+        from: MODELS.user,
+        localField: 'creatives.creative',
+        foreignField: '_id',
+        as: 'creativesDetails'
+      }
+    },
+    {
+      $addFields: {
+        creatives: {
+          $map: {
+            input: '$creativesDetails',
+            as: 'creative',
+            in: {
+              _id: '$$creative._id',
+              username: '$$creative.username',
+              name: '$$creative.name',
+              profileImage: { $concat: [process.env.BUCKET_HOST + '/', '$$creative.profileImage'] },
+              isOnline: '$$creative.isOnline',
+              acceptedProjectsCounter: '$$creative.acceptedProjectsCounter',
+              rate: '$$creative.rate'
+            }
+          }
         }
       }
     },
@@ -197,7 +218,6 @@ export const getProjectsHandler: RequestHandler<
     }
   ]);
   
-
 
   res.status(200).json({
     message: 'success',

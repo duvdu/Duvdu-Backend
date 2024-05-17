@@ -11,7 +11,7 @@ export const getCrmProjectsHandler: RequestHandler<
     ...req.pagination.filter,
     isDeleted: { $ne: true },
   });
-  
+
   const studioBookings = await studioBooking.aggregate([
     {
       $match: req.pagination.filter
@@ -72,10 +72,7 @@ export const getCrmProjectsHandler: RequestHandler<
             if: { $eq: [{ $size: '$userDetails' }, 0] },
             then: null,
             else: {
-              $arrayElemAt: [
-                '$userDetails',
-                0
-              ]
+              $arrayElemAt: ['$userDetails', 0]
             }
           }
         }
@@ -84,10 +81,34 @@ export const getCrmProjectsHandler: RequestHandler<
     {
       $addFields: {
         'user.profileImage': {
-          $concat: [
-            process.env.BUCKET_HOST + '/',
-            '$user.profileImage'
-          ]
+          $concat: [process.env.BUCKET_HOST + '/', '$user.profileImage']
+        }
+      }
+    },
+    {
+      $lookup: {
+        from: MODELS.user,
+        localField: 'creatives.creative',
+        foreignField: '_id',
+        as: 'creativesDetails'
+      }
+    },
+    {
+      $addFields: {
+        creatives: {
+          $map: {
+            input: '$creativesDetails',
+            as: 'creative',
+            in: {
+              _id: '$$creative._id',
+              username: '$$creative.username',
+              name: '$$creative.name',
+              profileImage: { $concat: [process.env.BUCKET_HOST + '/', '$$creative.profileImage'] },
+              isOnline: '$$creative.isOnline',
+              acceptedProjectsCounter: '$$creative.acceptedProjectsCounter',
+              rate: '$$creative.rate'
+            }
+          }
         }
       }
     },
@@ -95,7 +116,7 @@ export const getCrmProjectsHandler: RequestHandler<
       $project: {
         user: {
           username: '$user.username',
-          profileImage:  '$user.profileImage',
+          profileImage: '$user.profileImage',
           isOnline: '$user.isOnline',
           acceptedProjectsCounter: '$user.acceptedProjectsCounter',
           name: '$user.name',
@@ -122,6 +143,7 @@ export const getCrmProjectsHandler: RequestHandler<
       }
     }
   ]);
+  
   
   
   res.status(200).json({
