@@ -10,7 +10,7 @@ import express from 'express';
 import session from 'express-session';
 
 import { env } from './config/env';
-import { apiRoutes } from '../src/routes';
+import { apiRoutes } from './routes';
 
 export const app = express();
 app.use(express.json());
