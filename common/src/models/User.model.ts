@@ -47,7 +47,6 @@ const userSchema = new Schema<Iuser>(
       transform(doc, ret) {
         if (ret.coverImage) ret.coverImage = process.env.BUCKET_HOST + '/' + ret.coverImage;
         if (ret.profileImage) ret.profileImage = process.env.BUCKET_HOST + '/' + ret.profileImage;
-        return ret;
       },
 
     },

@@ -96,7 +96,6 @@ export const ProducerBooking = model<IproducerBooking>(MODELS.producerBooking , 
       ret.attachments = ret.attachments.map(
         (el: string) => process.env.BUCKET_HOST + '/' + el,
       );
-    return ret;
   },
 }}));
 

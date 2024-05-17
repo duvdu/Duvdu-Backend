@@ -139,7 +139,6 @@ export const TeamProject = model<IteamProject>(MODELS.teamProject , new Schema<I
         ret.attachments = ret.attachments.map(
           (el: string) => process.env.BUCKET_HOST + '/' + el,
         );
-      return ret;
     },
   }
 }
