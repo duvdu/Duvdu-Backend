@@ -15,8 +15,8 @@ export const getProjectsPagination: RequestHandler<
     isDeleted?: boolean;
     startDate?: Date;
     endDate?: Date;
-    tags?:string;
-    subCategory?:string
+    tags?: string;
+    subCategory?: string;
   }
 > = (req, res, next) => {
   if (req.query.search) req.pagination.filter.$text = { $search: req.query.search };
@@ -55,13 +55,13 @@ export const getProjectsHandler: RequestHandler<
     ...req.pagination.filter,
     isDeleted: { $ne: true },
   });
-    
+
   const projects = await CopyRights.aggregate([
     {
       $match: {
         ...req.pagination.filter,
-        isDeleted: { $ne: true }
-      }
+        isDeleted: { $ne: true },
+      },
     },
     { $sort: { createdAt: -1 } },
     { $limit: req.pagination.limit },
@@ -76,27 +76,27 @@ export const getProjectsHandler: RequestHandler<
               $cond: {
                 if: { $eq: ['ar', req.lang] },
                 then: '$$tag.ar',
-                else: '$$tag.en'
-              }
-            }
-          }
+                else: '$$tag.en',
+              },
+            },
+          },
         },
         subCategory: {
           $cond: {
             if: { $eq: ['ar', req.lang] },
             then: '$subCategory.ar',
-            else: '$subCategory.en'
-          }
-        }
-      }
+            else: '$subCategory.en',
+          },
+        },
+      },
     },
     {
       $lookup: {
         from: MODELS.user,
         localField: 'user',
         foreignField: '_id',
-        as: 'userDetails'
-      }
+        as: 'userDetails',
+      },
     },
     {
       $addFields: {
@@ -105,26 +105,26 @@ export const getProjectsHandler: RequestHandler<
             if: { $eq: [{ $size: '$userDetails' }, 0] },
             then: null,
             else: {
-              $arrayElemAt: ['$userDetails', 0]
-            }
-          }
+              $arrayElemAt: ['$userDetails', 0],
+            },
+          },
         },
         // Add process.env.BUCKET_HOST before profileImage
         profileImage: {
-          $concat: [process.env.BUCKET_HOST, '$user.profileImage']
-        }
-      }
+          $concat: [process.env.BUCKET_HOST + '/', '$user.profileImage'],
+        },
+      },
     },
     {
       $project: {
         _id: 1,
         user: {
           acceptedProjectsCounter: '$user.acceptedProjectsCounter',
-          profileImage: 1, // Use the modified profileImage field
+          profileImage: '$user.profileImage', // Use the modified profileImage field
           name: '$user.name',
           username: '$user.username',
           isOnline: '$user.isOnline',
-          rate: '$user.rate'
+          rate: '$user.rate',
         },
         category: 1,
         price: 1,
@@ -136,11 +136,10 @@ export const getProjectsHandler: RequestHandler<
         cycle: 1,
         rate: 1,
         tags: 1,
-        subCategory: 1
-      }
-    }
+        subCategory: 1,
+      },
+    },
   ]);
-  
 
   res.status(200).json({
     message: 'success',
