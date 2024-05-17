@@ -3,6 +3,7 @@ import { body, param, query } from 'express-validator';
 
 export const getContracts = [
   query('filter')
+    .optional()
     .isString()
     .bail()
     .custom((val) => {
@@ -20,7 +21,7 @@ export const takeAction = [
     .isString()
     .bail()
     .custom((val) => {
-      if ([ContractStatus.ongoing, ContractStatus.pending, ContractStatus.rejected].includes(val))
+      if ([ContractStatus.ongoing, ContractStatus.completed, ContractStatus.rejected].includes(val))
         return true;
       throw new Error();
     }),
