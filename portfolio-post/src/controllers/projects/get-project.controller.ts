@@ -10,8 +10,8 @@ export const getProjectHandler: RequestHandler<
     _id: req.params.projectId,
     isDeleted: { $ne: true },
   }).populate([
-    {path:'user' , select:'isOnline profileImage username'},
-    {path:'creatives.creative' , select:'isOnline profileImage username'}
+    {path:'user' , select:'isOnline profileImage username name'},
+    {path:'creatives.creative' , select:'isOnline profileImage username name'}
   ]);
   if (!project) return next(new NotFound('project not found'));
 
