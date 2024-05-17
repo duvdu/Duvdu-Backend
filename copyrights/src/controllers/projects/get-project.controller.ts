@@ -15,6 +15,7 @@ export const getProjectHandler: RequestHandler<
 
   (project.tags as any) = localizedTags;
   (project.subCategory as any) = localizedSubCategory;
+  (project.user as any).profileImage = `${process.env.BUCKET_HOST}/${(project.user as any).profileImage}`;
   
   res.status(200).json(<any>{ message: 'success', data: project });
 };

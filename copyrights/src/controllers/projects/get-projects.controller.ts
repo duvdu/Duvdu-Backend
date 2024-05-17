@@ -109,10 +109,6 @@ export const getProjectsHandler: RequestHandler<
             },
           },
         },
-        // Add process.env.BUCKET_HOST before profileImage
-        profileImage: {
-          $concat: [process.env.BUCKET_HOST + '/', '$user.profileImage'],
-        },
       },
     },
     {
@@ -120,7 +116,7 @@ export const getProjectsHandler: RequestHandler<
         _id: 1,
         user: {
           acceptedProjectsCounter: '$user.acceptedProjectsCounter',
-          profileImage: '$user.profileImage', // Use the modified profileImage field
+          profileImage: {$concat: [process.env.BUCKET_HOST + '/', '$user.profileImage']},
           name: '$user.name',
           username: '$user.username',
           isOnline: '$user.isOnline',

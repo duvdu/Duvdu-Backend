@@ -5,7 +5,7 @@ import { PortfolioPostBooking } from '../../models/booking.model';
 
 export const payBooking: RequestHandler = async (req, res, next) => {
   const book = await PortfolioPostBooking.findOneAndUpdate(
-    { paymentSession: req.query.session, state: BookingState.unpaid },
+    { paymentSession: req.query.session as unknown as string, state: BookingState.unpaid },
     { state: BookingState.paid },
   );
   if (!book) return next(new BadRequestError('invalid session'));

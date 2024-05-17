@@ -5,7 +5,7 @@ import { CopyrightsBooking } from '../../models/copyrights-booking.model';
 
 export const payBooking: RequestHandler = async (req, res, next) => {
   const book = await CopyrightsBooking.findOneAndUpdate(
-    { paymentSession: req.query.session, state: BookingState.unpaid },
+    { paymentSession: req.query.session as unknown as string, state: BookingState.unpaid },
     { state: BookingState.paid },
   );
   if (!book) return next(new BadRequestError('invalid session'));

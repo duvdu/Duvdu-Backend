@@ -7,7 +7,7 @@ import {
   uploadProjectMedia,
 } from '@duvdu-v1/duvdu';
 import { Router } from 'express';
-import rateLimit from 'express-rate-limit';
+// import rateLimit from 'express-rate-limit';
 
 import * as handlers from '../controllers/auth';
 import * as val from '../validators/auth';
@@ -26,10 +26,10 @@ router.post(
 );
 router.post(
   '/retreive-username',
-  rateLimit({
-    windowMs: 10 * 60 * 1000,
-    max: 20,
-  }),
+  // rateLimit({
+  //   windowMs: 10 * 60 * 1000,
+  //   max: 20,
+  // }),
   val.retreiveUsernameVal,
   handlers.retreiveUsernameHandler,
 );
