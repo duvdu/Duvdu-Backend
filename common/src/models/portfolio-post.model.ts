@@ -70,6 +70,7 @@ export const PortfolioPosts = model<IportfolioPost>(
             ret.attachments = ret.attachments.map(
               (el: string) => process.env.BUCKET_HOST + '/' + el,
             );
+          return ret;
         },
       }
     },

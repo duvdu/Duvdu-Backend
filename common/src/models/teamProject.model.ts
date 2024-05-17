@@ -131,15 +131,17 @@ export const TeamProject = model<IteamProject>(MODELS.teamProject , new Schema<I
     type:Boolean,
     default:true
   }
-} , {timestamps:true , collection:MODELS.teamProject , toJSON: {
-  transform(doc, ret) {
-    if (ret.cover) ret.cover = process.env.BUCKET_HOST + '/' + ret.cover;
-    if (ret.attachments)
-      ret.attachments = ret.attachments.map(
-        (el: string) => process.env.BUCKET_HOST + '/' + el,
-      );
-  },
-}
+} , {timestamps:true , collection:MODELS.teamProject , 
+  toJSON: {
+    transform(doc, ret) {
+      if (ret.cover) ret.cover = process.env.BUCKET_HOST + '/' + ret.cover;
+      if (ret.attachments)
+        ret.attachments = ret.attachments.map(
+          (el: string) => process.env.BUCKET_HOST + '/' + el,
+        );
+      return ret;
+    },
+  }
 }
 ));
 
