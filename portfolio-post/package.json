@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node src/index.ts",
+    "start": "node build/index.js",
     "dev": "nodemon src/index.ts",
     "test": "jest --watchAll --no-cache --runInBand",
     "test:ci": "jest",
@@ -12,14 +12,8 @@
     "lint:fix": "eslint --fix .",
     "format": "prettier --write .",
     "seeds": "ts-node seeds/plans.seeder.ts",
-    "seeds:dev": "ts-node seeds/roles.seeder.ts"
-  },
-  "jest": {
-    "preset": "ts-jest",
-    "testEnvironment": "node",
-    "setupFilesAfterEnv": [
-      "./src/test/setup.ts"
-    ]
+    "seeds:dev": "ts-node seeds/roles.seeder.ts",
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",
