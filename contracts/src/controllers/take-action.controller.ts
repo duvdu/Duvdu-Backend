@@ -30,14 +30,14 @@ export const takeAction: RequestHandler<
     case ContractStatus.ongoing:
       if (contract.status !== ContractStatus.pending)
         return next(new BadRequestError(`contract is already ${contract.status}`));
-      if (new Date(contract.createdAt).getTime() + 24 * 60 * 60 * 1000 >= new Date().getTime())
+      if (new Date(contract.createdAt).getTime() + 24 * 60 * 60 * 1000 < new Date().getTime())
         return next(new BadRequestError('timeout'));
       await updatePendingToOngoing(contract.id);
       break;
     case ContractStatus.rejected:
       if (contract.status !== ContractStatus.pending)
         return next(new BadRequestError(`contract is already ${contract.status}`));
-      if (new Date(contract.createdAt).getTime() + 24 * 60 * 60 * 1000 >= new Date().getTime())
+      if (new Date(contract.createdAt).getTime() + 24 * 60 * 60 * 1000 < new Date().getTime())
         return next(new BadRequestError('timeout'));
       await updatePendingToRejected(contract.id);
       break;
@@ -48,6 +48,7 @@ export const takeAction: RequestHandler<
       break;
   }
 
+  (contract as any)._doc.status = req.body.action;
   res.status(200).json({
     message: 'success',
     data: contract,
@@ -55,12 +56,13 @@ export const takeAction: RequestHandler<
 };
 
 const updatePendingToOngoing = async (id: string) => {
-  await Contracts.updateOne({ _id: id }, { state: ContractStatus.ongoing });
+  const x = await Contracts.updateOne({ _id: id }, { status: ContractStatus.ongoing });
+  console.log(x);
   // TODO: send notification to source user that state has changed
 };
 
 const updatePendingToRejected = async (id: string) => {
-  await Contracts.updateOne({ _id: id }, { state: ContractStatus.rejected });
+  await Contracts.updateOne({ _id: id }, { status: ContractStatus.rejected });
   // TODO: send notification to source user that state has changed
 };
 
@@ -77,14 +79,16 @@ const updatePendingToCompleted = async (
   contract.project;
   await Contracts.updateOne(
     { _id: contract.id },
-    { state: ContractStatus.completed, submitedAt: Date.now() },
+    { status: ContractStatus.completed, submitedAt: Date.now() },
   );
 
   if (submitFiles)
     await mongoose.connection.db.collection(contract.ref).updateOne(
       { _id: new mongoose.Types.ObjectId(contract.project) },
       {
-        submitFiles,
+        $set: {
+          submitFiles,
+        },
       },
     );
   // TODO: send notification to source user that state has changed

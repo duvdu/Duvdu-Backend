@@ -6,10 +6,8 @@ import * as val from '../validator/contract.validator';
 
 const router = Router();
 
-router
-  .route('/')
-  .all(isauthenticated)
-  .get(val.getContracts, controllers.getContracts)
-  .post(val.takeAction, controllers.takeAction);
+router.route('/').get(isauthenticated, val.getContracts, controllers.getContracts);
+
+router.route('/:contractId').post(isauthenticated, val.takeAction, controllers.takeAction);
 
 export const apiRoutes = router;
