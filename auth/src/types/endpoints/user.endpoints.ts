@@ -1,11 +1,30 @@
 /* eslint-disable @typescript-eslint/no-namespace */
-import { Iuser } from '@duvdu-v1/duvdu';
+import { IjwtPayload, Ipagination, Iuser } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 
 type successResponse<T> = T & {
   message: 'success';
 };
+
+/* eslint-disable @typescript-eslint/no-namespace */
+
+
+declare module 'express-session' {
+  interface SessionData {
+    access: string;
+    refresh: string;
+  }
+}
+
+declare global {
+  namespace Express {
+    interface Request {
+      loggedUser: IjwtPayload;
+      pagination: Ipagination;
+    }
+  }
+}
 
 //TODO: open with google
 //TODO: open with apple
