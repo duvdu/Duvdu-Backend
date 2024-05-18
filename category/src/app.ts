@@ -13,7 +13,6 @@ import { env } from './config/env';
 import { router as categoryRoutes } from './routes/index';
 
 
-
 export const app = express();
 
 app.use(express.json());
