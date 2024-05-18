@@ -129,13 +129,6 @@ spec:
                   name: analysis-srv
                   port: 
                     number: 3000
-          - path: /api/team-project/?(.*)
-            pathType: Prefix
-            backend: 
-              service:
-                  name: team-project-srv
-                  port: 
-                    number: 3000
           - path: /api/teamproject/?(.*)
             pathType: Prefix
             backend: 
