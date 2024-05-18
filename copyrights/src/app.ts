@@ -1,10 +1,6 @@
 import 'express-async-errors';
 import './types/custom-definition';
-import {
-  globalErrorHandlingMiddleware,
-  languageHeaderMiddleware,
-  sessionStore,
-} from '@duvdu-v1/duvdu';
+import { globalErrorHandlingMiddleware, languageHeaderMiddleware, sessionStore } from '@duvdu-v1/duvdu';
 import cors from 'cors';
 import express from 'express';
 import session from 'express-session';
@@ -13,35 +9,41 @@ import { env } from './config/env';
 import { apiRoutes } from './routes';
 
 export const app = express();
+
 app.use(express.json());
+
 app.set('trust proxy', true);
-app.use(
-  cors({
-    origin: ['*', 'http://localhost:3000'],
-    credentials: true,
-    exposedHeaders: ['set-cookie'],
-  }),
-);
 
-app.use(
-  session({
-    secret: env.expressSession.secret,
-    resave: false,
-    saveUninitialized: false,
-    store:
-      env.environment !== 'test' && env.expressSession.allowUseStorage
-        ? sessionStore(env.redis.uri, env.redis.pass)
-        : undefined,
-    cookie: {
-      sameSite: 'none',
-      secure: env.environment === 'production',
-      httpOnly: true,
-    },
-  }),
-);
+const corsOptions = {
+  origin: ['*', 'http://localhost:3000'],
+  credentials: true,
+  exposedHeaders: ['set-cookie'],
+};
+app.use(cors(corsOptions));
 
-app.use(languageHeaderMiddleware);
+async function setupSessionMiddleware() {
+  if (env.environment !== 'test' && env.expressSession.allowUseStorage) {
+    const store = await sessionStore(env.redis.uri, env.redis.pass);
+    app.use(
+      session({
+        secret: env.expressSession.secret,
+        resave: false,
+        saveUninitialized: false,
+        store: store,
+        cookie: {
+          sameSite: 'none',
+          secure: env.environment === 'production',
+          httpOnly: true,
+        },
+      })
+    );
+  }
+}
 
-app.use('/api/copyrights', apiRoutes);
+setupSessionMiddleware().then(() => {
+  app.use(languageHeaderMiddleware);
 
-app.use(globalErrorHandlingMiddleware);
+  app.use('/api/copyrights', apiRoutes);
+
+  app.use(globalErrorHandlingMiddleware);
+});

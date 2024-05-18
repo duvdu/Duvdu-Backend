@@ -13,13 +13,13 @@
     "format": "prettier --write .",
     "seeds": "ts-node seeds/plans.seeder.ts",
     "seeds:dev": "ts-node seeds/roles.seeder.ts",
-    "build":"tsc"
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@duvdu-v1/duvdu": "^1.1.59",
+    "@duvdu-v1/duvdu": "^1.1.61",
     "@jridgewell/sourcemap-codec": "^1.4.15",
     "@types/bcryptjs": "^2.4.5",
     "@types/cookie-session": "^2.0.48",
@@ -64,6 +64,5 @@
     "jest": "^29.7.0",
     "nodemon": "^3.1.0",
     "prettier": "^3.2.4"
-
   }
 }
