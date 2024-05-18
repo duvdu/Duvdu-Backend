@@ -4,9 +4,9 @@ import { createClient } from 'redis';
 import { DatabaseConnectionError } from '../errors/data-base-connections';
 
 
-export const redisConnection = (url: string , password:string) => {
+export const redisConnection = async (url: string , password:string) => {
   const client = createClient({ url , password });
-  client
+  await client
     .connect()
     .then(() => console.log(`redis connected in : ${url}`))
     .catch(() => {
