@@ -41,6 +41,7 @@ async function setupSessionMiddleware() {
   }
 }
 
+
 setupSessionMiddleware().then(() => {
   app.use(passport.initialize());
   app.use(passport.session());

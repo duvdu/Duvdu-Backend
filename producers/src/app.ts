@@ -19,6 +19,7 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
+
 async function setupSessionMiddleware() {
   if (env.environment !== 'test' && env.expressSession.allowUseStorage) {
     const store = await sessionStore(env.redis.uri, env.redis.pass);
