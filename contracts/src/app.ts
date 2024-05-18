@@ -41,6 +41,6 @@ app.use(
 );
 
 app.use(languageHeaderMiddleware);
-app.use('/api/portfolio-post', apiRoutes);
+app.use('/api/contracts', apiRoutes);
 
 app.use(globalErrorHandlingMiddleware);

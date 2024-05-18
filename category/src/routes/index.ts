@@ -11,7 +11,7 @@ import express from 'express';
 
 import * as handler from '../controllers';
 import * as val from '../validators/categoryVal';
-
+//:TODO update permissions
 export const router = express.Router();
 router.get(
   '/crm',
@@ -33,7 +33,12 @@ router
     val.createCategoryVal,
     handler.createCategoryHandler,
   )
-  .get(val.getCategoriesVal , globalPaginationMiddleware , handler.getCategoriesPagination,handler.getCategoriesHandler);
+  .get(
+    val.getCategoriesVal,
+    globalPaginationMiddleware,
+    handler.getCategoriesPagination,
+    handler.getCategoriesHandler,
+  );
 
 router
   .route('/:categoryId')
