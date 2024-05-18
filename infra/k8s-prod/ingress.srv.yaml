@@ -11,7 +11,7 @@ spec:
   ingressClassName: nginx
   rules:
     - host: www.duvdu.com
-      http:
+           http:
         paths:
           - path: /api/users/?(.*)
             pathType: Prefix
@@ -83,9 +83,8 @@ spec:
                   name: chat-srv
                   port: 
                     number: 3000
-
     - host: duvdu.com
-      http:
+           http:
         paths:
           - path: /api/users/?(.*)
             pathType: Prefix
@@ -136,6 +135,13 @@ spec:
                   name: teamproject-srv
                   port: 
                     number: 3000
+          - path: /api/producers/?(.*)
+            pathType: Prefix
+            backend: 
+              service:
+                  name: producer-srv
+                  port: 
+                    number: 3000
           - path: /api/contracts/?(.*)
             pathType: Prefix
             backend: 
@@ -150,7 +156,6 @@ spec:
                   name: chat-srv
                   port: 
                     number: 3000
-
   tls:
     - hosts:
         - duvdu.com
@@ -164,7 +169,6 @@ metadata:
   annotations:
     service.beta.kubernetes.io/do-loadbalancer-enable-proxy-protocol: 'true'
     service.beta.kubernetes.io/do-loadbalancer-hostname: 'www.duvdu.com'
-    service.beta.kubernetes.io/do-loadbalancer-size-unit: "5"
 
   labels:
     helm.sh/chart: ingress-nginx-2.0.3
