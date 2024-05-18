@@ -9,3 +9,4 @@ old_structure
 nginx
 docker
 dockerfile.dev
+Dockerfile-dev

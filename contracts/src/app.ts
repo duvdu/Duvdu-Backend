@@ -11,13 +11,13 @@ import session from 'express-session';
 
 import { env } from './config/env';
 import { apiRoutes } from './routes';
-
 export const app = express();
 app.use(express.json());
 app.set('trust proxy', true);
+
 app.use(
   cors({
-    origin: ['*', 'http://localhost:3000'],
+    origin: ['*', 'http://localhost:3000', 'http://localhost:3001'],
     credentials: true,
     exposedHeaders: ['set-cookie'],
   }),
@@ -41,7 +41,6 @@ app.use(
 );
 
 app.use(languageHeaderMiddleware);
-
 app.use('/api/contracts', apiRoutes);
 
 app.use(globalErrorHandlingMiddleware);
