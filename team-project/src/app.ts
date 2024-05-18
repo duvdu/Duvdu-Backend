@@ -4,8 +4,7 @@ import express from 'express';
 import session from 'express-session';
 
 import { env } from './config/env';
-import { moutnRoutes } from './routes';
-
+import { router } from './routes/teamProject.routes';
 export const app = express();
 app.use(express.json());
 app.set('trust proxy', true);
@@ -36,5 +35,5 @@ app.use(
 );
 
 app.use(languageHeaderMiddleware);
-moutnRoutes(app);
+app.use('/api/teamproject' , router);
 app.use(globalErrorHandlingMiddleware);
