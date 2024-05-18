@@ -11,7 +11,7 @@ spec:
   ingressClassName: nginx
   rules:
     - host: www.duvdu.com
-           http:
+      http:
         paths:
           - path: /api/users/?(.*)
             pathType: Prefix
@@ -84,7 +84,7 @@ spec:
                   port: 
                     number: 3000
     - host: duvdu.com
-           http:
+      http:
         paths:
           - path: /api/users/?(.*)
             pathType: Prefix
