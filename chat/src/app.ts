@@ -12,12 +12,11 @@ app.set('trust proxy', true);
 app.use(express.json());
 app.use(
   cors({
-    origin: ['*' , 'http://localhost:3000'],
-    credentials:true,
-    exposedHeaders: ['set-cookie']
+    origin: ['*', 'http://localhost:3000', 'http://localhost:3001'],
+    credentials: true,
+    exposedHeaders: ['set-cookie'],
   }),
 );
-
 
 export const mySession = session({
   secret: env.expressSession.secret,
@@ -25,7 +24,7 @@ export const mySession = session({
   saveUninitialized: false,
   store:
     env.environment !== 'test' && env.expressSession.allowUseStorage
-      ? sessionStore(env.redis.uri , env.redis.pass)
+      ? sessionStore(env.redis.uri, env.redis.pass)
       : undefined,
   cookie: {
     sameSite: 'none',

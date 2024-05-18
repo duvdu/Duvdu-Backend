@@ -18,7 +18,7 @@ app.set('trust proxy', true);
 
 app.use(
   cors({
-    origin: ['*', 'http://localhost:3000'],
+    origin: ['*', 'http://localhost:3000', 'http://localhost:3001'],
     credentials: true,
     exposedHeaders: ['set-cookie'],
   }),
@@ -30,9 +30,9 @@ app.use(
     resave: false,
     saveUninitialized: false,
     store:
-    env.environment !== 'test' && env.expressSession.allowUseStorage
-      ? sessionStore(env.redis.uri , env.redis.pass)
-      : undefined,
+      env.environment !== 'test' && env.expressSession.allowUseStorage
+        ? sessionStore(env.redis.uri, env.redis.pass)
+        : undefined,
     cookie: {
       sameSite: 'none',
       secure: env.environment === 'production',
@@ -42,7 +42,6 @@ app.use(
 );
 
 app.use(languageHeaderMiddleware);
-
 
 app.use('/api/category', categoryRoutes);
 

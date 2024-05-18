@@ -1,3 +1,5 @@
+import 'express-async-errors';
+import './types/custom-definition';
 import {
   globalErrorHandlingMiddleware,
   languageHeaderMiddleware,
@@ -8,15 +10,14 @@ import express from 'express';
 import session from 'express-session';
 
 import { env } from './config/env';
-import { router as studioBookingRoutes } from './routes';
-
+import { apiRoutes } from './routes';
 export const app = express();
 app.use(express.json());
 app.set('trust proxy', true);
 
 app.use(
   cors({
-    origin: ['*', 'http://localhost:3000'],
+    origin: ['*', 'http://localhost:3000', 'http://localhost:3001'],
     credentials: true,
     exposedHeaders: ['set-cookie'],
   }),
@@ -40,6 +41,6 @@ app.use(
 );
 
 app.use(languageHeaderMiddleware);
+app.use('/api/portfolio-post', apiRoutes);
 
-app.use('/api/studio-booking', studioBookingRoutes);
 app.use(globalErrorHandlingMiddleware);
