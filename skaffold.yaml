@@ -80,3 +80,11 @@ build:
         manual:
           - src: "src/**/*.ts"
             dest: .
+    - image: duvdu/contract
+      context: contracts
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*.ts"
+            dest: .

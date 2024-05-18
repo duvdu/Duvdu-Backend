@@ -66,6 +66,13 @@ spec:
                   name: producer-srv
                   port: 
                     number: 3000
+          - path: /api/contracts/?(.*)
+            pathType: Prefix
+            backend: 
+              service:
+                  name: contract-srv
+                  port: 
+                    number: 3000
           - path: /?(.*)
             pathType: Prefix
             backend: 
