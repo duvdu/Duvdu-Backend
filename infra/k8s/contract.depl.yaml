@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: auth-depl
+  name: contract-depl
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: auth
+      app: contract
   template:
     metadata:
       labels:
-        app: auth
+        app: contract
     spec:
       containers:
-        - name: auth
-          image: duvdu/auth
+        - name: contract
+          image: duvdu/contract
           env:
             - name: MONGO_URI
               valueFrom:
@@ -88,12 +88,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: auth-srv
+  name: contract-srv
 spec:
   selector:
-    app: auth
+    app: contract
   ports:
-    - name: auth
+    - name: contract
       protocol: TCP 
       port: 3000
       targetPort: 3000

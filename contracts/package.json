@@ -4,14 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": " ts-node src/index.ts",
+    "start": "node build/index.js",
     "dev": "ts-node-dev src/index.ts",
     "test": "jest --watchAll --no-cache --runInBand",
     "test:ci": "jest",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
     "format": "prettier --write .",
-    "seeds": "ts-node seeds/plans.seeder.ts"
+    "seeds": "ts-node seeds/plans.seeder.ts",
+    "build":"tsc"
   },
   "jest": {
     "preset": "ts-jest",
