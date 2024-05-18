@@ -64,7 +64,7 @@ build:
         manual:
           - src: "src/**/*.ts"
             dest: .
-    - image: duvdu/team-project
+    - image: duvdu/teamproject
       context: team-project
       docker:
         dockerfile: Dockerfile
