@@ -18,7 +18,6 @@ app.use(
   }),
 );
 
-
 export async function setupSessionMiddleware() {
   return session({
     secret: env.expressSession.secret,

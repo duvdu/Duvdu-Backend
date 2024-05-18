@@ -44,7 +44,6 @@ setupSessionMiddleware().then(() => {
   app.use(languageHeaderMiddleware);
 
   app.use('/api/copyrights', apiRoutes);
-
   app.use(globalErrorHandlingMiddleware);
 });
 
