@@ -1,3 +1,86 @@
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: teamproject-depl
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: teamproject
+#   template:
+#     metadata:
+#       labels:
+#         app: teamproject
+#     spec:
+#       containers:
+#         - name: teamproject
+#           image: duvdu/teamproject
+#           env:
+#             - name: MONGO_URI
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: mongo-uri
+#                   key: MONGO_URI
+#             - name: JWT_KEY
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: jwt-secret
+#                   key: JWT_KEY
+#             - name: CLIENT_ID
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: google-client-id
+#                   key: clientId
+#             - name: CLIENT_SECRET
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: google-client-secret
+#                   key: clientSecret
+#             - name: SESSION_SECRET
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: session-secret
+#                   key: sessionSecret
+#             - name: BUCKET_ACESS_KEY
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: bucket-acess-key
+#                   key: BUCKET_ACESS_KEY
+#             - name: BUCKET_SECRET_KEY
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: bucket-secret-key
+#                   key: BUCKET_SECRET_KEY
+#             - name: BUCKET_REGION
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: bucket-region
+#                   key: BUCKET_REGION
+#             - name: BUCKET_NAME
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: bucket-name
+#                   key: BUCKET_NAME
+#             - name: BUCKET_HOST
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: bucket-host
+#                   key: BUCKET_HOST
+#             - name: NODE_ENV
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: node-env
+#                   key: NODE_ENV
+#             - name: REDIS_HOST
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: redis-host
+#                   key: REDIS_HOST
+#             - name: REDIS_PASS
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: redis-pass
+#                   key: REDIS_PASS
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -12,6 +95,16 @@ spec:
       labels:
         app: teamproject
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - teamproject
+              topologyKey: "kubernetes.io/hostname"
       containers:
         - name: teamproject
           image: duvdu/teamproject

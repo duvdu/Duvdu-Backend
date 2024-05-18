@@ -1,3 +1,90 @@
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: chat-depl
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: chat
+#   template:
+#     metadata:
+#       labels:
+#         app: chat
+#     spec:
+#       containers:
+#         - name: chat
+#           image: duvdu/chat
+#           env:
+#             - name: MONGO_URI
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: mongo-uri
+#                   key: MONGO_URI
+#             - name: JWT_KEY
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: jwt-secret
+#                   key: JWT_KEY
+#             - name: SESSION_SECRET
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: session-secret
+#                   key: sessionSecret
+#             - name: BUCKET_ACESS_KEY
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: bucket-acess-key
+#                   key: BUCKET_ACESS_KEY
+#             - name: BUCKET_SECRET_KEY
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: bucket-secret-key
+#                   key: BUCKET_SECRET_KEY
+#             - name: BUCKET_REGION
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: bucket-region
+#                   key: BUCKET_REGION
+#             - name: BUCKET_NAME
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: bucket-name
+#                   key: BUCKET_NAME
+#             - name: BUCKET_HOST
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: bucket-host
+#                   key: BUCKET_HOST
+#             - name: NODE_ENV
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: node-env
+#                   key: NODE_ENV
+#             - name: REDIS_HOST
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: redis-host
+#                   key: REDIS_HOST
+#             - name: REDIS_PASS
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: redis-pass
+#                   key: REDIS_PASS
+
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: chat-srv
+# spec:
+#   selector:
+#     app: chat
+#   ports:
+#     - name: chat
+#       protocol: TCP 
+#       port: 3000
+#       targetPort: 3000
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -12,6 +99,16 @@ spec:
       labels:
         app: chat
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - chat
+              topologyKey: "kubernetes.io/hostname"
       containers:
         - name: chat
           image: duvdu/chat
@@ -82,6 +179,6 @@ spec:
     app: chat
   ports:
     - name: chat
-      protocol: TCP 
+      protocol: TCP
       port: 3000
       targetPort: 3000

@@ -40,7 +40,6 @@ async function setupSessionMiddleware() {
   }
 }
 
-
 setupSessionMiddleware().then(() => {
   app.use(languageHeaderMiddleware);
 
