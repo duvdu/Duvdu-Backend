@@ -40,7 +40,7 @@ async function setupSessionMiddleware() {
 setupSessionMiddleware().then(() => {
   app.use(languageHeaderMiddleware);
 
-  app.use('/api/teamproject', router);
+  app.use('/api/team', router);
 
   app.use(globalErrorHandlingMiddleware);
 });

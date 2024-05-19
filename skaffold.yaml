@@ -64,14 +64,6 @@ build:
         manual:
           - src: "src/**/*.ts"
             dest: .
-    - image: duvdu/teamproject
-      context: team-project
-      docker:
-        dockerfile: Dockerfile
-      sync:
-        manual:
-          - src: "src/**/*.ts"
-            dest: .
     - image: duvdu/producer
       context: producers
       docker:
