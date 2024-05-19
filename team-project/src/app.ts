@@ -1,8 +1,9 @@
-import { globalErrorHandlingMiddleware, languageHeaderMiddleware, sessionStore } from '@duvdu-v1/duvdu';
+import { globalErrorHandlingMiddleware, languageHeaderMiddleware } from '@duvdu-v1/duvdu';
 import cors from 'cors';
 import express from 'express';
 import session from 'express-session';
 
+import { sessionStore } from './config/ddd';
 import { env } from './config/env';
 import { router } from './routes/teamProject.routes';
 
@@ -18,30 +19,30 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-async function setupSessionMiddleware() {
-  if (env.environment !== 'test' && env.expressSession.allowUseStorage) {
-    const store = await sessionStore(env.redis.uri, env.redis.pass);
-    app.use(
-      session({
-        secret: env.expressSession.secret,
-        resave: false,
-        saveUninitialized: false,
-        store: store,
-        cookie: {
-          sameSite: 'none',
-          secure: env.environment === 'production',
-          httpOnly: true,
-        },
-      })
-    );
-  }
+
+if (env.environment !== 'test' && env.expressSession.allowUseStorage) {
+  const store = sessionStore(env.redis.uri, env.redis.pass);
+  app.use(
+    session({
+      secret: env.expressSession.secret,
+      resave: false,
+      saveUninitialized: false,
+      store: store,
+      cookie: {
+        sameSite: 'none',
+        secure: env.environment === 'production',
+        httpOnly: true,
+      },
+    })
+  );
 }
 
-setupSessionMiddleware().then(() => {
-  app.use(languageHeaderMiddleware);
 
-  app.use('/api/team', router);
 
-  app.use(globalErrorHandlingMiddleware);
-});
+app.use(languageHeaderMiddleware);
+
+app.use('/api/team', router);
+
+app.use(globalErrorHandlingMiddleware);
+
 
