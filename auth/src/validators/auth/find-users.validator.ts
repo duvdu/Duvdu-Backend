@@ -25,5 +25,7 @@ export const findUsers = [
     .bail()
     .toFloat(),
   query('hasVerificationPadge').optional().isBoolean().bail().toBoolean(),
+  query('limit').optional().isInt().toInt(),
+  query('page').optional().isInt().toInt(),
   globalValidatorMiddleware,
 ];
