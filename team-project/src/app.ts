@@ -20,22 +20,24 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 
-if (env.environment !== 'test' && env.expressSession.allowUseStorage) {
-  const store = sessionStore(env.redis.uri, env.redis.pass);  
-  app.use(
-    session({
-      secret: env.expressSession.secret,
-      resave: false,
-      saveUninitialized: false,
-      store: store,
-      cookie: {
-        sameSite: 'none',
-        secure: env.environment === 'production',
-        httpOnly: true,
-      },
-    })
-  );
-}
+
+app.use(
+  session({
+    secret: env.expressSession.secret,
+    resave: false,
+    saveUninitialized: false,
+    store:
+    env.environment !== 'test' && env.expressSession.allowUseStorage
+      ? sessionStore(env.redis.uri , env.redis.pass)
+      : undefined,
+    cookie: {
+      sameSite: 'none',
+      secure: env.environment === 'production',
+      httpOnly: true,
+    },
+  })
+);
+
 
 
 

@@ -5,7 +5,7 @@ import sharedSession from 'express-socket.io-session';
 import jwt from 'jsonwebtoken';
 import { Server } from 'socket.io';
 
-import {  setupSessionMiddleware } from '../app';
+import {  mySession } from '../app';
 import { env } from '../config/env';
 import { IcustomHandshake } from '../types/customSocket';
 
@@ -24,7 +24,7 @@ export class SocketServer {
   }
 
   private async setupMiddleware() {
-    this.io.use( sharedSession(await setupSessionMiddleware()));
+    this.io.use( sharedSession(mySession));
     this.io.use(async (socket: IcustomHandshake, next) => {
       if (!socket.handshake.session.access)
         return next();

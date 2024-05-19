@@ -18,27 +18,25 @@ app.use(
   }),
 );
 
-export async function setupSessionMiddleware() {
-  return session({
-    secret: env.expressSession.secret,
-    resave: false,
-    saveUninitialized: false,
-    store:
+export const mySession =  session({
+  secret: env.expressSession.secret,
+  resave: false,
+  saveUninitialized: false,
+  store:
       env.environment !== 'test' && env.expressSession.allowUseStorage
-        ? await sessionStore(env.redis.uri, env.redis.pass)
+        ?  sessionStore(env.redis.uri, env.redis.pass)
         : undefined,
-    cookie: {
-      sameSite: 'none',
-      secure: env.environment === 'production',
-      httpOnly: true,
-    },
-  });
-}
+  cookie: {
+    sameSite: 'none',
+    secure: env.environment === 'production',
+    httpOnly: true,
+  },
+});
 
-(async () => {
-  const mySession = await setupSessionMiddleware();
-  app.use(mySession);
-  moutnRoutes(app);
-  app.use(globalErrorHandlingMiddleware);
-})();
+
+
+app.use(mySession);
+moutnRoutes(app);
+app.use(globalErrorHandlingMiddleware);
+
 
