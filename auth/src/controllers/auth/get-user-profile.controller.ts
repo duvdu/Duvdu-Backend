@@ -7,7 +7,7 @@ export const getUserProfileHandler: GetUserProfileHandler = async (req, res, nex
     '-googleId -appleId -phoneNumber -password -verificationCode.code -verificationCode.expireAt -token -role -avaliableContracts',
   );
   if (!user) return next(new NotFound());
-  if (user.isBlocked) return next(new BadRequestError('user is blocked'));
+  if (user.isBlocked.value === true) return next(new BadRequestError('user is blocked'));
   const averageRate = +(
     user.rate.ratersCounter > 0 ? user.rate.totalRates / user.rate.ratersCounter : 0
   ).toFixed(2);
