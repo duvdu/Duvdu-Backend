@@ -22,6 +22,8 @@ app.use(cors(corsOptions));
 
 if (env.environment !== 'test' && env.expressSession.allowUseStorage) {
   const store = sessionStore(env.redis.uri, env.redis.pass);
+  console.log(store);
+  
   app.use(
     session({
       secret: env.expressSession.secret,
