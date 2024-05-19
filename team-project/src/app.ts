@@ -11,7 +11,6 @@ export const app = express();
 app.use(express.json());
 
 app.set('trust proxy', true);
-
 const corsOptions = {
   origin: ['*', 'http://localhost:3000', 'http://localhost:3001'],
   credentials: true,

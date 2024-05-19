@@ -41,3 +41,4 @@ export async function setupSessionMiddleware() {
   moutnRoutes(app);
   app.use(globalErrorHandlingMiddleware);
 })();
+
