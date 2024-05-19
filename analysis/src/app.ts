@@ -19,25 +19,28 @@ app.use(
   }),
 );
 
-app.use(
-  session({
-    secret: env.expressSession.secret,
-    resave: false,
-    saveUninitialized: false,
-    store:
-      env.environment !== 'test' && env.expressSession.allowUseStorage
-        ?sessionStore(env.redis.uri, env.redis.pass)
-        : undefined,
-    cookie: {
-      sameSite: 'none',
-      secure: env.environment === 'production',
-      httpOnly: true,
-    },
-  }),
-);
+(async () => {
+  const store = await sessionStore(env.redis.uri, env.redis.pass);
 
-app.use(globalErrorHandlingMiddleware);
+  app.use(
+    session({
+      secret: env.expressSession.secret,
+      resave: false,
+      saveUninitialized: false,
+      store,
+      cookie: {
+        sameSite: 'none',
+        secure: env.environment === 'production',
+        httpOnly: true,
+      },
+    })
+  );
 
+
+  
+  app.use(globalErrorHandlingMiddleware);
+  
+})();
 
 
 

@@ -1,9 +1,8 @@
-import { globalErrorHandlingMiddleware, languageHeaderMiddleware } from '@duvdu-v1/duvdu';
+import { globalErrorHandlingMiddleware, languageHeaderMiddleware , sessionStore } from '@duvdu-v1/duvdu';
 import cors from 'cors';
 import express from 'express';
 import session from 'express-session';
 
-import { sessionStore } from './config/ddd';
 import { env } from './config/env';
 import { router } from './routes/teamProject.routes';
 

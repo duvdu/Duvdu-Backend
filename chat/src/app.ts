@@ -1,7 +1,7 @@
 import 'express-async-errors';
 import { globalErrorHandlingMiddleware, sessionStore } from '@duvdu-v1/duvdu';
 import cors from 'cors';
-import express from 'express';
+import express, { RequestHandler } from 'express';
 import session from 'express-session';
 
 import { env } from './config/env';
@@ -18,25 +18,35 @@ app.use(
   }),
 );
 
-export const mySession =  session({
-  secret: env.expressSession.secret,
-  resave: false,
-  saveUninitialized: false,
-  store:
-      env.environment !== 'test' && env.expressSession.allowUseStorage
-        ?  sessionStore(env.redis.uri, env.redis.pass)
-        : undefined,
-  cookie: {
-    sameSite: 'none',
-    secure: env.environment === 'production',
-    httpOnly: true,
-  },
-});
 
+let mySession:RequestHandler;
 
+const initializeSessionStore = async () => {
+  const store = await sessionStore(env.redis.uri, env.redis.pass);
 
-app.use(mySession);
-moutnRoutes(app);
-app.use(globalErrorHandlingMiddleware);
+  mySession = session({
+    secret: env.expressSession.secret,
+    resave: false,
+    saveUninitialized: false,
+    store,
+    cookie: {
+      sameSite: 'none',
+      secure: env.environment === 'production',
+      httpOnly: true,
+    },
+  });
 
+  app.use(mySession);
+};
 
+(async () => {
+  try {
+    await initializeSessionStore();
+    moutnRoutes(app);
+    app.use(globalErrorHandlingMiddleware);
+  } catch (error) {
+    console.error('Failed to initialize session store', error);
+  }
+})();
+
+export { mySession };
