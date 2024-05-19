@@ -15,8 +15,8 @@ import * as val from '../validators/categoryVal';
 export const router = express.Router();
 router.get(
   '/crm',
-  // isauthenticated,
-  // isauthorized(PERMISSIONS.getAdminCategories),
+  isauthenticated,
+  isauthorized(PERMISSIONS.getAdminCategories),
   val.getCategoriesForCrmVal,
   globalPaginationMiddleware,
   handler.getCategoriesAdminPagination,
@@ -26,8 +26,8 @@ router.get(
 router
   .route('/')
   .post(
-    // isauthenticated,
-    // isauthorized(PERMISSIONS.createCategory),
+    isauthenticated,
+    isauthorized(PERMISSIONS.createCategory),
     uploadProjectMedia(FOLDERS.category),
     checkRequiredFields({ fields: ['cover'] }),
     val.createCategoryVal,
@@ -44,15 +44,15 @@ router
   .route('/:categoryId')
   .get(val.getCatogryVal, handler.getCategoryHandler)
   .put(
-    // isauthenticated,
-    // isauthorized(PERMISSIONS.updateCategory),
+    isauthenticated,
+    isauthorized(PERMISSIONS.updateCategory),
     uploadProjectMedia(FOLDERS.category),
     val.updateCategoryVal,
     handler.updateCategoryHandler,
   )
   .delete(
-    // isauthenticated,
-    // isauthorized(PERMISSIONS.removeCategory),
+    isauthenticated,
+    isauthorized(PERMISSIONS.removeCategory),
     val.removeCategoryVal,
     handler.removeCategoryHandler,
   );
