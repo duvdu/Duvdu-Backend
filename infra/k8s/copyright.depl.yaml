@@ -1,90 +1,3 @@
-# apiVersion: apps/v1
-# kind: Deployment
-# metadata:
-#   name: copyright-depl
-# spec:
-#   replicas: 1
-#   selector:
-#     matchLabels:
-#       app: copyright
-#   template:
-#     metadata:
-#       labels:
-#         app: copyright
-#     spec:
-#       containers:
-#         - name: copyright
-#           image: duvdu/copyright
-#           env:
-#             - name: MONGO_URI
-#               valueFrom:
-#                 secretKeyRef:
-#                   name: mongo-uri
-#                   key: MONGO_URI
-#             - name: JWT_KEY
-#               valueFrom:
-#                 secretKeyRef:
-#                   name: jwt-secret
-#                   key: JWT_KEY
-#             - name: SESSION_SECRET
-#               valueFrom:
-#                 secretKeyRef:
-#                   name: session-secret
-#                   key: sessionSecret
-#             - name: BUCKET_ACESS_KEY
-#               valueFrom:
-#                 secretKeyRef:
-#                   name: bucket-acess-key
-#                   key: BUCKET_ACESS_KEY
-#             - name: BUCKET_SECRET_KEY
-#               valueFrom:
-#                 secretKeyRef:
-#                   name: bucket-secret-key
-#                   key: BUCKET_SECRET_KEY
-#             - name: BUCKET_REGION
-#               valueFrom:
-#                 secretKeyRef:
-#                   name: bucket-region
-#                   key: BUCKET_REGION
-#             - name: BUCKET_NAME
-#               valueFrom:
-#                 secretKeyRef:
-#                   name: bucket-name
-#                   key: BUCKET_NAME
-#             - name: BUCKET_HOST
-#               valueFrom:
-#                 secretKeyRef:
-#                   name: bucket-host
-#                   key: BUCKET_HOST
-#             - name: NODE_ENV
-#               valueFrom:
-#                 secretKeyRef:
-#                   name: node-env
-#                   key: NODE_ENV
-#             - name: REDIS_HOST
-#               valueFrom:
-#                 secretKeyRef:
-#                   name: redis-host
-#                   key: REDIS_HOST
-#             - name: REDIS_PASS
-#               valueFrom:
-#                 secretKeyRef:
-#                   name: redis-pass
-#                   key: REDIS_PASS
-
-# ---
-# apiVersion: v1
-# kind: Service
-# metadata:
-#   name: copyright-srv
-# spec:
-#   selector:
-#     app: copyright
-#   ports:
-#     - name: copyright
-#       protocol: TCP 
-#       port: 3000
-#       targetPort: 3000
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -99,16 +12,6 @@ spec:
       labels:
         app: copyright
     spec:
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                  - key: app
-                    operator: In
-                    values:
-                      - copyright
-              topologyKey: "kubernetes.io/hostname"
       containers:
         - name: copyright
           image: duvdu/copyright
@@ -179,6 +82,6 @@ spec:
     app: copyright
   ports:
     - name: copyright
-      protocol: TCP
+      protocol: TCP 
       port: 3000
       targetPort: 3000
