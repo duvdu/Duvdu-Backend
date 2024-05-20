@@ -29,7 +29,6 @@ export interface IteamProject extends Document {
     }
   ];
   isDeleted:boolean;
-  showOnHome: boolean;
 }
 
 const UserSchema = new Schema<IteamProject['creatives'][0]['users'][0]>({
@@ -126,10 +125,6 @@ export const TeamProject = model<IteamProject>(MODELS.teamProject , new Schema<I
   isDeleted:{
     type:Boolean,
     default:false
-  },
-  showOnHome:{
-    type:Boolean,
-    default:true
   }
 } , {timestamps:true , collection:MODELS.teamProject , 
   toJSON: {
