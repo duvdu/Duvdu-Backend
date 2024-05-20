@@ -10,9 +10,9 @@ export const actionTeamProjectHandler:ActionTeamProjectOffer = async (req,res,ne
   if (!project) 
     return next(new NotFound('project not found'));
 
-  const creative = project.creatives.filter((creative : any)=> creative._id.toString() === req.body.category);
+  const creative = project.creatives.filter((creative : any)=> creative._id.toString() === req.body.craetiveScope);
   if (creative.length === 0) 
-    return next(new NotFound(`category not found ${req.body.category}`));
+    return next(new NotFound(`craetiveScope not found ${req.body.craetiveScope}`));
   
   const user = creative[0].users.filter(user => user.user.toString() === req.loggedUser.id);
   if (user.length === 0) 

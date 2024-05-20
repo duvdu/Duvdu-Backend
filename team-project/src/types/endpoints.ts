@@ -41,7 +41,6 @@ export interface CreateProjectHandler
       | 'shootingDays'
       | 'startDate'
       | 'creatives'
-      | 'showOnHome'
     >
   > {}
 
@@ -62,7 +61,6 @@ export interface UpdateProjectHandler
         | 'shootingDays'
         | 'startDate'
         | 'address'
-        | 'showOnHome'
       >
     >
   > {}
@@ -90,10 +88,13 @@ export interface RemoveProjectHandler
   extends RequestHandler<{ projectId: string }, successResponse<unknown> , unknown , unknown> {}
 
 export interface ActionTeamProjectOffer
-  extends RequestHandler<{ projectId: string }, successResponse<unknown>, { status: boolean , category:string } , unknown> {}
+  extends RequestHandler<{ projectId: string }, successResponse<unknown>, { status: boolean , craetiveScope:string } , unknown> {}
 
 export interface DeleteCreativeHandler
-  extends RequestHandler<{projectId:string} , successResponse<unknown> , {category:string , user:string} , unknown>{}
+  extends RequestHandler<{projectId:string} , successResponse<unknown> , {craetiveScope:string , user:string} , unknown>{}
 
 export interface UpdateCreativeHandler
-extends RequestHandler<{projectId:string} , successResponse<{data:IteamProject}> , Partial<{totalAmount?:number , workHours?:number , category?:string , user?:string}> , unknown>{}
+extends RequestHandler<{projectId:string} , successResponse<{data:IteamProject}> , Partial<{totalAmount?:number , workHours?:number , craetiveScope?:string , user?:string}> , unknown>{}
+
+export interface AddCretiveHandler
+extends RequestHandler<{projectId:string} , successResponse<unknown> ,{totalAmount?:number , workHours?:number , craetiveScope?:string , user?:string} , unknown >{}

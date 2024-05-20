@@ -14,13 +14,12 @@ export const createProjectVal = [
   body('startDate').isISO8601().toDate(),
   body('creatives').isArray(),
   body('creatives.*').isObject(),
-  body('creatives.*.jobTitle').isString().notEmpty(),
-  body('creatives.*.users').isArray({min:1}),
+  body('creatives.*.category').isMongoId(),
+  body('creatives.*.users').optional().isArray({min:1}),
   body('creatives.*.users.*').isObject(),
   body('creatives.*.users.*.user').isMongoId(),
   body('creatives.*.users.*.workHours').isInt({min:1}),
   body('creatives.*.users.*.totalAmount').isInt({min:1}),
-  body('showOnHome').isBoolean(),
   globalValidatorMiddleware
 ];
 
@@ -34,7 +33,6 @@ export const updateProjectVal = [
   body('address').optional().trim().isString().notEmpty(),
   body('shootingDays').optional().isInt({min:1}),
   body('startDate').optional().isISO8601().toDate(),
-  body('showOnHome').optional().isBoolean(),
   globalValidatorMiddleware
 ];
 
@@ -50,7 +48,7 @@ export const getProjectVal = [
 
 export const actionTeamProjectVal = [
   param('projectId').isMongoId(),
-  body('category').isMongoId(),
+  body('craetiveScope').isMongoId(),
   body('status').isBoolean(),
   globalValidatorMiddleware
 ];
@@ -58,7 +56,7 @@ export const actionTeamProjectVal = [
 export const deleteCreativeVal = [
   param('projectId').isMongoId(),
   body('user').isMongoId(),
-  body('category').isMongoId(),
+  body('craetiveScope').isMongoId(),
   globalValidatorMiddleware
 ];
 
@@ -70,7 +68,6 @@ export const getProjectsVal = [
   query('category').optional().isMongoId(),
   query('pricePerHourFrom').optional().isInt({min:1}),
   query('pricePerHourTo').optional().isInt({min:1}),
-  query('showOnHome').optional().isBoolean(),
   query('startDate').optional().isISO8601(),
   query('endDate').optional().isISO8601(),
   query('user').optional().isMongoId(),
@@ -86,8 +83,17 @@ export const projectAnalysisVal = [
 export const updateCreativeVal = [
   param('projectId').isMongoId(),
   body('user').isMongoId(),
-  body('category').isMongoId(),
+  body('craetiveScope').isMongoId(),
   body('workHours').optional().isInt({min:1}),
   body('totalAmount').optional().isInt({min:1}),
+  globalValidatorMiddleware
+];
+
+export const addCreativeVal = [
+  param('projectId').isMongoId(),
+  body('user').isMongoId(),
+  body('craetiveScope').isMongoId(),
+  body('workHours').isInt({min:1}),
+  body('totalAmount').isInt({min:1}),
   globalValidatorMiddleware
 ];

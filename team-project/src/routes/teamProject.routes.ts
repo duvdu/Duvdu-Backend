@@ -14,9 +14,10 @@ router.get('/crm' , isauthenticated , isauthorized(PERMISSIONS.getCrmTeamProject
 router.get('/analysis' , isauthenticated , isauthorized(PERMISSIONS.getTeamProjectAnalysisHandler) , val.projectAnalysisVal , globalPaginationMiddleware , handler.getProjectAnalysis);
 
 router.route('/:projectId/user')
-  .patch( val.actionTeamProjectVal , isauthenticated , handler.actionTeamProjectHandler)
-  .delete(val.deleteCreativeVal , isauthenticated , handler.deleteCreativeHandler)
-  .put(val.updateCreativeVal , isauthenticated  , handler.updateCreativeHandler);
+  .patch( isauthenticated ,val.actionTeamProjectVal ,  handler.actionTeamProjectHandler)
+  .delete( isauthenticated ,val.deleteCreativeVal , handler.deleteCreativeHandler)
+  .put(isauthenticated  ,val.updateCreativeVal ,  handler.updateCreativeHandler)
+  .post(isauthenticated , val.addCreativeVal ,handler.addCreativeHandler);
 
 router.route('/')
   .post(

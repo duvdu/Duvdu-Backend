@@ -70,8 +70,8 @@ export const getProjectsHandler:GetProjectsHandler = async(req,res)=>{
 
   const projects = await TeamProject.find({...req.pagination.filter , isDeleted:{$ne:true}})
     .populate([
-      {path:'user' , select:'isOnline profileImage username'},
-      {path:'creatives.users.user' , select:'isOnline profileImage username'}
+      {path:'user' , select:'isOnline profileImage username name'},
+      {path:'creatives.users.user' , select:'isOnline profileImage username name'}
     ]).sort({createdAt: -1}).limit(req.pagination.limit).skip(req.pagination.skip);
 
   const resultCount = await TeamProject.find({...req.pagination.filter , isDeleted:{$ne:true}}).countDocuments();
