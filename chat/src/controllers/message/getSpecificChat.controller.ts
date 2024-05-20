@@ -5,10 +5,7 @@ import { Types } from 'mongoose';
 
 import { GetSpecificChatHandler } from '../../types/endpoints/mesage.endpoints';
 
-
-
-export const getSpecificChatHandler:GetSpecificChatHandler = async (req,res)=>{
-
+export const getSpecificChatHandler: GetSpecificChatHandler = async (req, res) => {
   const userTwo = new Types.ObjectId(req.loggedUser.id);
   const userOne = new Types.ObjectId(req.params.receiver);
 
@@ -17,15 +14,15 @@ export const getSpecificChatHandler:GetSpecificChatHandler = async (req,res)=>{
       $match: {
         $or: [
           { sender: userOne, receiver: userTwo },
-          { sender: userTwo, receiver: userOne }
-        ]
-      }
+          { sender: userTwo, receiver: userOne },
+        ],
+      },
     },
     {
       $group: {
         _id: null,
-        allMessages: { $push: '$$ROOT' }
-      }
+        allMessages: { $push: '$$ROOT' },
+      },
     },
     {
       $addFields: {
@@ -37,32 +34,32 @@ export const getSpecificChatHandler:GetSpecificChatHandler = async (req,res)=>{
               cond: {
                 $and: [
                   { $eq: ['$$message.receiver', userTwo] },
-                  { $eq: ['$$message.watched', false] }
-                ]
-              }
-            }
-          }
-        }
-      }
+                  { $eq: ['$$message.watched', false] },
+                ],
+              },
+            },
+          },
+        },
+      },
     },
     {
-      $unwind: '$allMessages'
+      $unwind: '$allMessages',
     },
     {
       $lookup: {
         from: 'users',
         localField: 'allMessages.sender',
         foreignField: '_id',
-        as: 'senderDetails'
-      }
+        as: 'senderDetails',
+      },
     },
     {
       $lookup: {
         from: 'users',
         localField: 'allMessages.receiver',
         foreignField: '_id',
-        as: 'receiverDetails'
-      }
+        as: 'receiverDetails',
+      },
     },
     {
       $addFields: {
@@ -70,17 +67,17 @@ export const getSpecificChatHandler:GetSpecificChatHandler = async (req,res)=>{
           $cond: [
             { $eq: [{ $size: '$senderDetails' }, 0] },
             null,
-            { $arrayElemAt: ['$senderDetails', 0] }
-          ]
+            { $arrayElemAt: ['$senderDetails', 0] },
+          ],
         },
         'allMessages.receiver': {
           $cond: [
             { $eq: [{ $size: '$receiverDetails' }, 0] },
             null,
-            { $arrayElemAt: ['$receiverDetails', 0] }
-          ]
-        }
-      }
+            { $arrayElemAt: ['$receiverDetails', 0] },
+          ],
+        },
+      },
     },
     {
       $addFields: {
@@ -92,15 +89,15 @@ export const getSpecificChatHandler:GetSpecificChatHandler = async (req,res)=>{
               profileImage: {
                 $ifNull: [
                   { $concat: [process.env.BUCKET_HOST, '/', '$allMessages.sender.profileImage'] },
-                  null
-                ]
+                  null,
+                ],
               },
               isOnline: { $ifNull: ['$allMessages.sender.isOnline', null] },
               username: { $ifNull: ['$allMessages.sender.username', null] },
               name: { $ifNull: ['$allMessages.sender.name', null] },
-              _id: { $ifNull: ['$allMessages.sender._id', null] }
-            }
-          ]
+              _id: { $ifNull: ['$allMessages.sender._id', null] },
+            },
+          ],
         },
         'allMessages.receiver': {
           $cond: [
@@ -110,48 +107,48 @@ export const getSpecificChatHandler:GetSpecificChatHandler = async (req,res)=>{
               profileImage: {
                 $ifNull: [
                   { $concat: [process.env.BUCKET_HOST, '/', '$allMessages.receiver.profileImage'] },
-                  null
-                ]
+                  null,
+                ],
               },
               isOnline: { $ifNull: ['$allMessages.receiver.isOnline', null] },
               username: { $ifNull: ['$allMessages.receiver.username', null] },
-              name: { $ifNull: ['$allMessages.receiver.name', null] } ,
-              _id: { $ifNull: ['$allMessages.receiver._id', null] }
-            }
-          ]
-        }
-      }
+              name: { $ifNull: ['$allMessages.receiver.name', null] },
+              _id: { $ifNull: ['$allMessages.receiver._id', null] },
+            },
+          ],
+        },
+      },
     },
     {
-      $replaceRoot: { newRoot: { $mergeObjects: ['$allMessages', { unreadMessageCount: '$unreadMessageCount' }] } }
+      $replaceRoot: {
+        newRoot: { $mergeObjects: ['$allMessages', { unreadMessageCount: '$unreadMessageCount' }] },
+      },
     },
     {
-      $skip: req.pagination.skip
+      $skip: req.pagination.skip,
     },
     {
-      $limit: req.pagination.limit
+      $limit: req.pagination.limit,
     },
     {
-      $sort: { createdAt: 1 }
+      $sort: { createdAt: -1 },
     },
   ]);
-  
-  
 
   const resultCount = await Message.countDocuments({
     $or: [
       { sender: userOne, receiver: userTwo },
-      { sender: userTwo, receiver: userOne }
-    ]
+      { sender: userTwo, receiver: userOne },
+    ],
   });
 
   res.status(200).json({
-    message:'success',
+    message: 'success',
     pagination: {
       currentPage: req.pagination.page,
       resultCount,
       totalPages: Math.ceil(resultCount / req.pagination.limit),
     },
-    data:chat
+    data: chat,
   });
 };

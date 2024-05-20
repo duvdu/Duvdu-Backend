@@ -5,7 +5,6 @@ import { RequestHandler } from 'express';
 
 import { GetNotificationsCrmHandler } from '../../types/endpoints/notification.endpoint';
 
-
 export const getNotificationsPagination: RequestHandler<
   unknown,
   unknown,
@@ -37,25 +36,25 @@ export const getNotificationsPagination: RequestHandler<
   next();
 };
 
-
-export const getNotificationsCrmHandler:GetNotificationsCrmHandler = async (req,res)=>{
+export const getNotificationsCrmHandler: GetNotificationsCrmHandler = async (req, res) => {
   const notifications = await Notification.find(req.pagination.filter)
-    .limit(req.pagination.limit).skip(req.pagination.skip)
+    .sort({ createdAt: -1 })
+    .limit(req.pagination.limit)
+    .skip(req.pagination.skip)
     .populate([
-      {path:'sourceUser' , select:'name username profileImage'},
-      {path:'targetUser' , select:'name username profileImage'},
+      { path: 'sourceUser', select: 'name username profileImage' },
+      { path: 'targetUser', select: 'name username profileImage' },
     ]);
-
 
   const resultCount = await Notification.countDocuments(req.pagination.filter);
 
   res.status(200).json({
-    message:'success',
+    message: 'success',
     pagination: {
       currentPage: req.pagination.page,
       resultCount,
       totalPages: Math.ceil(resultCount / req.pagination.limit),
     },
-    data:notifications,
+    data: notifications,
   });
 };
