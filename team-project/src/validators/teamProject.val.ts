@@ -4,7 +4,6 @@ import { body, param, query } from 'express-validator';
 
 export const createProjectVal = [
   body('title').trim().isString().notEmpty(),
-  body('category').isMongoId(),
   body('budget').isInt({min:1}),
   body('desc').trim().isString().notEmpty(),
   body('location.lat').optional().isFloat({ min: -90, max: 90 }),
