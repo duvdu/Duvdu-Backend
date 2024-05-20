@@ -1,5 +1,6 @@
 import { Document, model, Schema, Types } from 'mongoose';
 
+import { Icategory } from '../types/Category';
 import { MODELS } from '../types/model-names';
 
 export interface IteamProject extends Document {
@@ -17,7 +18,7 @@ export interface IteamProject extends Document {
   status: 'pending' | 'completed';
   creatives: [
     {
-      jobTitle: string;
+      category: Types.ObjectId | Icategory;
       users: [
         {
           user: Types.ObjectId;
@@ -57,10 +58,10 @@ const UserSchema = new Schema<IteamProject['creatives'][0]['users'][0]>({
 
 
 const CreativeSchema = new Schema<IteamProject['creatives'][0]>({
-  jobTitle: {
-    type: String,
+  category: {
+    type: Schema.Types.ObjectId,
     required: true,
-    default:null
+    ref:MODELS.category
   },
   users: [UserSchema]
 });
