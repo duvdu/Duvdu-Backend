@@ -13,9 +13,9 @@ export const deleteCreativeHandler:DeleteCreativeHandler = async (req,res,next)=
   if (project.user.toString()!= req.loggedUser.id) 
     return next(new NotAllowedError('user not owner for this project'));
 
-  const creativeIndex = project.creatives.findIndex((creative: any) => creative._id.toString() === req.body.category);
+  const creativeIndex = project.creatives.findIndex((creative: any) => creative._id.toString() === req.body.craetiveScope);
   if (creativeIndex === -1) 
-    return next(new NotFound(`Category not found: ${req.body.category}`));
+    return next(new NotFound(`craetiveScope not found: ${req.body.craetiveScope}`));
 
   const userIndex = project.creatives[creativeIndex].users.findIndex((user: any) => user.user.toString() === req.body.user);
   if (userIndex === -1)

@@ -10,8 +10,8 @@ export const getProjectHandler:GetProjectHandler = async (req,res,next)=>{
     _id:req.params.projectId,
     isDeleted : {$ne:true}
   }).populate([
-    {path:'user' , select:'isOnline profileImage username'},
-    {path:'creatives.users.user' , select:'isOnline profileImage username'}
+    {path:'user' , select:'isOnline profileImage username name'},
+    {path:'creatives.users.user' , select:'isOnline profileImage username name'}
   ]);
     
   if (!project) 

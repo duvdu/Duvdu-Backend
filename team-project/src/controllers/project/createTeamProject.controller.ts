@@ -1,5 +1,5 @@
 import 'express-async-errors';
-import { BadRequestError, Bucket, Files, FOLDERS, MODELS, Project, TeamProject, Users } from '@duvdu-v1/duvdu';
+import { BadRequestError, Bucket, Categories, Files, FOLDERS, MODELS, Project, TeamProject, Users } from '@duvdu-v1/duvdu';
 
 import { CreateProjectHandler } from '../../types/endpoints';
 
@@ -8,7 +8,14 @@ export const createProjectHandler:CreateProjectHandler = async (req,res,next)=>{
   const attachments = <Express.Multer.File[]>(req.files as any).attachments;
   const cover = <Express.Multer.File[]>(req.files as any).cover;
 
-  const users = req.body.creatives.flatMap((creative:any) => creative.users.map((user:any) => user.user));
+  const categories = req.body.creatives.flatMap((creative:any) => creative.category);
+  const categoryFound = await Categories.find({_id:{$in:categories}}).countDocuments();
+
+  if (categoryFound != categories.length) 
+    return next(new BadRequestError('invalid categories'));
+
+  let users = req.body.creatives.flatMap((creative:any) => creative.users?.map((user:any) => user.user));
+  users  = users[0]== undefined?[]:users;
   
   const creativeFound = await Users.find({_id:{$in:users}}).countDocuments();
   

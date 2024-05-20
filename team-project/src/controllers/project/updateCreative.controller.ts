@@ -11,12 +11,12 @@ export const updateCreativeHandler:UpdateCreativeHandler = async (req,res,next)=
   const project = await TeamProject.findById(req.params.projectId);
   if (!project) 
     return next(new NotFound('project not found'));
-  if (project.user.toString()!= req.loggedUser.id) 
+  if (project.user.toString()!= req.loggedUser?.id) 
     return next(new NotAllowedError('user not owner for this project'));
 
-  const creativeIndex = project.creatives.findIndex((creative: any) => creative._id.toString() === req.body.category);
+  const creativeIndex = project.creatives.findIndex((creative: any) => creative._id.toString() === req.body.craetiveScope);
   if (creativeIndex === -1) 
-    return next(new NotFound(`Category not found: ${req.body.category}`));
+    return next(new NotFound(`Category not found: ${req.body.craetiveScope}`));
 
   const userIndex = project.creatives[creativeIndex].users.findIndex((user: any) => user.user.toString() === req.body.user);
   if (userIndex === -1)
@@ -29,8 +29,8 @@ export const updateCreativeHandler:UpdateCreativeHandler = async (req,res,next)=
     project.creatives[creativeIndex].users[userIndex].workHours = req.body.workHours;
   
   const populatedProject = await (await project.save()).populate([
-    {path:'user' , select:'isOnline profileImage username'},
-    {path:'creatives.users.user' , select:'isOnline profileImage username'}
+    {path:'user' , select:'isOnline profileImage username name'},
+    {path:'creatives.users.user' , select:'isOnline profileImage username name'}
   ]);
 
   res.status(200).json({message:'success' , data:populatedProject});
