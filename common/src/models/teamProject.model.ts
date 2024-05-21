@@ -7,7 +7,6 @@ export interface IteamProject extends Document {
   user:Types.ObjectId;
   cover: string;
   title: string;
-  category: Types.ObjectId;
   budget: number;
   desc: string;
   location: { lat: number; lng: number };
@@ -78,10 +77,6 @@ export const TeamProject = model<IteamProject>(MODELS.teamProject , new Schema<I
   title:{
     type:String,
     default:null
-  },
-  category:{
-    type: Schema.Types.ObjectId,
-    ref:MODELS.category
   },
   budget:{
     type:Number,

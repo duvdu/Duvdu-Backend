@@ -10,7 +10,9 @@ import * as val from '../validators/teamProject.val';
 export const router = express.Router();
 
 
-router.get('/crm' , isauthenticated , isauthorized(PERMISSIONS.getCrmTeamProjectHandler) , val.getProjectsVal , globalPaginationMiddleware , handler.getProjectsCrmHandler);
+router.get('/crm' ,
+ isauthenticated , isauthorized(PERMISSIONS.getCrmTeamProjectHandler) ,
+  val.getProjectsVal , globalPaginationMiddleware , handler.getProjectsCrmHandler);
 router.get('/analysis' , isauthenticated , isauthorized(PERMISSIONS.getTeamProjectAnalysisHandler) , val.projectAnalysisVal , globalPaginationMiddleware , handler.getProjectAnalysis);
 
 router.route('/:projectId/user')
@@ -28,7 +30,7 @@ router.route('/')
     val.createProjectVal,
     handler.createProjectHandler
   )
-  .get(val.getProjectsVal, globalPaginationMiddleware , handler.getProjectsPagination , handler.getProjectsHandler);
+  .get( isauthenticated , val.getProjectsVal, globalPaginationMiddleware , handler.getProjectsPagination , handler.getProjectsHandler);
 
 router.route('/:projectId')
   .patch(isauthenticated , isauthorized(PERMISSIONS.updateTeamProjectHandler),uploadProjectMedia(FOLDERS.team_project) , val.updateProjectVal , handler.updateProjectHandler)
