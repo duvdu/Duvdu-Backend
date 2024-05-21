@@ -11,7 +11,7 @@ export const router = express.Router();
 
 
 router.get('/crm' ,
- isauthenticated , isauthorized(PERMISSIONS.getCrmTeamProjectHandler) ,
+  isauthenticated , isauthorized(PERMISSIONS.getCrmTeamProjectHandler) ,
   val.getProjectsVal , globalPaginationMiddleware , handler.getProjectsCrmHandler);
 router.get('/analysis' , isauthenticated , isauthorized(PERMISSIONS.getTeamProjectAnalysisHandler) , val.projectAnalysisVal , globalPaginationMiddleware , handler.getProjectAnalysis);
 
