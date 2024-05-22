@@ -38,6 +38,8 @@ export const appInit = async () => {
         PERMISSIONS.createTicket,
         PERMISSIONS.createTeamProjectHandler,
         PERMISSIONS.updateTeamProjectCreativeHandler,
+        PERMISSIONS.updateTeamProjectHandler,
+        PERMISSIONS.deleteTeamProjectCreativeHandler,
         PERMISSIONS.deleteTeamProjectHandler,
         PERMISSIONS.booking,
       ]
