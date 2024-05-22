@@ -124,4 +124,13 @@ export const permissions = {
     PERMISSIONS.getStudioAnalysisHandler,
   ],
   booking: [PERMISSIONS.booking],
+  teamProject:[
+    PERMISSIONS.createTeamProjectHandler,
+    PERMISSIONS.deleteTeamProjectCreativeHandler,
+    PERMISSIONS.getTeamProjectAnalysisHandler,
+    PERMISSIONS.getCrmTeamProjectHandler,
+    PERMISSIONS.updateTeamProjectCreativeHandler,
+    PERMISSIONS.deleteTeamProjectHandler,
+    PERMISSIONS.updateTeamProjectHandler,
+  ]
 };
