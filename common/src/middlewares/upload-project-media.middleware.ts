@@ -18,7 +18,7 @@ export const uploadProjectMedia = (folder: string) =>
     }),
     limits: { fileSize: 100 * 1024 * 1024 },
     fileFilter(req, file, callback) {
-      if (file.mimetype.startsWith('image') || file.mimetype.startsWith('video') || file.mimetype === 'application/pdf')
+      if (file.mimetype.startsWith('image') || file.mimetype.startsWith('video') || file.mimetype === 'application/pdf' ||  file.mimetype === 'audio/mpeg' ||  file.mimetype === 'audio/wav')
         return callback(null, true);
       return callback(new BadRequestError('invalid file format'));
     },
