@@ -15,8 +15,8 @@ export const getProjectsCrmHandler : GetProjectsCrmHandler = async(req,res)=>{
       { path: 'creatives.category', select: `title.${req.lang}` }
     ])
     .sort({ createdAt: -1 })
-    .limit(req.pagination.limit)
     .skip(req.pagination.skip)
+    .limit(req.pagination.limit)
     .lean();
 
   const addBucketHost = (url: string) => {

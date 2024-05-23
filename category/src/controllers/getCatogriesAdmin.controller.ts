@@ -33,73 +33,12 @@ export const getCategoriesAdminPagination: RequestHandler<
 };
 
 export const getCatogriesAdminHandler: GetCatogriesAdminHandler = async (req, res) => {
-  // const category = await Categories.aggregate([
-  //   { $match: req.pagination.filter },
-  //   {
-  //     $project: {
-  //       title: {
-  //         $cond: {
-  //           if: { $eq: ['ar', req.lang] },
-  //           then: '$title.ar',
-  //           else: '$title.en',
-  //         },
-  //       },
-  //       _id: 1,
-  //       creativesCounter: 1,
-  //       cycle: 1,
-  //       subCategories: {
-  //         $map: {
-  //           input: '$subCategories',
-  //           as: 'subCat',
-  //           in: {
-  //             title: {
-  //               $cond: {
-  //                 if: { $eq: ['ar', req.lang] },
-  //                 then: '$$subCat.title.ar',
-  //                 else: '$$subCat.title.en',
-  //               },
-  //             },
-  //             tags: {
-  //               $map: {
-  //                 input: '$$subCat.tags',
-  //                 as: 'tag',
-  //                 in: {
-  //                   $cond: {
-  //                     if: { $eq: ['ar', req.lang] },
-  //                     then: '$$tag.ar',
-  //                     else: '$$tag.en',
-  //                   },
-  //                 },
-  //               },
-  //             },
-  //             _id: '$$subCat._id',
-  //           },
-  //         },
-  //       },
-  //       status: 1,
-  //       createdAt: 1,
-  //       updatedAt: 1,
-  //       __v: 1,
-  //       image: 1,
-  //       jobTitles: {
-  //         $map: {
-  //           input: '$jobTitles',
-  //           as: 'title',
-  //           in: {
-  //             $cond: {
-  //               if: { $eq: ['ar', req.lang] },
-  //               then: '$$title.ar',
-  //               else: '$$title.en',
-  //             },
-  //           },
-  //         },
-  //       },
-  //     },
-  //   },
-  // ]);
+  
 
   const category = await Categories.aggregate([
     { $match: req.pagination.filter },
+    {$skip:req.pagination.skip},
+    {$limit:req.pagination.limit},
     {
       $project: {
         title: 1,
@@ -123,5 +62,14 @@ export const getCatogriesAdminHandler: GetCatogriesAdminHandler = async (req, re
       },
     },
   ]);
-  res.status(200).json({ message: 'success', data: category });
+
+  const resultCount = await Categories.find(req.pagination.filter).countDocuments();
+  res.status(200).json({ 
+    message: 'success',
+    pagination:{
+      currentPage:req.pagination.page,
+      resultCount,
+      totalPages:Math.ceil(resultCount/req.pagination.limit)
+    },
+    data: category });
 };

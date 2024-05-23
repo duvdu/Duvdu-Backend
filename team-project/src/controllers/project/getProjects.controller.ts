@@ -67,13 +67,16 @@ export const getProjectsPagination: RequestHandler<
 };
 
 export const getProjectsHandler:GetProjectsHandler = async(req,res)=>{
+  console.log(req.pagination.limit);
+  console.log(req.pagination.page);
+  
 
   const projects = await TeamProject.find({ user:req.loggedUser?.id , ...req.pagination.filter , isDeleted:{$ne:true}})
     .populate([
       {path:'user' , select:'isOnline profileImage username name'},
       {path:'creatives.users.user' , select:'isOnline profileImage username name'},
       { path: 'creatives.category', select: `title.${req.lang}` }
-    ]).sort({createdAt: -1}).limit(req.pagination.limit).skip(req.pagination.skip).lean();
+    ]).sort({createdAt: -1}).skip(req.pagination.skip).limit(req.pagination.limit).lean();
 
   const addBucketHost = (url: string) => {
     if (url && !url.startsWith(process.env.BUCKET_HOST!)) {

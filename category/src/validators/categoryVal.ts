@@ -98,6 +98,8 @@ export const getCategoriesForCrmVal = [
   check('title').optional().isString().notEmpty(),
   check('cycle').optional().isString().notEmpty(),
   check('status').optional().isBoolean().toBoolean(),
+  check('limit').optional().isInt({min:1}),
+  check('page').optional().isInt({min:1}),
   globalValidatorMiddleware
 ];
 
@@ -105,5 +107,7 @@ export const getCategoriesVal = [
   check('search').optional().isString().notEmpty(),
   check('title').optional().isString().notEmpty(),
   check('cycle').optional().isString().notEmpty(),
+  check('limit').optional().isInt({min:1}),
+  check('page').optional().isInt({min:1}),
   globalValidatorMiddleware
 ];

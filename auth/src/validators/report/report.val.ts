@@ -17,6 +17,8 @@ export const getAllReportsVal = [
   check('closedById').optional().isMongoId(),
   check('sourceUser').optional().isMongoId(),
   check('feedback').optional().isString(),
+  check('limit').optional().isInt({min:1}),
+  check('page').optional().isInt({min:1}),
   globalValidatorMiddleware
 ];
 

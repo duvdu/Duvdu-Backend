@@ -92,5 +92,7 @@ export const getAllProjectsVal = [
   check('endDate').optional().isISO8601(),
   check('tags').optional().isString(),
   check('subCategory').optional().isString(),
+  check('limit').optional().isInt({min:1}),
+  check('page').optional().isInt({min:1}),
   globalValidatorMiddleware,
 ];

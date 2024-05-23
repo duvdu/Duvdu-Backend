@@ -27,7 +27,7 @@ export const getChatFromToHandler:GetChatFromUserToUserHandler = async (req ,res
     {path:'sender' , select:'profileImage isOnline username name'},
     {path:'receiver' , select:'profileImage isOnline username name'},
     { path: 'reactions.user', select: 'profileImage isOnline username name' }
-  ]).limit(req.pagination.limit).skip(req.pagination.skip);
+  ]).skip(req.pagination.skip).limit(req.pagination.limit);
 
   if (chat.length === 0) 
     return next(new NotFound(`no chat created between to users ${req.params.receiver} ${req.params.sender}`));

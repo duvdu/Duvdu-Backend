@@ -100,6 +100,8 @@ export const findAll = [
     .customSanitizer((val) => (val ? new Date(val) : new Date())),
   query('tags').optional().isString(),
   query('subCategory').optional().isString(),
+  query('limit').optional().isInt({min:1}),
+  query('page').optional().isInt({min:1}),
   globalValidatorMiddleware,
 ];
 

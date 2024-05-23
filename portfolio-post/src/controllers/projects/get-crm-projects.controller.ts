@@ -12,8 +12,8 @@ export const getCrmProjectsHandler: RequestHandler<
       $match: req.pagination.filter
     },
     { $sort: { createdAt: -1 } },
-    { $limit: req.pagination.limit },
     { $skip: req.pagination.skip },
+    { $limit: req.pagination.limit },
     {
       $addFields: {
         subCategory: {
