@@ -8,7 +8,7 @@ import { GetProducersHandler } from '../../types/endpoints';
 export const getProducersHandler:GetProducersHandler = async (req , res)=>{
   const producers = await Producer.find()
     .populate([{path:'user' , select:'profileImage username location rate'}])
-    .limit(req.pagination.limit).skip(req.pagination.skip).sort({ createdAt: -1 });
+    .skip(req.pagination.skip).limit(req.pagination.limit).sort({ createdAt: -1 });
 
   const resultCount = await Producer.find().countDocuments();
 

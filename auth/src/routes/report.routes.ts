@@ -10,9 +10,9 @@ export const router = express.Router();
 
 router.route('/')
   .post(isauthenticated ,uploadProjectMedia(FOLDERS.studio_booking),val.createReportVal,handler.createReportHandler)
-  .get(globalPaginationMiddleware , isauthenticated , isauthorized(PERMISSIONS.getAllReportsHandler) , handler.getReportsPagination , handler.getReportsHandler);
+  .get( isauthenticated , isauthorized(PERMISSIONS.getAllReportsHandler) , val.getAllReportsVal,globalPaginationMiddleware  , handler.getReportsPagination , handler.getReportsHandler);
 
 router.route('/:reportId')
-  .patch(isauthenticated ,isauthorized(PERMISSIONS.updateReportHandler) ,handler.updateReportHandler)
-  .get(isauthenticated , isauthorized(PERMISSIONS.getReportHandler),handler.getReportHandler)
-  .delete(isauthenticated , isauthorized(PERMISSIONS.deleteReportHandler),handler.getReportHandler);
+  .patch(isauthenticated ,isauthorized(PERMISSIONS.updateReportHandler) , val.updateReportVal ,handler.updateReportHandler)
+  .get(isauthenticated , isauthorized(PERMISSIONS.getReportHandler) , val.getReportVal,handler.getReportHandler)
+  .delete(isauthenticated , isauthorized(PERMISSIONS.deleteReportHandler) , val.updateReportVal,handler.removeReportHandler);

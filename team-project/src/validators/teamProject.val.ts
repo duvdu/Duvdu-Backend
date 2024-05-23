@@ -70,6 +70,8 @@ export const getProjectsVal = [
   query('startDate').optional().isISO8601(),
   query('endDate').optional().isISO8601(),
   query('user').optional().isMongoId(),
+  query('limit').optional().isInt({min:1}),
+  query('page').optional().isInt({min:1}),
   globalValidatorMiddleware
 ];
 

@@ -54,8 +54,9 @@ export const getReportsHandler:GetReportsHandler = async(req,res)=>{
   // Paginate and fetch reports
   const reports = await Report.find(req.pagination.filter)
     .sort('-createdAt')
+    .skip(req.pagination.skip)
     .limit(req.pagination.limit)
-    .skip(req.pagination.skip).populate({
+    .populate({
       path: 'project',
       populate: {
         path: 'project.type',

@@ -55,3 +55,9 @@ export const markMessageAsWatchedVal = [
   check('messages.*').isMongoId(),
   globalValidatorMiddleware
 ];
+
+export const gelLoggedUserVal = [
+  check('limit').optional().isInt({min:1}),
+  check('page').optional().isInt({min:1}),
+  globalValidatorMiddleware
+];

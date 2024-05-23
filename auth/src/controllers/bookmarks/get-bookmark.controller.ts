@@ -10,7 +10,7 @@ export const getBookmarkHandler: GetBookmarkHandler = async (req, res, next) => 
     .populate({
       path: 'projects',
       populate: { path: 'project.type' },
-      options: { limit: req.pagination.limit, skip: req.pagination.skip },
+      options: { skip: req.pagination.skip , limit: req.pagination.limit },
     })
     .lean();
   if (!bookmark) return next(new NotFound());

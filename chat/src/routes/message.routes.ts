@@ -14,7 +14,7 @@ router.get('/:receiver/chat/:sender',globalPaginationMiddleware,val.getChatFromT
 
 router.route('/')
   .post(uploadProjectMedia(FOLDERS.chat),val.sendNessageVal,handler.sendMessageHandler)
-  .get(globalPaginationMiddleware,handler.getLoggedUserChatsHandler);
+  .get(globalPaginationMiddleware , val.gelLoggedUserVal ,handler.getLoggedUserChatsHandler);
 
 
 router.route('/:receiver/chat')

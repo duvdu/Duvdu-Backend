@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-namespace */
-import { Icategory, IjwtPayload, Ipagination } from '@duvdu-v1/duvdu';
+import { Icategory, IjwtPayload, Ipagination, PaginationResponse } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 
@@ -55,7 +55,7 @@ export interface GetCategoryHandler
   > {}
 
 export interface GetCategoriesHandler
-  extends RequestHandler<unknown, successResponse<{ data: Icategory[] }>, unknown, unknown> {}
+  extends RequestHandler<unknown, PaginationResponse<{ data: Icategory[] }>, unknown, unknown> {}
 
 export interface GetCatogriesAdminHandler
-  extends RequestHandler<unknown, successResponse<{ data: Icategory[] }>, unknown, unknown> {}
+  extends RequestHandler<unknown, PaginationResponse<{ data: Icategory[] }>, unknown, unknown> {}

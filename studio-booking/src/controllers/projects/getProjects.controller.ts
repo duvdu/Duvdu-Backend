@@ -94,10 +94,10 @@ export const getProjectsHandler: RequestHandler<
       $sort: { createdAt: -1 }
     },
     {
-      $limit: req.pagination.limit
+      $skip: req.pagination.skip 
     },
     {
-      $skip: req.pagination.skip
+      $limit: req.pagination.limit
     },
     {
       $addFields: {

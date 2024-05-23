@@ -35,6 +35,8 @@ export const getCategoriesHandler: GetCategoriesHandler = async (req, res) => {
 
   const category = await Categories.aggregate([
     { $match: req.pagination.filter },
+    {$skip:req.pagination.skip},
+    {$limit:req.pagination.limit},
     {
       $project: {
         title: {
@@ -106,7 +108,15 @@ export const getCategoriesHandler: GetCategoriesHandler = async (req, res) => {
   ]);
   
 
-  
+  const resultCount = await Categories.find(req.pagination.filter).countDocuments();
 
-  res.status(200).json({ message: 'success', data: category });
+  res.status(200).json({ 
+    message: 'success',
+    pagination:{
+      currentPage:req.pagination.page,
+      resultCount,
+      totalPages:Math.ceil(resultCount/req.pagination.limit)
+    },
+    data: category
+  });
 };

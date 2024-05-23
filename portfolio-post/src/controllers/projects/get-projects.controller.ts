@@ -69,8 +69,8 @@ export const getProjectsHandler: RequestHandler<
       $match: { ...req.pagination.filter, isDeleted: { $ne: true } }
     },
     { $sort: { createdAt: -1 } },
-    { $limit: req.pagination.limit },
     { $skip: req.pagination.skip },
+    { $limit: req.pagination.limit },
     {
       $addFields: {
         subCategory: {

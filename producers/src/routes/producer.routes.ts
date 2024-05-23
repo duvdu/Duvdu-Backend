@@ -10,6 +10,6 @@ export const router = express.Router();
 
 router.route('/')
   .post(isauthenticated,handler.appendProducerHandler)
-  .get(globalPaginationMiddleware,handler.getProducersHandler);
+  .get(val.getProducersVal,globalPaginationMiddleware,handler.getProducersHandler);
 
-router.get('/:producerId' , val.getProducerHandler , handler.getProducerHandler);
+router.get('/:producerId' , val.getProducerVal , handler.getProducerHandler);
