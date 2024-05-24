@@ -11,7 +11,7 @@ const loadLanguageFile = (lang:string) => {
   console.log(lang);
   
   try {
-    const filePath = path.join(__dirname, `../languages/${lang}.json`);
+    const filePath = path.join(__dirname, `../../../../../src/languages/${lang}.json`);
     const data = fs.readFileSync(filePath, 'utf8');
     return JSON.parse(data);
   } catch (error) {
