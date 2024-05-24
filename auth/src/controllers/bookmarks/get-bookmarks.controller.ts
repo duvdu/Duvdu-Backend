@@ -13,13 +13,17 @@ export const getBookmarksHandler: GetBookmarksHandler = async (req, res, next) =
     .lean();
 
   if (!bookmarks) return next(new NotFound());
-
-  bookmarks.forEach((bookmark) => {
+  for (const bookmark of bookmarks) {
+    (bookmarks as any).totalProjects = (await Bookmarks.findById(bookmark._id))?.projects.length;
     bookmark.projects.forEach((el: any) => {
       el.project = el.project.type;
+      el.project.attachments = el.project.attachments.map(
+        (subEl: string) => process.env.BUCKET_HOST + '/' + subEl,
+      );
+      el.project.cover = process.env.BUCKET_HOST + '/' + el.project.cover;
       delete el.project.type;
     });
-  });
+  }
 
   bookmarks.unshift(bookmarks.pop() as any);
 
