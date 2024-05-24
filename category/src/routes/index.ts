@@ -42,7 +42,7 @@ router
 
 router
   .route('/:categoryId')
-  .get(val.getCatogryVal, handler.getCategoryHandler)
+  .get(val.getCategoryVal, handler.getCategoryHandler)
   .put(
     isauthenticated,
     isauthorized(PERMISSIONS.updateCategory),

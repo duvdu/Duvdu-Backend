@@ -15,8 +15,19 @@ export const getCategoriesPagination: RequestHandler<unknown, unknown, unknown, 
 
   
   if (req.query.search) {
-   
-    req.pagination.filter.$text = { $search: req.query.search };
+    const searchRegex = new RegExp(req.query.search, 'i');
+
+    req.pagination.filter.$or = [
+      { 'title.ar': searchRegex }, 
+      { 'title.en': searchRegex }, 
+      { 'jobTitles.ar': searchRegex }, 
+      { 'jobTitles.en': searchRegex }, 
+      { 'subCategories.title.ar': searchRegex }, 
+      { 'subCategories.title.en': searchRegex }, 
+      { 'tags.ar': searchRegex }, 
+      { 'tags.en': searchRegex }, 
+      { 'cycle': searchRegex },
+    ];
   }
   if (req.query.title) {
     
