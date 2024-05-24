@@ -7,14 +7,20 @@ export const getBookmarksHandler: GetBookmarksHandler = async (req, res, next) =
     .sort({ createdAt: -1 })
     .populate({
       path: 'projects',
-      populate: 'project.type',
+      populate: {
+        path: 'project.type',
+        populate: [
+          { path: 'user', select: 'name username profileImage isOnline' },
+          { path: 'creatives', select: 'name username profileImage isOnline' },
+        ],
+      },
       options: { limit: 3, sort: { createdAt: -1 } },
     })
     .lean();
 
   if (!bookmarks) return next(new NotFound());
   for (const bookmark of bookmarks) {
-    (bookmarks as any).totalProjects = (await Bookmarks.findById(bookmark._id))?.projects.length;
+    (bookmark as any).totalProjects = (await Bookmarks.findById(bookmark._id))?.projects.length;
     bookmark.projects.forEach((el: any) => {
       el.project = el.project.type;
       el.project.attachments = el.project.attachments.map(
