@@ -9,7 +9,13 @@ export const getBookmarkHandler: GetBookmarkHandler = async (req, res, next) => 
   const bookmark = await Bookmarks.findById(req.params.bookmarkId, { title: 1, projects: 1 })
     .populate({
       path: 'projects',
-      populate: { path: 'project.type' },
+      populate: {
+        path: 'project.type',
+        populate: [
+          { path: 'user', select: 'name username profileImage isOnline' },
+          { path: 'creatives', select: 'name username profileImage isOnline' },
+        ],
+      },
       options: { skip: req.pagination.skip, limit: req.pagination.limit, sort: { createdAt: -1 } },
     })
     .lean();
