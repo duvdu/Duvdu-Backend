@@ -1,0 +1,13 @@
+{
+    "titleArabicRequired": "Arabic title is required",
+    "titleEnglishRequired": "English title is required",
+    "invalidCycle": "Invalid cycle",
+    "titleRequired": "Title is required",
+    "titleString": "Title must be a string",
+    "cycleString": "Cycle must be a string",
+    "statusBoolean": "Status must be a boolean",
+    "categoryIdInvalid": "Invalid category ID",
+    "searchString": "Search must be a string",
+    "limitInteger": "Limit must be an integer greater than or equal to 1",
+    "pageInteger": "Page must be an integer greater than or equal to 1"
+}

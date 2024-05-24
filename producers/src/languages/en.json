@@ -1,0 +1,24 @@
+{
+  "producerIdInvalid": "Invalid value for producer ID",
+  "limitInt": "Limit must be a positive integer",
+  "pageInt": "Page must be a positive integer",
+  "detailsString": "Details must be a non-empty string",
+
+  "expectedbudgetInt": "Expected budget must be a positive integer",
+  "expectedprofitsInt": "Expected profits must be a positive integer",
+  "contractIdInvalid": "Invalid value for contract ID",
+  "statusInvalid": "Status must be one of: 'accepted', 'rejected', 'appoinment accepted', 'appoinment rejected'",
+  "searchKeywordsArray": "Search keywords must be an array",
+  "locationObject": "Location must be an object",
+  "location.latFloat": "Latitude must be a floating point number between -90 and 90",
+  "location.lngFloat": "Longitude must be a floating point number between -180 and 180",
+  "platformString": "Platform must be a string",
+  "cycleString": "Cycle must be a string",
+  "episodesInt": "Episodes must be an integer greater than or equal to 0",
+  "episodedurationInt": "Episode duration must be an integer greater than or equal to 0",
+  "statusArray": "Status must be an array",
+  "statusValuesInvalid": "Invalid status values provided",
+  "appoinmentDateISO8601": "Appointment date must be in ISO 8601 format",
+  "userInvalid": "Invalid value for user ID",
+  "producerInvalid": "Invalid value for producer ID"
+}

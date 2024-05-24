@@ -1,0 +1,25 @@
+{
+  "producerIdInvalid": "قيمة غير صالحة لمعرف الإنتاج",
+  "limitInt": "يجب أن يكون الحد قيمة صحيحة موجبة",
+  "pageInt": "يجب أن تكون الصفحة قيمة صحيحة موجبة",
+
+  "detailsString": "يجب أن تكون التفاصيل سلسلة نصية غير فارغة",
+
+  "expectedbudgetInt": "يجب أن يكون الميزانية المتوقعة عددًا صحيحًا موجبًا",
+  "expectedprofitsInt": "يجب أن تكون الأرباح المتوقعة عددًا صحيحًا موجبًا",
+  "contractIdInvalid": "قيمة غير صالحة لمعرف العقد",
+  "statusInvalid": "يجب أن يكون الحالة واحدة من: 'accepted', 'rejected', 'appoinment accepted', 'appoinment rejected'",
+  "searchKeywordsArray": "يجب أن تكون كلمات البحث مصفوفة",
+  "locationObject": "يجب أن تكون الموقع كائنًا",
+  "location.latFloat": "يجب أن تكون خطوط العرض رقمًا عشريًا بين -90 و 90",
+  "location.lngFloat": "يجب أن تكون خطوط الطول رقمًا عشريًا بين -180 و 180",
+  "platformString": "يجب أن تكون المنصة سلسلة نصية",
+  "cycleString": "يجب أن تكون الدورة سلسلة نصية",
+  "episodesInt": "يجب أن تكون الحلقات عددًا صحيحًا أكبر من أو يساوي 0",
+  "episodedurationInt": "يجب أن تكون مدة الحلقة عددًا صحيحًا أكبر من أو يساوي 0",
+  "statusArray": "يجب أن تكون الحالة مصفوفة",
+  "statusValuesInvalid": "قيم الحالة غير صالحة",
+  "appoinmentDateISO8601": "يجب أن يكون تاريخ الموعد في تنسيق ISO 8601",
+  "userInvalid": "قيمة غير صالحة لمعرف المستخدم",
+  "producerInvalid": "قيمة غير صالحة لمعرف المنتج"
+}

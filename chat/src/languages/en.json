@@ -1,0 +1,23 @@
+{
+    "contentRequired": "Content must be a string with at least 1 character",
+    "receiverInvalid": "Receiver ID must be a valid Mongo ID",
+    "messageInvalid": "Message ID must be a valid Mongo ID",
+    "reactionsArray": "Reactions must be an array with a maximum of 1 item",
+    "reactionTypeInvalid": "Reaction type must be a string",
+    "limitInvalid": "Limit must be an integer greater than or equal to 1",
+    "pageInvalid": "Page must be an integer greater than or equal to 1",
+    "toDateInvalid": "To date must be a valid ISO8601 date",
+    "fromDateInvalid": "From date must be a valid ISO8601 date",
+    "messagesArray": "Messages must be an array with at least 1 item",
+    "messageIdInvalid": "Message ID must be a valid Mongo ID",
+
+    "notificationIdInvalid": "Notification ID must be a valid Mongo ID",
+    "sourceUserInvalid": "Source User must be a valid Mongo ID",
+    "targetUserInvalid": "Target User must be a valid Mongo ID",
+    "typeInvalid": "Type must be a string",
+    "targetInvalid": "Target must be a valid Mongo ID",
+    "watchedInvalid": "Watched must be a boolean value",
+    "searchInvalid": "Search must be a string",
+    "startDateInvalid": "Start Date must be a valid ISO8601 date",
+    "endDateInvalid": "End Date must be a valid ISO8601 date"
+}

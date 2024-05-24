@@ -6,26 +6,52 @@ export const findUsers = [
   query('username')
     .optional()
     .isLength({ min: 6, max: 32 })
+    .withMessage('usernameInvalid')
     .bail()
     .custom((val) => {
       if (val.match(/^[a-z0-9_]+$/)) return true;
-      throw new Error('');
+      throw new Error('usernameFormat');
     }),
-  query('phoneNumber').optional().isMobilePhone('ar-EG'),
-  query('category').optional().isMongoId(),
-  query('priceFrom').optional().isFloat({ gt: 0 }).bail().toFloat(),
+  query('phoneNumber')
+    .optional()
+    .isMobilePhone('ar-EG')
+    .withMessage('phoneNumberInvalid'),
+  query('category')
+    .optional()
+    .isMongoId()
+    .withMessage('invalidFormat'),
+  query('priceFrom')
+    .optional()
+    .isFloat({ gt: 0 })
+    .withMessage('invalidFormat')
+    .bail()
+    .toFloat(),
   query('priceTo')
     .optional()
     .isFloat({ gt: 0 })
+    .withMessage('invalidFormat')
     .bail()
     .custom((val, { req }) => {
-      if (val <= req.querys?.priceFrom) throw new Error('');
+      if (val <= req.query?.priceFrom) throw new Error('invalidFormat');
       return true;
     })
     .bail()
     .toFloat(),
-  query('hasVerificationPadge').optional().isBoolean().bail().toBoolean(),
-  query('limit').optional().isInt().toInt(),
-  query('page').optional().isInt().toInt(),
+  query('hasVerificationPadge')
+    .optional()
+    .isBoolean()
+    .withMessage('invalidFormat')
+    .bail()
+    .toBoolean(),
+  query('limit')
+    .optional()
+    .isInt()
+    .withMessage('invalidFormat')
+    .toInt(),
+  query('page')
+    .optional()
+    .isInt()
+    .withMessage('invalidFormat')
+    .toInt(),
   globalValidatorMiddleware,
 ];

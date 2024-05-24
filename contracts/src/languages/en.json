@@ -1,0 +1,10 @@
+{
+    "invalidFilter": "Filter must be a string",
+    "invalidFilterValue": "Invalid filter value",
+    "invalidContractId": "Invalid contract ID",
+    "invalidAction": "Action must be a string",
+    "invalidActionValue": "Invalid action value",
+    "invalidSubmitFiles": "Submit files must be an object",
+    "invalidSubmitFilesLink": "Submit files link must be a string",
+    "invalidSubmitFilesNotes": "Submit files notes must be a string"
+}
