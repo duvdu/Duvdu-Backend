@@ -1,63 +1,113 @@
 import { globalValidatorMiddleware } from '@duvdu-v1/duvdu';
 import { check } from 'express-validator';
 
-
 export const sendNessageVal = [
-  check('content').optional().isString().isLength({min:1}),
-  check('receiver').isMongoId(),
+  check('content')
+    .optional()
+    .isString()
+    .isLength({ min: 1 })
+    .withMessage('contentRequired'),
+  check('receiver')
+    .isMongoId()
+    .withMessage('receiverInvalid'),
   globalValidatorMiddleware
 ];
-
 
 export const updateMessageVal = [
-  check('message').isMongoId(),
-  check('content').optional().isString().isLength({min:1}),
-  check('reactions').optional().isArray({min:1 , max:1}),
-  check('reactions.*.type').isString(),
+  check('message')
+    .isMongoId()
+    .withMessage('messageInvalid'),
+  check('content')
+    .optional()
+    .isString()
+    .isLength({ min: 1 })
+    .withMessage('contentRequired'),
+  check('reactions')
+    .optional()
+    .isArray({ min: 1, max: 1 })
+    .withMessage('reactionsArray'),
+  check('reactions.*.type')
+    .isString()
+    .withMessage('reactionTypeInvalid'),
   globalValidatorMiddleware
 ];
-
 
 export const deleteMessageVal = [
-  check('message').isMongoId(),
+  check('message')
+    .isMongoId()
+    .withMessage('messageIdInvalid'),
   globalValidatorMiddleware
 ];
-
 
 export const deleteChatVal = [
-  check('receiver').isMongoId(),
+  check('receiver')
+    .isMongoId()
+    .withMessage('receiverInvalid'),
   globalValidatorMiddleware
 ];
-
 
 export const getSpecificChatVal = [
-  check('receiver').isMongoId(),
-  check('limit').optional().isInt({min:1}),
-  check('page').optional().isInt({min:1}),
+  check('receiver')
+    .isMongoId()
+    .withMessage('receiverInvalid'),
+  check('limit')
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage('limitInvalid'),
+  check('page')
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage('pageInvalid'),
   globalValidatorMiddleware
 ];
-
 
 export const getChatFromToVal = [
-  check('sender').isMongoId(),
-  check('receiver').isMongoId(),
-  check('limit').optional().isInt({min:1}),
-  check('page').optional().isInt({min:1}),
-  check('toDate').optional().isISO8601(),
-  check('fromDate').optional().isISO8601(),
+  check('sender')
+    .isMongoId()
+    .withMessage('receiverInvalid'),
+  check('receiver')
+    .isMongoId()
+    .withMessage('receiverInvalid'),
+  check('limit')
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage('limitInvalid'),
+  check('page')
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage('pageInvalid'),
+  check('toDate')
+    .optional()
+    .isISO8601()
+    .withMessage('toDateInvalid'),
+  check('fromDate')
+    .optional()
+    .isISO8601()
+    .withMessage('fromDateInvalid'),
   globalValidatorMiddleware
 ];
 
-
 export const markMessageAsWatchedVal = [
-  check('receiver').isMongoId(),
-  check('messages').isArray({min:1}),
-  check('messages.*').isMongoId(),
+  check('receiver')
+    .isMongoId()
+    .withMessage('receiverInvalid'),
+  check('messages')
+    .isArray({ min: 1 })
+    .withMessage('messagesArray'),
+  check('messages.*')
+    .isMongoId()
+    .withMessage('messageIdInvalid'),
   globalValidatorMiddleware
 ];
 
 export const gelLoggedUserVal = [
-  check('limit').optional().isInt({min:1}),
-  check('page').optional().isInt({min:1}),
+  check('limit')
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage('limitInvalid'),
+  check('page')
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage('pageInvalid'),
   globalValidatorMiddleware
 ];

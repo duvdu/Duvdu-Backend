@@ -1,0 +1,10 @@
+{
+  "invalidFilter": "يجب أن يكون المرشح سلسلة نصية",
+  "invalidFilterValue": "قيمة مرشح غير صالحة",
+  "invalidContractId": "معرف العقد غير صالح",
+  "invalidAction": "يجب أن تكون الإجراء سلسلة نصية",
+  "invalidActionValue": "قيمة إجراء غير صالحة",
+  "invalidSubmitFiles": "يجب أن تكون ملفات التقديم كائنًا",
+  "invalidSubmitFilesLink": "يجب أن يكون رابط ملفات التقديم سلسلة نصية",
+  "invalidSubmitFilesNotes": "يجب أن تكون ملاحظات ملفات التقديم سلسلة نصية"
+}

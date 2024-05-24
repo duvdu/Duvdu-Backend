@@ -23,11 +23,11 @@ router.route('/:projectId/user')
 
 router.route('/')
   .post(
-    isauthenticated,
-    isauthorized(PERMISSIONS.createTeamProjectHandler),
+    // isauthenticated,
+    // isauthorized(PERMISSIONS.createTeamProjectHandler),
     uploadProjectMedia(FOLDERS.team_project),
-    checkRequiredFields({ fields: ['cover', 'attachments'] }),
     val.createProjectVal,
+    checkRequiredFields({ fields: ['cover', 'attachments'] }),
     handler.createProjectHandler
   )
   .get( isauthenticated , val.getProjectsVal, globalPaginationMiddleware , handler.getProjectsPagination , handler.getProjectsHandler);

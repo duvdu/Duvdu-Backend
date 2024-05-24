@@ -11,7 +11,7 @@ router
   .post(
     isauthenticated,
     isauthorized(PERMISSIONS.createTerm),
-    val.craeteTermVal,
+    val.createTermVal,
     handler.createTermHandler,
   )
   .get(handler.getTermHandler);

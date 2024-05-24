@@ -1,5 +1,5 @@
 import 'express-async-errors';
-import { globalErrorHandlingMiddleware, sessionStore } from '@duvdu-v1/duvdu';
+import { globalErrorHandlingMiddleware, languageHeaderMiddleware, sessionStore } from '@duvdu-v1/duvdu';
 import cors from 'cors';
 import express, { RequestHandler } from 'express';
 import session from 'express-session';
@@ -42,6 +42,7 @@ const initializeSessionStore = async () => {
 (async () => {
   try {
     await initializeSessionStore();
+    app.use(languageHeaderMiddleware);
     moutnRoutes(app);
     app.use(globalErrorHandlingMiddleware);
   } catch (error) {

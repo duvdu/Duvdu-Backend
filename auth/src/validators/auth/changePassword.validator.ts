@@ -5,6 +5,7 @@ export const changePasswordVal = [
   body('oldPassword').notEmpty(),
   body('newPassword')
     .exists()
-    .isStrongPassword({ minLength: 8, minLowercase: 1, minUppercase: 1, minNumbers: 1 }),
+    .isStrongPassword({ minLength: 8, minLowercase: 1, minUppercase: 1, minNumbers: 1 })
+    .withMessage('passwordInvalid'),
   globalValidatorMiddleware,
 ];
