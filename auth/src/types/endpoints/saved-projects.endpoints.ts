@@ -28,7 +28,7 @@ export interface GetBookmarksHandler
 export interface UpdateBookmarkHandler
   extends RequestHandler<
     { bookmarkId: string },
-    successResponse<unknown>,
+    successResponse<{ data: { title: string } }>,
     { title: string },
     unknown
   > {}
