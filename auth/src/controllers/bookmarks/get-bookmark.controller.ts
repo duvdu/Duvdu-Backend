@@ -15,7 +15,6 @@ export const getBookmarkHandler: GetBookmarkHandler = async (req, res, next) => 
           { path: 'user', select: 'name username profileImage isOnline' },
           { path: 'creatives.creative', select: 'name username profileImage isOnline' },
           { path: 'category', select: 'cycle title image' },
-          { path: 'creatives', select: 'name username profileImage isOnline' },
         ],
       },
       options: { skip: req.pagination.skip, limit: req.pagination.limit, sort: { createdAt: -1 } },
