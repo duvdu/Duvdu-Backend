@@ -9,7 +9,7 @@ const bookmarksSchema = new Schema<Ibookmark>(
     title: String,
     projects: [{ type: Schema.Types.ObjectId, ref: MODELS.projects }],
   },
-  { collection: MODELS.bookmark },
+  { collection: MODELS.bookmark, timestamps: true },
 );
 
 bookmarksSchema.index({ user: 1, title: 1 }, { unique: true });
