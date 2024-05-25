@@ -13,6 +13,7 @@ export const getBookmarksHandler: GetBookmarksHandler = async (req, res, next) =
           { path: 'user', select: 'name username profileImage isOnline' },
           { path: 'creatives.creative', select: 'name username profileImage isOnline' },
           { path: 'category', select: 'cycle title image' },
+          { path: 'creatives', select: 'name username profileImage isOnline' },
         ],
       },
       options: { limit: 3, sort: { createdAt: -1 } },
