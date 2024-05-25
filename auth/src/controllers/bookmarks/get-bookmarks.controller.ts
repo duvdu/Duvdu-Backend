@@ -3,7 +3,7 @@ import { Bookmarks, NotFound } from '@duvdu-v1/duvdu';
 import { GetBookmarksHandler } from '../../types/endpoints/saved-projects.endpoints';
 
 export const getBookmarksHandler: GetBookmarksHandler = async (req, res, next) => {
-  const bookmarks = await Bookmarks.find({ user: req.loggedUser.id }, { user: 1, title: 1 })
+  const bookmarks = await Bookmarks.find({ user: req.loggedUser.id })
     .sort({ createdAt: -1 })
     .populate({
       path: 'projects',
