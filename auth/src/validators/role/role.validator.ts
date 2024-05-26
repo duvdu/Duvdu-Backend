@@ -14,6 +14,7 @@ export const create = [
 ];
 
 export const update = [
+  param('roleId').isMongoId(),
   body('permissions').exists().isArray({ min: 1 }).withMessage('featuresArrayLength'),
   body('permissions.*').custom((val) => {
     if (Object.values(PERMISSIONS).includes(val)) return true;
