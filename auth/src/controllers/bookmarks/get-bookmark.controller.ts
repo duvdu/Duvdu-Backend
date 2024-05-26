@@ -13,7 +13,11 @@ export const getBookmarkHandler: GetBookmarkHandler = async (req, res, next) => 
         path: 'project.type',
         populate: [
           { path: 'user', select: 'name username profileImage isOnline' },
-          { path: 'creatives.creative', select: 'name username profileImage isOnline' },
+          {
+            path: 'creatives.creative',
+            select: 'name username profileImage isOnline',
+            options: { strictPopulate: false },
+          },
           { path: 'category', select: 'cycle title image' },
         ],
       },
@@ -23,8 +27,9 @@ export const getBookmarkHandler: GetBookmarkHandler = async (req, res, next) => 
   if (!bookmark) return next(new NotFound());
 
   bookmark.projects.forEach((el: any) => {
+    if (!el.project?.type) return;
     el.project = el.project.type;
-    el.project.attachments = el.project.attachments.map(
+    el.project.attachments = el.project.attachments?.map(
       (subEl: string) => process.env.BUCKET_HOST + '/' + subEl,
     );
     el.project.cover = process.env.BUCKET_HOST + '/' + el.project.cover;
