@@ -20,11 +20,8 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 
-(async () => {
-  console.log(env.redis.uri, env.redis.pass);
-  
+(async () => {  
   const store = await sessionStore(env.redis.uri, env.redis.pass);
-  console.log(store);
   
   app.use(
     session({
