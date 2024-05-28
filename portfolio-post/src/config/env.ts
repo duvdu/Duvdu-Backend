@@ -26,6 +26,11 @@ export const env = {
       host: process.env.BUCKET_HOST as string,
     },
   },
+  nats:{
+    clusterId:process.env.NATS_CLUSTER_ID,
+    clientId:process.env.NATS_CLIENT_ID,
+    url:process.env.NATS_URL
+  }
 };
 
 export const checkEnvVariables = () => {

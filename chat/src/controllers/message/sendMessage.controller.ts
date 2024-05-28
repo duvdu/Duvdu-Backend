@@ -1,8 +1,7 @@
 import 'express-async-errors';
-import { Bucket, Files, FOLDERS, Message, NotFound, Notification, Users } from '@duvdu-v1/duvdu';
+import { Bucket, Files, FOLDERS, Message, NotFound, Notification, NotificationType, Users } from '@duvdu-v1/duvdu';
 
 import { SendMessageHandler } from '../../types/endpoints/mesage.endpoints';
-import { NotificationType } from '../../types/notification.type';
 import { NotificationDetails } from '../../types/notificationDetails';
 import { Channels } from '../../types/socketChannels';
 import { sendNotificationOrFCM } from '../../utils/sendNotificationOrFcm';
