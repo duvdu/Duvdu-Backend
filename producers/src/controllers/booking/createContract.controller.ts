@@ -13,9 +13,9 @@ export const createContarctHandler:CreateContractHandler = async (req , res , ne
   const user = await Producer.findOne({user:req.body.producer});
   if (!user) 
     return next(new NotFound(`this user ${req.body.producer} not producer`));
-  console.log(user._id.toString() == req.loggedUser.id);
+  console.log(req.body.producer?.toString() == req.loggedUser.id);
   
-  if (user._id.toString() == req.loggedUser.id) 
+  if (req.body.producer?.toString() == req.loggedUser.id) 
     return next(new NotAllowedError());
 
   const booking = await ProducerBooking.create({
