@@ -1,6 +1,4 @@
-export * from './events/base-listener';
-export * from './events/base-publisher';
-export * from './events/subject';
+
 
 export * from './errors/bad-request-error';
 export * from './errors/data-base-connections';
@@ -51,6 +49,7 @@ export * from './types/pagination-response';
 export * from './types/portfolio-post-order';
 export * from './types/cycles';
 export * from './types/booking-states';
+export * from './types/socket-channel';
 
 export * from './models/Bookmark.model';
 export * from './models/Plan.model';
@@ -71,3 +70,12 @@ export * from './models/contracts.model';
 export * from './models/producer.model';
 
 export * from './services/category.service';
+export * from './types/notification.type';
+
+// events
+
+export * from './events/new-notification.event';
+export * from './events/nats-wrapper';
+export * from './events/base-listener';
+export * from './events/base-publisher';
+export * from './events/subject';
