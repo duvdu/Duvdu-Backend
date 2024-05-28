@@ -9,13 +9,13 @@ import { CreateContractHandler } from '../../types/endpoints';
 export const createContarctHandler:CreateContractHandler = async (req , res , next)=>{
   
   const attachments = req.files as Express.Multer.File[];
-  console.log(attachments);
 
   const user = await Producer.findOne({user:req.body.producer});
   if (!user) 
     return next(new NotFound(`this user ${req.body.producer} not producer`));
-
-  if (user._id.toString() === req.loggedUser.id) 
+  console.log(user._id.toString() == req.loggedUser.id);
+  
+  if (user._id.toString() == req.loggedUser.id) 
     return next(new NotAllowedError());
 
   const booking = await ProducerBooking.create({
