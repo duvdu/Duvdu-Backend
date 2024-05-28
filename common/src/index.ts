@@ -70,7 +70,7 @@ export * from './models/contracts.model';
 export * from './models/producer.model';
 
 export * from './services/category.service';
-
+export * from './types/notification.type';
 
 // events
 
