@@ -35,7 +35,7 @@ export const getRoleHandler: GetRoleHandler = async (req, res, next) => {
 export const updateRoleHandler: UpdateRoleHandler = async (req, res, next) => {
   const role = await Roles.findOneAndUpdate(
     { _id: req.params.roleId, key: { $ne: 'admin' } },
-    { features: req.body.features },
+    req.body,
   );
   if (!role) return next(new NotFound('role not found'));
   res.status(200).json({ message: 'success' });

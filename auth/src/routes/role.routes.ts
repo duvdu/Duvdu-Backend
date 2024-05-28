@@ -22,7 +22,6 @@ router
   .get(isauthorized(PERMISSIONS.getRoleHandler), val.roleId, controllers.getRoleHandler)
   .put(
     isauthorized(PERMISSIONS.updateRoleHandler),
-    val.roleId,
     val.update,
     controllers.updateRoleHandler,
   )
