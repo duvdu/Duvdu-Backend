@@ -21,8 +21,11 @@ app.use(cors(corsOptions));
 
 
 (async () => {
+  console.log(env.redis.uri, env.redis.pass);
+  
   const store = await sessionStore(env.redis.uri, env.redis.pass);
-
+  console.log(store);
+  
   app.use(
     session({
       secret: env.expressSession.secret,
@@ -42,7 +45,4 @@ app.use(cors(corsOptions));
   
   app.use(globalErrorHandlingMiddleware);
 })();
-
-
-
 
