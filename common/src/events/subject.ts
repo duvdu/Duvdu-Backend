@@ -1,3 +1,3 @@
 export enum Subject {
-  orderCreated = 'order:created',
+  newNotification = 'new:notification'
 }

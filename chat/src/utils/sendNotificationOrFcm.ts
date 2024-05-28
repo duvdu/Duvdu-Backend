@@ -33,6 +33,7 @@ export async function sendFCMNotification(
   }
 }
 
+
 export async function sendNotificationOrFCM(
   io: SocketIO.Server,
   socketChannel: string,
@@ -51,6 +52,8 @@ export async function sendNotificationOrFCM(
     });
   } 
   const user = await Users.findById(targetUserId);
+  console.log('iam here');
+  
   if (!user) throw new NotFound(`Target user not found ${targetUserId}`);
   if (user.notificationToken)
     await sendFCMNotification(
