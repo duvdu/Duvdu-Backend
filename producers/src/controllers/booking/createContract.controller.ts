@@ -1,6 +1,6 @@
 import 'express-async-errors';
 
-import { Bucket, Files, FOLDERS, NotFound, Producer, ProducerBooking } from '@duvdu-v1/duvdu';
+import { Bucket, Files, FOLDERS, NotAllowedError, NotFound, Producer, ProducerBooking } from '@duvdu-v1/duvdu';
 
 import { CreateContractHandler } from '../../types/endpoints';
 
@@ -14,6 +14,9 @@ export const createContarctHandler:CreateContractHandler = async (req , res , ne
   const user = await Producer.findOne({user:req.body.producer});
   if (!user) 
     return next(new NotFound(`this user ${req.body.producer} not producer`));
+
+  if (user._id.toString() === req.loggedUser.id) 
+    return next(new NotAllowedError());
 
   const booking = await ProducerBooking.create({
     ...req.body,
