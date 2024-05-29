@@ -2,7 +2,7 @@ import { Subject } from './subject';
 import { Inotification } from '../models/notification.model';
 
 
-export interface TicketCreatedEvent{
+export interface NewNotificationEvent{
     subject: Subject.newNotification;
     data: {
         targetUser:string,
