@@ -75,7 +75,7 @@ export * from './types/notification.type';
 // events
 
 export * from './events/new-notification.event';
-export * from './events/nats-wrapper';
+export * from '../../auth/src/nats-wrapper';
 export * from './events/base-listener';
 export * from './events/base-publisher';
 export * from './events/subject';

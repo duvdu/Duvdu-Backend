@@ -1,7 +1,8 @@
-import { dbConnection, natsWrapper } from '@duvdu-v1/duvdu';
+import { dbConnection } from '@duvdu-v1/duvdu';
 
 import { app } from './app';
 import { env, checkEnvVariables } from './config/env';
+import { natsWrapper } from './nats-wrapper';
 
 const start = async () => {
   checkEnvVariables();

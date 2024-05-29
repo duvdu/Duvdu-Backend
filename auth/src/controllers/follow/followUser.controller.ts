@@ -1,8 +1,11 @@
 import 'express-async-errors';
 
-import { BadRequestError, Follow, NotFound, Users } from '@duvdu-v1/duvdu';
+import { BadRequestError, Channels, Follow, NotFound, Notification, NotificationType, Users  } from '@duvdu-v1/duvdu';
 
+import { NewNotificationPublisher } from '../../event/publisher/newNotification.publisher';
+import { natsWrapper } from '../../nats-wrapper';
 import { FollowHandler } from '../../types/endpoints/follow.endpoints';
+import { NotificationDetails } from '../../types/notification_details';
 
 
 
@@ -28,6 +31,26 @@ export const followHandler:FollowHandler = async (req,res,next)=>{
     await sourceUser.save();
     await user.save();
   }
+
+  const notification = await Notification.create({
+    sourceUser:req.loggedUser.id,
+    targetUser:req.params.userId,
+    type:NotificationType.new_follower,
+    target:newFollow._id,
+    message:NotificationDetails.newFollow.message,
+    title:NotificationDetails.newFollow.title
+  });
+
+  const populatedNotification = await (
+    await notification.save()
+  ).populate('sourceUser', 'isOnline profileImage username');
+
+  await new NewNotificationPublisher(natsWrapper.client).publish({
+    notificationDetails:{message:notification.message , title:notification.title},
+    populatedNotification,
+    socketChannel:Channels.new_follower,
+    targetUser:notification.targetUser.toString()
+  });
 
   res.status(200).json({message:'success'});
 };
