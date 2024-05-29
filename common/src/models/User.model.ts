@@ -39,6 +39,10 @@ const userSchema = new Schema<Iuser>(
       type: String,
       default: null,
     },
+    followCount:{
+      followers:{type:Number , default:0},
+      following:{type:Number , default:0},
+    }
   },
   {
     timestamps: true,

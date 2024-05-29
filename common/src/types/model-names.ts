@@ -20,5 +20,6 @@ export enum MODELS {
   teamProjectBooking = 'teamProjects-booking',
   contracts = 'contracts',
   producer = 'producers',
-  producerBooking = 'producer-booking'
+  producerBooking = 'producer-booking',
+  follow = 'follow'
 }

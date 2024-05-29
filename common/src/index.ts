@@ -33,7 +33,6 @@ export * from './types/model-names';
 export * from './types/systemRoles';
 export * from './types/Bookmarks';
 export * from './types/Category';
-export * from './types/Follow';
 export * from './types/Pagination';
 export * from './types/Plan';
 export * from './types/Projects';
@@ -68,6 +67,7 @@ export * from './models/notification.model';
 export * from './models/teamProject.model';
 export * from './models/contracts.model';
 export * from './models/producer.model';
+export * from './models/follow.model';
 
 export * from './services/category.service';
 export * from './types/notification.type';

@@ -1,4 +1,4 @@
-import { Iuser } from '@duvdu-v1/duvdu';
+import { Ifollow, PaginationResponse } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 
@@ -7,19 +7,19 @@ type successResponse<T> = T & {
 };
 // TODO: while follow fire event to socket to send notification
 export interface FollowHandler
-  extends RequestHandler<{ targetUserId: string }, successResponse<unknown>> {}
+  extends RequestHandler<{ userId: string }, successResponse<unknown>> {}
 
 export interface UnFollowHandler
-  extends RequestHandler<{ targetUserId: string }, successResponse<unknown>> {}
+  extends RequestHandler<{ userId: string }, successResponse<unknown>> {}
 
 export interface GetFollowersHandler
   extends RequestHandler<
     unknown,
-    successResponse<{ data: Pick<Iuser, 'id' | 'name' | 'profileImage'> }[]>
+    PaginationResponse<{ data:Ifollow[]}>
   > {}
 
 export interface GetFollowingHandler
   extends RequestHandler<
     unknown,
-    successResponse<{ data: Pick<Iuser, 'id' | 'name' | 'profileImage'> }[]>
+    PaginationResponse<{ data: Ifollow[] }>
   > {}
