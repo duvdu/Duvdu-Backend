@@ -27,6 +27,11 @@ export const env = {
     secret: process.env.SESSION_SECRET as string,
     allowUseStorage: (process.env.ALLOW_USE_SESSION_STORAGE === 'true') as boolean,
   },
+  nats:{
+    clusterId:process.env.NATS_CLUSTER_ID,
+    clientId:process.env.NATS_CLIENT_ID,
+    url:process.env.NATS_URL
+  }
 };
 
 export const checkEnvVariables = () => {

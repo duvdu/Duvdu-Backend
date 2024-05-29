@@ -1,9 +1,13 @@
-import { dbConnection , natsWrapper } from '@duvdu-v1/duvdu';
-
+import { dbConnection  } from '@duvdu-v1/duvdu';
+import { Server } from 'socket.io';
 
 import { app } from './app';
 import { env, checkEnvVariables } from './config/env';
+import { NewNotificationListener } from './event/listiner/newNotification.listiner';
+import { natsWrapper } from './nats-wrapper';
 import { SocketServer } from './utils/socketImplementaion';
+
+let io: Server | undefined;
 const start = async () => {
   checkEnvVariables();
   
@@ -26,7 +30,7 @@ const start = async () => {
     natsWrapper.client.close();
   });
 
-
+  new NewNotificationListener(natsWrapper.client).listen();
 
   await dbConnection(env.mongoDb.uri);
   const server = app.listen(3000, () => {
@@ -34,9 +38,16 @@ const start = async () => {
   });
   
   const socketServer = new SocketServer(server);
-
+  io = socketServer.io;
   // Set the socket.io instance in the app
   app.set('socketio', socketServer.io);
 };
+
+export function getSocketIOInstance(): Server {
+  if (!io) {
+    throw new Error('Socket.IO instance has not been initialized');
+  }
+  return io;
+}
 
 start();
