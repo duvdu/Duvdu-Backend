@@ -1,5 +1,6 @@
-import { Iuser, PaginationResponse, Users } from '@duvdu-v1/duvdu';
+import { Iuser, MODELS, PaginationResponse, Users } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
+import mongoose from 'mongoose';
 
 export const filterUsers: RequestHandler<
   unknown,
@@ -35,19 +36,74 @@ export const findUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser
 ) => {
   console.log(req.pagination.filter);
   const count = await Users.countDocuments(req.pagination.filter);
-  const users = await Users.find(req.pagination.filter, {
-    name: 1,
-    username: 1,
-    profileImage: 1,
-    about: 1,
-    isOnline: 1,
-    isAvaliableToInstantProjects: 1,
-    pricePerHour: 1,
-    hasVerificationBadge: 1,
-    rate: 1,
-  })
-    .skip(req.pagination.skip)
-    .limit(req.pagination.limit);
+  // const users = await Users.find(req.pagination.filter, {
+  //   name: 1,
+  //   username: 1,
+  //   profileImage: 1,
+  //   about: 1,
+  //   isOnline: 1,
+  //   isAvaliableToInstantProjects: 1,
+  //   pricePerHour: 1,
+  //   hasVerificationBadge: 1,
+  //   rate: 1,
+  // })
+  //   .skip(req.pagination.skip)
+  //   .limit(req.pagination.limit);
+
+  const aggregationPipeline = [
+    {
+      $match: req.pagination.filter
+    },
+    {
+      $project: {
+        _id:1,
+        name: 1,
+        username: 1,
+        profileImage: { $concat: [process.env.BUCKET_HOST ,'/', '$profileImage'] }, // Prepend BUCKET_HOST to profileImage
+        about: 1,
+        isOnline: 1,
+        isAvaliableToInstantProjects: 1,
+        pricePerHour: 1,
+        hasVerificationBadge: 1,
+        rate: 1
+      }
+    },
+    {
+      $lookup: {
+        from: MODELS.follow,
+        let: { userId: '$_id' },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ['$following', '$$userId'] },
+                  { $eq: ['$follower', new mongoose.Types.ObjectId(req.loggedUser?.id)] } // Use optional chaining to avoid error if req.loggedUser is undefined
+                ]
+              }
+            }
+          }
+        ],
+        as: 'isFollow'
+      }
+    },
+    {
+      $addFields: {
+        isFollow: { $cond: { if: { $gt: [{ $size: '$isFollow' }, 0] }, then: true, else: false } }
+      }
+    },
+    {
+      $skip: req.pagination.skip
+    },
+    {
+      $limit: req.pagination.limit
+    }
+  ];
+  
+  const users = await Users.aggregate(aggregationPipeline);
+  
+  
+  
 
   res.status(200).json({
     message: 'success',

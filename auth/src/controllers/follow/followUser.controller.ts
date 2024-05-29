@@ -16,10 +16,16 @@ export const followHandler:FollowHandler = async (req,res,next)=>{
   if (!user) 
     return next(new NotFound('user not found'));
 
+  const sourceUser = await Users.findById(req.loggedUser.id);
+  if (!sourceUser) 
+    return next(new NotFound('user not found'));
+
   const newFollow = await Follow.create({follower:req.loggedUser.id , following:req.params.userId});
   
   if (newFollow) {
     user.followCount.followers++;
+    sourceUser.followCount.following++;
+    await sourceUser.save();
     await user.save();
   }
 
