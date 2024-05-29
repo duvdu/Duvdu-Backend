@@ -3,6 +3,7 @@ import {
   globalPaginationMiddleware,
   isauthenticated,
   isauthorized,
+  optionalAuthenticated,
   PERMISSIONS,
   uploadProjectMedia,
 } from '@duvdu-v1/duvdu';
@@ -15,7 +16,7 @@ import * as val from '../validators/auth';
 const router = Router();
 router
   .route('/find')
-  .get(val.findUsers, globalPaginationMiddleware, handlers.filterUsers, handlers.findUsers);
+  .get(val.findUsers , optionalAuthenticated, globalPaginationMiddleware, handlers.filterUsers, handlers.findUsers);
 router.post('/signin', val.signinVal, handlers.signinHandler);
 router.post('/signup', val.signupVal, handlers.signupHandler);
 router.post(
