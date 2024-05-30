@@ -1,5 +1,5 @@
 import 'express-async-errors';
-import { IstudioBooking, MODELS, PaginationResponse, studioBooking } from '@duvdu-v1/duvdu';
+import { IstudioBooking, MODELS, PaginationResponse, studioBooking, Users } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 export const getProjectsPagination: RequestHandler<
@@ -17,8 +17,8 @@ export const getProjectsPagination: RequestHandler<
     showOnHome?: boolean;
     startDate?: Date;
     endDate?: Date;
-    tags?:string;
-    subCategory?:string;
+    tags?: string;
+    subCategory?: string;
   }
 > = (req, res, next) => {
   req.pagination.filter = {};
@@ -82,22 +82,22 @@ export const getProjectsHandler: RequestHandler<
     ...req.pagination.filter,
     isDeleted: { $ne: true },
   });
-  
+
   const studioBookings = await studioBooking.aggregate([
     {
       $match: {
         ...req.pagination.filter,
         isDeleted: { $ne: true },
-      }
+      },
     },
     {
-      $sort: { createdAt: -1 }
+      $sort: { createdAt: -1 },
     },
     {
-      $skip: req.pagination.skip 
+      $skip: req.pagination.skip,
     },
     {
-      $limit: req.pagination.limit
+      $limit: req.pagination.limit,
     },
     {
       $addFields: {
@@ -105,8 +105,8 @@ export const getProjectsHandler: RequestHandler<
           $cond: {
             if: { $eq: ['ar', req.lang] },
             then: '$subCategory.ar',
-            else: '$subCategory.en'
-          }
+            else: '$subCategory.en',
+          },
         },
         tags: {
           $map: {
@@ -116,28 +116,28 @@ export const getProjectsHandler: RequestHandler<
               $cond: {
                 if: { $eq: ['ar', req.lang] },
                 then: '$$tag.ar',
-                else: '$$tag.en'
-              }
-            }
-          }
+                else: '$$tag.en',
+              },
+            },
+          },
         },
         cover: { $concat: [process.env.BUCKET_HOST + '/', '$cover'] },
         attachments: {
           $map: {
             input: '$attachments',
             as: 'attachment',
-            in: { $concat: [process.env.BUCKET_HOST + '/', '$$attachment'] }
-          }
-        }
-      }
+            in: { $concat: [process.env.BUCKET_HOST + '/', '$$attachment'] },
+          },
+        },
+      },
     },
     {
       $lookup: {
         from: MODELS.user,
         localField: 'user',
         foreignField: '_id',
-        as: 'userDetails'
-      }
+        as: 'userDetails',
+      },
     },
     {
       $addFields: {
@@ -146,26 +146,26 @@ export const getProjectsHandler: RequestHandler<
             if: { $eq: [{ $size: '$userDetails' }, 0] },
             then: null,
             else: {
-              $arrayElemAt: ['$userDetails', 0]
-            }
-          }
-        }
-      }
+              $arrayElemAt: ['$userDetails', 0],
+            },
+          },
+        },
+      },
     },
     {
       $addFields: {
         'user.profileImage': {
-          $concat: [process.env.BUCKET_HOST + '/', '$user.profileImage']
-        }
-      }
+          $concat: [process.env.BUCKET_HOST + '/', '$user.profileImage'],
+        },
+      },
     },
     {
       $lookup: {
         from: MODELS.user,
         localField: 'creatives.creative',
         foreignField: '_id',
-        as: 'creativesDetails'
-      }
+        as: 'creativesDetails',
+      },
     },
     {
       $addFields: {
@@ -180,11 +180,11 @@ export const getProjectsHandler: RequestHandler<
               profileImage: { $concat: [process.env.BUCKET_HOST + '/', '$$creative.profileImage'] },
               isOnline: '$$creative.isOnline',
               acceptedProjectsCounter: '$$creative.acceptedProjectsCounter',
-              rate: '$$creative.rate'
-            }
-          }
-        }
-      }
+              rate: '$$creative.rate',
+            },
+          },
+        },
+      },
     },
     {
       $project: {
@@ -194,7 +194,7 @@ export const getProjectsHandler: RequestHandler<
           isOnline: '$user.isOnline',
           acceptedProjectsCounter: '$user.acceptedProjectsCounter',
           name: '$user.name',
-          rate: '$user.rate'
+          rate: '$user.rate',
         },
         attachments: 1,
         cover: 1,
@@ -213,11 +213,20 @@ export const getProjectsHandler: RequestHandler<
         rate: 1,
         creatives: 1,
         tags: 1,
-        subCategory: 1
-      }
-    }
+        subCategory: 1,
+      },
+    },
   ]);
-  
+
+  if (req.loggedUser?.id) {
+    const user = await Users.findById(req.loggedUser.id, { favourites: 1 });
+
+    studioBookings.forEach((project) => {
+      project.isFavourite = user?.favourites.some(
+        (el) => el.project.toString() === project._id.toString(),
+      );
+    });
+  }
 
   res.status(200).json({
     message: 'success',
