@@ -1,11 +1,11 @@
 {
-  "name": "studio-booking",
+  "name": "copyrights",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "start": "node build/index.js",
-    "dev": "nodemon src/index.ts",
+    "dev": "ts-node-dev src/index.ts",
     "dev:docker": "ts-node src/index.ts",
     "test": "jest --watchAll --no-cache --runInBand",
     "test:ci": "jest",
@@ -13,7 +13,6 @@
     "lint:fix": "eslint --fix .",
     "format": "prettier --write .",
     "seeds": "ts-node seeds/plans.seeder.ts",
-    "seeds:dev": "ts-node seeds/roles.seeder.ts",
     "build": "tsc"
   },
   "keywords": [],
