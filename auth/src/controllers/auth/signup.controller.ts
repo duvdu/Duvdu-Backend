@@ -1,11 +1,4 @@
-import {
-  NotFound,
-  SystemRoles,
-  Roles,
-  Users,
-  VerificationReason,
-  Bookmarks,
-} from '@duvdu-v1/duvdu';
+import { NotFound, SystemRoles, Roles, Users, VerificationReason } from '@duvdu-v1/duvdu';
 
 import { SignupHandler } from '../../types/endpoints/user.endpoints';
 import { hashPassword } from '../../utils/bcrypt';
@@ -31,12 +24,6 @@ export const signupHandler: SignupHandler = async (req, res, next) => {
   });
 
   await newUser.save();
-
-  await Bookmarks.create({
-    user: newUser.id,
-    title: 'favourite',
-    projects: [],
-  });
 
   //TODO: send OTP
   res.status(201).json(<any>{ message: 'success', code: verificationCode });

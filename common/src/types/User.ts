@@ -12,7 +12,7 @@ export enum VerificationReason {
   forgetPasswordVerified = 'forget-password-verified',
   signup = 'signup',
   completeSginUp = 'complete-sginup',
-  CompleteSginUpVerfied = 'complete-sginup-verified'
+  CompleteSginUpVerfied = 'complete-sginup-verified',
 }
 export interface Iuser {
   id: string;
@@ -42,6 +42,7 @@ export interface Iuser {
   currentRank: string;
   isBlocked: { value: boolean; reason: string };
   followCount: { following: number; followers: number };
-  notificationToken:string | null,
-  isFollow?:boolean
+  notificationToken: string | null;
+  isFollow?: boolean;
+  favourites: { project: Types.ObjectId; cycle: string }[];
 }

@@ -1,6 +1,6 @@
 import 'express-async-errors';
 
-import { NotFound, studioBooking } from '@duvdu-v1/duvdu';
+import { NotFound, studioBooking, Users } from '@duvdu-v1/duvdu';
 
 import { GetProjectHandler } from '../../types/endpoints/endpoints';
 
@@ -9,16 +9,25 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
     .findOne({
       _id: req.params.projectId,
       isDeleted: { $ne: true },
-    }).populate([
-      {path:'user' , select:'isOnline profileImage username name'},
-      {path:'creatives.creative' , select:'isOnline profileImage username name'}
+    })
+    .populate([
+      { path: 'user', select: 'isOnline profileImage username name' },
+      { path: 'creatives.creative', select: 'isOnline profileImage username name' },
     ]);
 
   if (!project) return next(new NotFound('project not found'));
 
+  if (req.loggedUser?.id) {
+    const user = await Users.findById(req.loggedUser.id, { favourites: 1 });
+
+    (project as any)._doc.isFavourite = user?.favourites.some(
+      (el) => el.project.toString() === project._id.toString(),
+    );
+  }
+
   ((project as any)._doc.subCategory as any) = project.subCategory[req.lang];
 
-  ((project as any)._doc.tags as any) = project.tags.map(tag => tag[req.lang]);
+  ((project as any)._doc.tags as any) = project.tags.map((tag) => tag[req.lang]);
 
   res.status(200).json({ message: 'success', data: project });
 };

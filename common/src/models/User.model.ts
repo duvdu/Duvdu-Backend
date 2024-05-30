@@ -43,6 +43,12 @@ const userSchema = new Schema<Iuser>(
       followers: { type: Number, default: 0 },
       following: { type: Number, default: 0 },
     },
+    favourites: [
+      {
+        project: { type: Schema.Types.ObjectId, refPath: 'favourites.cycle', required: true },
+        cycle: { type: String, required: true },
+      },
+    ],
   },
   {
     timestamps: true,
