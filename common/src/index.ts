@@ -1,5 +1,3 @@
-
-
 export * from './errors/bad-request-error';
 export * from './errors/data-base-connections';
 export * from './errors/notfound-error';
@@ -75,7 +73,6 @@ export * from './types/notification.type';
 // events
 
 export * from './events/new-notification.event';
-export * from '../../auth/src/nats-wrapper';
 export * from './events/base-listener';
 export * from './events/base-publisher';
 export * from './events/subject';

@@ -1,6 +1,8 @@
 import {
+  checkRequiredFields,
   FOLDERS,
   globalPaginationMiddleware,
+  globalUploadMiddleware,
   isauthenticated,
   isauthorized,
   optionalAuthenticated,
@@ -8,7 +10,6 @@ import {
   uploadProjectMedia,
 } from '@duvdu-v1/duvdu';
 import { Router } from 'express';
-// import rateLimit from 'express-rate-limit';
 
 import * as handlers from '../controllers/auth';
 import * as val from '../validators/auth';
@@ -69,6 +70,12 @@ router
     uploadProjectMedia(FOLDERS.auth),
     val.updateProfileVal,
     handlers.updateProfileHandler,
+  )
+  // TODO: add authorization
+  .put(
+    globalUploadMiddleware('defaults' as any).single('file'),
+    checkRequiredFields({ single: 'file' }),
+    handlers.updateDefaultProfileCrm,
   );
 
 router.route('/profile/:userId').get(val.userIdVal, handlers.getUserProfileHandler);

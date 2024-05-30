@@ -1,4 +1,4 @@
-import { dbConnection } from '@duvdu-v1/duvdu';
+import { dbConnection, redisConnection } from '@duvdu-v1/duvdu';
 
 import { appInit } from './../seeds/roles.seeder';
 import { app } from './app';
@@ -6,14 +6,11 @@ import { env, checkEnvVariables } from './config/env';
 import { natsWrapper } from './nats-wrapper';
 
 const start = async () => {
-  
   checkEnvVariables();
 
-  await natsWrapper.connect(
-    env.nats.clusterId!,
-    env.nats.clientId!,
-    env.nats.url!
-  );
+  await redisConnection('', ' ');
+
+  await natsWrapper.connect(env.nats.clusterId!, env.nats.clientId!, env.nats.url!);
 
   natsWrapper.client.on('close', () => {
     console.log('nats connection close ');
@@ -29,9 +26,9 @@ const start = async () => {
   });
 
   await dbConnection(env.mongoDb.uri);
-  app.listen(3000, async() => {
+  app.listen(3000, async () => {
     console.log('app listen on port 3000');
-    
+
     await appInit();
   });
 };

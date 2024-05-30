@@ -17,9 +17,7 @@ export class Bucket {
 
   async saveBucketFiles(folder: string, ...files: Express.Multer.File[]) {
     for (const file of files) {
-      const fileStream = fs.createReadStream(
-        path.join(__dirname, `../../../../../media/${folder}/${file.filename}`),
-      );
+      const fileStream = fs.createReadStream(path.resolve(`media/${folder}/${file.filename}`));
       await new Promise((resolve, reject) => {
         this.s3.putObject(
           {
