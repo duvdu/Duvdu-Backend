@@ -39,10 +39,16 @@ const userSchema = new Schema<Iuser>(
       type: String,
       default: null,
     },
-    followCount:{
-      followers:{type:Number , default:0},
-      following:{type:Number , default:0},
-    }
+    followCount: {
+      followers: { type: Number, default: 0 },
+      following: { type: Number, default: 0 },
+    },
+    favourites: [
+      {
+        project: { type: Schema.Types.ObjectId, refPath: 'favourites.cycle', required: true },
+        cycle: { type: String, required: true },
+      },
+    ],
   },
   {
     timestamps: true,
@@ -52,7 +58,6 @@ const userSchema = new Schema<Iuser>(
         if (ret.coverImage) ret.coverImage = process.env.BUCKET_HOST + '/' + ret.coverImage;
         if (ret.profileImage) ret.profileImage = process.env.BUCKET_HOST + '/' + ret.profileImage;
       },
-
     },
   },
 ).index({ name: 'text' });

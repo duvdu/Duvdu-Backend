@@ -16,7 +16,13 @@ import * as val from '../validators/auth';
 const router = Router();
 router
   .route('/find')
-  .get(val.findUsers , optionalAuthenticated, globalPaginationMiddleware, handlers.filterUsers, handlers.findUsers);
+  .get(
+    val.findUsers,
+    optionalAuthenticated,
+    globalPaginationMiddleware,
+    handlers.filterUsers,
+    handlers.findUsers,
+  );
 router.post('/signin', val.signinVal, handlers.signinHandler);
 router.post('/signup', val.signupVal, handlers.signupHandler);
 router.post(
@@ -66,6 +72,8 @@ router
   );
 
 router.route('/profile/:userId').get(val.userIdVal, handlers.getUserProfileHandler);
+
+router.patch('/profile/favourites/:projectId', val.favourites, handlers.updateFavouriteList);
 
 router.route('/verify').post(val.verify, handlers.verifyHandler);
 

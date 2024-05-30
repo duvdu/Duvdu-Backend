@@ -66,7 +66,5 @@ export const getBookmarksHandler: GetBookmarksHandler = async (req, res, next) =
     });
   }
 
-  bookmarks.unshift(bookmarks.pop() as any);
-
   res.status(200).json({ message: 'success', data: bookmarks });
 };

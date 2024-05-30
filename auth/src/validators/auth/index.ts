@@ -13,3 +13,4 @@ export * from './resend-code.validator';
 export * from './verify.validator';
 export * from './completeSginup.validator';
 export * from './find-users.validator';
+export * from './favourite.validator';
