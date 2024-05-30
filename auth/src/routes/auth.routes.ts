@@ -1,8 +1,4 @@
-/* eslint-disable indent */
-import path from 'path';
-
 import {
-  BadRequestError,
   checkRequiredFields,
   FOLDERS,
   globalPaginationMiddleware,
@@ -14,9 +10,6 @@ import {
   uploadProjectMedia,
 } from '@duvdu-v1/duvdu';
 import { Router } from 'express';
-// import rateLimit from 'express-rate-limit';
-
-import multer from 'multer';
 
 import * as handlers from '../controllers/auth';
 import * as val from '../validators/auth';
@@ -77,6 +70,12 @@ router
     uploadProjectMedia(FOLDERS.auth),
     val.updateProfileVal,
     handlers.updateProfileHandler,
+  )
+  // TODO: add authorization
+  .put(
+    globalUploadMiddleware('defaults' as any).single('file'),
+    checkRequiredFields({ single: 'file' }),
+    handlers.updateDefaultProfileCrm,
   );
 
 router.route('/profile/:userId').get(val.userIdVal, handlers.getUserProfileHandler);
@@ -84,12 +83,5 @@ router.route('/profile/:userId').get(val.userIdVal, handlers.getUserProfileHandl
 router.route('/verify').post(val.verify, handlers.verifyHandler);
 
 router.route('/refresh').post(handlers.askRefreshTokenHandler);
-
-router.put(
-  '/profile',
-  globalUploadMiddleware('defaults' as any).single('file'),
-  checkRequiredFields({ single: 'file' }),
-  handlers.updateDefaultProfileCrm,
-);
 
 export const authRoutes = router;
