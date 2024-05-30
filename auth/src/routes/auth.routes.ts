@@ -78,9 +78,21 @@ router
     handlers.updateDefaultProfileCrm,
   );
 
-router.route('/profile/:userId').get(val.userIdVal, handlers.getUserProfileHandler);
+router.get(
+  '/profile/favourites',
+  isauthenticated,
+  val.getFavourites,
+  globalPaginationMiddleware,
+  handlers.getFavouriteProjects,
+);
+router.patch(
+  '/profile/favourites/:projectId',
+  isauthenticated,
+  val.favouritesAction,
+  handlers.updateFavouriteList,
+);
 
-router.patch('/profile/favourites/:projectId', val.favourites, handlers.updateFavouriteList);
+router.route('/profile/:userId').get(val.userIdVal, handlers.getUserProfileHandler);
 
 router.route('/verify').post(val.verify, handlers.verifyHandler);
 
