@@ -17,7 +17,7 @@ const userSchema = new Schema<Iuser>(
     verificationCode: { code: String, expireAt: Date, reason: { type: String, default: null } },
     isVerified: { type: Boolean, default: false },
     token: String,
-    profileImage: { type: String, default: null },
+    profileImage: { type: String, default: 'defaults/profile.jpg' },
     coverImage: { type: String, default: null },
     location: { lat: { type: Number, default: null }, lng: { type: Number, default: null } },
     category: { type: Schema.Types.ObjectId, ref: MODELS.category },
@@ -39,10 +39,10 @@ const userSchema = new Schema<Iuser>(
       type: String,
       default: null,
     },
-    followCount:{
-      followers:{type:Number , default:0},
-      following:{type:Number , default:0},
-    }
+    followCount: {
+      followers: { type: Number, default: 0 },
+      following: { type: Number, default: 0 },
+    },
   },
   {
     timestamps: true,
@@ -52,7 +52,6 @@ const userSchema = new Schema<Iuser>(
         if (ret.coverImage) ret.coverImage = process.env.BUCKET_HOST + '/' + ret.coverImage;
         if (ret.profileImage) ret.profileImage = process.env.BUCKET_HOST + '/' + ret.profileImage;
       },
-
     },
   },
 ).index({ name: 'text' });
