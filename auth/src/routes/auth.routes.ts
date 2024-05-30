@@ -1,6 +1,12 @@
+/* eslint-disable indent */
+import path from 'path';
+
 import {
+  BadRequestError,
+  checkRequiredFields,
   FOLDERS,
   globalPaginationMiddleware,
+  globalUploadMiddleware,
   isauthenticated,
   isauthorized,
   optionalAuthenticated,
@@ -10,13 +16,21 @@ import {
 import { Router } from 'express';
 // import rateLimit from 'express-rate-limit';
 
+import multer from 'multer';
+
 import * as handlers from '../controllers/auth';
 import * as val from '../validators/auth';
 
 const router = Router();
 router
   .route('/find')
-  .get(val.findUsers , optionalAuthenticated, globalPaginationMiddleware, handlers.filterUsers, handlers.findUsers);
+  .get(
+    val.findUsers,
+    optionalAuthenticated,
+    globalPaginationMiddleware,
+    handlers.filterUsers,
+    handlers.findUsers,
+  );
 router.post('/signin', val.signinVal, handlers.signinHandler);
 router.post('/signup', val.signupVal, handlers.signupHandler);
 router.post(
@@ -70,5 +84,12 @@ router.route('/profile/:userId').get(val.userIdVal, handlers.getUserProfileHandl
 router.route('/verify').post(val.verify, handlers.verifyHandler);
 
 router.route('/refresh').post(handlers.askRefreshTokenHandler);
+
+router.put(
+  '/profile',
+  globalUploadMiddleware('defaults' as any).single('file'),
+  checkRequiredFields({ single: 'file' }),
+  handlers.updateDefaultProfileCrm,
+);
 
 export const authRoutes = router;
