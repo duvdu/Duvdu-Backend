@@ -48,11 +48,14 @@ export const getBookmarksHandler: GetBookmarksHandler = async (req, res, next) =
         },
       }));
 
-      el.project.tags = (el.project.tags as { _id: string; en: string; ar: string }[])?.map((el) =>
-        req.lang === 'en' ? el.en : el.ar,
-      );
-      el.project.subCategory =
-        req.lang === 'en' ? el.project.subCategory.en : el.project.subCategory.ar;
+      if (el.project.tags)
+        el.project.tags = (el.project.tags as { _id: string; en: string; ar: string }[])?.map(
+          (el) => (req.lang === 'en' ? el.en : el.ar),
+        );
+
+      if (el.project.subCategory)
+        el.project.subCategory =
+          req.lang === 'en' ? el.project.subCategory.en : el.project.subCategory.ar;
 
       el.project.category = {
         ...el.project.category,
@@ -65,8 +68,6 @@ export const getBookmarksHandler: GetBookmarksHandler = async (req, res, next) =
       delete el.project.type;
     });
   }
-
-  bookmarks.unshift(bookmarks.pop() as any);
 
   res.status(200).json({ message: 'success', data: bookmarks });
 };

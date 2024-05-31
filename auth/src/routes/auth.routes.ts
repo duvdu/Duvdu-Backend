@@ -1,6 +1,8 @@
 import {
+  checkRequiredFields,
   FOLDERS,
   globalPaginationMiddleware,
+  globalUploadMiddleware,
   isauthenticated,
   isauthorized,
   optionalAuthenticated,
@@ -8,7 +10,6 @@ import {
   uploadProjectMedia,
 } from '@duvdu-v1/duvdu';
 import { Router } from 'express';
-// import rateLimit from 'express-rate-limit';
 
 import * as handlers from '../controllers/auth';
 import * as val from '../validators/auth';
@@ -16,7 +17,13 @@ import * as val from '../validators/auth';
 const router = Router();
 router
   .route('/find')
-  .get(val.findUsers , optionalAuthenticated, globalPaginationMiddleware, handlers.filterUsers, handlers.findUsers);
+  .get(
+    val.findUsers,
+    optionalAuthenticated,
+    globalPaginationMiddleware,
+    handlers.filterUsers,
+    handlers.findUsers,
+  );
 router.post('/signin', val.signinVal, handlers.signinHandler);
 router.post('/signup', val.signupVal, handlers.signupHandler);
 router.post(
@@ -63,7 +70,27 @@ router
     uploadProjectMedia(FOLDERS.auth),
     val.updateProfileVal,
     handlers.updateProfileHandler,
+  )
+  // TODO: add authorization
+  .put(
+    globalUploadMiddleware('defaults' as any).single('file'),
+    checkRequiredFields({ single: 'file' }),
+    handlers.updateDefaultProfileCrm,
   );
+
+router.get(
+  '/profile/favourites',
+  isauthenticated,
+  val.getFavourites,
+  globalPaginationMiddleware,
+  handlers.getFavouriteProjects,
+);
+router.patch(
+  '/profile/favourites/:projectId',
+  isauthenticated,
+  val.favouritesAction,
+  handlers.updateFavouriteList,
+);
 
 router.route('/profile/:userId').get(val.userIdVal, handlers.getUserProfileHandler);
 

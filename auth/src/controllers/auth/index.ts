@@ -12,3 +12,5 @@ export * from './verify.controller';
 export * from './ask-refresh-token.controller';
 export * from './completeSginUp.controller';
 export * from './find-users.controller';
+export * from './favourites.controller';
+export * from './update-default-profile-crm.controller';

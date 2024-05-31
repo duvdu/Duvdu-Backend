@@ -4,6 +4,7 @@ import {
   globalPaginationMiddleware,
   isauthenticated,
   isauthorized,
+  optionalAuthenticated,
   PERMISSIONS,
   uploadProjectMedia,
 } from '@duvdu-v1/duvdu';
@@ -28,6 +29,7 @@ router
     handler.createProjectHandler,
   )
   .get(
+    optionalAuthenticated,
     val.getAllProjectsVal,
     globalPaginationMiddleware,
     handler.getProjectsPagination,
@@ -73,7 +75,7 @@ router
     val.deleteProjectVal,
     handler.removeProjectHandler,
   )
-  .get(val.deleteProjectVal, handler.getProjectHandler);
+  .get(optionalAuthenticated, val.deleteProjectVal, handler.getProjectHandler);
 
 router.post(
   '/book/:projectId',

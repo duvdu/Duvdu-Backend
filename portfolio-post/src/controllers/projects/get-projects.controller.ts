@@ -1,4 +1,4 @@
-import { IportfolioPost, MODELS, PaginationResponse, PortfolioPosts } from '@duvdu-v1/duvdu';
+import { IportfolioPost, MODELS, PaginationResponse, PortfolioPosts, Users } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 export const getProjectsPagination: RequestHandler<
@@ -10,7 +10,7 @@ export const getProjectsPagination: RequestHandler<
     address?: string;
     tools?: string[];
     tags?: string;
-    subCategory?:string;
+    subCategory?: string;
     projectBudgetFrom?: number;
     projectBudgetTo?: number;
     category?: string;
@@ -66,7 +66,7 @@ export const getProjectsHandler: RequestHandler<
 
   const projects = await PortfolioPosts.aggregate([
     {
-      $match: { ...req.pagination.filter, isDeleted: { $ne: true } }
+      $match: { ...req.pagination.filter, isDeleted: { $ne: true } },
     },
     { $sort: { createdAt: -1 } },
     { $skip: req.pagination.skip },
@@ -77,8 +77,8 @@ export const getProjectsHandler: RequestHandler<
           $cond: {
             if: { $eq: ['ar', req.lang] },
             then: '$subCategory.ar',
-            else: '$subCategory.en'
-          }
+            else: '$subCategory.en',
+          },
         },
         tags: {
           $map: {
@@ -88,28 +88,28 @@ export const getProjectsHandler: RequestHandler<
               $cond: {
                 if: { $eq: ['ar', req.lang] },
                 then: '$$tag.ar',
-                else: '$$tag.en'
-              }
-            }
-          }
+                else: '$$tag.en',
+              },
+            },
+          },
         },
-        'cover': { $concat: [process.env.BUCKET_HOST, '/', '$cover'] },
-        'attachments': {
+        cover: { $concat: [process.env.BUCKET_HOST, '/', '$cover'] },
+        attachments: {
           $map: {
             input: '$attachments',
             as: 'att',
-            in: { $concat: [process.env.BUCKET_HOST, '/', '$$att'] }
-          }
-        }
-      }
+            in: { $concat: [process.env.BUCKET_HOST, '/', '$$att'] },
+          },
+        },
+      },
     },
     {
       $lookup: {
         from: MODELS.user,
         localField: 'creatives.creative',
         foreignField: '_id',
-        as: 'creatives'
-      }
+        as: 'creatives',
+      },
     },
     {
       $addFields: {
@@ -124,31 +124,31 @@ export const getProjectsHandler: RequestHandler<
               profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$$creative.profileImage'] },
               isOnline: '$$creative.isOnline',
               acceptedProjectsCounter: '$$creative.acceptedProjectsCounter',
-              rate: '$$creative.rate'
-            }
-          }
-        }
-      }
+              rate: '$$creative.rate',
+            },
+          },
+        },
+      },
     },
     {
       $lookup: {
         from: MODELS.user,
         localField: 'user',
         foreignField: '_id',
-        as: 'userDetails'
-      }
+        as: 'userDetails',
+      },
     },
     {
       $addFields: {
-        'user': {
-          $arrayElemAt: ['$userDetails', 0]
-        }
-      }
+        user: {
+          $arrayElemAt: ['$userDetails', 0],
+        },
+      },
     },
     {
       $addFields: {
         'user.profileImage': { $concat: [process.env.BUCKET_HOST, '/', '$user.profileImage'] },
-      }
+      },
     },
     {
       $project: {
@@ -176,11 +176,20 @@ export const getProjectsHandler: RequestHandler<
         projectScale: 1,
         showOnHome: 1,
         cycle: 1,
-        rate: 1
-      }
-    }
+        rate: 1,
+      },
+    },
   ]);
-  
+
+  if (req.loggedUser?.id) {
+    const user = await Users.findById(req.loggedUser.id, { favourites: 1 });
+
+    projects.forEach((project) => {
+      project.isFavourite = user?.favourites.some(
+        (el) => el.project.toString() === project._id.toString(),
+      );
+    });
+  }
 
   res.status(200).json({
     message: 'success',

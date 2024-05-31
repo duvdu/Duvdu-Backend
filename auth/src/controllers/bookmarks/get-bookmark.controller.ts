@@ -48,11 +48,14 @@ export const getBookmarkHandler: GetBookmarkHandler = async (req, res, next) => 
       }),
     );
 
-    el.project.tags = (el.project.tags as { _id: string; en: string; ar: string }[])?.map((el) =>
-      req.lang === 'en' ? el.en : el.ar,
-    );
-    el.project.subCategory =
-      req.lang === 'en' ? el.project.subCategory.en : el.project.subCategory.ar;
+    if (el.project.tags)
+      el.project.tags = (el.project.tags as { _id: string; en: string; ar: string }[])?.map((el) =>
+        req.lang === 'en' ? el.en : el.ar,
+      );
+
+    if (el.project.subCategory)
+      el.project.subCategory =
+        req.lang === 'en' ? el.project.subCategory.en : el.project.subCategory.ar;
 
     el.project.category = {
       ...el.project.category,

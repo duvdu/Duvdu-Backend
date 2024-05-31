@@ -7,6 +7,7 @@ import {
   FOLDERS,
   isauthenticated,
   globalUploadMiddleware,
+  optionalAuthenticated,
 } from '@duvdu-v1/duvdu';
 import { Router } from 'express';
 
@@ -20,6 +21,7 @@ const router = Router();
 router
   .route('/')
   .get(
+    optionalAuthenticated,
     val.findAll,
     globalPaginationMiddleware,
     handlers.getProjectsPagination,
@@ -55,7 +57,7 @@ router.get('/pay', payBooking);
 
 router
   .route('/:projectId')
-  .get(val.get, handlers.getProjectHandler)
+  .get(optionalAuthenticated, val.get, handlers.getProjectHandler)
   .patch(
     isauthenticated,
     isauthorized(PERMISSIONS.updatePortfolioProjectHandler),
