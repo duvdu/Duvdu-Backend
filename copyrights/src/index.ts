@@ -1,4 +1,4 @@
-import { dbConnection } from '@duvdu-v1/duvdu';
+import { dbConnection, redisConnection } from '@duvdu-v1/duvdu';
 
 import { app } from './app';
 import { env, checkEnvVariables } from './config/env';
@@ -6,6 +6,8 @@ import { natsWrapper } from './nats-wrapper';
 
 const start = async () => {
   checkEnvVariables();
+  await redisConnection('', ' ');
+
   await natsWrapper.connect(
     env.nats.clusterId!,
     env.nats.clientId!,
