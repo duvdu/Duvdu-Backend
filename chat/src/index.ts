@@ -1,4 +1,4 @@
-import { dbConnection  } from '@duvdu-v1/duvdu';
+import { dbConnection, redisConnection  } from '@duvdu-v1/duvdu';
 import { Server } from 'socket.io';
 
 import { app } from './app';
@@ -10,7 +10,8 @@ import { SocketServer } from './utils/socketImplementaion';
 let io: Server | undefined;
 const start = async () => {
   checkEnvVariables();
-  
+  await redisConnection('', ' ');
+
   await natsWrapper.connect(
     env.nats.clusterId!,
     env.nats.clientId!,

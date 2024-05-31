@@ -21,6 +21,7 @@ app.use(cors(corsOptions));
 
 
 (async () => {  
+  
   const store = await sessionStore(env.redis.uri, env.redis.pass);
   
   app.use(

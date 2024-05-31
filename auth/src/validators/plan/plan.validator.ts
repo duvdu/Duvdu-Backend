@@ -10,6 +10,7 @@ export const create = [
 ];
 
 export const update = [
+  param('planId').isMongoId().withMessage('planIdInvalid'),
   body('title').optional().isString().trim().withMessage('titleString').isLength({ min: 2 }).withMessage('titleLength'),
   body('status').optional().isBoolean().withMessage('statusBoolean'),
   globalValidatorMiddleware,

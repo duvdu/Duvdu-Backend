@@ -28,7 +28,6 @@ router
   .get(isauthorized(PERMISSIONS.getPlanHandler), val.planId, controllers.getPlanHandler)
   .patch(
     isauthorized(PERMISSIONS.updatePlanHandler),
-    val.planId,
     val.update,
     controllers.updatePlanHandler,
   )

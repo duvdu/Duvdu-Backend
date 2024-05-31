@@ -13,13 +13,13 @@ export const createPlanHandler: CreatePlanHandler = async (req, res, next) => {
   const role = await Roles.findById(req.body.role);
   if (!role) return next(new NotFound('role not found'));
   const plan = await Plans.create(req.body);
-  res.status(201).json({ message: 'success', id: plan.id });
+  res.status(201).json({ message: 'success', data:plan });
 };
 
 export const updatePlanHandler: UpdatePlanHandler = async (req, res, next) => {
   const plan = await Plans.findByIdAndUpdate(req.params.planId, req.body);
   if (!plan) return next(new NotFound('plan not found'));
-  res.status(200).json({ message: 'success' });
+  res.status(200).json({ message: 'success' , data:plan });
 };
 
 export const removePlanHandler: RemovePlanHandler = async (req, res, next) => {
