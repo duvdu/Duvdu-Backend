@@ -52,7 +52,7 @@ export const findUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser
         isAvaliableToInstantProjects: 1,
         pricePerHour: 1,
         hasVerificationBadge: 1,
-        rate: 1و
+        rate: 1,
         followCount:1
       }
     },
