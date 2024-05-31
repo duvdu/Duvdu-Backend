@@ -42,7 +42,8 @@ export interface UpdateContractHandler
 extends RequestHandler<{contractId:string} , SuccessResponse<{data:IproducerBooking}> , Pick<IproducerBooking , 'status'> , unknown>{}
 
 
-
+export interface GetUserContractsHandler
+extends RequestHandler<unknown , PaginationResponse<{data:IproducerBooking[]}> , unknown , unknown>{}
 
 
 
