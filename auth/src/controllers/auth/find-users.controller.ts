@@ -36,19 +36,6 @@ export const findUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser
 ) => {
   console.log(req.pagination.filter);
   const count = await Users.countDocuments(req.pagination.filter);
-  // const users = await Users.find(req.pagination.filter, {
-  //   name: 1,
-  //   username: 1,
-  //   profileImage: 1,
-  //   about: 1,
-  //   isOnline: 1,
-  //   isAvaliableToInstantProjects: 1,
-  //   pricePerHour: 1,
-  //   hasVerificationBadge: 1,
-  //   rate: 1,
-  // })
-  //   .skip(req.pagination.skip)
-  //   .limit(req.pagination.limit);
 
   const aggregationPipeline = [
     {
@@ -65,7 +52,8 @@ export const findUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser
         isAvaliableToInstantProjects: 1,
         pricePerHour: 1,
         hasVerificationBadge: 1,
-        rate: 1
+        rate: 1,
+        followCount:1
       }
     },
     {
