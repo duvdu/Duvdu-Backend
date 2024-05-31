@@ -8,6 +8,7 @@ export const router = express.Router();
 
 
 router.use(isauthenticated);
+router.route('/user').get( isauthenticated , val.getContractsVal , globalPaginationMiddleware , handler.getUserContractsPagination , handler.getUserContractHandler);
 router.route('/')
   .post(
     isauthorized(PERMISSIONS.booking),
