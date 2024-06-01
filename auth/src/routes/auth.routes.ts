@@ -78,6 +78,8 @@ router
     handlers.updateDefaultProfileCrm,
   );
 
+router.get('/profile/projects', isauthenticated, handlers.getLoggedUserProjects);
+
 router.get(
   '/profile/favourites',
   isauthenticated,
