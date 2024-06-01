@@ -6,7 +6,7 @@ export const updateCategoryHandler: UpdateCategoryHandler = async (req, res, nex
   const cover = <Express.Multer.File[] | undefined>(req.files as any).cover;
   const category = await Categories.findById(req.params.categoryId);
   if (!category) 
-    return next(new NotFound('category not found'));
+    return next(new NotFound({en:'category not found' , ar:'الفئة غير موجودة'} , req.lang));
   const s3 = new Bucket();
   if (cover) {
     await s3.saveBucketFiles(FOLDERS.category , ...cover);
@@ -18,8 +18,6 @@ export const updateCategoryHandler: UpdateCategoryHandler = async (req, res, nex
 
   const newCategory = await Categories.findByIdAndUpdate(req.params.categoryId, req.body , {new:true});
 
-  if (!newCategory) return next(new NotFound('can not update category'));
-
-  res.status(200).json({ message: 'success' , data:newCategory });
+  res.status(200).json({ message: 'success' , data:newCategory! });
 };
 

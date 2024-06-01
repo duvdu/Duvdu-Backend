@@ -12,7 +12,7 @@ export const getProjectHandler: RequestHandler<
     { path: 'user', select: 'isOnline profileImage username name' },
     { path: 'creatives.creative', select: 'isOnline profileImage username name' },
   ]);
-  if (!project) return next(new NotFound('project not found'));
+  if (!project) return next(new NotFound({en:'project not found' , ar:'المشروع غير موجود'} , req.lang));
 
   if (req.loggedUser?.id) {
     const user = await Users.findById(req.loggedUser.id, { favourites: 1 });

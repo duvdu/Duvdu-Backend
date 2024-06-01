@@ -62,8 +62,8 @@ export const getUserContractsPagination: RequestHandler<
 
 export const getUserContractHandler:GetUserContractsHandler = async (req,res)=>{
   const contracts = await ProducerBooking.find({user:req.loggedUser.id,...req.pagination.filter}).populate([
-    {path:'user' , select:'profileImage username location rate'},
-    {path:'producer' , select:'profileImage username location rate'}
+    {path:'user' , select:'profileImage username location rate name'},
+    {path:'producer' , select:'profileImage username location rate name'}
   ]).limit(req.pagination.limit).skip(req.pagination.skip).sort({ createdAt: -1 });
 
   const resultCount = await ProducerBooking.find({user:req.loggedUser.id,...req.pagination.filter}).countDocuments();

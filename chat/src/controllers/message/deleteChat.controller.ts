@@ -14,7 +14,7 @@ export const deleteChatHandler:DeleteChatHandler = async (req,res,next)=>{
     { sender: req.params.receiver, receiver: req.loggedUser.id }
   ]});
   if (!messages) 
-    return next(new BadRequestError(`user dont have any chat with this ${req.params.receiver}`));
+    return next(new BadRequestError({en:`user dont have any chat with this ${req.params.receiver}` , ar:`المستخدم ليس لديه أي محادثة مع ${req.params.receiver}`} , req.lang));
  
   const s3 = new Bucket();
 

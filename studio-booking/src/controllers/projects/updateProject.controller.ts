@@ -20,16 +20,16 @@ export const updateProjectHandler: UpdateProjectHandler = async (req, res, next)
   const attachments = <Express.Multer.File[] | undefined>(req.files as any)?.attachments;
   const cover = <Express.Multer.File[] | undefined>(req.files as any)?.cover;
   const project = await studioBooking.findById(projectId);
-  if (!project) return next(new NotFound('project not found'));
+  if (!project) return next(new NotFound({en:'project not found' , ar:'المشروع غير موجود'} , req.lang));
   if (project.user.toString() != req.loggedUser.id)
-    return next(new NotAllowedError('user not owner for this project'));
+    return next(new NotAllowedError(undefined , req.lang));
 
   if (req.body.creatives) {
     const creativesCount = await Users.countDocuments({
       _id: req.body.creatives.map((el: any) => el.creative),
     });
     if (creativesCount !== req.body.creatives.length)
-      return next(new BadRequestError('invalid cretives'));
+      return next(new BadRequestError({en:'invalid cretives' , ar:'الإبداعات غير صالحة'} , req.lang));
   }
   if (req.body.invitedCreatives) {
     const invitedCreatives = await createInvitedUsers(req.body.invitedCreatives);

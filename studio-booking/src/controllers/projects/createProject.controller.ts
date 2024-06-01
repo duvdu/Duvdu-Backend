@@ -32,7 +32,7 @@ export const createProjectHandler: CreateProjectHandler = async (req, res, next)
         _id: req.body.creatives.map((el: any) => el.creative),
       });
       if (req.body.creatives.length != creativeCount)
-        return next(new BadRequestError('invalid cretaives'));
+        return next(new BadRequestError({en:'invalid cretaives' , ar:'الإبداعات غير صالحة'} , req.lang));
     }
 
     let invitedCreatives;

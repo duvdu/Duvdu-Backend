@@ -8,7 +8,7 @@ export const payBooking: RequestHandler = async (req, res, next) => {
     { paymentSession: req.query.session as unknown as string, state: BookingState.unpaid },
     { state: BookingState.paid },
   );
-  if (!book) return next(new BadRequestError('invalid session'));
+  if (!book) return next(new BadRequestError({en:'invalid session' , ar:'جلسة غير صالحة'} , req.lang));
 
   // TODO: send notification to target user
   await Contracts.create({

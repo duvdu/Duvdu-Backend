@@ -14,7 +14,7 @@ export const sendMessageHandler:SendMessageHandler = async (req,res,next)=>{
 
   const receiver = await Users.findById(req.body.receiver);
   if (!receiver) 
-    return next(new NotFound(`no receiver in this id ${req.body.receiver}`));
+    return next(new NotFound({en:`no receiver in this id ${req.body.receiver}` , ar:`لا يوجد مستقبل بهذا المعرف ${req.body.receiver}`} , req.lang));
 
   const attachments = <Express.Multer.File[] | undefined>(req.files as any)?.attachments;  
   if (attachments) {

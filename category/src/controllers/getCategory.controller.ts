@@ -71,6 +71,6 @@ export const getCategoryHandler: GetCategoryHandler = async (req, res, next) => 
   ]);
   
   
-  if (!category) return next(new NotFound('category not found'));
+  if (!category) return next(new NotFound({en:'category not found' , ar:'الفئة غير موجودة'} , req.lang));
   res.status(200).json({ message: 'success', data: category[0] });
 };

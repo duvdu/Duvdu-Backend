@@ -29,14 +29,14 @@ export const bookProjectHandler: RequestHandler<
     _id: req.params.projectId,
     isDeleted: { $ne: true },
   });
-  if (!project) return next(new NotFound('project not found'));
+  if (!project) return next(new NotFound({en:'project not found' , ar:'المشروع غير موجود'},req.lang));
 
   const toolsWithFees: { name: string; fees: number }[] = [];
   // assert tools
   if (req.body.tools)
     for (const tool of req.body.tools) {
       const equip = project.tools.find((el: any) => el._id.toString() === tool);
-      if (!equip) return next(new NotFound('Equipment not found in this project'));
+      if (!equip) return next(new NotFound({en:'Equipment not found in this project' , ar:'المعدات غير موجودة في هذا المشروع'} , req.lang));
       toolsWithFees.push(equip);
     }
 
@@ -45,7 +45,7 @@ export const bookProjectHandler: RequestHandler<
   if (req.body.creatives)
     for (const creativeId of req.body.creatives) {
       const creative = project.creatives.find((el: any) => el._id.toString() === creativeId);
-      if (!creative) return next(new NotFound('Equipment not found in this project'));
+      if (!creative) return next(new NotFound({en:'Equipment not found in this project' , ar:'المعدات غير موجودة في هذا المشروع'} , req.lang));
       creativesWithFees.push(creative as any);
     }
 

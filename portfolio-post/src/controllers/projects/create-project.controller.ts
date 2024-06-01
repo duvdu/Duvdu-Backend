@@ -55,7 +55,7 @@ export const createProjectHandler: RequestHandler<
     _id: req.body.creatives?.map((el) => el.creative),
   });
   if (req.body.creatives && creativesCount !== req.body.creatives.length)
-    return next(new BadRequestError('invalid creatives'));
+    return next(new BadRequestError({en:'invalid creatives' , ar:'الإبداعات غير صالحة'} , req.lang));
 
   // handle unregistered creatives
   let invitedCreatives;

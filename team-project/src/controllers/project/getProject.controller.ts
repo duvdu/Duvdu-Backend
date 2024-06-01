@@ -23,7 +23,7 @@ export const getProjectHandler:GetProjectHandler = async (req,res,next)=>{
   };
       
   if (!project) 
-    return next(new NotFound('project not found'));
+    return next(new NotFound({en:'project not found' , ar:'المشروع غير موجود'} , req.lang));
 
   const modifiedProjects = [project].map(project => {
     const modifiedProject = { ...project };
