@@ -1,22 +1,19 @@
-import { dbConnection, redisConnection  } from '@duvdu-v1/duvdu';
+import { dbConnection } from '@duvdu-v1/duvdu';
 import { Server } from 'socket.io';
 
 import { app } from './app';
 import { env, checkEnvVariables } from './config/env';
 import { NewNotificationListener } from './event/listiner/newNotification.listiner';
 import { natsWrapper } from './nats-wrapper';
+import { handleRedisConnection } from './utils/handle-redis-connection';
 import { SocketServer } from './utils/socketImplementaion';
 
 let io: Server | undefined;
 const start = async () => {
   checkEnvVariables();
-  await redisConnection('', ' ');
+  await handleRedisConnection();
 
-  await natsWrapper.connect(
-    env.nats.clusterId!,
-    env.nats.clientId!,
-    env.nats.url!
-  );
+  await natsWrapper.connect(env.nats.clusterId!, env.nats.clientId!, env.nats.url!);
 
   natsWrapper.client.on('close', () => {
     console.log('nats connection close ');
@@ -37,7 +34,7 @@ const start = async () => {
   const server = app.listen(3000, () => {
     console.log('app listen on port 3000');
   });
-  
+
   const socketServer = new SocketServer(server);
   io = socketServer.io;
   // Set the socket.io instance in the app
