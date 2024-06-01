@@ -13,7 +13,7 @@ export const getReportHandler:GetReportHandler = async (req,res,next)=>{
   });
 
   if (!report) 
-    return next(new NotFound(`report not found ${req.params.reportId}`));
+    return next(new NotFound(undefined , req.lang));
 
   res.status(200).json({message:'success' , data:report});
 };

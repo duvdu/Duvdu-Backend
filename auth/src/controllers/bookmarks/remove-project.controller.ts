@@ -14,6 +14,6 @@ export const removeProjectFromBookmarkHandler: RemoveProjectFromBookmarkHandler 
       $pull: { projects: req.params.projectId },
     },
   );
-  if (!bookmark) return next(new NotFound());
+  if (!bookmark) return next(new NotFound(undefined , req.lang));
   res.status(200).json({ message: 'success' });
 };

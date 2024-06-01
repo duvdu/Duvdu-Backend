@@ -23,7 +23,7 @@ export const getBookmarksHandler: GetBookmarksHandler = async (req, res, next) =
     })
     .lean();
 
-  if (!bookmarks) return next(new NotFound());
+  if (!bookmarks) return next(new NotFound(undefined , req.lang));
   for (const bookmark of bookmarks) {
     (bookmark as any).totalProjects = (await Bookmarks.findById(bookmark._id))?.projects.length;
     bookmark.projects.forEach((el: any) => {

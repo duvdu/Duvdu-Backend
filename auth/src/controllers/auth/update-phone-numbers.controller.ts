@@ -8,7 +8,7 @@ import { generateRandom6Digit } from '../../utils/gitRandom6Dugut';
 export const askUpdatePhoneNumberHandler: AskUpdatePhoneNumberHandler = async (req, res, next) => {
   const currentUser = await Users.findById(req.loggedUser?.id);
   if (!currentUser)
-    return next(new UnauthenticatedError());
+    return next(new UnauthenticatedError(undefined , req.lang));
 
   const randomCode = generateRandom6Digit();
   const hashedRandomCode = hashVerificationCode(randomCode);
@@ -30,9 +30,9 @@ export const updatePhoneNumberHandler: RequestHandler<
   { phoneNumber: string }
 > = async (req, res, next) => {
   const currentUser = await Users.findById(req.loggedUser?.id);
-  if (!currentUser) return next(new NotFound());
+  if (!currentUser) return next(new NotFound(undefined , req.lang));
   if (currentUser.verificationCode?.reason !== VerificationReason.updateOldPhoneNumberVerified)
-    return next(new UnauthorizedError());
+    return next(new UnauthorizedError(undefined , req.lang));
 
   const verificationCode: string = generateRandom6Digit();
   const hashedVerificationCode: string = hashVerificationCode(verificationCode);

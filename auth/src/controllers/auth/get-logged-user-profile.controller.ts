@@ -6,7 +6,7 @@ export const getLoggedUserProfileHandler: GetLoggedUserProfileHandler = async (r
   const user = await Users.findById(req.loggedUser?.id).select(
     '-googleId -appleId -password -verificationCode.code -verificationCode.expireAt -token -role',
   );
-  if (!user) return next(new UnauthenticatedError());
+  if (!user) return next(new UnauthenticatedError(undefined , req.lang));
   const averageRate = +(
     user.rate.ratersCounter > 0 ? user.rate.totalRates / user.rate.ratersCounter : 0
   ).toFixed(2);

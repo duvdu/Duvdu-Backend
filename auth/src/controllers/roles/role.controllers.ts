@@ -15,9 +15,9 @@ export const createRoleHandler: CreateRoleHandler = async (req, res) => {
 
 export const removeRoleHandler: RemoveRoleHandler = async (req, res, next) => {
   const role = await Roles.findOneAndDelete({ _id: req.params.roleId, key: { $ne: 'admin' } });
-  if (!role) return next(new NotFound('role not found'));
+  if (!role) return next(new NotFound({en:'role not found' , ar:'الدور غير موجود'} , req.lang));
   const plans = await Plans.countDocuments({ role: req.params.roleId });
-  if (plans > 0) return next(new BadRequestError(`already ${plans} plans related to this role`));
+  if (plans > 0) return next(new BadRequestError({en:`already ${plans} plans related to this role` , ar:'بالفعل ${users} مشتركين في هذه الخطة'} , req.lang));
   res.status(204).json();
 };
 
@@ -28,7 +28,7 @@ export const getRolesHandler: GetRolesHandler = async (req, res) => {
 
 export const getRoleHandler: GetRoleHandler = async (req, res, next) => {
   const role = await Roles.findOne({ _id: req.params.roleId, key: { $ne: 'admin' } });
-  if (!role) return next(new NotFound('role not found'));
+  if (!role) return next(new NotFound({en:'role not found' , ar:'الدور غير موجود'} , req.lang));
   res.status(200).json({ message: 'success', data: role });
 };
 
@@ -37,6 +37,6 @@ export const updateRoleHandler: UpdateRoleHandler = async (req, res, next) => {
     { _id: req.params.roleId, key: { $ne: 'admin' } },
     req.body,
   );
-  if (!role) return next(new NotFound('role not found'));
+  if (!role) return next(new NotFound({en:'role not found' , ar:'الدور غير موجود'} , req.lang));
   res.status(200).json({ message: 'success' });
 };

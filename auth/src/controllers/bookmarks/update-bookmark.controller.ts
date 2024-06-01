@@ -4,7 +4,7 @@ import { UpdateBookmarkHandler } from '../../types/endpoints/saved-projects.endp
 
 export const updateBookmarkHandler: UpdateBookmarkHandler = async (req, res, next) => {
   const bookmark = await Bookmarks.findOne({ _id: req.params.bookmarkId, user: req.loggedUser.id });
-  if (!bookmark) return next(new NotFound());
+  if (!bookmark) return next(new NotFound(undefined , req.lang));
 
   await Bookmarks.updateOne({ _id: req.params.bookmarkId }, { title: req.body.title });
 

@@ -17,7 +17,7 @@ export const createRateHandler: RequestHandler<
   { project: string; cycle: number; rate: number; desc: string }
 > = async (req, res, next) => {
   const project = <IportfolioPost>await getProjectByCycle(req.body.project, req.body.cycle);
-  if (!project) return next(new NotFound('project not found'));
+  if (!project) return next(new NotFound({en:'project not found' , ar: 'المشروع غير موجود'} , req.lang));
 
   await Rates.create({
     project: { id: req.body.project, cycle: req.body.cycle },
