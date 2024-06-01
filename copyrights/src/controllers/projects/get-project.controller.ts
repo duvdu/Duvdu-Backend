@@ -9,7 +9,7 @@ export const getProjectHandler: RequestHandler<
     _id: req.params.projectId,
     isDeleted: { $ne: true },
   }).populate([{ path: 'user', select: ['username', 'profileImage', 'isOnline' , 'acceptedProjectsCounter' , 'name' , 'rate'] }]).lean();
-  if (!project) return next(new NotFound('project not found'));
+  if (!project) return next(new NotFound({en:'project not found' , ar:'المشروع غير موجود'} , req.lang));
   const localizedTags = project.tags.map(tag => tag[req.lang]) as string[]; 
   const localizedSubCategory = project.subCategory[req.lang]; 
 

@@ -18,32 +18,32 @@ export const takeAction: RequestHandler<
   { action: ContractStatus; submitFiles?: { link?: string; notes?: string } }
 > = async (req, res, next) => {
   const contract = await Contracts.findById(req.params.contractId);
-  if (!contract) return next(new NotFound('contract not found'));
+  if (!contract) return next(new NotFound(undefined , req.lang));
 
   if (
     // req.loggedUser.id.toString() !== contract.sourceUser.toString() &&
     req.loggedUser.id.toString() !== contract.targetUser.toString()
   )
-    return next(new NotAllowedError('not allowed to take action'));
+    return next(new NotAllowedError(undefined , req.lang));
 
   switch (req.body.action) {
     case ContractStatus.ongoing:
       if (contract.status !== ContractStatus.pending)
-        return next(new BadRequestError(`contract is already ${contract.status}`));
+        return next(new BadRequestError({en:`contract is already ${contract.status}` , ar:`العقد بالفعل ${contract.status}`} , req.lang));
       if (new Date(contract.createdAt).getTime() + 24 * 60 * 60 * 1000 < new Date().getTime())
-        return next(new BadRequestError('timeout'));
+        return next(new BadRequestError({en:'timeout' , ar:'انتهاء المهلة'} , req.lang));
       await updatePendingToOngoing(contract.id);
       break;
     case ContractStatus.rejected:
       if (contract.status !== ContractStatus.pending)
-        return next(new BadRequestError(`contract is already ${contract.status}`));
+        return next(new BadRequestError({en:`contract is already ${contract.status}` , ar:`العقد بالفعل ${contract.status}`} , req.lang));
       if (new Date(contract.createdAt).getTime() + 24 * 60 * 60 * 1000 < new Date().getTime())
         return next(new BadRequestError('timeout'));
       await updatePendingToRejected(contract.id);
       break;
     case ContractStatus.completed:
       if (contract.status !== ContractStatus.ongoing)
-        return next(new BadRequestError(`contract is already ${contract.status}`));
+        return next(new BadRequestError({en:`contract is already ${contract.status}` , ar:`العقد بالفعل ${contract.status}`} , req.lang));
       await updatePendingToCompleted(contract, req.body.submitFiles);
       break;
   }

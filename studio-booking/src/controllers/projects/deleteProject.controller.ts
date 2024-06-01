@@ -16,6 +16,6 @@ export const removeProjectHandler: RemoveProjectHandler = async (req, res, next)
     { new: true },
   );
 
-  if (!project) return next(new NotAllowedError('user not owner for this project'));
+  if (!project) return next(new NotAllowedError(undefined , req.lang));
   res.status(204).json({ message: 'success' });
 };

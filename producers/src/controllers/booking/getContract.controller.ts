@@ -14,7 +14,7 @@ export const getContractHandler:GetContractHandler = async (req,res,next)=>{
     ]);
 
   if (!contract) 
-    return next(new NotFound('contract not found'));
+    return next(new NotFound({en:'contract not found' , ar:'العقد غير موجود'} , req.lang));
 
   res.status(200).json({message:'success' , data:contract});
 };

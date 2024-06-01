@@ -13,6 +13,6 @@ export const getProducerHandler:GetProducerHandler = async (req,res,next)=>{
     .populate([{path:'user' , select:'profileImage username location rate'}]);
   
   if (!user) 
-    return next(new NotFound('user not found'));
+    return next(new NotFound({en:'user not found' , ar:'المستخدم غير موجود'} , req.lang));
   res.status(200).json({message:'success' , data:user});
 };

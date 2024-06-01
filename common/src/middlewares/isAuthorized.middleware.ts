@@ -12,6 +12,6 @@ export const isauthorized = (permission: PERMISSIONS) => <RequestHandler>(async 
   next,
 ) => {
   if ((req as any).loggedUser.role.key === SystemRoles.admin) return next();
-  if (!(req as any).loggedUser.role.permissions.includes(permission)) return next(new UnauthorizedError());
+  if (!(req as any).loggedUser.role.permissions.includes(permission)) return next(new UnauthorizedError(undefined , (req as any).lang));
   next();
 });

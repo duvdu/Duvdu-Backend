@@ -30,7 +30,7 @@ export const getChatFromToHandler:GetChatFromUserToUserHandler = async (req ,res
   ]).skip(req.pagination.skip).limit(req.pagination.limit);
 
   if (chat.length === 0) 
-    return next(new NotFound(`no chat created between to users ${req.params.receiver} ${req.params.sender}`));
+    return next(new NotFound(undefined , req.lang));
   
   const resultCount = await Message.countDocuments(req.pagination.filter);
 

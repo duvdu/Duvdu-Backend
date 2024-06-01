@@ -12,7 +12,7 @@ export const createProjectHandler:CreateProjectHandler = async (req,res,next)=>{
   const categoryFound = await Categories.find({_id:{$in:categories}}).countDocuments();
 
   if (categoryFound != categories.length) 
-    return next(new BadRequestError('invalid categories'));
+    return next(new BadRequestError({en:'invalid categories' , ar:'الفئات غير صالحة'} , req.lang));
 
   let users = req.body.creatives.flatMap((creative:any) => creative.users?.map((user:any) => user.user));
   users  = users[0]== undefined?[]:users;
@@ -20,7 +20,7 @@ export const createProjectHandler:CreateProjectHandler = async (req,res,next)=>{
   const creativeFound = await Users.find({_id:{$in:users}}).countDocuments();
   
   if (creativeFound != users.length) 
-    return next(new BadRequestError('invalid creatives'));
+    return next(new BadRequestError({en:'invalid creatives' , ar:'الإبداعات غير صالحة'} , req.lang));
 
   const project = await TeamProject.create({
     ...req.body,

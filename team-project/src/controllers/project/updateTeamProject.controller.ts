@@ -12,9 +12,9 @@ export const updateProjectHandler:UpdateProjectHandler = async (req,res,next)=>{
 
   const project = await TeamProject.findById(req.params.projectId);
   if (!project) 
-    return next(new NotFound('project not found'));
+    return next(new NotFound({en:'project not found' , ar:'المشروع غير موجود'} , req.lang));
   if (project.user.toString() != req.loggedUser.id) 
-    return next(new NotAllowedError('user not owner for ths project'));
+    return next(new NotAllowedError(undefined , req.lang));
 
   const s3 = new Bucket();
   if (attachments) {

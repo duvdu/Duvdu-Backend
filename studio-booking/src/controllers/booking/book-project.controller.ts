@@ -24,12 +24,12 @@ export const bookProjectHandler: RequestHandler<
     .collection(MODELS.studioBooking)
     .findOne({ _id: new mongoose.Types.ObjectId(req.params.projectId), isDeleted: { $ne: true } });
   // const project = await studioBooking.findOne({ _id: req.params.projectId, isDeleted: true });
-  if (!project) return next(new NotFound('Project not found'));
+  if (!project) return next(new NotFound({en:'Project not found' , ar:'المشروع غير موجود'} , req.lang));
   const equipmentsWithFees: { name: string; fees: number }[] = [];
   // assert equipments
   for (const equipment of req.body.equipments) {
     const equip = project.equipments.find((el: any) => el._id.toString() === equipment);
-    if (!equip) return next(new NotFound('Equipment not found in this project'));
+    if (!equip) return next(new NotFound({en:'Equipment not found in this project' , ar:'المعدات غير موجودة في هذا المشروع'} , req.lang));
     equipmentsWithFees.push(equip);
   }
 

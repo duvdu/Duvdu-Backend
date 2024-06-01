@@ -14,7 +14,7 @@ export const removeProjectHandler: RequestHandler<{ projectId: string }, Success
     },
     { isDeleted: true },
   );
-  if (!project) return next(new NotAllowedError());
+  if (!project) return next(new NotAllowedError(undefined , req.lang));
 
   res.status(200).json({ message: 'success' });
 };

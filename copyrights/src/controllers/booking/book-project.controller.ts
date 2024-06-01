@@ -18,9 +18,9 @@ export const bookProjectHandler: RequestHandler<
   SuccessResponse<{ data: { paymentLink: string } }>
 > = async (req, res, next) => {
   // assert data
-  if (req.body.targetUser === req.loggedUser.id.toString()) return next(new BadRequestError(''));
+  if (req.body.targetUser === req.loggedUser.id.toString()) return next(new BadRequestError(undefined , req.lang));
   const project = await CopyRights.findById(req.params.projectId);
-  if (!project) return next(new NotFound('Project not found'));
+  if (!project) return next(new NotFound({en:'Project not found' , ar:'المشروع غير موجود'} , req.lang));
 
   // deal with media
   const attachments = req.files as Express.Multer.File[];
