@@ -1,6 +1,7 @@
-import { model, Schema } from 'mongoose';
+import { model, Schema, Types } from 'mongoose';
 
 import { MODELS } from '../types/model-names';
+import { Iuser } from '../types/User';
 
 interface Iproject {
   project: {
@@ -8,6 +9,7 @@ interface Iproject {
   };
   ref: string;
   cycle: number;
+  user: Types.ObjectId | Iuser;
   rate: { ratersCounter: number; totalRates: number };
 }
 
@@ -23,6 +25,7 @@ export const Project = model<Iproject>(
         ref: String,
       },
       ref: String,
+      user: { type: Schema.Types.ObjectId, ref: MODELS.user },
       rate: {
         ratersCounter: { type: Number, default: 0 },
         totalRates: { type: Number, default: 0 },

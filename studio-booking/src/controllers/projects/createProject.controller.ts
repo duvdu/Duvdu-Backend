@@ -10,19 +10,22 @@ import {
   Users,
   CYCLES,
   filterTagsForCategory,
-  
 } from '@duvdu-v1/duvdu';
 
 import { createInvitedUsers } from '../../services/create-invited-users';
 import { CreateProjectHandler } from '../../types/endpoints/endpoints';
 
 export const createProjectHandler: CreateProjectHandler = async (req, res, next) => {
-
   try {
     const attachments = <Express.Multer.File[]>(req.files as any).attachments;
     const cover = <Express.Multer.File[]>(req.files as any).cover;
 
-    const {filteredTags , subCategoryTitle} = await filterTagsForCategory(req.body.category.toString() , req.body.subCategory , req.body.tags , CYCLES.studioBooking);
+    const { filteredTags, subCategoryTitle } = await filterTagsForCategory(
+      req.body.category.toString(),
+      req.body.subCategory,
+      req.body.tags,
+      CYCLES.studioBooking,
+    );
 
     (req.body.tags as any) = filteredTags;
     (req.body.subCategory as any) = subCategoryTitle;
@@ -32,7 +35,9 @@ export const createProjectHandler: CreateProjectHandler = async (req, res, next)
         _id: req.body.creatives.map((el: any) => el.creative),
       });
       if (req.body.creatives.length != creativeCount)
-        return next(new BadRequestError({en:'invalid cretaives' , ar:'الإبداعات غير صالحة'} , req.lang));
+        return next(
+          new BadRequestError({ en: 'invalid cretaives', ar: 'الإبداعات غير صالحة' }, req.lang),
+        );
     }
 
     let invitedCreatives;
@@ -51,13 +56,16 @@ export const createProjectHandler: CreateProjectHandler = async (req, res, next)
     await project.save();
     Files.removeFiles(...project.attachments, project.cover);
 
-    await Project.create({project:{
-      type:project.id,
-      ref:MODELS.studioBooking
-    } , ref:MODELS.studioBooking});
+    await Project.create({
+      project: {
+        type: project.id,
+        ref: MODELS.studioBooking,
+      },
+      user: req.loggedUser.id,
+      ref: MODELS.studioBooking,
+    });
 
     res.status(201).json({ message: 'success', data: project });
-  
   } catch (error) {
     next(error);
   }
