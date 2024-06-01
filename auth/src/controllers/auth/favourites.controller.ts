@@ -11,7 +11,8 @@ export const updateFavouriteList: RequestHandler<
   let project;
   if (req.query.action !== 'remove') {
     project = await Project.findOne({ 'project.type': req.params.projectId });
-    if (!project) return next(new NotFound({en:'project not found' , ar: 'المشروع غير موجود'} , req.lang));
+    if (!project)
+      return next(new NotFound({ en: 'project not found', ar: 'المشروع غير موجود' }, req.lang));
   }
 
   const filter =
@@ -52,6 +53,29 @@ export const getFavouriteProjects: RequestHandler<
     el.project.tags = (el.project.tags as { _id: string; en: string; ar: string }[])?.map((el) =>
       req.lang === 'en' ? el.en : el.ar,
     );
+    if (el.project.attachments)
+      el.project.attachments = el.project.attachments?.map(
+        (subEl: string) => process.env.BUCKET_HOST + '/' + subEl,
+      );
+    if (el.project.cover) el.project.cover = process.env.BUCKET_HOST + '/' + el.project.cover;
+    if (el.project?.user?.profileImage)
+      el.project.user.profileImage = process.env.BUCKET_HOST + '/' + el.project.user.profileImage;
+    if (el.project.creatives)
+      el.project.creatives = (
+        el.project.creatives as { creative: { profileImage?: string } }[]
+      )?.map((el) => ({
+        ...el,
+        creative: {
+          ...el.creative,
+          profileImage: el.creative.profileImage
+            ? process.env.BUCKET_HOST + '/' + el.creative.profileImage
+            : null,
+        },
+      }));
+    if (el.project.tags)
+      el.project.tags = (el.project.tags as { _id: string; en: string; ar: string }[])?.map((el) =>
+        req.lang === 'en' ? el.en : el.ar,
+      );
     if (el.project.subCategory)
       el.project.subCategory =
         req.lang === 'en' ? el.project.subCategory.en : el.project.subCategory.ar;
