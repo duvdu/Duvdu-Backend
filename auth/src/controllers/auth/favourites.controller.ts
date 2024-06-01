@@ -58,11 +58,11 @@ export const getFavouriteProjects: RequestHandler<
         (subEl: string) => process.env.BUCKET_HOST + '/' + subEl,
       );
     if (el.project.cover) el.project.cover = process.env.BUCKET_HOST + '/' + el.project.cover;
-    // if (
-    //   el.project?.user?.profileImage &&
-    //   !(el.project?.user?.profileImage as string).startsWith('http://')
-    // )
-    //   el.project.user.profileImage = process.env.BUCKET_HOST + '/' + el.project.user.profileImage;
+    if (
+      el.project?.user?.profileImage &&
+      !(el.project?.user?.profileImage as string).startsWith('http')
+    )
+      el.project.user.profileImage = process.env.BUCKET_HOST + '/' + el.project.user.profileImage;
     if (el.project.creatives)
       el.project.creatives = (
         el.project.creatives as { creative: { profileImage?: string } }[]
