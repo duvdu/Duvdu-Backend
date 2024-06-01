@@ -1,5 +1,6 @@
 import { Schema, model, Types } from 'mongoose';
 
+import { CYCLES } from '../types/cycles';
 import { MODELS } from '../types/model-names';
 import { Iuser } from '../types/User';
 
@@ -14,17 +15,16 @@ export interface IportfolioPost {
   tools: { name: string; fees: number }[];
   searchKeywords: string[];
   creatives: { creative: Types.ObjectId | Iuser; fees: number }[];
-  tags: {ar:string , en:string}[];
-  subCategory:{ar:string , en:string};
+  tags: { ar: string; en: string }[];
+  subCategory: { ar: string; en: string };
   projectBudget: number;
   category: Types.ObjectId;
   projectScale: { scale: number; time: 'minutes' | 'hours' };
   showOnHome: boolean;
-  cycle: number;
+  cycle: string;
   rate: { ratersCounter: number; totalRates: number };
   isDeleted: boolean;
 }
-
 
 export const PortfolioPosts = model<IportfolioPost>(
   MODELS.portfolioPost,
@@ -44,16 +44,16 @@ export const PortfolioPosts = model<IportfolioPost>(
           fees: { type: Number, default: null },
         },
       ],
-      tags:[{ ar: { type: String, default: null }, en: { type: String, default: null } }],
-      subCategory:{
-        ar:String,
-        en:String
+      tags: [{ ar: { type: String, default: null }, en: { type: String, default: null } }],
+      subCategory: {
+        ar: String,
+        en: String,
       },
       projectBudget: { type: Number, default: null },
       category: { type: Schema.Types.ObjectId, ref: MODELS.category, required: true },
       projectScale: { scale: { type: Number, default: 0 }, time: { type: String, default: null } },
       showOnHome: { type: Boolean, default: true },
-      cycle: { type: Number, default: 1 },
+      cycle: { type: String, default: CYCLES.portfolioPost },
       isDeleted: { type: Boolean, default: false },
       rate: {
         ratersCounter: { type: Number, default: 0 },
@@ -71,10 +71,9 @@ export const PortfolioPosts = model<IportfolioPost>(
               (el: string) => process.env.BUCKET_HOST + '/' + el,
             );
         },
-      }
+      },
     },
   )
     .index({ createdAt: 1, updatedAt: -1 })
     .index({ title: 'text', desc: 'text', tools: 'text', searchKeywords: 'text' }),
 );
-

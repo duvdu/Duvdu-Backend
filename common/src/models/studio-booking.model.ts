@@ -1,5 +1,6 @@
 import mongoose, { model, Schema, Types } from 'mongoose';
 
+import { CYCLES } from '../types/cycles';
 import { MODELS } from '../types/model-names';
 import { Iuser } from '../types/User';
 
@@ -19,7 +20,7 @@ export interface IstudioBooking {
   insurance: number;
   showOnHome: boolean;
   category: Types.ObjectId;
-  cycle: number;
+  cycle: string;
   rate: { ratersCounter: number; totalRates: number };
   isDeleted: boolean;
   creatives: { creative: Types.ObjectId | Iuser; fees: number }[];
@@ -57,7 +58,7 @@ export const studioBooking = model<IstudioBooking>(
         ref: MODELS.category,
         required: true,
       },
-      cycle: { type: Number, default: 2 },
+      cycle: { type: String, default: CYCLES.studioBooking },
       isDeleted: { type: Boolean, default: false },
       creatives: [
         {
@@ -86,7 +87,7 @@ export const studioBooking = model<IstudioBooking>(
               (el: string) => process.env.BUCKET_HOST + '/' + el,
             );
         },
-      }
+      },
     },
   ),
 );
