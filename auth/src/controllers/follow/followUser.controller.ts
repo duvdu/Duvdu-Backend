@@ -13,15 +13,15 @@ export const followHandler:FollowHandler = async (req,res,next)=>{
   const follow = await Follow.findOne({follower:req.loggedUser.id  , following:req.params.userId});
 
   if (follow) 
-    return next(new BadRequestError(`user ${req.loggedUser.id} is already follow this user ${req.params.userId}`));
+    return next(new BadRequestError({en:`user ${req.loggedUser.id} is already follow this user ${req.params.userId}` , ar:`المستخدم ${req.loggedUser.id} يتابع بالفعل هذا المستخدم ${req.params.userId}`} , req.lang));
     
   const user  = await Users.findById(req.params.userId);
   if (!user) 
-    return next(new NotFound('user not found'));
+    return next(new NotFound({en:'user not found' , ar: 'المستخدم غير موجود'},req.lang));
 
   const sourceUser = await Users.findById(req.loggedUser.id);
   if (!sourceUser) 
-    return next(new NotFound('user not found'));
+    return next(new NotFound({en:'user not found' , ar: 'المستخدم غير موجود'},req.lang));
 
   const newFollow = await Follow.create({follower:req.loggedUser.id , following:req.params.userId});
   

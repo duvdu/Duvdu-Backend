@@ -11,7 +11,7 @@ export const updateFavouriteList: RequestHandler<
   let project;
   if (req.query.action !== 'remove') {
     project = await Project.findOne({ 'project.type': req.params.projectId });
-    if (!project) return next(new NotFound('project not found'));
+    if (!project) return next(new NotFound({en:'project not found' , ar: 'المشروع غير موجود'} , req.lang));
   }
 
   const filter =

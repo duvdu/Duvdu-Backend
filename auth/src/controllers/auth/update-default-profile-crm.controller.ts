@@ -5,7 +5,7 @@ export const updateDefaultProfileCrm: RequestHandler<
   unknown,
   SuccessResponse<{ data: { url: string } }>
 > = async (req, res, next) => {
-  if (!req.file) return next(new BadRequestError(''));
+  if (!req.file) return next(new BadRequestError(undefined , req.lang));
   const bucket = new Bucket();
   // TODO: remove last image
   await bucket.saveBucketFiles('defaults', req.file);

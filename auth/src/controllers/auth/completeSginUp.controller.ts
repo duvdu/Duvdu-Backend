@@ -10,11 +10,11 @@ import { generateRandom6Digit } from '../../utils/gitRandom6Dugut';
 
 export const completeSginupHandler:CompleteSginUpHandler = async (req,res,next)=>{
   const role = await Roles.findOne({key:SystemRoles.unverified});
-  if (!role)return next(new NotFound('role not found'));
+  if (!role)return next(new NotFound({en:'role not found' , ar: 'الدور غير موجود'} , req.lang));
 
   const user = await Users.findById(req.loggedUser.id);
-  if (!user) return next(new NotFound('user not found'));
-  if (user.verificationCode?.reason != VerificationReason.completeSginUp) return next(new UnauthorizedError('user not in this cycle'));
+  if (!user) return next(new NotFound({en:'user not found' ,ar: 'المستخدم غير موجود' } , req.lang));
+  if (user.verificationCode?.reason != VerificationReason.completeSginUp) return next(new UnauthorizedError({en:'user not in this cycle' , ar: 'المستخدم ليس في هذه الدورة'} , req.lang));
   const verificationCode = generateRandom6Digit();
   user.name=req.body.name;
   user.username=req.body.username;

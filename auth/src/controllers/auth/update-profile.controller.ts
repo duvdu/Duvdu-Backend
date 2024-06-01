@@ -13,13 +13,13 @@ import { UpdateProfileHandler } from './../../types/endpoints/user.endpoints';
 
 export const updateProfileHandler: UpdateProfileHandler = async (req, res, next) => {
   const profile = await Users.findById(req.loggedUser.id);
-  if (!profile) return next(new NotFound('no user found'));
+  if (!profile) return next(new NotFound({en:'no user found' , ar: 'المستخدم غير موجود'} , req.lang));
 
   const coverImage = <Express.Multer.File[] | undefined>(req.files as any).coverImage;
   const profileImage = <Express.Multer.File[] | undefined>(req.files as any).profileImage;
   if (req.body.category) {
     const category = await Categories.findById(req.body.category);
-    if (!category) return next(new NotFound('category not found'));
+    if (!category) return next(new NotFound({en:'category not found' , ar:'الفئة غير موجودة'} , req.lang));
   }
 
   const s3 = new Bucket();
@@ -38,7 +38,7 @@ export const updateProfileHandler: UpdateProfileHandler = async (req, res, next)
   }
 
   const user = await Users.findByIdAndUpdate(req.loggedUser?.id, req.body, { new: true });
-  if (!user) return next(new BadRequestError('cannot update this user'));
+  if (!user) return next(new BadRequestError({en:'cannot update this user' , ar:'لا يمكن تحديث هذا المستخدم'},req.lang));
 
   res.status(200).json({ message: 'success', data: user });
 };

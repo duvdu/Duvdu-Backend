@@ -24,7 +24,7 @@ export const getBookmarkHandler: GetBookmarkHandler = async (req, res, next) => 
       options: { skip: req.pagination.skip, limit: req.pagination.limit, sort: { createdAt: -1 } },
     })
     .lean();
-  if (!bookmark) return next(new NotFound());
+  if (!bookmark) return next(new NotFound(undefined , req.lang));
 
   bookmark.projects.forEach((el: any) => {
     if (!el.project?.type) return;

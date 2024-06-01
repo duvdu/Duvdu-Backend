@@ -9,13 +9,13 @@ export const signinHandler: SigninHandler = async (req, res, next) => {
   const user = await Users.findOne({ username: req.body.username });
 
   if (!user || !(await comparePassword(req.body.password, user.password || '')))
-    return next(new UnauthenticatedError());
+    return next(new UnauthenticatedError(undefined , req.lang));
 
   if (!user.isVerified && (user.verificationCode!.reason = VerificationReason.signup)) 
-    return next(new BadRequestError(`Account not verified reason : ${VerificationReason.signup}`));
+    return next(new BadRequestError({en:`Account not verified reason : ${VerificationReason.signup}` , ar:`سبب عدم توثيق الحساب : ${VerificationReason.signup}`} , req.lang));
 
   const role = await Roles.findById(user.role);
-  if (!role) return next(new UnauthenticatedError('user dont have a role'));
+  if (!role) return next(new UnauthenticatedError({en:'user dont have a role' , ar: 'المستخدم ليس لديه دور'} , req.lang));
   
   const accessToken = generateAccessToken({
     id: user.id,
