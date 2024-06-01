@@ -8,7 +8,7 @@ export const createReportHandler:CreateReportHandler = async (req,res,next)=>{
   const attachments = <Express.Multer.File[]>(req.files as any)?.attachments;  
   const project = await Project.findOne({'project.type':req.body.project});
   if (!project) 
-    return next(new NotFound(`project not found ${req.body.project}`));
+    return next(new NotFound(undefined , req.lang));
 
   const s3 = new Bucket();
   if (attachments) {
