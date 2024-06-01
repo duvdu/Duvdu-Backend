@@ -10,7 +10,7 @@ import { GetProducerHandler } from '../../types/endpoints';
 
 export const getProducerHandler:GetProducerHandler = async (req,res,next)=>{
   const user = await Producer.findById(req.params.producerId)
-    .populate([{path:'user' , select:'profileImage username location rate'}]);
+    .populate([{path:'user' , select:'profileImage username location rate name'}]);
   
   if (!user) 
     return next(new NotFound({en:'user not found' , ar:'المستخدم غير موجود'} , req.lang));

@@ -17,8 +17,8 @@ export const updateContractHandler:UpdateContractHandler = async (req,res,next)=
     return next(new NotAllowedError(undefined , req.lang));
 
   const updatedContract = await ProducerBooking.findByIdAndUpdate(req.params.contractId , {status:req.body.status} , {new:true}).populate([
-    {path:'user' , select:'profileImage username location rate'},
-    {path:'producer' , select:'profileImage username location rate'}
+    {path:'user' , select:'profileImage username location rate name'},
+    {path:'producer' , select:'profileImage username location rate name'}
   ]);
   
   if (!updatedContract) 

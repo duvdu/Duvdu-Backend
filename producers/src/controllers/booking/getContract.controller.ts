@@ -9,8 +9,8 @@ import { GetContractHandler } from '../../types/endpoints';
 export const getContractHandler:GetContractHandler = async (req,res,next)=>{
   const contract = await ProducerBooking.findById(req.params.contractId)
     .populate([
-      {path:'user' , select:'profileImage username location rate'},
-      {path:'producer' , select:'profileImage username location rate'}
+      {path:'user' , select:'profileImage username location rate name'},
+      {path:'producer' , select:'profileImage username location rate name'}
     ]);
 
   if (!contract) 
