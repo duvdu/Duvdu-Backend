@@ -41,7 +41,6 @@ export const createProjectHandler: RequestHandler<
   const attachments = <Express.Multer.File[]>(req.files as any).attachments;
   const cover = <Express.Multer.File>(req.files as any).cover[0];
 
-    
   // handle category
   const { filteredTags, subCategoryTitle } = await filterTagsForCategory(
     req.body.category.toString(),
@@ -55,7 +54,9 @@ export const createProjectHandler: RequestHandler<
     _id: req.body.creatives?.map((el) => el.creative),
   });
   if (req.body.creatives && creativesCount !== req.body.creatives.length)
-    return next(new BadRequestError({en:'invalid creatives' , ar:'الإبداعات غير صالحة'} , req.lang));
+    return next(
+      new BadRequestError({ en: 'invalid creatives', ar: 'الإبداعات غير صالحة' }, req.lang),
+    );
 
   // handle unregistered creatives
   let invitedCreatives;
@@ -74,8 +75,7 @@ export const createProjectHandler: RequestHandler<
     subCategory: subCategoryTitle,
     tags: filteredTags,
     creatives: [...(req.body.creatives || []), ...(invitedCreatives || [])],
-    user: '662c9ac0cf033b86395d6e0b'
-    // user: req.loggedUser.id
+    user: req.loggedUser.id,
   });
 
   await Project.create({
@@ -83,6 +83,7 @@ export const createProjectHandler: RequestHandler<
       type: project.id,
       ref: MODELS.portfolioPost,
     },
+    user: req.loggedUser.id,
     ref: MODELS.portfolioPost,
   });
   res.status(201).json({ message: 'success', data: project });
