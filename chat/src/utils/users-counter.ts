@@ -14,5 +14,5 @@ export const addUserToVisitor = async (n = 1) => {
   return count + n;
 };
 
-export const getLoggedCount = async () => +((await redisClient.get(totalLogged)) || 0);
+export const getLoggedCount = async () => +((await redisClient.get(totalLogged )) || 0);
 export const getVisitorCount = async () => +((await redisClient.get(totalVisitors)) || 0);

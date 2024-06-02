@@ -24,6 +24,7 @@ router
     handlers.filterUsers,
     handlers.findUsers,
   );
+
 router.post('/signin', val.signinVal, handlers.signinHandler);
 router.post('/signup', val.signupVal, handlers.signupHandler);
 router.post(
@@ -94,7 +95,7 @@ router.patch(
   handlers.updateFavouriteList,
 );
 
-router.route('/profile/:userId').get(val.userIdVal, handlers.getUserProfileHandler);
+router.route('/profile/:username').get(handlers.getUserProfileHandler);
 
 router.route('/verify').post(val.verify, handlers.verifyHandler);
 

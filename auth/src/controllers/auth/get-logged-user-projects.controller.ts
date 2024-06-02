@@ -4,7 +4,7 @@ import { RequestHandler } from 'express';
 export const getLoggedUserProjects: RequestHandler<
   unknown,
   SuccessResponse<{ data: any }>
-> = async (req, res, next) => {
+> = async (req, res) => {
   const count = await Project.countDocuments({ user: req.loggedUser.id });
 
   const projects = await Project.find({ user: req.loggedUser.id })
