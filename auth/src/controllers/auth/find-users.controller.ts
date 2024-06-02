@@ -53,7 +53,9 @@ export const findUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser
         pricePerHour: 1,
         hasVerificationBadge: 1,
         rate: 1,
-        followCount:1
+        followCount:1,
+        invalidAddress:1,
+        likes:1
       }
     },
     {

@@ -19,6 +19,7 @@ export const updateProfileVal = [
         .customSanitizer((val) => +val)
         .run(req);
     }),
+  body('address').optional().exists().isString().withMessage('invalidAddress'),
   body('category')
     .optional()
     .isMongoId().withMessage('categoryInvalid'),

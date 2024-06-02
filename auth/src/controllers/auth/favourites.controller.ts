@@ -17,9 +17,10 @@ export const updateFavouriteList: RequestHandler<
 
   const filter =
     req.query.action === 'remove'
-      ? { $pull: { favourites: { project: req.params.projectId } } }
+      ? { $pull: { favourites: { project: req.params.projectId } } , likes:{$inc:-1} }
       : {
           $addToSet: { favourites: { project: req.params.projectId, cycle: (project as any).ref } },
+          likes:{$inc:1}
         };
   await Users.updateOne({ _id: req.loggedUser.id }, filter);
 
