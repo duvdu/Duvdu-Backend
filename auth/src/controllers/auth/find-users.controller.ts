@@ -34,7 +34,6 @@ export const findUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser
   req,
   res,
 ) => {
-  console.log(req.pagination.filter);
   const count = await Users.countDocuments(req.pagination.filter);
 
   const aggregationPipeline = [
@@ -55,7 +54,9 @@ export const findUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser
         rate: 1,
         followCount:1,
         invalidAddress:1,
-        likes:1
+        likes:1,
+        address:1,
+        views:1
       }
     },
     {
@@ -91,9 +92,6 @@ export const findUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser
   ];
   
   const users = await Users.aggregate(aggregationPipeline);
-  
-  
-  
 
   res.status(200).json({
     message: 'success',

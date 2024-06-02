@@ -50,7 +50,8 @@ const userSchema = new Schema<Iuser>(
       },
     ],
     address:{type:String , default:null},
-    likes:{type:Number , default:0}
+    likes:{type:Number , default:0},
+    views:{type:Number , default:0}
   },
   {
     timestamps: true,

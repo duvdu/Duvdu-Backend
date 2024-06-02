@@ -154,7 +154,7 @@ export interface GetLoggedUserProfileHandler
 
 export interface GetUserProfileHandler
   extends RequestHandler<
-    { userId: string },
+    { username: string },
     successResponse<{
       data: Pick<
         Iuser,
