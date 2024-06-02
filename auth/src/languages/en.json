@@ -37,6 +37,7 @@
     "usernameString": "Username must be a string",
     "codeString": "Code must be a string",
     "verificationCodeLength": "Verification code must be exactly 6 characters long",
+    "invalidAddress":"Address is required",
 
 
     

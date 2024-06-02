@@ -49,6 +49,8 @@ const userSchema = new Schema<Iuser>(
         cycle: { type: String, required: true },
       },
     ],
+    address:{type:String , default:null},
+    likes:{type:Number , default:0}
   },
   {
     timestamps: true,

@@ -45,4 +45,6 @@ export interface Iuser {
   notificationToken: string | null;
   isFollow?: boolean;
   favourites: { project: Types.ObjectId; cycle: string }[];
+  address:string,
+  likes:number
 }
