@@ -15,4 +15,3 @@ export * from './find-users.controller';
 export * from './favourites.controller';
 export * from './update-default-profile-crm.controller';
 export * from './get-logged-user-projects.controller';
-export * from './getUser.controller';

@@ -46,6 +46,5 @@ export interface Iuser {
   isFollow?: boolean;
   favourites: { project: Types.ObjectId; cycle: string }[];
   address:string,
-  likes:number,
-  views:number
+  likes:number
 }
