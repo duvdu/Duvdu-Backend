@@ -142,6 +142,13 @@ export const getSpecificChatHandler: GetSpecificChatHandler = async (req, res) =
     ],
   });
 
+  await Message.updateMany({
+    $or: [
+      { sender: userOne, receiver: userTwo, watched: false },
+      { sender: userTwo, receiver: userOne, watched: false },
+    ],
+  }, { $set: { watched: true } });
+
   res.status(200).json({
     message: 'success',
     pagination: {

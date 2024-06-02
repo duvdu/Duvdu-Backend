@@ -36,7 +36,7 @@ export const createProjectHandler:CreateProjectHandler = async (req,res,next)=>{
   await Project.create({project:{
     type:project.id,
     ref:MODELS.studioBooking
-  } , ref:MODELS.studioBooking});
+  } , ref:MODELS.studioBooking, user: req.loggedUser.id});
 
   res.status(201).json({message:'success' , data:project});
 };
