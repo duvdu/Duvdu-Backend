@@ -6,6 +6,7 @@ import jwt from 'jsonwebtoken';
 import { Server } from 'socket.io';
 
 import { handleSocketEvents } from './handle-socket-events.controller';
+import { handleEndUserSession, handleUserSession } from './handle-user-session.controller';
 import {
   addUserToLogged,
   addUserToVisitor,
@@ -59,6 +60,7 @@ export class SocketServer {
           .emit(EVENTS.loggedCounterUpdate, { counter: await getLoggedCount() });
         next();
       } catch (error) {
+        console.error(error);
         return next(new UnauthenticatedError('invalid or expired token'));
       }
     });
@@ -77,9 +79,11 @@ export class SocketServer {
       console.log('connect guest');
     }
 
+    if (socket.data.user) await handleUserSession(this.io, socket);
     handleSocketEvents(this.io, socket);
 
     socket.on('disconnect', async () => {
+      if (socket.data.user) await handleEndUserSession(this.io, socket);
       if (userId) {
         await Users.findByIdAndUpdate(userId, { isOnline: false }, { new: true });
         await addUserToLogged(-1);
