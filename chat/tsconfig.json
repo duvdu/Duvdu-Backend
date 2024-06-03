@@ -10,6 +10,10 @@
     "skipLibCheck": true,
     "resolveJsonModule": true
   },
-  "include": ["src/**/*.ts", "../common/src/types/notification.type.ts"],
+  "include": [
+    "src/**/*.ts",
+    "../common/src/types/notification.type.ts",
+    "../common/src/models/session.model.ts"
+  ],
   "exclude": ["node_modules", "__test__"]
 }

@@ -1,4 +1,4 @@
-import { NotFound, SystemRoles, Roles, Users, VerificationReason } from '@duvdu-v1/duvdu';
+import { NotFound, SystemRoles, Roles, Users, VerificationReason, Sessions } from '@duvdu-v1/duvdu';
 
 import { SignupHandler } from '../../types/endpoints/user.endpoints';
 import { hashPassword } from '../../utils/bcrypt';
@@ -8,7 +8,7 @@ import { generateRandom6Digit } from '../../utils/gitRandom6Dugut';
 export const signupHandler: SignupHandler = async (req, res, next) => {
   const role = await Roles.findOne({ key: SystemRoles.unverified });
 
-  if (!role) return next(new NotFound(undefined , req.lang));
+  if (!role) return next(new NotFound(undefined, req.lang));
 
   const verificationCode = generateRandom6Digit();
   const newUser = await Users.create({
@@ -24,6 +24,8 @@ export const signupHandler: SignupHandler = async (req, res, next) => {
   });
 
   await newUser.save();
+
+  await Sessions.create({ user: newUser.id });
 
   //TODO: send OTP
   res.status(201).json(<any>{ message: 'success', code: verificationCode });
