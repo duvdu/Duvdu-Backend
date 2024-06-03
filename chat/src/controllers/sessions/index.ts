@@ -1,8 +1,6 @@
-import { NotFound, SuccessResponse } from '@duvdu-v1/duvdu';
+import { Isession, NotFound, Sessions, SuccessResponse } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import { Types } from 'mongoose';
-
-import { Isession, Sessions } from '../../model/session.model';
 
 export const getUserSession: RequestHandler<
   { userId: string },

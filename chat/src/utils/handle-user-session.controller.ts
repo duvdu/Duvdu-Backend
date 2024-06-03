@@ -1,8 +1,6 @@
-import { Iuser } from '@duvdu-v1/duvdu';
+import { Iuser, Sessions } from '@duvdu-v1/duvdu';
 import { Server, Socket } from 'socket.io';
 import UAParser from 'ua-parser-js';
-
-import { Sessions } from '../model/session.model';
 
 export const handleUserSession = async (io: Server, socket: Socket) => {
   const user = socket.data.user as Iuser;

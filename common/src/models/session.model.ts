@@ -1,5 +1,7 @@
-import { Iuser, MODELS } from '@duvdu-v1/duvdu';
 import { model, Schema, Types } from 'mongoose';
+
+import { MODELS } from '../types/model-names';
+import { Iuser } from '../types/User';
 
 export interface Isession {
   user: Types.ObjectId | Iuser;
