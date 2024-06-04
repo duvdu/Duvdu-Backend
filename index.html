@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body></body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.1/socket.io.js"></script>
+  <script>
+    const cookie =
+      'connect.sid=s%3AeWAeJC9PY_6DEcs9jhllddH4hEJ-Q9Yw.cidST8Y7UEUsuxep9AuMYSkBxWf3mh0ciZZaK3Sw3aE';
+    const host = 'http://localhost:3000';
+    const socket = io(host, {
+      transports: ['websocket'],
+    });
+    socket.on('connect', () => {
+      console.log('connected');
+    });
+  </script>
+</html>
