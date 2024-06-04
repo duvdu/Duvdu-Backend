@@ -14,5 +14,9 @@ export const getUserProfileHandler: GetUserProfileHandler = async (req, res, nex
   ).toFixed(2);
   user.profileViews++;
   await user.save();
+  if (user.coverImage)
+    (user as any)._doc.coverImage = process.env.BUCKET_HOST + '/' + user.coverImage;
+  if (user.profileImage)
+    (user as any)._doc.profileImage = process.env.BUCKET_HOST + '/' + user.profileImage;
   res.status(200).json({ message: 'success', data: { ...(user as any)._doc, averageRate } });
 };
