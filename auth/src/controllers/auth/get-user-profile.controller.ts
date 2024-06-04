@@ -29,7 +29,7 @@ export const getUserProfileHandler: GetUserProfileHandler = async (req, res, nex
     };
 
   // isFollow
-  const isFollow = await Follow.findOne({ follower: req.loggedUser.id, following: user.id });
+  const isFollow = await Follow.findOne({ follower: req.loggedUser?.id, following: user.id });
 
   res.status(200).json({
     message: 'success',
