@@ -9,7 +9,7 @@ export const signinHandler: SigninHandler = async (req, res, next) => {
   const user = await Users.findOne({ username: req.body.username });
 
   if (!user || !(await comparePassword(req.body.password, user.password || '')))
-    return next(new UnauthenticatedError(undefined , req.lang));
+    return next(new UnauthenticatedError({ar:'خطا ف  الاسم او كلمة المرور ' , en:'invalid username or password'} , req.lang));
 
   if (!user.isVerified && (user.verificationCode!.reason = VerificationReason.signup)) 
     return next(new BadRequestError({en:`Account not verified reason : ${VerificationReason.signup}` , ar:`سبب عدم توثيق الحساب : ${VerificationReason.signup}`} , req.lang));
