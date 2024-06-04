@@ -2,13 +2,11 @@
 import { IjwtPayload, Ipagination, Iuser } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-
 type successResponse<T> = T & {
   message: 'success';
 };
 
 /* eslint-disable @typescript-eslint/no-namespace */
-
 
 declare module 'express-session' {
   interface SessionData {
@@ -22,7 +20,7 @@ declare global {
     interface Request {
       loggedUser: IjwtPayload;
       pagination: Ipagination;
-      lang : 'ar'|'en'
+      lang: 'ar' | 'en';
     }
   }
 }
@@ -37,7 +35,7 @@ export interface SigninHandler
   extends RequestHandler<
     unknown,
     successResponse<unknown>,
-    { username: string; password: string , notificationToken?:string },
+    { username: string; password: string; notificationToken?: string },
     unknown
   > {}
 
@@ -50,7 +48,7 @@ export interface SignupHandler
       phoneNumber: { key: string; number: string };
       username: string;
       password: string;
-      notificationToken?:string;
+      notificationToken?: string;
     },
     unknown
   > {}
@@ -107,7 +105,7 @@ export interface ResendVerificationCodeHandler
 export interface UpdateProfileHandler
   extends RequestHandler<
     unknown,
-    successResponse<{data:Iuser}>,
+    successResponse<{ data: Iuser }>,
     Partial<
       Pick<
         Iuser,
@@ -146,7 +144,7 @@ export interface GetLoggedUserProfileHandler
         | 'pricePerHour'
         | 'hasVerificationBadge'
         | 'currentRank'
-      > & { averageRate: number };
+      >;
     }>,
     unknown,
     unknown
@@ -180,6 +178,10 @@ export interface GetUserProfileHandler
     unknown
   > {}
 
-
-export interface CompleteSginUpHandler 
-extends RequestHandler<unknown , successResponse<unknown> , Pick<Iuser , 'phoneNumber' | 'username' | 'name'> , unknown>{}
+export interface CompleteSginUpHandler
+  extends RequestHandler<
+    unknown,
+    successResponse<unknown>,
+    Pick<Iuser, 'phoneNumber' | 'username' | 'name'>,
+    unknown
+  > {}
