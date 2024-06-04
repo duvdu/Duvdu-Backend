@@ -95,7 +95,7 @@ router.patch(
   handlers.updateFavouriteList,
 );
 
-router.route('/profile/:username').get(handlers.getUserProfileHandler);
+router.route('/profile/:username').get(optionalAuthenticated, handlers.getUserProfileHandler);
 
 router.route('/verify').post(val.verify, handlers.verifyHandler);
 

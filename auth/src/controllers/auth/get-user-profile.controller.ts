@@ -1,4 +1,4 @@
-import { BadRequestError, Icategory, NotFound, Users } from '@duvdu-v1/duvdu';
+import { BadRequestError, Follow, Icategory, NotFound, Users } from '@duvdu-v1/duvdu';
 
 import { GetUserProfileHandler } from '../../types/endpoints/user.endpoints';
 
@@ -28,5 +28,11 @@ export const getUserProfileHandler: GetUserProfileHandler = async (req, res, nex
           : (user.category as Icategory).title.ar,
     };
 
-  res.status(200).json({ message: 'success', data: { ...(user as any)._doc, averageRate } });
+  // isFollow
+  const isFollow = await Follow.findOne({ follower: req.loggedUser.id, following: user.id });
+
+  res.status(200).json({
+    message: 'success',
+    data: { ...(user as any)._doc, averageRate, isFollow: !!isFollow },
+  });
 };
