@@ -3,6 +3,7 @@ import { RequestHandler } from 'express';
 
 import { hashPassword } from '../../utils/bcrypt';
 import { hashVerificationCode } from '../../utils/crypto';
+import { generateBrowserFingerprint } from '../../utils/generateFingerPrint';
 import { generateAccessToken, generateRefreshToken } from '../../utils/generateToken';
 import { generateRandom6Digit } from '../../utils/gitRandom6Dugut';
 
@@ -63,16 +64,10 @@ export const updateForgetenPasswordHandler: RequestHandler<
     if (/mobile|android|touch|webos/i.test(userAgent)) 
       clientType = 'mobile';
   
+  const fingerprint = await generateBrowserFingerprint(); 
 
-  if (clientType  == 'web') {
-    req.session.access = accessToken;
-    req.session.refresh = refreshToken;
-  }else if(clientType == 'mobile'){
-    req.session.mobileAccess = accessToken;
-    req.session.mobileRefresh = refreshToken;
-  }
+  
 
-  user.token = refreshToken;
   await user.save();
 
   res.status(200).json({ message: 'success' });
