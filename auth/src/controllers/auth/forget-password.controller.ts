@@ -58,6 +58,12 @@ export const updateForgetenPasswordHandler: RequestHandler<
   });
   const refreshToken = generateRefreshToken({ id: user.id });
 
+  const userAgent = req.headers['user-agent'];
+  let clientType = 'web';
+
+  if (userAgent && /mobile|android|touch|webos/i.test(userAgent))
+    clientType = 'mobile';
+
   let userSessionDoc = await userSession.findOne({ user: user._id, fingerPrint: fingerprint }).exec();
 
   if (userSessionDoc) {
@@ -68,6 +74,8 @@ export const updateForgetenPasswordHandler: RequestHandler<
       fingerPrint: fingerprint,
       accessToken,
       refreshToken,
+      clientType,
+      userAgent
     });
   }
 

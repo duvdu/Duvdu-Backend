@@ -45,6 +45,7 @@ export const signinHandler: SigninHandler = async (req, res, next) => {
       accessToken,
       refreshToken,
       clientType,
+      userAgent
     });
 
     req.session.access = accessToken;
