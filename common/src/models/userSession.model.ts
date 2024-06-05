@@ -8,7 +8,8 @@ export interface IuserSession {
     user: Types.ObjectId | Iuser;
     fingerPrint:string;
     accessToken: string,
-    refreshToken: string
+    refreshToken: string,
+    clientType:'web'|'mobile'
 }
 
 
@@ -16,5 +17,6 @@ export const userSession = model<IuserSession>(MODELS.userSession , new Schema<I
   user:{type:Schema.Types.ObjectId , ref:MODELS.user},
   fingerPrint:{type:String , default:null},
   accessToken:{type:String , default:null},
-  refreshToken:{type:String , default:null}
+  refreshToken:{type:String , default:null},
+  clientType:{type:String , enum:['web' , 'mobile'] , default:null}
 } , {timestamps:true}));
