@@ -33,10 +33,25 @@ export const completeSginupHandler:CompleteSginUpHandler = async (req,res,next)=
     role: { key: role.key, permissions: role.permissions },
   });
   const refreshToken = generateRefreshToken({ id: user.id });
-  user.token = accessToken;
+
+  const userAgent = req.headers['user-agent'];
+  let clientType = 'web';
+
+  if (userAgent) 
+    if (/mobile|android|touch|webos/i.test(userAgent)) 
+      clientType = 'mobile';
+  
+
+  if (clientType  == 'web') {
+    req.session.access = accessToken;
+    req.session.refresh = refreshToken;
+  }else if(clientType == 'mobile'){
+    req.session.mobileAccess = accessToken;
+    req.session.mobileRefresh = refreshToken;
+  }
+  user.token = refreshToken;
   await user.save();
-  req.session.access = accessToken;
-  req.session.refresh = refreshToken;
+
   //TODO: send OTP
   res.status(200).json({message:'success'});
 };

@@ -25,8 +25,21 @@ export const signinHandler: SigninHandler = async (req, res, next) => {
   });
   const refreshToken = generateRefreshToken({ id: user.id });
 
-  req.session.access = accessToken;
-  req.session.refresh = refreshToken;
+  const userAgent = req.headers['user-agent'];
+  let clientType = 'web';
+
+  if (userAgent) 
+    if (/mobile|android|touch|webos/i.test(userAgent)) 
+      clientType = 'mobile';
+  
+
+  if (clientType  == 'web') {
+    req.session.access = accessToken;
+    req.session.refresh = refreshToken;
+  }else if(clientType == 'mobile'){
+    req.session.mobileAccess = accessToken;
+    req.session.mobileRefresh = refreshToken;
+  }
   user.token = refreshToken;
   user.notificationToken = req.body.notificationToken?req.body.notificationToken:null;
 
