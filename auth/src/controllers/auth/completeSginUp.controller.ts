@@ -80,7 +80,11 @@ export const completeSginupHandler: CompleteSginUpHandler = async (req,res,next)
   const refreshToken = generateRefreshToken({ id: user.id });
   
   let userSessionDoc = await userSession.findOne({ user: user._id, fingerPrint: fingerprint }).exec();
+  const userAgent = req.headers['user-agent'];
+  let clientType = 'web';
 
+  if (userAgent && /mobile|android|touch|webos/i.test(userAgent))
+    clientType = 'mobile';
   if (userSessionDoc) {
     await userSessionDoc.updateOne({ accessToken, refreshToken });
   } else {
@@ -89,6 +93,8 @@ export const completeSginupHandler: CompleteSginUpHandler = async (req,res,next)
       fingerPrint: fingerprint,
       accessToken,
       refreshToken,
+      clientType,
+      userAgent
     });
   }
 
