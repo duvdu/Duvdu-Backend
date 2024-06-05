@@ -1,4 +1,4 @@
-import { BadRequestError, NotFound, UnauthorizedError, Users , Irole , SuccessResponse , VerificationReason } from '@duvdu-v1/duvdu';
+import { BadRequestError, NotFound, UnauthorizedError, Users , Irole , SuccessResponse , VerificationReason, userSession } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 import { hashPassword } from '../../utils/bcrypt';
@@ -47,6 +47,9 @@ export const updateForgetenPasswordHandler: RequestHandler<
 
   const role = <Irole>user.role;
 
+  const fingerprint = await generateBrowserFingerprint(); 
+
+
   const accessToken = generateAccessToken({
     id: user.id,
     isVerified: user.isVerified,
@@ -55,20 +58,25 @@ export const updateForgetenPasswordHandler: RequestHandler<
   });
   const refreshToken = generateRefreshToken({ id: user.id });
 
+  let userSessionDoc = await userSession.findOne({ user: user._id, fingerPrint: fingerprint }).exec();
+
+  if (userSessionDoc) {
+    await userSessionDoc.updateOne({ accessToken, refreshToken });
+  } else {
+    userSessionDoc = await userSession.create({
+      user: user._id,
+      fingerPrint: fingerprint,
+      accessToken,
+      refreshToken,
+    });
+  }
+
   user.password = await hashPassword(req.body.newPassword);
-
-  const userAgent = req.headers['user-agent'];
-  let clientType = 'web';
-
-  if (userAgent) 
-    if (/mobile|android|touch|webos/i.test(userAgent)) 
-      clientType = 'mobile';
-  
-  const fingerprint = await generateBrowserFingerprint(); 
-
-  
+  user.token = refreshToken;
 
   await user.save();
+  req.session.access = accessToken;
+  req.session.refresh = refreshToken;
 
   res.status(200).json({ message: 'success' });
 };

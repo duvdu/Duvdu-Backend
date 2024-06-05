@@ -187,3 +187,6 @@ export interface CompleteSginUpHandler
     Pick<Iuser, 'phoneNumber' | 'username' | 'name'>,
     unknown
   > {}
+
+export interface LogoutHandler
+extends RequestHandler<unknown , successResponse<unknown> , unknown , unknown>{}
