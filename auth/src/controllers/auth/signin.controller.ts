@@ -25,7 +25,7 @@ export const signinHandler: SigninHandler = async (req, res, next) => {
   if (userAgent && /mobile|android|touch|webos/i.test(userAgent))
     clientType = 'mobile';
 
-  const existingSession = await userSession.findOne({ user: user._id, fingerPrint: fingerprint, clientType }).exec();
+  const existingSession = await userSession.findOne({ user: user._id, fingerPrint: fingerprint, clientType });
 
   if (existingSession) {
     req.session.access = existingSession.accessToken;
