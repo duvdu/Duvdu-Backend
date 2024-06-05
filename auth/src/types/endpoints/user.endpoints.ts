@@ -12,6 +12,8 @@ declare module 'express-session' {
   interface SessionData {
     access: string;
     refresh: string;
+    mobileAccess:string;
+    mobileRefresh:string;
   }
 }
 
@@ -185,3 +187,6 @@ export interface CompleteSginUpHandler
     Pick<Iuser, 'phoneNumber' | 'username' | 'name'>,
     unknown
   > {}
+
+export interface LogoutHandler
+extends RequestHandler<unknown , successResponse<unknown> , unknown , unknown>{}

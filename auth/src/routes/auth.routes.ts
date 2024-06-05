@@ -24,7 +24,7 @@ router
     handlers.filterUsers,
     handlers.findUsers,
   );
-
+router.post('/logout' , isauthenticated , handlers.logoutHandler);
 router.post('/signin', val.signinVal, handlers.signinHandler);
 router.post('/signup', val.signupVal, handlers.signupHandler);
 router.post(
