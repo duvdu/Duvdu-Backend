@@ -12,6 +12,8 @@ declare module 'express-session' {
   interface SessionData {
     access: string;
     refresh: string;
+    mobileAccess:string;
+    mobileRefresh:string;
   }
 }
 

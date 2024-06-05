@@ -20,7 +20,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@duvdu-v1/duvdu": "^1.1.96",
+    "@duvdu-v1/duvdu": "^1.1.98",
+    "@fingerprintjs/fingerprintjs": "^4.4.0",
     "@jridgewell/sourcemap-codec": "^1.4.15",
     "@types/bcryptjs": "^2.4.5",
     "@types/cookie-session": "^2.0.48",
@@ -44,6 +45,7 @@
     "express-rate-limiter": "^1.3.1",
     "express-session": "^1.18.0",
     "express-validator": "^7.0.1",
+    "fingerprintjs": "^0.5.3",
     "mongoose": "^8.2.4",
     "node-nats-streaming": "^0.3.2",
     "passport": "^0.7.0",
@@ -56,6 +58,7 @@
   },
   "devDependencies": {
     "@types/dotenv": "^8.2.0",
+    "@types/fingerprintjs": "^0.5.28",
     "@typescript-eslint/eslint-plugin": "^6.19.0",
     "@typescript-eslint/parser": "^6.19.0",
     "eslint": "^8.56.0",
