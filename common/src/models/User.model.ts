@@ -51,7 +51,8 @@ const userSchema = new Schema<Iuser>(
     ],
     address:{type:String , default:null},
     likes:{type:Number , default:0},
-    rank:{title:{type:String , default:null} , nextRangPercentage:{type:Number, default:0}}
+    rank:{title:{type:String , default:null} , nextRangPercentage:{type:Number, default:0}},
+    projectsView:{type:Number , default:0}
   },
   {
     timestamps: true,
