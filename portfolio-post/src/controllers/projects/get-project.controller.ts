@@ -9,8 +9,8 @@ export const getProjectHandler: RequestHandler<
     _id: req.params.projectId,
     isDeleted: { $ne: true },
   }).populate([
-    { path: 'user', select: 'isOnline profileImage username name name rate likes about profileViews address followCount' },
-    { path: 'creatives.creative', select: 'isOnline profileImage username name name rate likes about profileViews address followCount' },
+    { path: 'user', select: 'isOnline profileImage username name name rate likes about profileViews address followCount rank projectsView' },
+    { path: 'creatives.creative', select: 'isOnline profileImage username name name rate likes about profileViews address followCount rank projectsView' },
   ]);
   if (!project) return next(new NotFound({en:'project not found' , ar:'المشروع غير موجود'} , req.lang));
 

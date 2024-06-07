@@ -66,6 +66,8 @@ export const getCrmProjectsHandler: RequestHandler<
               name: '$$creative.name',
               profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$$creative.profileImage'] },
               isOnline: '$$creative.isOnline',
+              rank: '$$creative.rank',
+              projectsView: '$$creative.projectsView',
               acceptedProjectsCounter: '$$creative.acceptedProjectsCounter',
               rate: '$$creative.rate'
             }
@@ -103,6 +105,8 @@ export const getCrmProjectsHandler: RequestHandler<
           acceptedProjectsCounter: '$user.acceptedProjectsCounter',
           rate: '$user.rate',
           profileImage: '$user.profileImage',
+          rank: '$user.rank',
+          projectsView: '$user.projectsView',
         },
         attachments: 1,
         cover: 1,

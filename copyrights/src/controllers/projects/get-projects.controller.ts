@@ -120,6 +120,8 @@ export const getProjectsHandler: RequestHandler<
           name: '$user.name',
           username: '$user.username',
           isOnline: '$user.isOnline',
+          rank: '$user.rank',
+          projectsView: '$user.projectsView',
           rate: '$user.rate',
         },
         category: 1,
