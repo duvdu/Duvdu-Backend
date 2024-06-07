@@ -46,5 +46,7 @@ export interface Iuser {
   isFollow?: boolean;
   favourites: { project: Types.ObjectId; cycle: string }[];
   address:string,
-  likes:number
+  likes:number,
+  rank:{title:string , nextRangPercentage:number},
+  projectsView:number
 }

@@ -73,8 +73,8 @@ export const getProjectsHandler:GetProjectsHandler = async(req,res)=>{
 
   const projects = await TeamProject.find({ user:req.loggedUser?.id , ...req.pagination.filter , isDeleted:{$ne:true}})
     .populate([
-      {path:'user' , select:'isOnline profileImage username name'},
-      {path:'creatives.users.user' , select:'isOnline profileImage username name'},
+      {path:'user' , select:'isOnline profileImage username name rank projectsView'},
+      {path:'creatives.users.user' , select:'isOnline profileImage username name rank projectsView'},
       { path: 'creatives.category', select: `title.${req.lang}` }
     ]).sort({createdAt: -1}).skip(req.pagination.skip).limit(req.pagination.limit).lean();
 

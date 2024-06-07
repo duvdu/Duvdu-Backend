@@ -125,6 +125,8 @@ export const getProjectsHandler: RequestHandler<
               isOnline: '$$creative.isOnline',
               acceptedProjectsCounter: '$$creative.acceptedProjectsCounter',
               rate: '$$creative.rate',
+              rank: '$$creative.rank',
+              projectsView: '$$creative.projectsView',
             },
           },
         },

@@ -24,9 +24,9 @@ export const getChatFromToHandler:GetChatFromUserToUserHandler = async (req ,res
   }
 
   const chat = await Message.find(req.pagination.filter).sort({createdAt:-1}).populate([
-    {path:'sender' , select:'profileImage isOnline username name'},
-    {path:'receiver' , select:'profileImage isOnline username name'},
-    { path: 'reactions.user', select: 'profileImage isOnline username name' }
+    {path:'sender' , select:'profileImage isOnline username name rank projectsView'},
+    {path:'receiver' , select:'profileImage isOnline username name rank projectsView'},
+    { path: 'reactions.user', select: 'profileImage isOnline username name rank projectsView' }
   ]).skip(req.pagination.skip).limit(req.pagination.limit);
 
   if (chat.length === 0) 

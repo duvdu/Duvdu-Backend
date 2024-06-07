@@ -8,7 +8,7 @@ export const getProjectHandler: RequestHandler<
   const project = await CopyRights.findOne({
     _id: req.params.projectId,
     isDeleted: { $ne: true },
-  }).populate([{ path: 'user', select: ['username', 'profileImage', 'isOnline' , 'acceptedProjectsCounter' , 'name' , 'rate'] }]).lean();
+  }).populate([{ path: 'user', select: ['username', 'profileImage', 'isOnline' , 'acceptedProjectsCounter' , 'name' , 'rate' , 'rank' , 'projectsView'] }]).lean();
   if (!project) return next(new NotFound({en:'project not found' , ar:'المشروع غير موجود'} , req.lang));
   const localizedTags = project.tags.map(tag => tag[req.lang]) as string[]; 
   const localizedSubCategory = project.subCategory[req.lang]; 

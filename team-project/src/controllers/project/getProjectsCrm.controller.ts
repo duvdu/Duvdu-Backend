@@ -10,8 +10,8 @@ export const getProjectsCrmHandler : GetProjectsCrmHandler = async(req,res)=>{
 
   const projects = await TeamProject.find({ ...req.pagination.filter })
     .populate([
-      { path: 'user', select: 'isOnline profileImage username name' },
-      { path: 'creatives.users.user', select: 'isOnline profileImage username name' },
+      { path: 'user', select: 'isOnline profileImage username name rank projectsView' },
+      { path: 'creatives.users.user', select: 'isOnline profileImage username name rank projectsView' },
       { path: 'creatives.category', select: `title.${req.lang}` }
     ])
     .sort({ createdAt: -1 })

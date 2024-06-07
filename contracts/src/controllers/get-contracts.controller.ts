@@ -14,7 +14,7 @@ export const getContracts: RequestHandler<
   else filter.$or = [{ sourceUser: req.loggedUser.id }, { targetUser: req.loggedUser.id }];
 
   const contracts = await Contracts.find(filter)
-    .populate([{ path: 'targetUser', select: 'username name profileImage isOnline' }])
+    .populate([{ path: 'targetUser', select: 'username name profileImage isOnline rank projectsView' }])
     .lean();
   contracts.forEach((contract) => {
     if ((contract.targetUser as Iuser).profileImage)

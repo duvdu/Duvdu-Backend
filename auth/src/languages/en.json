@@ -1,7 +1,7 @@
 {
     "invalidFormat": "Invalid format",
     "lengthBetween": "Length must be between 6 and 32 characters",
-    "passwordInvalid": "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one number",
+    "passwordInvalid": "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one number , and one special character",
     "oldPasswordEmpty": "Old password cannot be empty",
     "nameInvalid": "Name must be between 3 and 32 characters.",
     "phoneNumberInvalid": "Phone number must be a valid Egyptian number.",

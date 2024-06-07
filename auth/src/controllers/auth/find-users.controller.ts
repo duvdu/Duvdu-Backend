@@ -56,7 +56,9 @@ export const findUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser
         invalidAddress:1,
         likes:1,
         address:1,
-        profileViews:1
+        profileViews:1,
+        rank:1,
+        projectsView:1
       }
     },
     {

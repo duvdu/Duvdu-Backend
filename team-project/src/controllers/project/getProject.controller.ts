@@ -10,8 +10,8 @@ export const getProjectHandler:GetProjectHandler = async (req,res,next)=>{
     _id:req.params.projectId,
     isDeleted : {$ne:true}
   }).populate([
-    {path:'user' , select:'isOnline profileImage username name'},
-    {path:'creatives.users.user' , select:'isOnline profileImage username name'},
+    {path:'user' , select:'isOnline profileImage username name rank projectsView'},
+    {path:'creatives.users.user' , select:'isOnline profileImage username name rank projectsView'},
     { path: 'creatives.category', select: `title.${req.lang}` }
   ]).lean();
 

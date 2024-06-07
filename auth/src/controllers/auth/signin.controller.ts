@@ -25,32 +25,29 @@ export const signinHandler: SigninHandler = async (req, res, next) => {
   if (userAgent && /mobile|android|touch|webos/i.test(userAgent))
     clientType = 'mobile';
 
-  const existingSession = await userSession.findOne({ user: user._id, fingerPrint: fingerprint, clientType });
+  await userSession.findOneAndDelete({ user: user._id, fingerPrint: fingerprint, clientType });
 
-  if (existingSession) {
-    req.session.access = existingSession.accessToken;
-    req.session.refresh = existingSession.refreshToken;
-  } else {
-    const accessToken = generateAccessToken({
-      id: user.id,
-      isVerified: user.isVerified,
-      isBlocked: user.isBlocked,
-      role: { key: role.key, permissions: role.permissions },
-    });
-    const refreshToken = generateRefreshToken({ id: user.id });
 
-    await userSession.create({
-      user: user._id,
-      fingerPrint: fingerprint,
-      accessToken,
-      refreshToken,
-      clientType,
-      userAgent
-    });
+  const accessToken = generateAccessToken({
+    id: user.id,
+    isVerified: user.isVerified,
+    isBlocked: user.isBlocked,
+    role: { key: role.key, permissions: role.permissions },
+  });
+  const refreshToken = generateRefreshToken({ id: user.id });
 
-    req.session.access = accessToken;
-    req.session.refresh = refreshToken;
-  }
+  await userSession.create({
+    user: user._id,
+    fingerPrint: fingerprint,
+    accessToken,
+    refreshToken,
+    clientType,
+    userAgent
+  });
+
+  req.session.access = accessToken;
+  req.session.refresh = refreshToken;
+  
 
   res.status(200).json({ message: 'success' });
 };
