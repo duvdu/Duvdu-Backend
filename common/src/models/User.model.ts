@@ -20,7 +20,7 @@ const userSchema = new Schema<Iuser>(
     profileImage: { type: String, default: 'defaults/profile.jpg' },
     coverImage: { type: String, default: null },
     location: { lat: { type: Number, default: null }, lng: { type: Number, default: null } },
-    category: { type: Schema.Types.ObjectId, ref: MODELS.category },
+    category: { type: Schema.Types.ObjectId, ref: MODELS.category  , default:null},
     acceptedProjectsCounter: { type: Number, default: 0 },
     profileViews: { type: Number, default: 0 },
     about: { type: String, default: null },
@@ -51,6 +51,7 @@ const userSchema = new Schema<Iuser>(
     ],
     address:{type:String , default:null},
     likes:{type:Number , default:0},
+    rank:{title:{type:String , default:null} , nextRangPercentage:{type:Number, default:0}}
   },
   {
     timestamps: true,
