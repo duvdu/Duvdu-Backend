@@ -23,14 +23,14 @@ router.route('/:projectId/user')
 
 router.route('/')
   .post(
-    // isauthenticated,
-    // isauthorized(PERMISSIONS.createTeamProjectHandler),
+    isauthenticated,
+    isauthorized(PERMISSIONS.createTeamProjectHandler),
     uploadProjectMedia(FOLDERS.team_project),
     val.createProjectVal,
     checkRequiredFields({ fields: ['cover', 'attachments'] }),
     handler.createProjectHandler
   )
-  .get( isauthenticated , val.getProjectsVal, globalPaginationMiddleware , handler.getProjectsPagination , handler.getProjectsHandler);
+  .get( val.getProjectsVal, globalPaginationMiddleware , handler.getProjectsPagination , handler.getProjectsHandler);
 
 router.route('/:projectId')
   .patch(isauthenticated , isauthorized(PERMISSIONS.updateTeamProjectHandler),uploadProjectMedia(FOLDERS.team_project) , val.updateProjectVal , handler.updateProjectHandler)

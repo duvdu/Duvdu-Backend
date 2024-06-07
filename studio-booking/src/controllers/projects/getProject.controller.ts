@@ -11,8 +11,8 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
       isDeleted: { $ne: true },
     })
     .populate([
-      { path: 'user', select: 'isOnline profileImage username name' },
-      { path: 'creatives.creative', select: 'isOnline profileImage username name' },
+      { path: 'user', select: 'isOnline profileImage username name rate likes about profileViews address followCount' },
+      { path: 'creatives.creative', select: 'isOnline profileImage username name name rate likes about profileViews address followCount' },
     ]);
 
   if (!project) return next(new NotFound({en:'project not found' , ar:'المشروع غير موجود'} , req.lang));

@@ -7,7 +7,7 @@ export const changePasswordHandler: ChangePasswordHandler = async (req, res, nex
   const user = await Users.findById(req.loggedUser?.id);
 
   if (!user || !(await comparePassword(req.body.oldPassword, user.password || '')))
-    return next(new UnauthenticatedError(undefined , req.lang));
+    return next(new UnauthenticatedError({en:'invalid password' , ar:'كلمة السر خاطئة' } , req.lang));
 
   user.password = await hashPassword(req.body.newPassword);
   await user.save();
