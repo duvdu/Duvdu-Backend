@@ -81,6 +81,7 @@ router
   );
 
 router.get('/profile/projects', isauthenticated, handlers.getLoggedUserProjects);
+router.get('/profile/projects/:username', handlers.getUserProjectsByUsername);
 
 router.get(
   '/profile/favourites',
