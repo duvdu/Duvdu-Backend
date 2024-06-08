@@ -1,5 +1,4 @@
 import {
-  checkRequiredFields,
   FOLDERS,
   globalPaginationMiddleware,
   globalUploadMiddleware,
@@ -24,7 +23,7 @@ router
     handlers.filterUsers,
     handlers.findUsers,
   );
-router.post('/logout' , isauthenticated , handlers.logoutHandler);
+router.post('/logout', isauthenticated, handlers.logoutHandler);
 router.post('/signin', val.signinVal, handlers.signinHandler);
 router.post('/signup', val.signupVal, handlers.signupHandler);
 router.post(
@@ -74,9 +73,11 @@ router
   )
   // TODO: add authorization
   .put(
-    globalUploadMiddleware('defaults' as any).single('file'),
-    checkRequiredFields({ single: 'file' }),
-    handlers.updateDefaultProfileCrm,
+    globalUploadMiddleware('defaults' as any).fields([
+      { name: 'profile', maxCount: 1 },
+      { name: 'cover', maxCount: 1 },
+    ]),
+    handlers.updateDefaultImagesCrm,
   );
 
 router.get('/profile/projects', isauthenticated, handlers.getLoggedUserProjects);
