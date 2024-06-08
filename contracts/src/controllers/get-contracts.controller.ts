@@ -14,10 +14,15 @@ export const getContracts: RequestHandler<
   else filter.$or = [{ sourceUser: req.loggedUser.id }, { targetUser: req.loggedUser.id }];
 
   const contracts = await Contracts.find(filter)
-    .populate([{ path: 'targetUser', select: 'username name profileImage isOnline rank projectsView' }])
+    .populate([
+      { path: 'targetUser', select: 'username name profileImage isOnline rank projectsView' },
+    ])
     .lean();
   contracts.forEach((contract) => {
-    if ((contract.targetUser as Iuser).profileImage)
+    if (
+      (contract.targetUser as Iuser).profileImage &&
+      !(contract.targetUser as Iuser).profileImage?.startsWith('http')
+    )
       (contract.targetUser as Iuser).profileImage =
         process.env.BUCKET_HOST + '/' + (contract.targetUser as Iuser).profileImage;
     if (contract.status !== ContractStatus.pending) return contract;
