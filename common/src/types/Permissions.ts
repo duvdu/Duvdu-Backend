@@ -61,7 +61,11 @@ export enum PERMISSIONS {
   updateTeamProjectHandler = 'update team project',
   deleteTeamProjectHandler = 'delete team project',
   // producer
-  getProducersContractCrm = 'get producers contract crm'
+  getProducersContractCrm = 'get producers contract crm',
+  // rank
+  createRankHandler = 'create rank',
+  updateRankHandler = 'update rank',
+  deleteRankHandler = 'delete rank'
 }
 
 export const permissions = {

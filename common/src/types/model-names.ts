@@ -22,5 +22,6 @@ export enum MODELS {
   producer = 'producers',
   producerBooking = 'producer-booking',
   follow = 'follow',
-  userSession = 'user-sessions'
+  userSession = 'user-sessions',
+  rank = 'ranks'
 }

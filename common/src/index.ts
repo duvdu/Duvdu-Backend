@@ -68,8 +68,10 @@ export * from './models/producer.model';
 export * from './models/follow.model';
 export * from './models/session.model';
 export * from './models/userSession.model';
+export * from './models/ranks.model';
 
 export * from './services/category.service';
+export * from './services/projectView.service';
 export * from './types/notification.type';
 
 // events

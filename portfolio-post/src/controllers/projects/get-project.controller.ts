@@ -1,4 +1,4 @@
-import { SuccessResponse, IportfolioPost, PortfolioPosts, NotFound, Users } from '@duvdu-v1/duvdu';
+import { SuccessResponse, IportfolioPost, PortfolioPosts, NotFound, Users, incrementProjectsView } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 export const getProjectHandler: RequestHandler<
@@ -25,6 +25,8 @@ export const getProjectHandler: RequestHandler<
   ((project as any)._doc.subCategory as any) = project.subCategory[req.lang];
 
   ((project as any)._doc.tags as any) = project.tags.map((tag) => tag[req.lang]);
+
+  await incrementProjectsView((project.user as any)._id);
 
   res.status(200).json(<any>{ message: 'success', data: project });
 };

@@ -1,0 +1,9 @@
+{
+  "rank": "Rank must be a string and is required.",
+  "actionCount": "Action count must be an integer greater than or equal to 1.",
+  "rankId": "Rank ID must be a valid Mongo ID.",
+  "actionCountFrom": "Action count from must be a non-negative integer.",
+  "actionCountTo": "Action count to must be a non-negative integer.",
+  "startDate": "Start date must be a valid ISO 8601 date.",
+  "endDate": "End date must be a valid ISO 8601 date."
+}
