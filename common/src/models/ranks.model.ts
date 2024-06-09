@@ -11,6 +11,6 @@ export interface Irank {
 
 
 export const Rank = model<Irank>(MODELS.rank , new Schema<Irank>({
-  actionCount:{type:Number , default:0},
-  rank:{type:String , default:null}
+  actionCount:{type:Number , unique:true , default:0},
+  rank:{type:String , unique:true , default:null}
 } , {timestamps:true , collection:MODELS.rank}));

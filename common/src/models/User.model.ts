@@ -1,5 +1,6 @@
 import { Schema, model } from 'mongoose';
 
+import { updateRankForUser, UserDocument } from '../services/rank.service';
 import { MODELS } from '../types/model-names';
 import { Iuser } from '../types/User';
 
@@ -65,5 +66,12 @@ const userSchema = new Schema<Iuser>(
     },
   },
 ).index({ name: 'text' });
+
+userSchema.pre('save', async function (next) {
+  if (this.isModified('acceptedProjectsCounter')) 
+    await updateRankForUser(this as UserDocument);
+  
+  next();
+});
 
 export const Users = model<Iuser>(MODELS.user, userSchema);
