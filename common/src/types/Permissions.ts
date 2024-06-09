@@ -136,5 +136,10 @@ export const permissions = {
     PERMISSIONS.updateTeamProjectCreativeHandler,
     PERMISSIONS.deleteTeamProjectHandler,
     PERMISSIONS.updateTeamProjectHandler,
+  ],
+  rank:[
+    PERMISSIONS.createRankHandler,
+    PERMISSIONS.updateRankHandler,
+    PERMISSIONS.deleteRankHandler
   ]
 };
