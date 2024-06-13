@@ -7,7 +7,7 @@ import { GetProducersHandler } from '../../types/endpoints';
 
 export const getProducersHandler:GetProducersHandler = async (req , res)=>{
   const producers = await Producer.find()
-    .populate([{path:'user' , select:'isOnline profileImage username name  rate likes about profileViews address followCount acceptedProjectsCounter rank projectsView'}])
+    .populate([{path:'user' , select:'isOnline profileImage username name rate likes about profileViews address followCount acceptedProjectsCounter rank projectsView'}])
     .skip(req.pagination.skip).limit(req.pagination.limit).sort({ createdAt: -1 });
 
   const resultCount = await Producer.find().countDocuments();

@@ -37,8 +37,11 @@ export const updateProfileHandler: UpdateProfileHandler = async (req, res, next)
     Files.removeFiles(req.body.profileImage);
   }
 
-  const user = await Users.findByIdAndUpdate(req.loggedUser?.id, req.body, { new: true });
+  const user = await Users.findByIdAndUpdate(req.loggedUser?.id, req.body, { new: true }).populate([{path:'category' , select:'title'}]);
   if (!user) return next(new BadRequestError({en:'cannot update this user' , ar:'لا يمكن تحديث هذا المستخدم'},req.lang));
+
+  if (user.category) 
+    (user.category as any).title = (user.category as any).title[req.lang];
 
   res.status(200).json({ message: 'success', data: user });
 };
