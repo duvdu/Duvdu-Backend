@@ -70,7 +70,6 @@ const userSchema = new Schema<Iuser>(
 userSchema.pre('save', async function (next) {
   if (this.isModified('acceptedProjectsCounter')) 
     await updateRankForUser(this as UserDocument);
-  
   next();
 });
 

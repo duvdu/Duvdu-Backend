@@ -17,8 +17,12 @@ export const filterUsers: RequestHandler<
     isBlocked?: boolean;
   }
 > = (req, res, next) => {
-  if (req.query.search) req.pagination.filter.$text = { $search: req.query.search };
-  if (req.query.username) req.pagination.filter.username = req.query.username;
+  if (req.query.search) {
+    req.pagination.filter.$or = [
+      { 'phoneNumber.number': { $regex: `\\b${req.query.search}\\b`, $options: 'i' } },
+      { username: { $regex: `\\b${req.query.search}\\b`, $options: 'i' } },
+    ];
+  }  if (req.query.username) req.pagination.filter.username = req.query.username;
   if (req.query.phoneNumber) req.pagination.filter['phoneNumber.number'] = req.query.phoneNumber;
   if (req.query.category) req.pagination.filter.category = req.query.category;
   if (req.query.priceFrom) req.pagination.filter.price = { $gte: req.query.priceFrom };
@@ -42,23 +46,77 @@ export const findUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser
     },
     {
       $project: {
-        _id:1,
+        _id: 1,
         name: 1,
         username: 1,
-        profileImage: { $concat: [process.env.BUCKET_HOST ,'/', '$profileImage'] }, // Prepend BUCKET_HOST to profileImage
+        profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$profileImage'] },
+        coverImage: { $concat: [process.env.BUCKET_HOST, '/', '$coverImage'] },
         about: 1,
         isOnline: 1,
         isAvaliableToInstantProjects: 1,
         pricePerHour: 1,
         hasVerificationBadge: 1,
         rate: 1,
-        followCount:1,
-        invalidAddress:1,
-        likes:1,
-        address:1,
-        profileViews:1,
-        rank:1,
-        projectsView:1
+        followCount: 1,
+        invalidAddress: 1,
+        likes: 1,
+        address: 1,
+        profileViews: 1,
+        rank: 1,
+        projectsView: 1,
+        category: 1 // Include category field in the projection
+      }
+    },
+    {
+      $lookup: {
+        from: MODELS.category,
+        localField: 'category',
+        foreignField: '_id',
+        as: 'categoryDetails'
+      }
+    },
+    {
+      $addFields: {
+        category: {
+          $cond: {
+            if: { $gt: [{ $size: '$categoryDetails' }, 0] },
+            then: {
+              _id: { $arrayElemAt: ['$categoryDetails._id', 0] },
+              title: {
+                $cond: {
+                  if: { $eq: [req.lang, 'ar'] },
+                  then: { $arrayElemAt: ['$categoryDetails.title.ar', 0] },
+                  else: { $arrayElemAt: ['$categoryDetails.title.en', 0] }
+                }
+              }
+            },
+            else: null
+          }
+        }
+      }
+    },
+    {
+      $project: {
+        _id: 1,
+        name: 1,
+        username: 1,
+        profileImage: 1,
+        coverImage: 1,
+        about: 1,
+        isOnline: 1,
+        isAvaliableToInstantProjects: 1,
+        pricePerHour: 1,
+        hasVerificationBadge: 1,
+        rate: 1,
+        followCount: 1,
+        invalidAddress: 1,
+        likes: 1,
+        address: 1,
+        profileViews: 1,
+        rank: 1,
+        projectsView: 1,
+        category: 1, // Include the category object
+        isFollow: 1
       }
     },
     {
@@ -71,7 +129,7 @@ export const findUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser
               $expr: {
                 $and: [
                   { $eq: ['$following', '$$userId'] },
-                  { $eq: ['$follower', new mongoose.Types.ObjectId(req.loggedUser?.id)] } // Use optional chaining to avoid error if req.loggedUser is undefined
+                  { $eq: ['$follower', new mongoose.Types.ObjectId(req.loggedUser?.id)] }
                 ]
               }
             }
@@ -92,7 +150,6 @@ export const findUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser
       $limit: req.pagination.limit
     }
   ];
-  
   const users = await Users.aggregate(aggregationPipeline);
 
   res.status(200).json({

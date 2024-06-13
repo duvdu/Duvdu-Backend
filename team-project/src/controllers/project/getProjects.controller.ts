@@ -23,7 +23,6 @@ export const getProjectsPagination: RequestHandler<
     showOnHome?: boolean;
     startDate?: Date;
     endDate?: Date;
-    user?: Types.ObjectId; 
   }
 > = async (req,res,next)=>{
 
@@ -59,10 +58,6 @@ export const getProjectsPagination: RequestHandler<
       $lte: req.query.endDate || new Date(),
     };
   }
-  if (req.query.user) {
-    req.pagination.filter['creatives.users.user'] = req.query.user;
-  }
-
   next();
 };
 
@@ -71,7 +66,7 @@ export const getProjectsHandler:GetProjectsHandler = async(req,res)=>{
   console.log(req.pagination.page);
   
 
-  const projects = await TeamProject.find({ user:req.loggedUser?.id , ...req.pagination.filter , isDeleted:{$ne:true}})
+  const projects = await TeamProject.find({ user:req.loggedUser.id , ...req.pagination.filter , isDeleted:{$ne:true}})
     .populate([
       {path:'user' , select:'isOnline profileImage username name rank projectsView'},
       {path:'creatives.users.user' , select:'isOnline profileImage username name rank projectsView'},

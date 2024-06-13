@@ -30,7 +30,7 @@ router.route('/')
     checkRequiredFields({ fields: ['cover', 'attachments'] }),
     handler.createProjectHandler
   )
-  .get( val.getProjectsVal, globalPaginationMiddleware , handler.getProjectsPagination , handler.getProjectsHandler);
+  .get(isauthenticated ,val.getProjectsVal, globalPaginationMiddleware , handler.getProjectsPagination , handler.getProjectsHandler);
 
 router.route('/:projectId')
   .patch(isauthenticated , isauthorized(PERMISSIONS.updateTeamProjectHandler),uploadProjectMedia(FOLDERS.team_project) , val.updateProjectVal , handler.updateProjectHandler)
