@@ -3,6 +3,8 @@ import { UnauthenticatedError, Users } from '@duvdu-v1/duvdu';
 import { GetLoggedUserProfileHandler } from '../../types/endpoints/user.endpoints';
 
 export const getLoggedUserProfileHandler: GetLoggedUserProfileHandler = async (req, res, next) => {
+  console.log(await Users.findById(req.loggedUser?.id));
+  
   const user = await Users.findById(req.loggedUser?.id)
     .select(
       '-googleId -appleId -password -verificationCode.code -verificationCode.expireAt -token -role -favourites',
