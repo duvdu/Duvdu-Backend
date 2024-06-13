@@ -112,7 +112,7 @@ export const getProjectsHandler:GetProjectsHandler = async(req,res)=>{
     return modifiedProject;
   });
 
-  const resultCount = await TeamProject.find({...req.pagination.filter , isDeleted:{$ne:true}}).countDocuments();
+  const resultCount = await TeamProject.find({user:req.loggedUser.id,...req.pagination.filter , isDeleted:{$ne:true}}).countDocuments();
 
   res.status(200).json(<any>{
     message: 'success',
