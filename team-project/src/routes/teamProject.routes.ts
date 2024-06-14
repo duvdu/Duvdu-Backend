@@ -35,6 +35,6 @@ router.route('/')
 router.route('/:projectId')
   .patch(isauthenticated , isauthorized(PERMISSIONS.updateTeamProjectHandler),uploadProjectMedia(FOLDERS.team_project) , val.updateProjectVal , handler.updateProjectHandler)
   .delete(isauthenticated , isauthorized(PERMISSIONS.deleteTeamProjectHandler) , val.deleteProjectVal , handler.removeProjectHandler)
-  .get(val.getProjectVal ,handler.getProjectHandler);
+  .get(isauthenticated , val.getProjectVal ,handler.getProjectHandler);
 
 
