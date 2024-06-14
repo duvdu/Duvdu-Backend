@@ -10,4 +10,5 @@ export interface Icategory {
   jobTitles?: string[];
   cycle: CYCLES;
   status: boolean;
+  trend:boolean;
 }
