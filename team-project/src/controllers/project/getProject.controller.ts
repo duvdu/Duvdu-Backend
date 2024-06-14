@@ -8,6 +8,7 @@ import { GetProjectHandler } from '../../types/endpoints';
 export const getProjectHandler:GetProjectHandler = async (req,res,next)=>{
   const project = await TeamProject.findOne({
     _id:req.params.projectId,
+    user:req.loggedUser.id,
     isDeleted : {$ne:true}
   }).populate([
     {path:'user' , select:'isOnline profileImage username name rank projectsView'},
@@ -15,16 +16,17 @@ export const getProjectHandler:GetProjectHandler = async (req,res,next)=>{
     { path: 'creatives.category', select: `title.${req.lang}` }
   ]).lean();
 
+  if (!project) 
+    return next(new NotFound({en:'project not found' , ar:'المشروع غير موجود'} , req.lang));
+  
+  
   const addBucketHost = (url: string) => {
     if (url && !url.startsWith(process.env.BUCKET_HOST!)) {
       return `${process.env.BUCKET_HOST}/${url}`;
     }
     return url;
   };
-      
-  if (!project) 
-    return next(new NotFound({en:'project not found' , ar:'المشروع غير موجود'} , req.lang));
-
+        
   const modifiedProjects = [project].map(project => {
     const modifiedProject = { ...project };
       
