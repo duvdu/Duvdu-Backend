@@ -1,10 +1,10 @@
-import { incrementProjectsView, Users } from '@duvdu-v1/duvdu';
+import { incrementProjectsView, NotFound, Users } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import { Types } from 'mongoose';
 
 import { Rentals } from '../../models/rental.model';
 
-export const getProjectHandler: RequestHandler = async (req, res) => {
+export const getProjectHandler: RequestHandler = async (req, res, next) => {
   const pipelines = [
     {
       $set: {
@@ -84,6 +84,8 @@ export const getProjectHandler: RequestHandler = async (req, res) => {
       ...pipelines,
     ])
   )[0];
+
+  if (!project) return next(new NotFound(undefined, req.lang));
 
   if (req.loggedUser?.id) {
     const user = await Users.findById(req.loggedUser.id, { favourites: 1 });
