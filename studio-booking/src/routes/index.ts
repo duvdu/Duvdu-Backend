@@ -10,6 +10,7 @@ import {
 } from '@duvdu-v1/duvdu';
 import express from 'express';
 
+import { rentalRoutes } from './rental.routes';
 import { bookProjectHandler } from '../controllers/booking/book-project.controller';
 import { payBooking } from '../controllers/booking/pay.controller';
 import * as handler from '../controllers/projects';
@@ -17,6 +18,8 @@ import { bookProject as bookProjectVal } from '../validators/booking/booking.val
 import * as val from '../validators/index';
 
 export const router = express.Router();
+
+router.use('/rental', rentalRoutes);
 
 router
   .route('/')

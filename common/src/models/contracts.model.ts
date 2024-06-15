@@ -6,6 +6,7 @@ import { Iuser } from '../types/User';
 export enum ContractStatus {
   canceled = 'canceled',
   pending = 'pending',
+  waitingForPayment = 'waiting for payment',
   ongoing = 'ongoing',
   completed = 'completed',
   rejected = 'rejected',
@@ -23,6 +24,7 @@ export interface Icontract {
   sourceUser: Iuser | Types.ObjectId;
   targetUser: Iuser | Types.ObjectId;
   project: Types.ObjectId;
+  details: string;
   book: Types.ObjectId;
   ref: RefModels;
   startDate: Date;
