@@ -43,8 +43,8 @@ export const getProjectAnalysis: RequestHandler<
       $project: {
         _id: 1,
         totalBookings: 1,
-        username: '$userDetails.username',
-        profileImage: '$userDetails.profileImage',
+        username: { $concat: [process.env.BUCKET_HOST, '$userDetails.username'] },
+        profileImage: { $concat: [process.env.BUCKET_HOST, '$userDetails.profileImage'] },
       },
     },
     { $sort: { totalBookings: -1 } },
