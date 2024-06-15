@@ -175,6 +175,8 @@ export const createCategoryVal = [
     .withMessage('statusMustBeBoolean')
     .bail()
     .toBoolean(),
+  body('trend').optional().isBoolean().withMessage('statusMustBeBoolean'),
+
   globalValidatorMiddleware,
 ];
 
@@ -231,6 +233,7 @@ export const updateCategoryVal = [
     .withMessage('statusMustBeBoolean')
     .bail()
     .toBoolean(),
+  body('trend').optional().isBoolean().withMessage('statusMustBeBoolean'),
   globalValidatorMiddleware,
 ];
 

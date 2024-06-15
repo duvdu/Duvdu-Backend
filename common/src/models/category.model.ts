@@ -35,6 +35,7 @@ const categorySchema = new mongoose.Schema<Icategory>(
       type: Boolean,
       default: true,
     },
+    trend:{type:Boolean , default:false}
   },
   {
     timestamps: true,
