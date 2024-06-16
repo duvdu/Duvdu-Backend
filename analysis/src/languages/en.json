@@ -5,5 +5,13 @@
   "actionCountFrom": "Action count from must be a non-negative integer.",
   "actionCountTo": "Action count to must be a non-negative integer.",
   "startDate": "Start date must be a valid ISO 8601 date.",
-  "endDate": "End date must be a valid ISO 8601 date."
+  "endDate": "End date must be a valid ISO 8601 date.",
+
+  "expirationTimeArray": "Expiration time must be an array with at least one element.",
+  "expirationTimeObject": "Each expiration time must be an object.",
+  "expirationTimeInt": "Each expiration time must be an integer greater than 0.",
+  "settingIdMongoId": "Setting ID must be a valid Mongo ID.",
+  "expirationIdMongoId": "Expiration ID must be a valid Mongo ID.",
+  "timeInt": "Time must be an integer greater than 0."
+
 }
