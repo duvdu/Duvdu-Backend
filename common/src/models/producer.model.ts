@@ -5,14 +5,7 @@ import { CYCLES } from '../types/cycles';
 import { MODELS } from '../types/model-names';
 import { Iuser } from '../types/User';
 
-export interface Iproducer{
-    user : Types.ObjectId | Iuser;
-    category: Types.ObjectId | Icategory;
-    subCategories?: { title: { en: string; ar: string }; tags: { en: string; ar: string }[] }[];
-    maxBudget:number;
-    minBudget:number;
-    searchKeywords:string []
-}
+
 
 export interface IproducerBooking{
     producer:Types.ObjectId | Iuser;
@@ -105,6 +98,16 @@ export const ProducerBooking = model<IproducerBooking>(MODELS.producerBooking , 
   },
 }}));
 
+
+
+export interface Iproducer{
+  user : Types.ObjectId | Iuser;
+  category: Types.ObjectId | Icategory;
+  subCategories?: { title: { en: string; ar: string }; tags: { en: string; ar: string }[] }[];
+  maxBudget:number;
+  minBudget:number;
+  searchKeywords:string []
+}
 
 export const Producer = model<Iproducer>(MODELS.producer , new Schema<Iproducer>({
   user:{

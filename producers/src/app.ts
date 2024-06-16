@@ -40,7 +40,6 @@ app.use(cors(corsOptions));
 
   app.use(languageHeaderMiddleware);
   mountRoutes(app);
-  
   app.use(globalErrorHandlingMiddleware);
 })();
 
