@@ -20,8 +20,9 @@ export enum MODELS {
   teamProjectBooking = 'teamProjects-booking',
   contracts = 'contracts',
   producer = 'producers',
-  producerBooking = 'producer-booking',
+  producerContract = 'producer-contracts',
   follow = 'follow',
   userSession = 'user-sessions',
-  rank = 'ranks'
+  rank = 'ranks',
+  setting='settings'
 }
