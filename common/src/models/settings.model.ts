@@ -11,5 +11,5 @@ export interface Isetting {
 
 
 export const Setting = model<Isetting>(MODELS.setting , new Schema<Isetting>({
-  expirationTime:[{time:Number}]
+  expirationTime:[{time:Number , unique:true}]
 },{timestamps:true , collection:MODELS.setting}));
