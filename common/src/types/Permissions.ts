@@ -61,7 +61,7 @@ export enum PERMISSIONS {
   updateTeamProjectHandler = 'update team project',
   deleteTeamProjectHandler = 'delete team project',
   // producer
-  getProducersContractCrm = 'get producers contract crm',
+  deleteProducerHandler = 'delete producer',
   // rank
   createRankHandler = 'create rank',
   updateRankHandler = 'update rank',

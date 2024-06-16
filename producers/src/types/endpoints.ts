@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-namespace */
-import { IjwtPayload, Ipagination, Iproducer, IproducerBooking, PaginationResponse, SuccessResponse } from '@duvdu-v1/duvdu';
+import { IjwtPayload, Ipagination, Iproducer, PaginationResponse, SuccessResponse } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 
@@ -23,29 +23,11 @@ declare global {
 }
 
 
+export interface AppendProducerHandler
+extends RequestHandler<unknown , SuccessResponse<{data:Iproducer}> , Pick<Iproducer , 'category' | 'maxBudget' |'minBudget' |'searchKeywords' | 'subCategories'> & {subcategory:[{subcategory:string , tags:[string]}]} , unknown>{}
 
-
-
-export interface CreateContractHandler
-extends RequestHandler<unknown , SuccessResponse<{data:IproducerBooking}> , Partial<Pick<IproducerBooking , 'attachments' | 'details' | 'episodeduration' | 'episodes' | 'expectedbudget' | 'expectedprofits' | 'platform' | 'producer' >> , unknown>{}
-
-export interface CreateAppointmentBookingHandler
-extends RequestHandler<{contractId:string} , SuccessResponse<{data:IproducerBooking}> , Pick<IproducerBooking , 'appoinment'> , unknown >{}
-
-export interface GetContractHandler
-extends RequestHandler<{contractId:string} , SuccessResponse<{data:IproducerBooking}> , unknown , unknown>{}
-
-export interface GetContractsHandler
-extends RequestHandler<unknown , PaginationResponse<{data:IproducerBooking[]}> , unknown , unknown>{}
-
-export interface UpdateContractHandler
-extends RequestHandler<{contractId:string} , SuccessResponse<{data:IproducerBooking}> , Pick<IproducerBooking , 'status'> , unknown>{}
-
-
-export interface GetUserContractsHandler
-extends RequestHandler<unknown , PaginationResponse<{data:IproducerBooking[]}> , unknown , unknown>{}
-
-
+export interface UpdateProducerHandler
+extends RequestHandler<{producerId:string} , SuccessResponse<{data:Iproducer}> , Pick<Iproducer , 'category' | 'maxBudget' | 'minBudget' | 'searchKeywords' | 'subCategories'>& {subcategory:[{subcategory:string , tags:[string]}]} ,unknown >{}
 
 export interface GetProducersHandler
 extends RequestHandler<unknown , PaginationResponse<{data:Iproducer[]}> , unknown , unknown>{}
@@ -53,5 +35,11 @@ extends RequestHandler<unknown , PaginationResponse<{data:Iproducer[]}> , unknow
 export interface GetProducerHandler
 extends RequestHandler<{producerId:string} , SuccessResponse<{data:Iproducer}> , unknown , unknown>{}
 
-export interface AppendProducerHandler
+export interface GetLoggedProducerHandler
+extends RequestHandler<unknown , SuccessResponse<{data:Iproducer}> , unknown , unknown>{}
+
+export interface DeleteProducerHandler
+extends RequestHandler<{producerId:string} , SuccessResponse , unknown , unknown>{}
+
+export interface DeleteLoggedProducerHandler
 extends RequestHandler<unknown , SuccessResponse , unknown , unknown>{}
