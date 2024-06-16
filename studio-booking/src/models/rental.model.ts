@@ -16,7 +16,7 @@ export interface Irental {
   location: { lat: number; lng: number };
   address: string;
   searchKeywords: string[];
-  insurance: string;
+  insurance: number;
   showOnHome: boolean;
   projectScale: { unit: string; minimum: number; maximum: number; pricerPerUnit: number };
   isDeleted: boolean;
@@ -42,7 +42,7 @@ export const Rentals = model<Irental>(
       location: { lat: Number, lng: Number },
       address: String,
       searchKeywords: [String],
-      insurance: String,
+      insurance: Number,
       showOnHome: { type: Boolean, default: true },
       projectScale: { unit: String, minimum: Number, maximum: Number, pricerPerUnit: Number },
       isDeleted: { type: Boolean, default: false },

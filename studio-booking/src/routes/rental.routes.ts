@@ -8,7 +8,9 @@ import {
 } from '@duvdu-v1/duvdu';
 import { Router } from 'express';
 
+import * as contractHandlers from '../controllers/booking/rental-contract.controller';
 import * as handlers from '../controllers/projects_rental';
+import * as contractVal from '../validators/booking/contract.validator';
 import * as val from '../validators/rental.validator';
 
 const router = Router();
@@ -48,5 +50,24 @@ router
     handlers.updateProjectHandler,
   )
   .delete(isauthenticated, val.getOne, handlers.removeProjectHandler);
+
+router.post(
+  '/:projectId/contract',
+  isauthenticated,
+  contractVal.create,
+  contractHandlers.createContractHandler,
+);
+router.post(
+  '/contract/pay/:paymentSession',
+  isauthenticated,
+  contractVal.pay,
+  contractHandlers.payContract,
+);
+router.post(
+  '/contract/:contractId/action',
+  isauthenticated,
+  contractVal.action,
+  contractHandlers.contractAction,
+);
 
 export const rentalRoutes = router;
