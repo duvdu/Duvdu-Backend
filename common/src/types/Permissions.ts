@@ -65,7 +65,12 @@ export enum PERMISSIONS {
   // rank
   createRankHandler = 'create rank',
   updateRankHandler = 'update rank',
-  deleteRankHandler = 'delete rank'
+  deleteRankHandler = 'delete rank',
+
+  //setting
+  createSettingHandler = 'create setting',
+  updateSettingHandler = 'update setting',
+  deleteSettingHandler = 'delete setting'
 }
 
 export const permissions = {
@@ -141,5 +146,10 @@ export const permissions = {
     PERMISSIONS.createRankHandler,
     PERMISSIONS.updateRankHandler,
     PERMISSIONS.deleteRankHandler
+  ],
+  setting:[
+    PERMISSIONS.createSettingHandler,
+    PERMISSIONS.updateSettingHandler,
+    PERMISSIONS.deleteSettingHandler
   ]
 };
