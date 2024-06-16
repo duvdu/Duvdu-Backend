@@ -106,7 +106,6 @@ export const ProducerBooking = model<IproducerBooking>(MODELS.producerBooking , 
 }}));
 
 
-
 export const Producer = model<Iproducer>(MODELS.producer , new Schema<Iproducer>({
   user:{
     type: Schema.Types.ObjectId,
