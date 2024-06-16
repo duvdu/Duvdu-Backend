@@ -95,7 +95,7 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
       },
     },
     {
-      $unset: 'userDetails',
+      $unset: ['userDetails', 'categoryDetails'],
     },
   ];
 
