@@ -1,4 +1,4 @@
-import { globalPaginationMiddleware, isauthenticated } from '@duvdu-v1/duvdu';
+import { globalPaginationMiddleware, isauthenticated, isauthorized, PERMISSIONS } from '@duvdu-v1/duvdu';
 import express from 'express';
 
 
@@ -22,4 +22,4 @@ router.route('/')
 router.route('/:producerId')
   .patch(val.updateProducerVal , handler.updateProducerHandler)
   .get(val.getProducerVal , handler.getProducerHandler)
-  .delete(val.getProducerVal , handler.deleteProducerHandler); 
+  .delete(isauthorized(PERMISSIONS.deleteProducerHandler) , val.getProducerVal , handler.deleteProducerHandler); 
