@@ -3,7 +3,7 @@ import { RequestHandler } from 'express';
 
 import { GetCategoriesHandler } from '../types/endpoints/endpoints';
 
-
+// get categories
 export const getCategoriesPagination: RequestHandler<unknown, unknown, unknown, {
   search?: string;
   title?: string;
