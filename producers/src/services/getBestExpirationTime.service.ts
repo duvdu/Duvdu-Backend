@@ -1,10 +1,11 @@
-import { Setting } from "@duvdu-v1/duvdu";
+import { BadRequestError, Setting } from "@duvdu-v1/duvdu";
 
 export async function getBestExpirationTime(isoDate: string) {
   const givenDate = new Date(isoDate);
   const currentDate = new Date();
   
   const timeDifferenceInHours = Math.abs((givenDate.getTime() - currentDate.getTime()) / (1000 * 60 * 60));
+  console.log(timeDifferenceInHours);
   
   const settings = await Setting.findOne().exec();
   
@@ -17,7 +18,7 @@ export async function getBestExpirationTime(isoDate: string) {
     .filter((time) => time % 2 === 0 && time * 2 <= timeDifferenceInHours);
   
   if (validTimes.length === 0) {
-    throw new Error('No valid expiration times found');
+    throw new BadRequestError(`the minimum difference time between booking and now must be at least ${settings.expirationTime[0].time * 2} hour`);
   }
   
   let bestTime = validTimes[0];

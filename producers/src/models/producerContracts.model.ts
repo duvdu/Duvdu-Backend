@@ -33,7 +33,7 @@ export interface IproducerContarct {
     actionAt:Date
 }
 
-export const ProducerContarct = model<IproducerContarct>(MODELS.producerContract , new Schema<IproducerContarct>({
+export const ProducerContract = model<IproducerContarct>(MODELS.producerContract , new Schema<IproducerContarct>({
   producer:{type:Schema.Types.ObjectId , ref:MODELS.user},
   user:{type:Schema.Types.ObjectId , ref:MODELS.user},
   projectType:{type:String , default:null},

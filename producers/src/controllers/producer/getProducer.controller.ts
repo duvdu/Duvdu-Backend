@@ -49,7 +49,8 @@ export const getProducerHandler:GetProducerHandler = async (req,res,next)=>{
         searchKeywords: 1,
         createdAt: 1,
         updatedAt: 1,
-        category:1
+        category:1, 
+        user:1
       },
     },
   ]);
