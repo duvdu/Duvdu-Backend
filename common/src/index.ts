@@ -74,6 +74,7 @@ export * from './models/settings.model';
 export * from './services/category.service';
 export * from './services/projectView.service';
 export * from './types/notification.type';
+export * from './types/notification_details';
 
 // events
 
