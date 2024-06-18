@@ -16,10 +16,10 @@ router.route('/user')
 
 router.route('/')
   .post( val.appendProducerVal , handler.appendProducerHandler)
-  .get(val.getProducersVal, globalPaginationMiddleware , handler.getProducersPagination,handler.getProducersHandler);
+  .get(val.getProducersVal, globalPaginationMiddleware , handler.getProducersPagination,handler.getProducersHandler)
+  .patch(val.updateProducerVal , handler.updateProducerHandler);
 
 
 router.route('/:producerId')
-  .patch(val.updateProducerVal , handler.updateProducerHandler)
   .get(val.getProducerVal , handler.getProducerHandler)
   .delete(isauthorized(PERMISSIONS.deleteProducerHandler) , val.getProducerVal , handler.deleteProducerHandler); 

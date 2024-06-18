@@ -1,6 +1,6 @@
 import 'express-async-errors';
 
-import { Producer } from '@duvdu-v1/duvdu';
+import { MODELS, Producer } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import mongoose from 'mongoose';
 
@@ -57,16 +57,32 @@ export const getProducersPagination: RequestHandler<
 
 
 export const getProducersHandler:GetProducersHandler = async (req,res)=>{
-      
+
+  const { filter, skip, limit } = req.pagination; 
+
   const producers = await Producer.aggregate([
     {
-      $match:req.pagination.filter
+      $match: filter,
     },
     {
-      $skip:req.pagination.skip
+      $sort: { createdAt: -1 },
     },
     {
-      $limit:req.pagination.limit
+      $skip: skip,
+    },
+    {
+      $limit: limit,
+    },
+    {
+      $lookup: {
+        from: MODELS.user,
+        localField: 'user', 
+        foreignField: '_id',
+        as: 'user',
+      },
+    },
+    {
+      $unwind: '$user' 
     },
     {
       $project: {
@@ -105,12 +121,28 @@ export const getProducersHandler:GetProducersHandler = async (req,res)=>{
         searchKeywords: 1,
         createdAt: 1,
         updatedAt: 1,
-        category:1
+        category: 1,
+        user: {
+          profileImage: {
+            $cond: [
+              { $eq: ['$user.profileImage', null] },
+              null,
+              { $concat: [process.env.BUCKET_HOST, '$user.profileImage'] },
+            ],
+          },
+          username: '$user.username',
+          isOnline: '$user.isOnline',
+          acceptedProjectsCounter: '$user.acceptedProjectsCounter',
+          name: '$user.name',
+          rate: '$user.rate',
+          rank: '$user.rank',
+          projectsView: '$user.projectsView',
+        },
       },
     },
   ]);
 
-  const resultCount = await Producer.countDocuments(req.pagination.filter);
+  const resultCount = await Producer.countDocuments(filter);
   res.status(200).json({
     message:'success',
     pagination:{

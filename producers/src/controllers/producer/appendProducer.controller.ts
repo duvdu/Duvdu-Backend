@@ -55,7 +55,7 @@ export const appendProducerHandler: AppendProducerHandler = async (req, res, nex
   
     const producer = await Producer.create({
       ...req.body,
-    //   user:req.loggedUser.id
+      user:req.loggedUser.id
     });
   
     res.status(201).json({message:'success' , data:producer});

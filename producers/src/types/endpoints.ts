@@ -2,6 +2,8 @@
 import { IjwtPayload, Ipagination, Iproducer, PaginationResponse, SuccessResponse } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
+import { IproducerContarct } from '../models/producerContracts.model';
+
 
 
 
@@ -43,3 +45,20 @@ extends RequestHandler<{producerId:string} , SuccessResponse , unknown , unknown
 
 export interface DeleteLoggedProducerHandler
 extends RequestHandler<unknown , SuccessResponse , unknown , unknown>{}
+
+
+
+export interface CreateContractHandler
+extends RequestHandler<unknown , SuccessResponse<{data:IproducerContarct}> , Pick<IproducerContarct , 'address' | 'appointmentDate' | 'attachments' | 'episodesDuration' | 'episodesNumber' | 'expectedBudget' | 'expectedProfits' |'location'|'platform'|'producer'|'projectDetails'|'projectType'|'stageExpiration'> , unknown>{}
+
+export interface UpdateContractHandler
+extends RequestHandler<{contractId:string} , SuccessResponse<{data:IproducerContarct}> ,Partial<Pick<IproducerContarct , 'appointmentDate' | 'status' | 'rejectedBy'>> , unknown>{}
+
+export interface GetContractHandler
+extends RequestHandler<{contractId:string} , SuccessResponse<{data:IproducerContarct}> , unknown , unknown>{}
+
+export interface GetUserContractsHandler
+extends RequestHandler<unknown , SuccessResponse<{data:IproducerContarct[]}> , unknown , unknown>{}
+
+
+
