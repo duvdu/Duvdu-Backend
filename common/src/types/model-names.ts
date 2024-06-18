@@ -24,5 +24,5 @@ export enum MODELS {
   follow = 'follow',
   userSession = 'user-sessions',
   rank = 'ranks',
-  setting='settings'
+  setting = 'settings',
 }

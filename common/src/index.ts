@@ -63,13 +63,14 @@ export * from './models/report.model';
 export * from './models/messages.model';
 export * from './models/notification.model';
 export * from './models/teamProject.model';
-export * from './models/contracts.model';
+// export * from './models/contracts.model';
 export * from './models/producer.model';
 export * from './models/follow.model';
 export * from './models/session.model';
 export * from './models/userSession.model';
 export * from './models/ranks.model';
 export * from './models/settings.model';
+export * from './models/all-contracts.model';
 
 export * from './services/category.service';
 export * from './services/projectView.service';

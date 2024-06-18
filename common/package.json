@@ -1,6 +1,6 @@
 {
   "name": "@duvdu-v1/duvdu",
-  "version": "1.1.114",
+  "version": "1.1.116",
   "main": "./build/index.js",
   "types": "./build/index.d.ts",
   "files": [
@@ -19,7 +19,7 @@
   "author": "motemed khaled",
   "license": "ISC",
   "dependencies": {
-    "@duvdu-v1/duvdu": "^1.1.4",
+    "@duvdu-v1/duvdu": "^1.1.116",
     "@types/express": "^4.17.21",
     "@types/express-session": "^1.18.0",
     "@types/jsonwebtoken": "^9.0.5",
