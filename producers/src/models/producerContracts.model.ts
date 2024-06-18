@@ -27,7 +27,7 @@ export interface IproducerContarct {
     appointmentDate:Date;
     address:string;
     location:{lat:number , lng:number},
-    rejectedBy:'producer' | 'user',
+    rejectedBy:'producer' | 'user' | 'system',
     status:ContractStatus,
     stageExpiration:number,
     actionAt:Date
@@ -47,7 +47,7 @@ export const ProducerContract = model<IproducerContarct>(MODELS.producerContract
   location:{lat:{type:Number , default:0} , lng:{type:Number , default:0}},
   attachments:[String],
   appointmentDate:Date,
-  rejectedBy:{type:String , enum:['producer' , 'user']},
+  rejectedBy:{type:String , enum:['producer' , 'user' , 'system']},
   status:{type:String , enum:ContractStatus , default:ContractStatus.pending},
   stageExpiration:{type:Number , default:0},
   actionAt:Date

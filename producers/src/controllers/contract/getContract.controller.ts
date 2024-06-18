@@ -140,6 +140,7 @@ export const getContarctHandler: GetContractHandler = async (req, res, next) => 
         status: 1,
         stageExpiration: 1,
         actionAt: 1,
+        rejectedBy:1,
       },
     },
   ]);

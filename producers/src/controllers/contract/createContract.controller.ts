@@ -1,12 +1,13 @@
 import 'express-async-errors';
 
-import { Bucket, Files, FOLDERS, NotFound, Notification, NotificationType, Producer } from '@duvdu-v1/duvdu';
+import { Bucket, Channels, Files, FOLDERS, NotFound, Notification, NotificationDetails, NotificationType, Producer } from '@duvdu-v1/duvdu';
 
+import { NewNotificationPublisher } from '../../event/publisher/newNotification.publisher';
 import { ProducerContract } from '../../models/producerContracts.model';
+import { natsWrapper } from '../../nats-wrapper';
 import { getBestExpirationTime } from '../../services/getBestExpirationTime.service';
 import { CreateContractHandler } from '../../types/endpoints';
-
-
+import { contractQueue } from '../../utils/expirationQueue';
 
 export const createContractHandler:CreateContractHandler = async (req,res,next)=>{
   try {
@@ -30,16 +31,33 @@ export const createContractHandler:CreateContractHandler = async (req,res,next)=
     const notification = await Notification.create({
       sourceUser:req.loggedUser.id,
       targetUser:producer.user,
-      type:NotificationType.new_message,
+      type:NotificationType.new_producer_contract,
       target:contract._id,
-      message:NotificationDetails.newMessage.message,
-      title:NotificationDetails.newMessage.title
+      message:NotificationDetails.newProducerContract.title,
+      title:NotificationDetails.newProducerContract.message
     });
   
     const populatedNotification = await (
       await notification.save()
     ).populate('sourceUser', 'isOnline profileImage username');
 
+    await new NewNotificationPublisher(natsWrapper.client).publish({
+      notificationDetails:{message:notification.message , title:notification.title},
+      populatedNotification,
+      socketChannel:Channels.new_producer_contract,
+      targetUser:notification.targetUser.toString()
+    });
+
+    const delay = contract.stageExpiration * 3600 * 1000;
+    await contractQueue.add(
+      {
+        contractId: contract._id.toString(),
+      },
+      {
+        delay,
+      },
+    );
+    
     res.status(201).json({message:'success' , data:contract});
   } catch (error) {
     next(error);

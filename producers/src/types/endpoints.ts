@@ -58,7 +58,7 @@ export interface GetContractHandler
 extends RequestHandler<{contractId:string} , SuccessResponse<{data:IproducerContarct}> , unknown , unknown>{}
 
 export interface GetUserContractsHandler
-extends RequestHandler<unknown , PaginationResponse<{data:IproducerContarct[]}> , unknown , unknown>{}
+extends RequestHandler<unknown , SuccessResponse<{data:IproducerContarct[]}> , unknown , unknown>{}
 
 
 

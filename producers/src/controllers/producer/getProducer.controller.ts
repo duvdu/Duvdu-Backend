@@ -1,6 +1,6 @@
 import 'express-async-errors';
 
-import { NotFound, Producer } from '@duvdu-v1/duvdu';
+import { MODELS, NotFound, Producer } from '@duvdu-v1/duvdu';
 import mongoose from 'mongoose';
 
 import { GetProducerHandler } from '../../types/endpoints';
@@ -10,7 +10,18 @@ import { GetProducerHandler } from '../../types/endpoints';
 export const getProducerHandler:GetProducerHandler = async (req,res,next)=>{
   const producers = await Producer.aggregate([
     {
-      $match:{_id:new mongoose.Types.ObjectId(req.params.producerId)}
+      $match: { _id: new mongoose.Types.ObjectId(req.params.producerId) },
+    },
+    {
+      $lookup: {
+        from: MODELS.user,  
+        localField: 'user', 
+        foreignField: '_id', 
+        as: 'user',
+      },
+    },
+    {
+      $unwind: '$user' 
     },
     {
       $project: {
@@ -49,8 +60,23 @@ export const getProducerHandler:GetProducerHandler = async (req,res,next)=>{
         searchKeywords: 1,
         createdAt: 1,
         updatedAt: 1,
-        category:1, 
-        user:1
+        category: 1,
+        user: {
+          profileImage: {
+            $cond: [
+              { $eq: ['$user.profileImage', null] },
+              null,
+              { $concat: [process.env.BUCKET_HOST, '$user.profileImage'] },
+            ],
+          },
+          username: '$user.username',
+          isOnline: '$user.isOnline',
+          acceptedProjectsCounter: '$user.acceptedProjectsCounter',
+          name: '$user.name',
+          rate: '$user.rate',
+          rank: '$user.rank',
+          projectsView: '$user.projectsView',
+        },
       },
     },
   ]);

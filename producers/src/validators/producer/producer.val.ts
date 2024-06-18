@@ -20,7 +20,6 @@ export const appendProducerVal = [
 ];
 
 export const updateProducerVal = [
-  param('producerId').isMongoId().withMessage('producerIdMongoId'),
   body('category')
     .optional()
     .isMongoId()

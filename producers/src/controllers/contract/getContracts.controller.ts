@@ -48,13 +48,15 @@ export const getContractsPagination: RequestHandler<
     req.pagination.filter['producer.user._id'] = new mongoose.Types.ObjectId(req.loggedUser.id);
 
   if (req.query.filter === 'i_recieved') 
-    req.pagination.filter.user = new mongoose.Types.ObjectId(req.loggedUser.id);
+    req.pagination.filter['user._id'] = new mongoose.Types.ObjectId(req.loggedUser.id);
   next();
 };
 
 
 
 export const getContractsHandler:GetUserContractsHandler = async (req,res)=>{
+  
+
   const contracts = await ProducerContract.aggregate([
     {
       $lookup: {
@@ -121,6 +123,7 @@ export const getContractsHandler:GetUserContractsHandler = async (req,res)=>{
                 rate: '$producerUser.rate',
                 rank: '$producerUser.rank',
                 projectsView: '$producerUser.projectsView',
+                _id:'$producerUser._id'
               },
             },
           },
@@ -185,29 +188,19 @@ export const getContractsHandler:GetUserContractsHandler = async (req,res)=>{
         status: 1,
         stageExpiration: 1,
         actionAt: 1,
+        rejectedBy:1
       },
     },
     {
       $match: req.pagination.filter,
     },
     {
-      $skip:req.pagination.skip
+      $sort: { createdAt: -1 },
     },
-    {
-      $limit:req.pagination.limit
-    }
   ]);
-
-
-  const resultCount = await ProducerContract.countDocuments(req.pagination.filter);
 
   res.status(200).json({
     message:'success',
-    pagination:{
-      currentPage:req.pagination.page,
-      resultCount,
-      totalPages:Math.ceil(resultCount/req.pagination.limit)
-    },
     data:contracts
   });
 };

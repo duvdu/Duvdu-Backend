@@ -6,11 +6,8 @@ import { UpdateProducerHandler } from '../../types/endpoints';
 
 
 export const updateProducerHandler:UpdateProducerHandler = async (req,res,next)=>{
-  try {
-    console.log(req.params.producerId);
-    
-    const producer = await Producer.findById(req.params.producerId);
-    console.log(producer);
+  try {    
+    const producer = await Producer.findOne({user:req.loggedUser.id});
     
     if (!producer) 
       return next(new NotFound({en:'producer not found' , ar:'المُنتج غير موجود'} , req.lang));
@@ -67,7 +64,7 @@ export const updateProducerHandler:UpdateProducerHandler = async (req,res,next)=
     
       req.body.subCategories = resultSubCategories;
 
-      const updatedProducer = await Producer.findByIdAndUpdate(req.params.producerId , req.body , {new:true});
+      const updatedProducer = await Producer.findOneAndUpdate({user:req.loggedUser.id}, req.body , {new:true});
 
       res.status(200).json({message:'success' , data:updatedProducer!});
     }
