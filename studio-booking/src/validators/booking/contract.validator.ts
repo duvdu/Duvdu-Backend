@@ -5,6 +5,7 @@ export const create = [
   param('projectId').isMongoId(),
   body('details').isString(),
   body('projectScale.numberOfUnits').isInt({ min: 1 }),
+  body('bookingDate').isString().bail().isISO8601(),
   globalValidatorMiddleware,
 ];
 

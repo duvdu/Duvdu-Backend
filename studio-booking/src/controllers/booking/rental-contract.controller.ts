@@ -1,6 +1,12 @@
 import crypto from 'crypto';
 
-import { BadRequestError, NotAllowedError, NotFound, SuccessResponse } from '@duvdu-v1/duvdu';
+import {
+  BadRequestError,
+  NotAllowedError,
+  Contracts,
+  NotFound,
+  SuccessResponse,
+} from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 import { ContractStatus, RentalContracts } from '../../models/rental-contracts.model';
@@ -31,9 +37,10 @@ export const createContractHandler: RequestHandler<
       ),
     );
 
-  const expirationStage = await getStageExpiration(new Date(req.body.bookingDate), req.lang);
+  const stageExpiration = await getStageExpiration(new Date(req.body.bookingDate), req.lang);
+  console.log('stageExpiration', stageExpiration);
 
-  await RentalContracts.create({
+  const contract = await RentalContracts.create({
     ...req.body,
     customer: req.loggedUser.id,
     sp: project.user,
@@ -47,10 +54,18 @@ export const createContractHandler: RequestHandler<
       2,
     ),
     insurance: project.insurance,
-    stageExpiration: expirationStage,
+    stageExpiration,
     status: ContractStatus.pending,
   });
-  // TODO: add to all-contracts model
+
+  await Contracts.create({
+    customer: contract.customer,
+    sp: contract.sp,
+    contract: contract.id,
+    ref: 'rental_contracts',
+  });
+
+  // TODO: send notification
 
   res.status(201).end();
 };
