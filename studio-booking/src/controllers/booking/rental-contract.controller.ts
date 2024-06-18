@@ -6,6 +6,7 @@ import {
   Contracts,
   NotFound,
   SuccessResponse,
+  Users,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
@@ -130,6 +131,16 @@ export const contractAction: RequestHandler<
         { status: ContractStatus.rejected, rejectedBy: 'sp', actionAt: new Date() },
       );
     } else if (req.body.action === 'accept') {
+      const spUser = await Users.findOne({ _id: req.loggedUser.id }, { avaliableContracts: 1 });
+      if (spUser?.avaliableContracts || 0 < 1)
+        return next(
+          new NotAllowedError(
+            { en: 'please, buy a plan first', ar: 'please, buy a plan first' },
+            req.lang,
+          ),
+        );
+
+      await Users.updateOne({ _id: req.loggedUser.id }, { $inc: { avaliableContracts: -1 } });
       // update project state to await payment
       // create payment link and send it to customer
       const paymentSession = crypto.randomBytes(16).toString('hex');

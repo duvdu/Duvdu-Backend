@@ -1,4 +1,4 @@
-import { incrementProjectsView, NotFound, Users } from '@duvdu-v1/duvdu';
+import { incrementProjectsView, MODELS, NotFound, Users } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import { Types } from 'mongoose';
 
@@ -28,6 +28,31 @@ export const getProjectHandler: RequestHandler = async (req, res, next) => {
         },
       },
     },
+
+    {
+      $lookup: {
+        from: MODELS.category,
+        localField: 'category',
+        foreignField: '_id',
+        as: 'categoryDetails',
+      },
+    },
+    { $unwind: '$categoryDetails' },
+    {
+      $set: {
+        category: {
+          _id: '$categoryDetails._id',
+          image: { $concat: [process.env.BUCKET_HOST, '/', '$categoryDetails.image'] },
+          title: {
+            $cond: {
+              if: { $eq: [req.lang, 'ar'] },
+              then: '$categoryDetails.title.ar',
+              else: '$categoryDetails.title.en',
+            },
+          },
+        },
+      },
+    },
     {
       $lookup: {
         from: 'users',
@@ -45,7 +70,7 @@ export const getProjectHandler: RequestHandler = async (req, res, next) => {
           _id: '$userDetails._id',
           username: '$userDetails.username',
           profileImage: {
-            $concat: [process.env.BUCKET_HOST, '$userDetails.profileImage'],
+            $concat: [process.env.BUCKET_HOST, '/', '$userDetails.profileImage'],
           },
           isOnline: '$userDetails.isOnline',
           acceptedProjectsCounter: '$userDetails.acceptedProjectsCounter',
@@ -59,12 +84,12 @@ export const getProjectHandler: RequestHandler = async (req, res, next) => {
             input: '$attachments',
             as: 'attachment',
             in: {
-              $concat: [process.env.BUCKET_HOST, '$$attachment'],
+              $concat: [process.env.BUCKET_HOST, '/', '$$attachment'],
             },
           },
         },
         cover: {
-          $concat: [process.env.BUCKET_HOST, '$cover'],
+          $concat: [process.env.BUCKET_HOST, '/', '$cover'],
         },
       },
     },
