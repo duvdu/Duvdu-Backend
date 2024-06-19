@@ -59,12 +59,12 @@ export const createContractHandler: RequestHandler<
     status: ContractStatus.pending,
   });
 
-  // await Contracts.create({
-  //   customer: contract.customer,
-  //   sp: contract.sp,
-  //   contract: contract.id,
-  //   ref: 'rental_contracts',
-  // });
+  await Contracts.create({
+    customer: contract.customer,
+    sp: contract.sp,
+    contract: contract.id,
+    ref: 'rental_contracts',
+  });
 
   // TODO: send notification
 
