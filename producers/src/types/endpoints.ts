@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-namespace */
-import { IjwtPayload, Ipagination, Iproducer, PaginationResponse, SuccessResponse } from '@duvdu-v1/duvdu';
+import { IjwtPayload, Ipagination, Iproducer, IproducerContarct, PaginationResponse, SuccessResponse } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-import { IproducerContarct } from '../models/producerContracts.model';
 
 
 

@@ -1,7 +1,6 @@
-import { MODELS, NotFound } from '@duvdu-v1/duvdu';
+import { MODELS, NotFound, ProducerContract } from '@duvdu-v1/duvdu';
 import mongoose from 'mongoose';
 
-import { ProducerContract } from '../../models/producerContracts.model';
 import { GetContractHandler } from '../../types/endpoints';
 
 export const getContarctHandler: GetContractHandler = async (req, res, next) => {

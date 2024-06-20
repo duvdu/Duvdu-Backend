@@ -1,9 +1,8 @@
 import 'express-async-errors';
 
-import { BadRequestError, Channels, NotAllowedError, NotFound, Notification, NotificationDetails, NotificationType, Producer, UnauthorizedError } from '@duvdu-v1/duvdu';
+import { BadRequestError, Channels, ContractStatus, NotAllowedError, NotFound, Notification, NotificationDetails, NotificationType, Producer, ProducerContract, UnauthorizedError } from '@duvdu-v1/duvdu';
 
 import { NewNotificationPublisher } from '../../event/publisher/newNotification.publisher';
-import { ContractStatus, ProducerContract } from '../../models/producerContracts.model';
 import { natsWrapper } from '../../nats-wrapper';
 import { UpdateContractHandler } from '../../types/endpoints';
 import { contractQueue } from '../../utils/expirationQueue';

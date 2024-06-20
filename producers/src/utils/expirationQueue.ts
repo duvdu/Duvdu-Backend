@@ -1,7 +1,7 @@
+import { ContractStatus, ProducerContract } from '@duvdu-v1/duvdu';
 import Queue from 'bull';
 
 import { env } from '../config/env';
-import { ContractStatus, ProducerContract } from '../models/producerContracts.model';
 
 
 interface IcontarctQueue {

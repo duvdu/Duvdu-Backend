@@ -173,9 +173,12 @@ export const getContracts: RequestHandler<
       { customer: new mongoose.Types.ObjectId(req.loggedUser.id) },
       { sp: new mongoose.Types.ObjectId(req.loggedUser.id) },
     ];
-  const contracts = await Contracts.find().populate([{path:'sp'} , {path:'customer'} , {path:'contract'}]);
-  console.log(contracts);
-  
+  const contracts = await Contracts.find(filter).populate([
+    {path:'sp' , select:'isOnline profileImage username name rank projectsView'} ,
+    {path:'customer' , select:'isOnline profileImage username name rank projectsView'} ,
+    {path:'contract'}
+  ]).sort({createdAt: -1});
+
   res.status(200).json({message:'success' , data:contracts});
     
 };

@@ -1,9 +1,8 @@
 import 'express-async-errors';
 
-import { BadRequestError, Bucket, Channels, Contracts, CYCLES, Files, FOLDERS, NotFound, Notification, NotificationDetails, NotificationType, Producer } from '@duvdu-v1/duvdu';
+import { BadRequestError, Bucket, Channels, Contracts, CYCLES, Files, FOLDERS, MODELS, NotFound, Notification, NotificationDetails, NotificationType, Producer, ProducerContract } from '@duvdu-v1/duvdu';
 
 import { NewNotificationPublisher } from '../../event/publisher/newNotification.publisher';
-import { ProducerContract } from '../../models/producerContracts.model';
 import { natsWrapper } from '../../nats-wrapper';
 import { getBestExpirationTime } from '../../services/getBestExpirationTime.service';
 import { CreateContractHandler } from '../../types/endpoints';
@@ -63,7 +62,7 @@ export const createContractHandler:CreateContractHandler = async (req,res,next)=
       },
     );
 
-    await Contracts.create({contract:contract._id , customer:contract.user , sp:producer.user , cycle:CYCLES.producer , ref:'producer_contracts'});
+    await Contracts.create({contract:contract._id , customer:contract.user , sp:producer.user , cycle:CYCLES.producer , ref:MODELS.producerContract});
     
     res.status(201).json({message:'success' , data:contract});
   } catch (error) {

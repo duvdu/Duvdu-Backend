@@ -1,7 +1,6 @@
-import { globalValidatorMiddleware } from '@duvdu-v1/duvdu';
+import { ContractStatus, globalValidatorMiddleware } from '@duvdu-v1/duvdu';
 import { body, param, query } from 'express-validator';
 
-import { ContractStatus } from '../../models/producerContracts.model';
 
 export const createContractVal = [
   body('address').isString().exists().withMessage('address.required'),
