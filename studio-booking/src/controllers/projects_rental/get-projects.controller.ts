@@ -40,7 +40,7 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
       $set: {
         category: {
           _id: '$categoryDetails._id',
-          image: { $concat: [process.env.BUCKET_HOST, '$categoryDetails.image'] },
+          image: { $concat: [process.env.BUCKET_HOST, '/', '$categoryDetails.image'] },
           title: {
             $cond: {
               if: { $eq: [req.lang, 'ar'] },
@@ -68,10 +68,10 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
           _id: '$userDetails._id',
           username: '$userDetails.username',
           profileImage: {
-            $concat: [process.env.BUCKET_HOST, '$userDetails.profileImage'],
+            $concat: [process.env.BUCKET_HOST, '/', '$userDetails.profileImage'],
           },
           cover: {
-            $concat: [process.env.BUCKET_HOST, '$userDetails.cover'],
+            $concat: [process.env.BUCKET_HOST, '/', '$userDetails.cover'],
           },
           isOnline: '$userDetails.isOnline',
           acceptedProjectsCounter: '$userDetails.acceptedProjectsCounter',
@@ -85,12 +85,12 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
             input: '$attachments',
             as: 'attachment',
             in: {
-              $concat: [process.env.BUCKET_HOST, '$$attachment'],
+              $concat: [process.env.BUCKET_HOST, '/', '$$attachment'],
             },
           },
         },
         cover: {
-          $concat: [process.env.BUCKET_HOST, '$cover'],
+          $concat: [process.env.BUCKET_HOST, '/', '$cover'],
         },
       },
     },

@@ -6,10 +6,11 @@ import { Irental } from './rental.model';
 export enum ContractStatus {
   canceled = 'canceled',
   pending = 'pending',
-  waitingForPayment = 'waiting for payment',
+  waitingForPayment = 'waiting-for-payment',
   ongoing = 'ongoing',
   completed = 'completed',
   rejected = 'rejected',
+  complaint = 'complaint',
 }
 
 export interface IrentalContract {
