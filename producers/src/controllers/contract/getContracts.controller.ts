@@ -6,7 +6,6 @@ import mongoose from 'mongoose';
 import { ContractStatus, ProducerContract } from '../../models/producerContracts.model';
 import { GetUserContractsHandler } from '../../types/endpoints';
 
-// Adjust this import based on your actual path
 
 export const getContractsPagination: RequestHandler<
   unknown,
@@ -44,11 +43,15 @@ export const getContractsPagination: RequestHandler<
     };
   }
 
-  if (req.query.filter === 'i_created') 
+  if (req.query.filter === 'i_recieved') 
     req.pagination.filter['producer.user._id'] = new mongoose.Types.ObjectId(req.loggedUser.id);
 
-  if (req.query.filter === 'i_recieved') 
+  if (req.query.filter === 'i_created') 
     req.pagination.filter['user._id'] = new mongoose.Types.ObjectId(req.loggedUser.id);
+  
+  if (req.query.filter == undefined) 
+    req.pagination.filter['user._id'] = new mongoose.Types.ObjectId(req.loggedUser.id);
+
   next();
 };
 
@@ -113,7 +116,7 @@ export const getContractsHandler:GetUserContractsHandler = async (req,res)=>{
                   $cond: [
                     { $eq: ['$producerUser.profileImage', null] },
                     null,
-                    { $concat: [process.env.BUCKET_HOST, '$producerUser.profileImage'] },
+                    { $concat: [process.env.BUCKET_HOST , '/', '$producerUser.profileImage'] },
                   ],
                 },
                 username: '$producerUser.username',
@@ -167,7 +170,7 @@ export const getContractsHandler:GetUserContractsHandler = async (req,res)=>{
         user: {
           _id: '$userDetails._id',
           username: '$userDetails.username',
-          profileImage: { $concat: [process.env.BUCKET_HOST, '$userDetails.profileImage'] },
+          profileImage: { $concat: [process.env.BUCKET_HOST ,'/', '$userDetails.profileImage'] },
           isOnline: '$userDetails.isOnline',
           acceptedProjectsCounter: '$userDetails.acceptedProjectsCounter',
           name: '$userDetails.name',

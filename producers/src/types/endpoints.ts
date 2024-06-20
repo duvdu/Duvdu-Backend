@@ -49,7 +49,7 @@ extends RequestHandler<unknown , SuccessResponse , unknown , unknown>{}
 
 
 export interface CreateContractHandler
-extends RequestHandler<unknown , SuccessResponse<{data:IproducerContarct}> , Pick<IproducerContarct , 'address' | 'appointmentDate' | 'attachments' | 'episodesDuration' | 'episodesNumber' | 'expectedBudget' | 'expectedProfits' |'location'|'platform'|'producer'|'projectDetails'|'projectType'|'stageExpiration'> , unknown>{}
+extends RequestHandler<unknown , SuccessResponse<{data:IproducerContarct}> , Pick<IproducerContarct , 'address' | 'appointmentDate' | 'attachments' | 'episodesDuration' | 'episodesNumber' | 'expectedBudget' | 'expectedProfits' |'location'|'platform'|'producer'|'projectDetails'|'stageExpiration'> , unknown>{}
 
 export interface UpdateContractHandler
 extends RequestHandler<{contractId:string} , SuccessResponse<{data:IproducerContarct}> ,Partial<Pick<IproducerContarct , 'appointmentDate' | 'status' | 'rejectedBy'>> , unknown>{}

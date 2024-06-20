@@ -76,13 +76,24 @@ export const getProducersHandler:GetProducersHandler = async (req,res)=>{
     {
       $lookup: {
         from: MODELS.user,
-        localField: 'user', 
+        localField: 'user',
         foreignField: '_id',
         as: 'user',
       },
     },
     {
-      $unwind: '$user' 
+      $unwind: '$user',
+    },
+    {
+      $lookup: {
+        from: MODELS.category, 
+        localField: 'category',
+        foreignField: '_id',
+        as: 'categoryData',
+      },
+    },
+    {
+      $unwind: '$categoryData',
     },
     {
       $project: {
@@ -121,13 +132,25 @@ export const getProducersHandler:GetProducersHandler = async (req,res)=>{
         searchKeywords: 1,
         createdAt: 1,
         updatedAt: 1,
-        category: 1,
+        category: {
+          _id: '$categoryData._id',
+          image: {
+            $concat: [process.env.BUCKET_HOST, '/', '$categoryData.image'],
+          },
+          title: {
+            $cond: {
+              if: { $eq: ['ar', req.lang] },
+              then: '$categoryData.title.ar',
+              else: '$categoryData.title.en',
+            },
+          },
+        },
         user: {
           profileImage: {
             $cond: [
               { $eq: ['$user.profileImage', null] },
               null,
-              { $concat: [process.env.BUCKET_HOST, '$user.profileImage'] },
+              { $concat: [process.env.BUCKET_HOST, '/', '$user.profileImage'] },
             ],
           },
           username: '$user.username',
@@ -141,6 +164,7 @@ export const getProducersHandler:GetProducersHandler = async (req,res)=>{
       },
     },
   ]);
+  
 
   const resultCount = await Producer.countDocuments(filter);
   res.status(200).json({

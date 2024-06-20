@@ -25,5 +25,25 @@
   "subCategoryOptionalString": "الفئة يجب أن تكون",
   "userOptionalMongoId": "يجب أن يكون معرف صالح.",
   "limitOptionalInt": "المحدد يجب أن يكون",
-  "pageOptionalInt": "المحدد يجب أن يكون"
+  "pageOptionalInt": "المحدد يجب أن يكون",
+
+
+
+  "address.required": "العنوان مطلوب",
+  "location.lat.invalid": "يجب أن يكون خط العرض بين -90 و 90",
+  "location.lng.invalid": "يجب أن يكون خط الطول بين -180 و 180",
+  "appointmentDate.invalid": "يجب أن يكون تاريخ الموعد تاريخ ISO8601 صالح",
+  "appointmentDate.past": "يجب أن يكون تاريخ الموعد أكبر من التاريخ الحالي",
+  "episodesDuration.invalid": "يجب أن تكون مدة الحلقات على الأقل 1",
+  "episodesNumber.invalid": "يجب أن يكون عدد الحلقات على الأقل 1",
+  "expectedBudget.invalid": "يجب أن تكون الميزانية المتوقعة على الأقل 1",
+  "expectedProfits.invalid": "يجب أن تكون الأرباح المتوقعة على الأقل 1",
+  "platform.required": "المنصة مطلوبة",
+  "producer.invalid": "يجب أن يكون المنتج معرّف Mongo صالح",
+  "projectDetails.required": "تفاصيل المشروع مطلوبة",
+  "contractId.invalid": "يجب أن يكون معرّف العقد معرّف Mongo صالح",
+  "status.invalid": "يجب أن تكون الحالة إما 'ملغاة' أو 'مقبولة' أو 'مرفوضة'",
+  "filter.invalid": "يجب أن يكون الفلتر إما 'i_created' أو 'i_received'",
+  "limit.invalid": "يجب أن يكون الحد الأدنى 1",
+  "page.invalid": "يجب أن يكون الحد الأدنى للصفحة 1"
 }

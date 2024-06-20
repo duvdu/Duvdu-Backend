@@ -14,14 +14,25 @@ export const getProducerHandler:GetProducerHandler = async (req,res,next)=>{
     },
     {
       $lookup: {
-        from: MODELS.user,  
-        localField: 'user', 
-        foreignField: '_id', 
+        from: MODELS.user,
+        localField: 'user',
+        foreignField: '_id',
         as: 'user',
       },
     },
     {
-      $unwind: '$user' 
+      $unwind: '$user',
+    },
+    {
+      $lookup: {
+        from: MODELS.category,
+        localField: 'category',
+        foreignField: '_id',
+        as: 'categoryData',
+      },
+    },
+    {
+      $unwind: '$categoryData',
     },
     {
       $project: {
@@ -60,13 +71,25 @@ export const getProducerHandler:GetProducerHandler = async (req,res,next)=>{
         searchKeywords: 1,
         createdAt: 1,
         updatedAt: 1,
-        category: 1,
+        category: {
+          _id: '$categoryData._id',
+          image: {
+            $concat: [process.env.BUCKET_HOST, '/', '$categoryData.image'],
+          },
+          title: {
+            $cond: {
+              if: { $eq: ['ar', req.lang] },
+              then: '$categoryData.title.ar',
+              else: '$categoryData.title.en',
+            },
+          },
+        },
         user: {
           profileImage: {
             $cond: [
               { $eq: ['$user.profileImage', null] },
               null,
-              { $concat: [process.env.BUCKET_HOST, '$user.profileImage'] },
+              { $concat: [process.env.BUCKET_HOST, '/', '$user.profileImage'] },
             ],
           },
           username: '$user.username',
@@ -80,7 +103,7 @@ export const getProducerHandler:GetProducerHandler = async (req,res,next)=>{
       },
     },
   ]);
-    
+  
   if (producers.length == 0) 
     return next(new NotFound({en:'producer not found' , ar:'لم يتم العثور على المنتج'} , req.lang));
 

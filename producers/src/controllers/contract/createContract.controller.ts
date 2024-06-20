@@ -1,6 +1,6 @@
 import 'express-async-errors';
 
-import { Bucket, Channels, Contracts, CYCLES, Files, FOLDERS, MODELS, NotFound, Notification, NotificationDetails, NotificationType, Producer } from '@duvdu-v1/duvdu';
+import { BadRequestError, Bucket, Channels, Contracts, CYCLES, Files, FOLDERS, MODELS, NotFound, Notification, NotificationDetails, NotificationType, Producer } from '@duvdu-v1/duvdu';
 
 import { NewNotificationPublisher } from '../../event/publisher/newNotification.publisher';
 import { ProducerContract } from '../../models/producerContracts.model';
@@ -15,6 +15,12 @@ export const createContractHandler:CreateContractHandler = async (req,res,next)=
     const producer = await Producer.findById(req.body.producer);
     if (!producer) 
       return next(new NotFound({en:'producer not found' , ar:'لم يتم العثور على المنتج'} , req.lang));
+
+    if (req.body.expectedBudget < producer.minBudget) 
+      return next(new BadRequestError({en:'project budget must me greater than producer minimum budget' , ar:'يجب أن يكون ميزانية المشروع أكبر من الحد الأدنى لميزانية المنتج'} , req.lang));
+
+    if (req.body.expectedBudget > producer.maxBudget) 
+      return next(new BadRequestError({en:'project budget must me less than producer max budget' , ar:'يجب أن تكون ميزانية المشروع أقل من الحد الأقصى لميزانية المنتج'} , req.lang));
   
     req.body.stageExpiration = await getBestExpirationTime(req.body.appointmentDate.toString());
   
