@@ -1,9 +1,8 @@
 import 'express-async-errors';
 
-import { BadRequestError, Bucket, Channels, Contracts, CYCLES, Files, FOLDERS, MODELS, NotFound, Notification, NotificationDetails, NotificationType, Producer } from '@duvdu-v1/duvdu';
+import { BadRequestError, Bucket, Channels, Contracts, CYCLES, Files, FOLDERS, MODELS, NotFound, Notification, NotificationDetails, NotificationType, Producer, ProducerContract } from '@duvdu-v1/duvdu';
 
 import { NewNotificationPublisher } from '../../event/publisher/newNotification.publisher';
-import { ProducerContract } from '../../models/producerContracts.model';
 import { natsWrapper } from '../../nats-wrapper';
 import { getBestExpirationTime } from '../../services/getBestExpirationTime.service';
 import { CreateContractHandler } from '../../types/endpoints';

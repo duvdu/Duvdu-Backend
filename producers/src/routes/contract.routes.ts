@@ -10,7 +10,7 @@ export const router = express.Router();
 
 router.use(isauthenticated);
 
-router.route('/').post( globalUploadMiddleware(FOLDERS.producer).fields([
+router.route('/').post( globalUploadMiddleware(FOLDERS.producer , {fileTypes:['image','application/pdf','video']}).fields([
   { name: 'attachments', maxCount: 10 }
 ]),
 val.createContractVal,

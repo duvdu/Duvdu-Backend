@@ -1,9 +1,8 @@
 import 'express-async-errors';
-import { MODELS } from '@duvdu-v1/duvdu';
+import { ContractStatus, MODELS, ProducerContract } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import mongoose from 'mongoose';
 
-import { ContractStatus, ProducerContract } from '../../models/producerContracts.model';
 import { GetUserContractsHandler } from '../../types/endpoints';
 
 

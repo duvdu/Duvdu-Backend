@@ -6,6 +6,7 @@ import { GetTrendyCategoriesHandler } from '../../types/endpoints/home.endpoints
 
 
 export const getTrendyCategoriesHandler:GetTrendyCategoriesHandler = async (req,res)=>{
+
   const category = await Categories.aggregate([
     { $match: {trend:true} },
     {
@@ -37,10 +38,13 @@ export const getTrendyCategoriesHandler:GetTrendyCategoriesHandler = async (req,
                   input: '$$subCat.tags',
                   as: 'tag',
                   in: {
-                    $cond: {
-                      if: { $eq: ['ar', req.lang] },
-                      then: '$$tag.ar',
-                      else: '$$tag.en',
+                    id: '$$tag._id',
+                    title: {
+                      $cond: {
+                        if: { $eq: ['ar', req.lang] },
+                        then: '$$tag.ar',
+                        else: '$$tag.en',
+                      },
                     },
                   },
                 },
@@ -50,7 +54,6 @@ export const getTrendyCategoriesHandler:GetTrendyCategoriesHandler = async (req,
           },
         },
         status: 1,
-        trend:1,
         createdAt: 1,
         updatedAt: 1,
         __v: 1,

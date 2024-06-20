@@ -1,7 +1,7 @@
-import { Iuser, MODELS } from '@duvdu-v1/duvdu';
+import { MODELS } from '@duvdu-v1/duvdu';
 import { model, Schema, Types } from 'mongoose';
 
-
+import { Iuser } from '../types/User';
 
 
 export enum ContractStatus {
@@ -49,4 +49,11 @@ export const ProducerContract = model<IproducerContarct>(MODELS.producerContract
   status:{type:String , enum:ContractStatus , default:ContractStatus.pending},
   stageExpiration:{type:Number , default:0},
   actionAt:Date
-} , {timestamps:true , collection:MODELS.producerContract}));
+} , {timestamps:true , collection:MODELS.producerContract , toJSON: {
+  transform(doc, ret) {
+    if (ret.attachments)
+      ret.attachments = ret.attachments.map(
+        (el: string) => process.env.BUCKET_HOST + '/' + el,
+      );
+  },
+},}));
