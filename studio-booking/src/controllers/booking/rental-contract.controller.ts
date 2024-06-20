@@ -7,6 +7,7 @@ import {
   NotFound,
   SuccessResponse,
   Users,
+  CYCLES,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
@@ -64,6 +65,7 @@ export const createContractHandler: RequestHandler<
     sp: contract.sp,
     contract: contract.id,
     ref: 'rental_contracts',
+    cycle: CYCLES.studioBooking
   });
 
   // TODO: send notification
