@@ -1,6 +1,6 @@
 import 'express-async-errors';
 
-import { Bucket, Channels, Files, FOLDERS, NotFound, Notification, NotificationDetails, NotificationType, Producer } from '@duvdu-v1/duvdu';
+import { Bucket, Channels, Contracts, CYCLES, Files, FOLDERS, MODELS, NotFound, Notification, NotificationDetails, NotificationType, Producer } from '@duvdu-v1/duvdu';
 
 import { NewNotificationPublisher } from '../../event/publisher/newNotification.publisher';
 import { ProducerContract } from '../../models/producerContracts.model';
@@ -17,7 +17,6 @@ export const createContractHandler:CreateContractHandler = async (req,res,next)=
       return next(new NotFound({en:'producer not found' , ar:'لم يتم العثور على المنتج'} , req.lang));
   
     req.body.stageExpiration = await getBestExpirationTime(req.body.appointmentDate.toString());
-    console.log(req.body.stageExpiration);
   
     await new Bucket().saveBucketFiles(FOLDERS.producer, ...attachments, );
     req.body.attachments = attachments.map((el) => `${FOLDERS.producer}/${el.filename}`);
@@ -57,6 +56,8 @@ export const createContractHandler:CreateContractHandler = async (req,res,next)=
         delay,
       },
     );
+
+    await Contracts.create({contract:contract._id , customer:contract.user , sp:producer.user , cycle:CYCLES.producer , ref:MODELS.producerContract});
     
     res.status(201).json({message:'success' , data:contract});
   } catch (error) {

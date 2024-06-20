@@ -1,5 +1,7 @@
-import { Iuser, MODELS } from '@duvdu-v1/duvdu';
 import { Types, model, Schema } from 'mongoose';
+
+import { MODELS } from '../types/model-names';
+import { Iuser } from '../types/User';
 
 export interface Icontract {
   id: string;
@@ -7,6 +9,7 @@ export interface Icontract {
   sp: Types.ObjectId | Iuser;
   contract: Types.ObjectId;
   ref: string;
+  cycle:string
 }
 
 export const Contracts = model<Icontract>(
@@ -16,5 +19,6 @@ export const Contracts = model<Icontract>(
     sp: { type: Schema.Types.ObjectId, ref: MODELS.user },
     contract: { type: Schema.Types.ObjectId, refPath: 'ref' },
     ref: String,
+    cycle:{type:String , default:null}
   }),
 );
