@@ -41,7 +41,7 @@ app.use(cors(corsOptions));
 
   app.use(languageHeaderMiddleware);
 
-  app.use('/api/studio-booking', apiRoutes);
+  app.use('/api/rentals', apiRoutes);
   
   app.use(globalErrorHandlingMiddleware);
 })();

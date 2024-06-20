@@ -31,7 +31,7 @@ spec:
                   name: portfolio-post-srv
                   port: 
                     number: 3000
-          - path: /api/studio-booking/?(.*)
+          - path: /api/rentals/?(.*)
             pathType: Prefix
             backend: 
               service:

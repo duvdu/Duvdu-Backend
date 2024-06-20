@@ -1,6 +1,6 @@
 import 'express-async-errors';
 
-import { Bucket, Channels, Files, FOLDERS, NotFound, Notification, NotificationDetails, NotificationType, Producer } from '@duvdu-v1/duvdu';
+import { Bucket, Channels, Contracts, CYCLES, Files, FOLDERS, MODELS, NotFound, Notification, NotificationDetails, NotificationType, Producer } from '@duvdu-v1/duvdu';
 
 import { NewNotificationPublisher } from '../../event/publisher/newNotification.publisher';
 import { ProducerContract } from '../../models/producerContracts.model';
@@ -56,6 +56,8 @@ export const createContractHandler:CreateContractHandler = async (req,res,next)=
         delay,
       },
     );
+
+    await Contracts.create({contract:contract._id , customer:contract.user , sp:producer.user , cycle:CYCLES.producer , ref:MODELS.producerContract});
     
     res.status(201).json({message:'success' , data:contract});
   } catch (error) {
