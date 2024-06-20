@@ -21,90 +21,135 @@ export const getContracts: RequestHandler<
 
   const contracts = await Contracts.aggregate([
     {
-      $match: filter,
-    },
-    {
-      $lookup: {
-        from: 'rental_contracts',
-        localField: 'contract',
-        foreignField: '_id',
-        as: 'contractDetails',
-      },
-    },
-    { $unwind: '$contractDetails' },
-    {
-      $set: {
-        contract: '$contractDetails',
-      },
-    },
-    {
-      $unset: 'contractDetails',
-    },
-    {
-      $lookup: {
-        from: 'users',
-        localField: 'customer',
-        foreignField: '_id',
-        as: 'customerDetails',
-      },
-    },
-    { $unwind: '$customerDetails' },
-    {
-      $set: {
-        customer: {
-          _id: '$customerDetails._id',
-          name: '$customerDetails.name',
-          username: '$customerDetails.username',
-          profileImage: {
-            $concat: [process.env.BUCKET_HOST, '/', '$customerDetails.profileImage'],
+      $facet: {
+        rental_contracts: [
+          { $match: { ref: 'rental_contracts' } },
+          {
+            $lookup: {
+              from: 'rental_contracts',
+              localField: 'contract',
+              foreignField: '_id',
+              as: 'contract',
+            },
           },
-        },
-      },
-    },
-    { $unset: 'customerDetails' },
-    {
-      $lookup: {
-        from: 'users',
-        localField: 'sp',
-        foreignField: '_id',
-        as: 'spDetails',
-      },
-    },
-    { $unwind: '$spDetails' },
-    {
-      $set: {
-        sp: {
-          _id: '$spDetails._id',
-          name: '$spDetails.name',
-          username: '$spDetails.username',
-          profileImage: {
-            $concat: [process.env.BUCKET_HOST, '/', '$spDetails.profileImage'],
+          {
+            $unwind: {
+              path: '$contract',
+              preserveNullAndEmptyArrays: true,
+            },
           },
-        },
+          {
+            $lookup: {
+              from: 'users',
+              localField: 'customer',
+              foreignField: '_id',
+              as: 'customer',
+            },
+          },
+          { $unwind: '$customer' },
+          {
+            $lookup: {
+              from: 'users',
+              localField: 'sp',
+              foreignField: '_id',
+              as: 'sp',
+            },
+          },
+          { $unwind: '$sp' },
+          {
+            $project: {
+              _id: 1,
+              ref: 1,
+              contract: 1,
+              customer: {
+                _id: '$customer._id',
+                name: '$customer.name',
+                username: '$customer.username',
+                isOnline: '$customer.isOnline',
+                profileImage: '$customer.profileImage',
+              },
+              sp: {
+                _id: '$sp._id',
+                name: '$sp.name',
+                username: '$sp.username',
+                isOnline: '$sp.isOnline',
+                profileImage: '$sp.profileImage',
+              },
+            },
+          },
+        ],
+        copyright_contracts: [
+          { $match: { ref: 'copyright_contracts' } },
+          {
+            $lookup: {
+              from: 'copyright_contracts',
+              localField: 'contract',
+              foreignField: '_id',
+              as: 'contract',
+            },
+          },
+          {
+            $unwind: {
+              path: '$contract',
+              preserveNullAndEmptyArrays: true,
+            },
+          },
+          {
+            $lookup: {
+              from: 'users',
+              localField: 'customer',
+              foreignField: '_id',
+              as: 'customer',
+            },
+          },
+          { $unwind: '$customer' },
+          {
+            $lookup: {
+              from: 'users',
+              localField: 'sp',
+              foreignField: '_id',
+              as: 'sp',
+            },
+          },
+          { $unwind: '$sp' },
+          {
+            $project: {
+              _id: 1,
+              ref: 1,
+              contract: 1,
+              customer: {
+                _id: '$customer._id',
+                name: '$customer.name',
+                username: '$customer.username',
+                isOnline: '$customer.isOnline',
+                profileImage: '$customer.profileImage',
+              },
+              sp: {
+                _id: '$sp._id',
+                name: '$sp.name',
+                username: '$sp.username',
+                isOnline: '$sp.isOnline',
+                profileImage: '$sp.profileImage',
+              },
+            },
+          },
+        ],
       },
     },
-    { $unset: 'spDetails' },
   ]);
-  console.log('cccccc', contracts);
-  contracts.forEach((contract) => {
-    //   if (
-    //     (contract.targetUser as Iuser).profileImage &&
-    //     !(contract.targetUser as Iuser).profileImage?.startsWith('http')
-    //   )
-    //     (contract.targetUser as Iuser).profileImage =
-    //       process.env.BUCKET_HOST, '/' + '/' + (contract.targetUser as Iuser).profileImage;
-    //   if (contract.status !== ContractStatus.pending) return contract;
-    // TODO: calc remaining time for all cases
+  contracts[0].rental_contracts.forEach((contract: any) => {
     const createdAt = new Date(contract.contract.createdAt).getTime();
-    // console.log('createdAt', createdAt);
     const responseNoticePeriod = createdAt + contract.contract?.stageExpiration * 60 * 60 * 1000;
-    // console.log('response period in milli', responseNoticePeriod);
     (contract as any).remainingTime = parseInt(`${(responseNoticePeriod - Date.now()) / 1000}`);
-    // console.log('remaining', parseInt(`${(responseNoticePeriod - Date.now()) / 1000}`));
-    //   return contract;
   });
+  contracts[0].copyright_contracts.forEach((contract: any) => {
+    const createdAt = new Date(contract.contract.createdAt).getTime();
+    const responseNoticePeriod = createdAt + contract.contract?.stageExpiration * 60 * 60 * 1000;
+    (contract as any).remainingTime = parseInt(`${(responseNoticePeriod - Date.now()) / 1000}`);
+  });
+
   res.status(200).json({
     message: 'success',
-    data: contracts,
+    data: contracts[0],
   });
 };
