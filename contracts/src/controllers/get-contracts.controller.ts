@@ -56,7 +56,7 @@ export const getContracts: RequestHandler<
           name: '$customerDetails.name',
           username: '$customerDetails.username',
           profileImage: {
-            $concat: [process.env.BUCKET_HOST, '$customerDetails.profileImage'],
+            $concat: [process.env.BUCKET_HOST, '/', '$customerDetails.profileImage'],
           },
         },
       },
@@ -78,30 +78,31 @@ export const getContracts: RequestHandler<
           name: '$spDetails.name',
           username: '$spDetails.username',
           profileImage: {
-            $concat: [process.env.BUCKET_HOST, '$spDetails.profileImage'],
+            $concat: [process.env.BUCKET_HOST, '/', '$spDetails.profileImage'],
           },
         },
       },
     },
     { $unset: 'spDetails' },
   ]);
-  contracts.forEach((contract) => {
-    //   if (
-    //     (contract.targetUser as Iuser).profileImage &&
-    //     !(contract.targetUser as Iuser).profileImage?.startsWith('http')
-    //   )
-    //     (contract.targetUser as Iuser).profileImage =
-    //       process.env.BUCKET_HOST + '/' + (contract.targetUser as Iuser).profileImage;
-    //   if (contract.status !== ContractStatus.pending) return contract;
-    // TODO: calc remaining time for all cases
-    const createdAt = new Date(contract.contract.createdAt).getTime();
-    console.log('createdAt', createdAt);
-    const responseNoticePeriod = createdAt + contract.contract?.stageExpiration * 60 * 60 * 1000;
-    console.log('response period in milli', responseNoticePeriod);
-    (contract as any).remainingTime = parseInt(`${(responseNoticePeriod - Date.now()) / 1000}`);
-    console.log('remaining', parseInt(`${(responseNoticePeriod - Date.now()) / 1000}`));
-    //   return contract;
-  });
+  console.log('cccccc', contracts);
+  // contracts.forEach((contract) => {
+  //   //   if (
+  //   //     (contract.targetUser as Iuser).profileImage &&
+  //   //     !(contract.targetUser as Iuser).profileImage?.startsWith('http')
+  //   //   )
+  //   //     (contract.targetUser as Iuser).profileImage =
+  //   //       process.env.BUCKET_HOST, '/' + '/' + (contract.targetUser as Iuser).profileImage;
+  //   //   if (contract.status !== ContractStatus.pending) return contract;
+  //   // TODO: calc remaining time for all cases
+  //   const createdAt = new Date(contract.contract.createdAt).getTime();
+  //   console.log('createdAt', createdAt);
+  //   const responseNoticePeriod = createdAt + contract.contract?.stageExpiration * 60 * 60 * 1000;
+  //   console.log('response period in milli', responseNoticePeriod);
+  //   (contract as any).remainingTime = parseInt(`${(responseNoticePeriod - Date.now()) / 1000}`);
+  //   console.log('remaining', parseInt(`${(responseNoticePeriod - Date.now()) / 1000}`));
+  //   //   return contract;
+  // });
   res.status(200).json({
     message: 'success',
     data: contracts,
