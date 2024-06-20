@@ -29,7 +29,7 @@ contractQueue.process(async (job) => {
           actionAt: new Date()
         },
         {new:true}
-      );      
+      );
     }
   } catch (error) {
     return new Error('Failed to cancelled producer contract');

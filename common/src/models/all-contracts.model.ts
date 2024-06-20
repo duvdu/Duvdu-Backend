@@ -7,6 +7,7 @@ export interface Icontract {
   sp: Types.ObjectId | Iuser;
   contract: Types.ObjectId;
   ref: string;
+  cycle:string
 }
 
 export const Contracts = model<Icontract>(

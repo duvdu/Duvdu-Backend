@@ -17,7 +17,6 @@ export const createContractHandler:CreateContractHandler = async (req,res,next)=
       return next(new NotFound({en:'producer not found' , ar:'لم يتم العثور على المنتج'} , req.lang));
   
     req.body.stageExpiration = await getBestExpirationTime(req.body.appointmentDate.toString());
-    console.log(req.body.stageExpiration);
   
     await new Bucket().saveBucketFiles(FOLDERS.producer, ...attachments, );
     req.body.attachments = attachments.map((el) => `${FOLDERS.producer}/${el.filename}`);
