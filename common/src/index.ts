@@ -71,6 +71,7 @@ export * from './models/userSession.model';
 export * from './models/ranks.model';
 export * from './models/settings.model';
 export * from './models/all-contracts.model';
+export * from './models/producer_contracts.model';
 
 export * from './services/category.service';
 export * from './services/projectView.service';
