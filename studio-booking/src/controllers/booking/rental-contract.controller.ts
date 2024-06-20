@@ -40,7 +40,6 @@ export const createContractHandler: RequestHandler<
     );
 
   const stageExpiration = await getStageExpiration(new Date(req.body.bookingDate), req.lang);
-  console.log('stageExpiration', stageExpiration);
 
   const contract = await RentalContracts.create({
     ...req.body,
@@ -70,7 +69,7 @@ export const createContractHandler: RequestHandler<
 
   // TODO: send notification
 
-  res.status(201).end();
+  res.status(201).json({ message: 'success' });
 };
 
 const getStageExpiration = async (bookingDate: Date, lang: string) => {
