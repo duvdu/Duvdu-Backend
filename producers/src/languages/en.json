@@ -24,5 +24,23 @@
   "subCategoryOptionalString": "Subcategory must be string.",
   "userOptionalMongoId": "User ID must be a valid Mongo ID.",
   "limitOptionalInt": "The limit must be integer.",
-  "pageOptionalInt": "The page must be integer."
+  "pageOptionalInt": "The page must be integer.",
+
+  "address.required": "Address is required",
+  "location.lat.invalid": "Latitude must be between -90 and 90",
+  "location.lng.invalid": "Longitude must be between -180 and 180",
+  "appointmentDate.invalid": "Appointment date must be a valid ISO8601 date",
+  "appointmentDate.past": "Appointment date must be greater than the current date",
+  "episodesDuration.invalid": "Episodes duration must be at least 1",
+  "episodesNumber.invalid": "Episodes number must be at least 1",
+  "expectedBudget.invalid": "Expected budget must be at least 1",
+  "expectedProfits.invalid": "Expected profits must be at least 1",
+  "platform.required": "Platform is required",
+  "producer.invalid": "Producer must be a valid Mongo ID",
+  "projectDetails.required": "Project details are required",
+  "contractId.invalid": "Contract ID must be a valid Mongo ID",
+  "status.invalid": "Status must be one of 'canceled', 'accepted', or 'rejected'",
+  "filter.invalid": "Filter must be one of 'i_created' or 'i_received'",
+  "limit.invalid": "Limit must be at least 1",
+  "page.invalid": "Page must be at least 1"
 }

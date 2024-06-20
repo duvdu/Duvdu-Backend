@@ -66,7 +66,7 @@ export const getLoggedProducerHandler:GetLoggedProducerHandler = async (req,res,
             $cond: [
               { $eq: ['$user.profileImage', null] },
               null,
-              { $concat: [process.env.BUCKET_HOST, '$user.profileImage'] },
+              { $concat: [process.env.BUCKET_HOST ,'/', '$user.profileImage'] },
             ],
           },
           username: '$user.username',
