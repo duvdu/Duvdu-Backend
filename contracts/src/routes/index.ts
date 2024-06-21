@@ -8,6 +8,6 @@ const router = Router();
 
 router.route('/').get(isauthenticated, val.getContracts, controllers.getContracts);
 
-router.route('/:contractId').post(isauthenticated, val.getContract, controllers.getContract);
+router.route('/:contractId').get(isauthenticated, val.getContract, controllers.getContract);
 
 export const apiRoutes = router;
