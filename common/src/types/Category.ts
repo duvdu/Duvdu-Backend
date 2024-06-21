@@ -11,4 +11,5 @@ export interface Icategory {
   cycle: CYCLES;
   status: boolean;
   trend:boolean;
+  media: 'image' | 'video' | 'audio'
 }
