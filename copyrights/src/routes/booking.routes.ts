@@ -2,6 +2,7 @@ import { isauthenticated, globalUploadMiddleware, FOLDERS } from '@duvdu-v1/duvd
 import { Router } from 'express';
 
 import {
+  contractAction,
   createContractHandler,
   payContract,
 } from '../controllers/booking/copyright-contract.controller';
@@ -9,7 +10,7 @@ import * as val from '../validators/booking/booking.validator';
 
 const router = Router();
 
-router.get('/pay', payContract);
+router.get('/pay', val.pay, payContract);
 
 router.post(
   '/:projectId',
@@ -23,6 +24,8 @@ router.post(
   // bookProjectHandler,
   createContractHandler,
 );
+
+router.post('/:contractId/action', val.action, contractAction);
 // router.patch(
 //   '/:bookingId',
 //   isauthenticated,
