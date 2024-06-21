@@ -18,7 +18,7 @@ export interface IcopyrightContract {
   sp: Types.ObjectId | Iuser;
   project: Types.ObjectId | IcopyRights;
   details: string;
-  attachments: string;
+  attachments: string[];
   location: { lat: number; lng: number };
   address: string;
   totalPrice: number;
@@ -45,7 +45,7 @@ export const CopyrightContracts = model<IcopyrightContract>(
       sp: { type: Schema.Types.ObjectId, ref: MODELS.user },
       project: { type: Schema.Types.ObjectId, ref: 'rentals' },
       details: { type: String, default: null },
-      attachments: String,
+      attachments: [String],
       location: { lat: Number, lng: Number },
       address: String,
       totalPrice: Number,
