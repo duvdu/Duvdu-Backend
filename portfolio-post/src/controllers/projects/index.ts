@@ -1,1 +1,7 @@
 export * from './createProject.controller';
+export * from './updateProject.controller';
+export * from './getProject.controller';
+export * from './getProjects.controller';
+export * from './deleteProject.controller';
+export * from './getProjectAnalysis.controller';
+export * from './getProjectsForCrm.controllers';

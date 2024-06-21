@@ -62,9 +62,7 @@ export const getProjectsPagination: RequestHandler<
 };
 
 export const getProjectsHandler:GetProjectsHandler = async(req,res)=>{
-  console.log(req.pagination.limit);
-  console.log(req.pagination.page);
-  
+
 
   const projects = await TeamProject.find({ user:req.loggedUser.id , ...req.pagination.filter , isDeleted:{$ne:true}})
     .populate([

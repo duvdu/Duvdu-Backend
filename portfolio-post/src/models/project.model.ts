@@ -2,7 +2,7 @@ import { Iuser, MODELS } from '@duvdu-v1/duvdu';
 import { model, Schema, Types } from 'mongoose';
 
 
-export interface Iproject {
+export interface IprojectCycle {
     user: Types.ObjectId | Iuser;
     category: Types.ObjectId | Iuser;
     subCategory: { ar: string; en: string };
@@ -24,7 +24,7 @@ export interface Iproject {
     rate: { ratersCounter: number; totalRates: number };
 }
 
-export const Project = model<Iproject>('projects' , new Schema<Iproject>({
+export const ProjectCycle = model<IprojectCycle>('projects' , new Schema<IprojectCycle>({
   user:{type:Schema.Types.ObjectId , ref:MODELS.user},
   category:{type:Schema.Types.ObjectId , ref:MODELS.category},
   subCategory:{ar:{type:String , default:null} , en:{type:String , default:null}},

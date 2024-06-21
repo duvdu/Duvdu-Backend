@@ -74,3 +74,61 @@ Error: validation error
     at next (D:\work\freelance\duvdu_backend\portfolio-post\node_modules\express\lib\router\route.js:149:13)
     at middleware (D:\work\freelance\duvdu_backend\portfolio-post\node_modules\express-validator\src\middlewares\check.js:16:13)
     at processTicksAndRejections (node:internal/process/task_queues:95:5)
+2024-06-21T20:31:14.681Z [ERROR]: Cannot read properties of undefined (reading 'map')
+TypeError: Cannot read properties of undefined (reading 'map')
+    at D:\work\freelance\duvdu_backend\portfolio-post\src\controllers\projects\createProject.controller.ts:21:76
+    at Generator.next (<anonymous>)
+    at fulfilled (D:\work\freelance\duvdu_backend\portfolio-post\src\controllers\projects\createProject.controller.ts:5:58)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+2024-06-21T20:33:25.389Z [ERROR]: Cannot read properties of undefined (reading 'map')
+TypeError: Cannot read properties of undefined (reading 'map')
+    at D:\work\freelance\duvdu_backend\portfolio-post\src\controllers\projects\createProject.controller.ts:21:76
+    at Generator.next (<anonymous>)
+    at fulfilled (D:\work\freelance\duvdu_backend\portfolio-post\src\controllers\projects\createProject.controller.ts:5:58)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+2024-06-21T20:36:16.283Z [ERROR]: Cannot read properties of undefined (reading 'map')
+TypeError: Cannot read properties of undefined (reading 'map')
+    at D:\work\freelance\duvdu_backend\portfolio-post\src\controllers\projects\createProject.controller.ts:21:76
+    at Generator.next (<anonymous>)
+    at fulfilled (D:\work\freelance\duvdu_backend\portfolio-post\src\controllers\projects\createProject.controller.ts:5:58)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+2024-06-21T20:37:14.154Z [ERROR]: Cannot read properties of undefined (reading 'map')
+TypeError: Cannot read properties of undefined (reading 'map')
+    at D:\work\freelance\duvdu_backend\portfolio-post\src\controllers\projects\createProject.controller.ts:21:76
+    at Generator.next (<anonymous>)
+    at fulfilled (D:\work\freelance\duvdu_backend\portfolio-post\src\controllers\projects\createProject.controller.ts:5:58)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+2024-06-21T20:38:46.714Z [ERROR]: Cannot read properties of undefined (reading 'map')
+TypeError: Cannot read properties of undefined (reading 'map')
+    at D:\work\freelance\duvdu_backend\portfolio-post\src\controllers\projects\createProject.controller.ts:21:76
+    at Generator.next (<anonymous>)
+    at fulfilled (D:\work\freelance\duvdu_backend\portfolio-post\src\controllers\projects\createProject.controller.ts:5:58)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+2024-06-21T20:39:56.174Z [ERROR]: Cannot read properties of undefined (reading 'map')
+TypeError: Cannot read properties of undefined (reading 'map')
+    at D:\work\freelance\duvdu_backend\portfolio-post\src\controllers\projects\createProject.controller.ts:21:76
+    at Generator.next (<anonymous>)
+    at fulfilled (D:\work\freelance\duvdu_backend\portfolio-post\src\controllers\projects\createProject.controller.ts:5:58)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+2024-06-21T20:42:01.049Z [ERROR]: Invalid tags
+Error: Invalid tags
+    at D:\work\freelance\duvdu_backend\portfolio-post\src\services\category.service.ts:26:52
+    at Generator.next (<anonymous>)
+    at fulfilled (D:\work\freelance\duvdu_backend\portfolio-post\src\services\category.service.ts:5:58)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+2024-06-21T20:42:47.116Z [ERROR]: Invalid tags
+Error: Invalid tags
+    at D:\work\freelance\duvdu_backend\portfolio-post\src\services\category.service.ts:26:52
+    at Generator.next (<anonymous>)
+    at fulfilled (D:\work\freelance\duvdu_backend\portfolio-post\src\services\category.service.ts:5:58)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+2024-06-21T20:58:57.462Z [ERROR]: ENOENT: no such file or directory, unlink 'D:\work\freelance\duvdu_backend\portfolio-post\media\studio-booking\0c515194-3a50-41de-97e7-28878ab1e8a2.jpg'
+Error: ENOENT: no such file or directory, unlink 'D:\work\freelance\duvdu_backend\portfolio-post\media\studio-booking\0c515194-3a50-41de-97e7-28878ab1e8a2.jpg'
+    at Object.unlinkSync (node:fs:1868:18)
+    at D:\work\freelance\duvdu_backend\portfolio-post\node_modules\@duvdu-v1\duvdu\build\utils\file.js:18:26
+    at Array.forEach (<anonymous>)
+    at Object.removeFiles (D:\work\freelance\duvdu_backend\portfolio-post\node_modules\@duvdu-v1\duvdu\build\utils\file.js:16:15)
+    at D:\work\freelance\duvdu_backend\portfolio-post\src\controllers\projects\createProject.controller.ts:38:15
+    at Generator.next (<anonymous>)
+    at fulfilled (D:\work\freelance\duvdu_backend\portfolio-post\src\controllers\projects\createProject.controller.ts:5:58)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)

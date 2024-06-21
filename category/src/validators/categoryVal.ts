@@ -176,7 +176,7 @@ export const createCategoryVal = [
     .bail()
     .toBoolean(),
   body('trend').optional().isBoolean().withMessage('statusMustBeBoolean'),
-
+  body('media').optional().isIn(['video' , 'image' , 'audio']).withMessage('invalidmedia'),
   globalValidatorMiddleware,
 ];
 
@@ -200,6 +200,7 @@ export const updateCategoryVal = [
     .withMessage('cycleStringRequired')
     .bail()
     .custom((val) => {
+
       if (Object.values(CYCLES).includes(val)) return true;
       throw new Error('invalidCycle');
     }),
@@ -234,6 +235,7 @@ export const updateCategoryVal = [
     .bail()
     .toBoolean(),
   body('trend').optional().isBoolean().withMessage('statusMustBeBoolean'),
+  body('media').optional().isIn(['video' , 'image' , 'audio']).withMessage('invalidmedia'),
   globalValidatorMiddleware,
 ];
 
