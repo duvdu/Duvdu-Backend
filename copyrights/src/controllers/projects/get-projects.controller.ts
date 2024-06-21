@@ -99,6 +99,30 @@ export const getProjectsHandler: RequestHandler<
       },
     },
     {
+      $lookup: {
+        from: MODELS.category,
+        localField: 'category',
+        foreignField: '_id',
+        as: 'category',
+      },
+    },
+    { $unwind: '$category' },
+    {
+      $set: {
+        category: {
+          _id: '$category._id',
+          image: { $concat: [process.env.BUCKET_HOST, '/', '$category.image'] },
+          title: {
+            $cond: {
+              if: { $eq: [req.lang, 'ar'] },
+              then: '$category.title.ar',
+              else: '$category.title.en',
+            },
+          },
+        },
+      },
+    },
+    {
       $addFields: {
         user: {
           $cond: {
@@ -116,7 +140,7 @@ export const getProjectsHandler: RequestHandler<
         _id: 1,
         user: {
           acceptedProjectsCounter: '$user.acceptedProjectsCounter',
-          profileImage: {$concat: [process.env.BUCKET_HOST + '/', '$user.profileImage']},
+          profileImage: { $concat: [process.env.BUCKET_HOST + '/', '$user.profileImage'] },
           name: '$user.name',
           username: '$user.username',
           isOnline: '$user.isOnline',
@@ -124,7 +148,10 @@ export const getProjectsHandler: RequestHandler<
           projectsView: '$user.projectsView',
           rate: '$user.rate',
         },
-        category: 1,
+        category: {
+          _id: 1,
+          title: 1,
+        },
         price: 1,
         duration: 1,
         address: 1,
