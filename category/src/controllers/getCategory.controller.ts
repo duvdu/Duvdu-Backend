@@ -102,7 +102,7 @@ export const getCategoryHandler: GetCategoryHandler = async (req, res, next) => 
                   input: '$$subCat.tags',
                   as: 'tag',
                   in: {
-                    id: '$$tag._id',
+                    _id: '$$tag._id',
                     title: {
                       $cond: {
                         if: { $eq: ['ar', req.lang] },
