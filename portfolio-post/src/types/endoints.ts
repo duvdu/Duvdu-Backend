@@ -1,7 +1,6 @@
-import { PaginationResponse, SuccessResponse } from '@duvdu-v1/duvdu';
+import { IprojectCycle, PaginationResponse, SuccessResponse } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-import { IprojectCycle } from '../models/project.model';
 
 
 export interface CreateProjectHandler

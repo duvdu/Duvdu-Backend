@@ -37,6 +37,7 @@ export const appInit = async () => {
           PERMISSIONS.createProtfolioProjectHandler,
           PERMISSIONS.createStudioProjectHandler,
           PERMISSIONS.updatePortfolioProjectHandler,
+          PERMISSIONS.removePortfolioProjectHandler,
           PERMISSIONS.updateStudioProjectHandler,
           PERMISSIONS.updateCopyrightHandler,
           PERMISSIONS.createTicket,

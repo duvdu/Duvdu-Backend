@@ -54,11 +54,14 @@ export const getProducerHandler:GetProducerHandler = async (req,res,next)=>{
                   input: '$$subCat.tags',
                   as: 'tag',
                   in: {
-                    $cond: {
-                      if: { $eq: ['ar', req.lang] },
-                      then: '$$tag.ar',
-                      else: '$$tag.en',
+                    title: {
+                      $cond: {
+                        if: { $eq: ['ar', req.lang] },
+                        then: '$$tag.ar',
+                        else: '$$tag.en',
+                      },
                     },
+                    _id: '$$tag._id', 
                   },
                 },
               },

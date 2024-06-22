@@ -43,11 +43,14 @@ export const getLoggedProducerHandler:GetLoggedProducerHandler = async (req,res,
                   input: '$$subCat.tags',
                   as: 'tag',
                   in: {
-                    $cond: {
-                      if: { $eq: ['ar', req.lang] },
-                      then: '$$tag.ar',
-                      else: '$$tag.en',
+                    title: {
+                      $cond: {
+                        if: { $eq: ['ar', req.lang] },
+                        then: '$$tag.ar',
+                        else: '$$tag.en',
+                      },
                     },
+                    _id: '$$tag._id',
                   },
                 },
               },

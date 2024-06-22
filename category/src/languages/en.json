@@ -21,6 +21,6 @@
     "cycleMustBeNonEmptyString": "Cycle must be a non-empty string",
     "limitMustBePositiveInteger": "Limit must be a positive integer",
     "pageMustBePositiveInteger": "Page must be a positive integer",
-    "invalidmedia":"invalid media"
+    "invalidmedia":"media required and must be value of this video image audio"
   }
   

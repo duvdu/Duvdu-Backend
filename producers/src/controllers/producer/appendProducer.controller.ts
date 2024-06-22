@@ -4,6 +4,11 @@ import { BadRequestError, Categories, CYCLES, NotFound, Producer } from '@duvdu-
 import { AppendProducerHandler } from '../../types/endpoints';
 
 export const appendProducerHandler: AppendProducerHandler = async (req, res, next) => {
+
+  const producer = await Producer.findOne({user:req.loggedUser.id});
+  if (producer) 
+    return next(new BadRequestError({en:'you are already producer' , ar:'أنت بالفعل منتج.'} , req.lang));
+
   try {
     const category = await Categories.findById(req.body.category);
     if (!category) {
