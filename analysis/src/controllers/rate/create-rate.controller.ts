@@ -1,9 +1,9 @@
 /* eslint-disable indent */
 import {
   CopyRights,
-  IportfolioPost,
+  IprojectCycle,
   NotFound,
-  PortfolioPosts,
+  ProjectCycle,
   studioBooking,
   SuccessResponse,
 } from '@duvdu-v1/duvdu';
@@ -16,7 +16,7 @@ export const createRateHandler: RequestHandler<
   SuccessResponse,
   { project: string; cycle: number; rate: number; desc: string }
 > = async (req, res, next) => {
-  const project = <IportfolioPost>await getProjectByCycle(req.body.project, req.body.cycle);
+  const project = <IprojectCycle>await getProjectByCycle(req.body.project, req.body.cycle);
   if (!project) return next(new NotFound({en:'project not found' , ar: 'المشروع غير موجود'} , req.lang));
 
   await Rates.create({
@@ -32,7 +32,7 @@ export const createRateHandler: RequestHandler<
 export const getProjectByCycle = async (projectId: string, cycle: number) => {
   switch (cycle) {
     case 1:
-      return await PortfolioPosts.findById(projectId);
+      return await ProjectCycle.findById(projectId);
     case 2:
       return await studioBooking.findById(projectId);
     case 3:

@@ -24,7 +24,7 @@ spec:
                   name: category-srv
                   port: 
                     number: 3000
-          - path: /api/portfolio-post/?(.*)
+          - path: /api/projects/?(.*)
             pathType: Prefix
             backend: 
               service:

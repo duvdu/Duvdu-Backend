@@ -7,9 +7,19 @@ import { GetProjectHandler } from '../../types/endoints';
 
 
 export const getProjectHandler:GetProjectHandler = async (req,res,next)=>{
+
   const projects = await ProjectCycle.aggregate([
     {
       $match: { _id:new mongoose.Types.ObjectId(req.params.projectId) , isDeleted:false},
+    },
+    {
+      $sort: { createdAt: -1 },
+    },
+    {
+      $skip: req.pagination.skip,
+    },
+    {
+      $limit: req.pagination.limit,
     },
     {
       $lookup: {
@@ -24,7 +34,7 @@ export const getProjectHandler:GetProjectHandler = async (req,res,next)=>{
     },
     {
       $lookup: {
-        from: MODELS.category, 
+        from: MODELS.category,
         localField: 'category',
         foreignField: '_id',
         as: 'category',
@@ -34,10 +44,24 @@ export const getProjectHandler:GetProjectHandler = async (req,res,next)=>{
       $unwind: '$category',
     },
     {
+      $lookup: {
+        from: MODELS.user,
+        localField: 'creatives',
+        foreignField: '_id',
+        as: 'creatives',
+      },
+    },
+    {
+      $unwind: {
+        path: '$creatives',
+        preserveNullAndEmptyArrays: true,  
+      },
+    },
+    {
       $project: {
         _id: 1,
         user: {
-          profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$user.profileImage'] }, 
+          profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$user.profileImage'] },
           isOnline: '$user.isOnline',
           username: '$user.username',
           name: '$user.name',
@@ -45,24 +69,43 @@ export const getProjectHandler:GetProjectHandler = async (req,res,next)=>{
           projectsView: '$user.projectsView',
         },
         category: {
-          title:'$category.title.' + req.lang,
-          _id: '$category._id'
-        }, 
-        subCategory: '$subCategory.' + req.lang, 
+          title: '$category.title.' + req.lang,
+          _id: '$category._id',
+        },
+        subCategory: '$subCategory.' + req.lang,
         tags: {
           $map: {
             input: '$tags',
             as: 'tag',
-            in: '$$tag.' + req.lang
-          }
+            in: '$$tag.' + req.lang,
+          },
         },
-        cover: { $concat: [process.env.BUCKET_HOST, '/', '$cover'] }, 
-        attachments: { $map: { input: '$attachments', as: 'attachment', in: { $concat: [process.env.BUCKET_HOST, '/', '$$attachment'] } } }, 
+        cover: { $concat: [process.env.BUCKET_HOST, '/', '$cover'] },
+        attachments: {
+          $map: {
+            input: '$attachments',
+            as: 'attachment',
+            in: { $concat: [process.env.BUCKET_HOST, '/', '$$attachment'] },
+          },
+        },
         name: 1,
         description: 1,
         tools: 1,
         functions: 1,
-        creatives: 1,
+        creatives: {
+          $map: {
+            input: '$creatives',
+            as: 'creative',
+            in: {
+              profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$$creative.profileImage'] },
+              isOnline: '$$creative.isOnline',
+              username: '$$creative.username',
+              name: '$$creative.name',
+              rank: '$$creative.rank',
+              projectsView: '$$creative.projectsView',
+            },
+          },
+        },
         location: 1,
         address: 1,
         searchKeyWords: 1,
@@ -73,6 +116,7 @@ export const getProjectHandler:GetProjectHandler = async (req,res,next)=>{
       },
     },
   ]);
+  
 
   if (!projects[0]) 
     return next(new NotFound({en:'project not found' , ar:'المشروع غير موجود'} , req.lang));
