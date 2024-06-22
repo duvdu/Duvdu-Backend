@@ -25,7 +25,7 @@ router.post(
   createContractHandler,
 );
 
-router.post('/:contractId/action', val.action, contractAction);
+router.post('/:contractId/action', isauthenticated, val.action, contractAction);
 // router.patch(
 //   '/:bookingId',
 //   isauthenticated,

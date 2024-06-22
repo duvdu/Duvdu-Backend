@@ -11,6 +11,7 @@ import {
   Bucket,
   FOLDERS,
   Files,
+  CYCLES,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
@@ -63,6 +64,7 @@ export const createContractHandler: RequestHandler<
     sp: contract.sp,
     contract: contract.id,
     ref: 'copyright_contracts',
+    cycle: CYCLES.copyRights,
   });
 
   // TODO: send notification
