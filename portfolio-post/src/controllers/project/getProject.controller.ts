@@ -13,15 +13,6 @@ export const getProjectHandler:GetProjectHandler = async (req,res,next)=>{
       $match: { _id:new mongoose.Types.ObjectId(req.params.projectId) , isDeleted:false},
     },
     {
-      $sort: { createdAt: -1 },
-    },
-    {
-      $skip: req.pagination.skip,
-    },
-    {
-      $limit: req.pagination.limit,
-    },
-    {
       $lookup: {
         from: MODELS.user,
         localField: 'user',
@@ -49,12 +40,6 @@ export const getProjectHandler:GetProjectHandler = async (req,res,next)=>{
         localField: 'creatives',
         foreignField: '_id',
         as: 'creatives',
-      },
-    },
-    {
-      $unwind: {
-        path: '$creatives',
-        preserveNullAndEmptyArrays: true,  
       },
     },
     {
@@ -94,7 +79,7 @@ export const getProjectHandler:GetProjectHandler = async (req,res,next)=>{
         functions: 1,
         creatives: {
           $map: {
-            input: '$creatives',
+            input: { $ifNull: ['$creatives', []] },
             as: 'creative',
             in: {
               profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$$creative.profileImage'] },
@@ -116,7 +101,6 @@ export const getProjectHandler:GetProjectHandler = async (req,res,next)=>{
       },
     },
   ]);
-  
 
   if (!projects[0]) 
     return next(new NotFound({en:'project not found' , ar:'المشروع غير موجود'} , req.lang));

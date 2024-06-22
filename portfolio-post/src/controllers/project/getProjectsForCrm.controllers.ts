@@ -51,12 +51,6 @@ export const getProjetcsCrm : GetProjectsForCrmHandler = async (req,res)=>{
       },
     },
     {
-      $unwind: {
-        path: '$creatives',
-        preserveNullAndEmptyArrays: true,  // In case creatives array can be empty
-      },
-    },
-    {
       $project: {
         _id: 1,
         user: {
@@ -93,7 +87,7 @@ export const getProjetcsCrm : GetProjectsForCrmHandler = async (req,res)=>{
         functions: 1,
         creatives: {
           $map: {
-            input: '$creatives',
+            input: { $ifNull: ['$creatives', []] },
             as: 'creative',
             in: {
               profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$$creative.profileImage'] },
@@ -114,8 +108,7 @@ export const getProjetcsCrm : GetProjectsForCrmHandler = async (req,res)=>{
         rate: 1,
       },
     },
-  ]);
-  
+  ]);  
   const resultCount = await ProjectCycle.countDocuments(req.pagination.filter);
       
   res.status(200).json({
