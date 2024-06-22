@@ -1,7 +1,7 @@
 import { checkRequiredFields, FOLDERS, globalPaginationMiddleware, globalUploadMiddleware, isauthenticated, isauthorized, PERMISSIONS } from '@duvdu-v1/duvdu';
 import express from 'express';
 
-import * as handler from '../controllers/projects';
+import * as handler from '../controllers/project';
 import * as val from '../validators/project.val';
 
 export const router = express.Router();
