@@ -7,11 +7,10 @@ import { GetProjectsForCrmHandler } from '../../types/endoints';
 
 
 export const getProjetcsCrm : GetProjectsForCrmHandler = async (req,res)=>{
-
+ 
   const projects = await ProjectCycle.aggregate([
     {
-      $match: req.pagination.filter,
-    },
+      $match: req.pagination.filter,    },
     {
       $sort: { createdAt: -1 },
     },
@@ -34,7 +33,7 @@ export const getProjetcsCrm : GetProjectsForCrmHandler = async (req,res)=>{
     },
     {
       $lookup: {
-        from: MODELS.category, 
+        from: MODELS.category,
         localField: 'category',
         foreignField: '_id',
         as: 'category',
@@ -44,10 +43,24 @@ export const getProjetcsCrm : GetProjectsForCrmHandler = async (req,res)=>{
       $unwind: '$category',
     },
     {
+      $lookup: {
+        from: MODELS.user,
+        localField: 'creatives',
+        foreignField: '_id',
+        as: 'creatives',
+      },
+    },
+    {
+      $unwind: {
+        path: '$creatives',
+        preserveNullAndEmptyArrays: true,  // In case creatives array can be empty
+      },
+    },
+    {
       $project: {
         _id: 1,
         user: {
-          profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$user.profileImage'] }, 
+          profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$user.profileImage'] },
           isOnline: '$user.isOnline',
           username: '$user.username',
           name: '$user.name',
@@ -55,24 +68,43 @@ export const getProjetcsCrm : GetProjectsForCrmHandler = async (req,res)=>{
           projectsView: '$user.projectsView',
         },
         category: {
-          title:'$category.title.' + req.lang,
-          _id: '$category._id'
-        }, 
-        subCategory: '$subCategory.' + req.lang, 
+          title: '$category.title.' + req.lang,
+          _id: '$category._id',
+        },
+        subCategory: '$subCategory.' + req.lang,
         tags: {
           $map: {
             input: '$tags',
             as: 'tag',
-            in: '$$tag.' + req.lang
-          }
+            in: '$$tag.' + req.lang,
+          },
         },
-        cover: { $concat: [process.env.BUCKET_HOST, '/', '$cover'] }, 
-        attachments: { $map: { input: '$attachments', as: 'attachment', in: { $concat: [process.env.BUCKET_HOST, '/', '$$attachment'] } } }, 
+        cover: { $concat: [process.env.BUCKET_HOST, '/', '$cover'] },
+        attachments: {
+          $map: {
+            input: '$attachments',
+            as: 'attachment',
+            in: { $concat: [process.env.BUCKET_HOST, '/', '$$attachment'] },
+          },
+        },
         name: 1,
         description: 1,
         tools: 1,
         functions: 1,
-        creatives: 1,
+        creatives: {
+          $map: {
+            input: '$creatives',
+            as: 'creative',
+            in: {
+              profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$$creative.profileImage'] },
+              isOnline: '$$creative.isOnline',
+              username: '$$creative.username',
+              name: '$$creative.name',
+              rank: '$$creative.rank',
+              projectsView: '$$creative.projectsView',
+            },
+          },
+        },
         location: 1,
         address: 1,
         searchKeyWords: 1,
@@ -83,7 +115,7 @@ export const getProjetcsCrm : GetProjectsForCrmHandler = async (req,res)=>{
       },
     },
   ]);
-      
+  
   const resultCount = await ProjectCycle.countDocuments(req.pagination.filter);
       
   res.status(200).json({
