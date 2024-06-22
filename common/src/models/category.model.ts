@@ -35,7 +35,8 @@ const categorySchema = new mongoose.Schema<Icategory>(
       type: Boolean,
       default: true,
     },
-    trend:{type:Boolean , default:false}
+    trend:{type:Boolean , default:false},
+    media:{type:String , enum:['image' , 'video' , 'audio']}
   },
   {
     timestamps: true,

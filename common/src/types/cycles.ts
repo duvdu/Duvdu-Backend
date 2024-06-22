@@ -1,5 +1,5 @@
 export enum CYCLES {
-  portfolioPost = 'portfolio-post',
+  portfolioPost = 'project',
   studioBooking = 'studio-booking',
   copyRights = 'copy-rights',
   teamProject = 'team-project',

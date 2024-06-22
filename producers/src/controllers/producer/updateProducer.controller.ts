@@ -63,11 +63,11 @@ export const updateProducerHandler:UpdateProducerHandler = async (req,res,next)=
       });
     
       req.body.subCategories = resultSubCategories;
-
-      const updatedProducer = await Producer.findOneAndUpdate({user:req.loggedUser.id}, req.body , {new:true});
-
-      res.status(200).json({message:'success' , data:updatedProducer!});
     }
+
+    const updatedProducer = await Producer.findOneAndUpdate({user:req.loggedUser.id}, req.body , {new:true});
+
+    res.status(200).json({message:'success' , data:updatedProducer!});
   } catch (error) {
     next(error);
   }

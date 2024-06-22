@@ -143,9 +143,14 @@ export const createCategoryVal = [
     .isString()
     .withMessage('cycleStringRequired')
     .bail()
-    .custom((val) => {
-      if (Object.values(CYCLES).includes(val)) return true;
-      throw new Error('invalidCycle');
+    .custom((val , {req}) => {
+      if (!Object.values(CYCLES).includes(val)) {
+        throw new Error('invalidCycle');
+      }
+      if (val === CYCLES.portfolioPost && !req.body.media) {
+        throw new Error('invalidmedia');
+      }
+      return true;
     }),
   body('jobTitles')
     .isArray()
@@ -176,7 +181,7 @@ export const createCategoryVal = [
     .bail()
     .toBoolean(),
   body('trend').optional().isBoolean().withMessage('statusMustBeBoolean'),
-
+  body('media').optional().isIn(['video' , 'image' , 'audio']).withMessage('invalidmedia'),
   globalValidatorMiddleware,
 ];
 
@@ -199,9 +204,14 @@ export const updateCategoryVal = [
     .isString()
     .withMessage('cycleStringRequired')
     .bail()
-    .custom((val) => {
-      if (Object.values(CYCLES).includes(val)) return true;
-      throw new Error('invalidCycle');
+    .custom((val , {req}) => {
+      if (!Object.values(CYCLES).includes(val)) {
+        throw new Error('invalidCycle');
+      }
+      if (val === CYCLES.portfolioPost && !req.body.media) {
+        throw new Error('invalidmedia');
+      }
+      return true;
     }),
   body('jobTitles')
     .optional()
@@ -234,6 +244,7 @@ export const updateCategoryVal = [
     .bail()
     .toBoolean(),
   body('trend').optional().isBoolean().withMessage('statusMustBeBoolean'),
+  body('media').optional().isIn(['video' , 'image' , 'audio']).withMessage('invalidmedia'),
   globalValidatorMiddleware,
 ];
 

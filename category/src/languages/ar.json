@@ -20,5 +20,6 @@
   "titleMustBeNonEmptyString": "يجب أن يكون العنوان سلسلة نصية غير فارغة",
   "cycleMustBeNonEmptyString": "يجب أن تكون الدورة سلسلة نصية غير فارغة",
   "limitMustBePositiveInteger": "يجب أن يكون الحد عددًا صحيحًا إيجابيًا",
-  "pageMustBePositiveInteger": "يجب أن تكون الصفحة عددًا صحيحًا إيجابيًا"
+  "pageMustBePositiveInteger": "يجب أن تكون الصفحة عددًا صحيحًا إيجابيًا",
+  "invalidmedia":"الميديا مطلوبة ويجب أن تكون قيمة من هذا: فيديو، صورة، صوت"
 }

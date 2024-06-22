@@ -31,7 +31,7 @@ export interface CreateCategoryHandler
   extends RequestHandler<
     unknown,
     successResponse<{data:Icategory}>,
-    Pick<Icategory, 'title'  | 'cycle' | 'tags' | 'jobTitles' | 'status' | 'trend' >& {cover:string},
+    Pick<Icategory, 'title'  | 'cycle' | 'tags' | 'jobTitles' | 'status' | 'trend' | 'media' >& {cover:string},
     unknown
   > {}
 
@@ -39,7 +39,7 @@ export interface UpdateCategoryHandler
   extends RequestHandler<
     { categoryId: string },
     successResponse<{data:Icategory}>,
-    Partial<Pick<Icategory, 'image'|'cycle' | 'tags' | 'title' | 'jobTitles' | 'status' |'trend' >& {cover?:string}>,
+    Partial<Pick<Icategory, 'image'|'cycle' | 'tags' | 'title' | 'jobTitles' | 'status' |'trend' | 'media' >& {cover?:string}>,
     unknown
   > {}
 

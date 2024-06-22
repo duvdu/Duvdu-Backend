@@ -1,79 +1,47 @@
-import { Schema, model, Types } from 'mongoose';
+import { Iuser, MODELS } from '@duvdu-v1/duvdu';
+import { model, Schema, Types } from 'mongoose';
 
-import { CYCLES } from '../types/cycles';
-import { MODELS } from '../types/model-names';
-import { Iuser } from '../types/User';
 
-export interface IportfolioPost {
-  id: string;
-  user: Types.ObjectId | Iuser;
-  attachments: string[];
-  cover: string;
-  title: string;
-  desc: string;
-  address: string;
-  tools: { name: string; fees: number }[];
-  searchKeywords: string[];
-  creatives: { creative: Types.ObjectId | Iuser; fees: number }[];
-  tags: { ar: string; en: string }[];
-  subCategory: { ar: string; en: string };
-  projectBudget: number;
-  category: Types.ObjectId;
-  projectScale: { scale: number; time: 'minutes' | 'hours' };
-  showOnHome: boolean;
-  cycle: string;
-  rate: { ratersCounter: number; totalRates: number };
-  isDeleted: boolean;
+export interface IprojectCycle {
+    user: Types.ObjectId | Iuser;
+    category: Types.ObjectId | Iuser;
+    subCategory: { ar: string; en: string };
+    tags: { ar: string; en: string }[];
+    cover:string;
+    attachments:string[];
+    name:string;
+    description:string;
+    tools:{name:string , unitPrice:number}[];
+    functions:{name:string , unitPrice:number}[];
+    creatives: Types.ObjectId[] | Iuser [];
+    location:{lat:number , lng:number};
+    address:string;
+    searchKeyWords:string[];
+    insurance: number;
+    showOnHome: boolean;
+    projectScale: { unit: string; minimum: number; maximum: number; pricerPerUnit: number };
+    isDeleted: boolean;
+    rate: { ratersCounter: number; totalRates: number };
 }
 
-export const PortfolioPosts = model<IportfolioPost>(
-  MODELS.portfolioPost,
-  new Schema<IportfolioPost>(
-    {
-      user: { type: Schema.Types.ObjectId, ref: MODELS.user },
-      attachments: [String],
-      cover: { type: String, default: null },
-      title: { type: String, default: null },
-      desc: { type: String, default: null },
-      address: { type: String, default: null },
-      tools: [{ name: { type: String, default: null }, fees: { type: Number, default: 0 } }],
-      searchKeywords: [String],
-      creatives: [
-        {
-          creative: { type: Schema.Types.ObjectId, ref: MODELS.user },
-          fees: { type: Number, default: null },
-        },
-      ],
-      tags: [{ ar: { type: String, default: null }, en: { type: String, default: null } }],
-      subCategory: {
-        ar: String,
-        en: String,
-      },
-      projectBudget: { type: Number, default: null },
-      category: { type: Schema.Types.ObjectId, ref: MODELS.category, required: true },
-      projectScale: { scale: { type: Number, default: 0 }, time: { type: String, default: null } },
-      showOnHome: { type: Boolean, default: true },
-      cycle: { type: String, default: CYCLES.portfolioPost },
-      isDeleted: { type: Boolean, default: false },
-      rate: {
-        ratersCounter: { type: Number, default: 0 },
-        totalRates: { type: Number, default: 0 },
-      },
-    },
-    {
-      timestamps: true,
-      collection: MODELS.portfolioPost,
-      toJSON: {
-        transform(doc, ret) {
-          if (ret.cover) ret.cover = process.env.BUCKET_HOST + '/' + ret.cover;
-          if (ret.attachments)
-            ret.attachments = ret.attachments.map(
-              (el: string) => process.env.BUCKET_HOST + '/' + el,
-            );
-        },
-      },
-    },
-  )
-    .index({ createdAt: 1, updatedAt: -1 })
-    .index({ title: 'text', desc: 'text', tools: 'text', searchKeywords: 'text' }),
-);
+export const ProjectCycle = model<IprojectCycle>(MODELS.portfolioPost , new Schema<IprojectCycle>({
+  user:{type:Schema.Types.ObjectId , ref:MODELS.user},
+  category:{type:Schema.Types.ObjectId , ref:MODELS.category},
+  subCategory:{ar:{type:String , default:null} , en:{type:String , default:null}},
+  tags:[{ar:{type:String , default:null} , en:{type:String , default:null}}],
+  cover:{type:String , default:null},
+  attachments:[{type:String , default:null}],
+  name:{type:String , default:null},
+  description:{type:String , default:null},
+  tools:[{name:{type:String , default:null} , unitPrice:{type:Number , default:0}}],
+  functions:[{name:{type:String , default:null} , unitPrice:{type:Number , default:0}}],
+  creatives:[{type:Schema.Types.ObjectId , ref:MODELS.user}],
+  location:{lat:{type:Number , default:0} , lng:{type:Number , default:0}},
+  address:{type:String , default:null},
+  searchKeyWords:[String],
+  insurance:{type:Number , default:0},
+  showOnHome:{type:Boolean , default:true},
+  projectScale: { unit: String, minimum: Number, maximum: Number, pricerPerUnit: Number },
+  isDeleted:{type:Boolean , default:false},
+  rate: { ratersCounter: Number, totalRates: Number },
+},{timestamps:true , collection:MODELS.portfolioPost}));
