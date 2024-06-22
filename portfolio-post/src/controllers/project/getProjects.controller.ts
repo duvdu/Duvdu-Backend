@@ -118,12 +118,6 @@ export const getProjectsHandler:GetProjectsHandler = async (req,res)=>{
       },
     },
     {
-      $unwind: {
-        path: '$creatives',
-        preserveNullAndEmptyArrays: true, 
-      },
-    },
-    {
       $project: {
         _id: 1,
         user: {
@@ -160,7 +154,7 @@ export const getProjectsHandler:GetProjectsHandler = async (req,res)=>{
         functions: 1,
         creatives: {
           $map: {
-            input: '$creatives',
+            input: { $ifNull: ['$creatives', []] },
             as: 'creative',
             in: {
               profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$$creative.profileImage'] },
