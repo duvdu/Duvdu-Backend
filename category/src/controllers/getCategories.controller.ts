@@ -151,7 +151,7 @@ export const getCategoriesHandler: GetCategoriesHandler = async (req, res) => {
                   input: '$$subCat.tags',
                   as: 'tag',
                   in: {
-                    id: '$$tag._id',
+                    _id: '$$tag._id',
                     title: {
                       $cond: {
                         if: { $eq: ['ar', req.lang] },
