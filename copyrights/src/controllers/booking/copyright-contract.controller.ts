@@ -190,7 +190,8 @@ export const contractAction: RequestHandler<
       );
     else if (req.body.action === 'accept' && contract.status === ContractStatus.pending) {
       const spUser = await Users.findOne({ _id: req.loggedUser.id }, { avaliableContracts: 1 });
-      if (spUser?.avaliableContracts || 0 < 1)
+
+      if ((spUser?.avaliableContracts || 0) < 1)
         return next(
           new NotAllowedError(
             { en: 'please, buy a plan first', ar: 'please, buy a plan first' },
