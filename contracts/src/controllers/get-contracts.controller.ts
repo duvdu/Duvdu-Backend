@@ -66,29 +66,17 @@ export const getContracts: RequestHandler<
     {
       $set: {
         contract: {
-          $switch: {
-            branches: [
-              {
-                case: {
-                  $ne: ['$copyright_contract', null],
+          $ifNull: [
+            {
+              $ifNull: [
+                '$copyright_contract',
+                {
+                  $ifNull: ['$producer_contract', '$rental_contract'],
                 },
-                then: '$copyright_contract',
-              },
-              {
-                case: {
-                  $ne: ['$producer_contract', null],
-                },
-                then: '$producer_contract',
-              },
-              {
-                case: {
-                  $ne: ['$rental_contract', null],
-                },
-                then: '$rental_contract',
-              },
-            ],
-            default: null,
-          },
+              ],
+            },
+            null,
+          ],
         },
       },
     },
