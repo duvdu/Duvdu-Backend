@@ -64,7 +64,7 @@ export const createContractHandler: RequestHandler<
     sp: contract.sp,
     contract: contract.id,
     ref: 'rental_contracts',
-    cycle: CYCLES.studioBooking
+    cycle: CYCLES.studioBooking,
   });
 
   // TODO: send notification
@@ -133,7 +133,7 @@ export const contractAction: RequestHandler<
       );
     } else if (req.body.action === 'accept') {
       const spUser = await Users.findOne({ _id: req.loggedUser.id }, { avaliableContracts: 1 });
-      if (spUser?.avaliableContracts || 0 < 1)
+      if ((spUser?.avaliableContracts || 0) < 1)
         return next(
           new NotAllowedError(
             { en: 'please, buy a plan first', ar: 'please, buy a plan first' },
@@ -222,5 +222,3 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
 
   res.status(200).json({ message: 'success' });
 };
-
-
