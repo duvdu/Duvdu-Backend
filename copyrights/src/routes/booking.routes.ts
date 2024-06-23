@@ -10,7 +10,7 @@ import * as val from '../validators/booking/booking.validator';
 
 const router = Router();
 
-router.get('/pay', val.pay, payContract);
+router.get('/pay/:paymentSession', val.pay, payContract);
 
 router.post(
   '/:projectId',
