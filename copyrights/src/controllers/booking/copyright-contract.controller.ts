@@ -1,4 +1,6 @@
 // TODO: update contract
+import crypto from 'crypto';
+
 import {
   CopyRights,
   NotAllowedError,
@@ -200,9 +202,14 @@ export const contractAction: RequestHandler<
         );
 
       await Users.updateOne({ _id: req.loggedUser.id }, { $inc: { avaliableContracts: -1 } });
+      const paymentSession = crypto.randomBytes(16).toString('hex');
       await CopyrightContracts.updateOne(
         { _id: req.params.contractId },
-        { status: ContractStatus.waitingForFirstPayment, actionAt: new Date() },
+        {
+          status: ContractStatus.waitingForFirstPayment,
+          actionAt: new Date(),
+          paymentLink: paymentSession,
+        },
       );
     } else if (
       req.body.action === 'reject' &&
@@ -215,12 +222,17 @@ export const contractAction: RequestHandler<
     else if (
       req.body.action === 'accept' &&
       contract.status === ContractStatus.updateAfterFirstPayment
-    )
+    ) {
+      const paymentSession = crypto.randomBytes(16).toString('hex');
       await CopyrightContracts.updateOne(
         { _id: req.params.contractId },
-        { status: ContractStatus.waitingForTotalPayment, actionAt: new Date() },
+        {
+          status: ContractStatus.waitingForTotalPayment,
+          actionAt: new Date(),
+          paymentLink: paymentSession,
+        },
       );
-    else
+    } else
       return next(
         new NotAllowedError(
           {
