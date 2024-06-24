@@ -1,8 +1,7 @@
 import 'express-async-errors';
 
-import { BadRequestError, Bucket, CYCLES, Files, FOLDERS, MODELS, Project, ProjectCycle, Users } from '@duvdu-v1/duvdu';
+import { BadRequestError, Bucket, CYCLES, Files, filterTagsForCategory, FOLDERS, MODELS, Project, ProjectCycle, Users } from '@duvdu-v1/duvdu';
 
-import { filterTagsForCategory } from '../../services/category.service';
 import { CreateProjectHandler } from '../../types/endoints';
 
 
