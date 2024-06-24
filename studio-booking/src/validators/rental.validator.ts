@@ -1,6 +1,8 @@
 import { globalValidatorMiddleware } from '@duvdu-v1/duvdu';
 import { body, param } from 'express-validator';
 
+import { RentalUnits } from '../models/rental.model';
+
 export const create = [
   body('category').isMongoId(),
   body('subCategory').isMongoId(),
@@ -19,7 +21,15 @@ export const create = [
   body('insurance').isFloat({ min: 0 }).bail().toFloat(),
   body('showOnHome').optional().isBoolean().bail().toBoolean(),
   // body('projectScale').isObject(),
-  body('projectScale.unit').isString().bail().trim(),
+  body('projectScale.unit')
+    .isString()
+    .bail()
+    .trim()
+    .custom((val) => {
+      const units = Object.values(RentalUnits);
+      if (units.includes(val)) return true;
+      throw new Error('unit must be one of : ' + units);
+    }),
   body('projectScale.minimum').isInt({ min: 1 }).bail().toInt(),
   body('projectScale.maximum').isInt({ min: 1 }).bail().toInt(),
   body('projectScale.pricerPerUnit').isFloat({ gt: 0 }).bail().toFloat(),
@@ -53,7 +63,16 @@ export const update = [
       if (val.unit && val.minimum && val.maximum && val.pricerPerUnit) return true;
       throw new Error();
     }),
-  body('projectScale.unit').optional().isString().bail().trim(),
+  body('projectScale.unit')
+    .optional()
+    .isString()
+    .bail()
+    .trim()
+    .custom((val) => {
+      const units = Object.values(RentalUnits);
+      if (units.includes(val)) return true;
+      throw new Error('unit must be one of : ' + units);
+    }),
   body('projectScale.minimum').optional().isInt().bail().toInt(),
   body('projectScale.maximum').optional().isInt().bail().toInt(),
   body('projectScale.pricerPerUnit').isFloat({ min: 0 }).bail().toFloat(),

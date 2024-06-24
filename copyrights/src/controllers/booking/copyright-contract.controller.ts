@@ -78,10 +78,8 @@ const getStageExpiration = async (date: Date, lang: string) => {
   const storedExpirations = setting?.expirationTime.map((el) => el.time);
   if (!storedExpirations || storedExpirations.length === 0)
     throw new Error('stored expiry times not exists');
-  console.log('storedExpirations: ', storedExpirations);
 
   const contractTimeToBookingDate = +((date.getTime() - new Date().getTime()) / (1000 * 60 * 60));
-  console.log('contractTimeToBookingDate: ', contractTimeToBookingDate);
   if (contractTimeToBookingDate < storedExpirations[0] * 3)
     throw new NotAllowedError(
       {
