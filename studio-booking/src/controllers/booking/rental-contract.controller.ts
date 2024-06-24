@@ -8,9 +8,16 @@ import {
   SuccessResponse,
   Users,
   CYCLES,
+  addToDate,
+  Setting,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
+import {
+  onGoingExpiration,
+  paymentExpiration,
+  pendingExpiration,
+} from '../../config/expiration-queue';
 import { ContractStatus, RentalContracts } from '../../models/rental-contracts.model';
 import { Rentals } from '../../models/rental.model';
 
@@ -20,7 +27,7 @@ export const createContractHandler: RequestHandler<
   {
     details: string;
     projectScale: { numberOfUnits: number };
-    bookingDate: string;
+    startDate: string;
   }
 > = async (req, res, next) => {
   const project = await Rentals.findOne({ _id: req.params.projectId, isDeleted: { $ne: true } });
@@ -39,10 +46,16 @@ export const createContractHandler: RequestHandler<
       ),
     );
 
-  const stageExpiration = await getStageExpiration(new Date(req.body.bookingDate), req.lang);
+  const deadline: Date = addToDate(
+    new Date(req.body.startDate),
+    project.projectScale.unit,
+    req.body.projectScale.numberOfUnits,
+  );
+  const stageExpiration = await getStageExpiration(new Date(req.body.startDate), req.lang);
 
   const contract = await RentalContracts.create({
     ...req.body,
+    deadline,
     customer: req.loggedUser.id,
     sp: project.user,
     project: project._id,
@@ -51,6 +64,7 @@ export const createContractHandler: RequestHandler<
       numberOfUnits: req.body.projectScale.numberOfUnits,
       unitPrice: project.projectScale.pricerPerUnit,
     },
+
     totalPrice: (req.body.projectScale.numberOfUnits * project.projectScale.pricerPerUnit).toFixed(
       2,
     ),
@@ -58,6 +72,11 @@ export const createContractHandler: RequestHandler<
     stageExpiration,
     status: ContractStatus.pending,
   });
+
+  await pendingExpiration.add(
+    { contractId: contract.id },
+    { delay: (stageExpiration || 0) * 60 * 60 * 1000 },
+  );
 
   await Contracts.create({
     customer: contract.customer,
@@ -72,12 +91,13 @@ export const createContractHandler: RequestHandler<
   res.status(201).json({ message: 'success' });
 };
 
-const getStageExpiration = async (bookingDate: Date, lang: string) => {
-  const storedExpirations = [4, 10, 24];
-  const contractTimeToBookingDate = +(
-    (bookingDate.getTime() - new Date().getTime()) /
-    (1000 * 60 * 60)
-  );
+const getStageExpiration = async (date: Date, lang: string) => {
+  const setting = await Setting.findOne({});
+  const storedExpirations = setting?.expirationTime.map((el) => el.time);
+  if (!storedExpirations || storedExpirations.length === 0)
+    throw new Error('stored expiry times not exists');
+
+  const contractTimeToBookingDate = +((date.getTime() - new Date().getTime()) / (1000 * 60 * 60));
   if (contractTimeToBookingDate < storedExpirations[0] * 2)
     throw new NotAllowedError(
       {
@@ -90,7 +110,7 @@ const getStageExpiration = async (bookingDate: Date, lang: string) => {
     return storedExpirations.at(-1);
 
   const minimumAvailableExpirationStage =
-    storedExpirations[storedExpirations.findIndex((el) => el > contractTimeToBookingDate) - 1];
+    storedExpirations[storedExpirations.findIndex((el) => el * 2 > contractTimeToBookingDate) - 1];
 
   return minimumAvailableExpirationStage;
 };
@@ -146,12 +166,21 @@ export const contractAction: RequestHandler<
       // create payment link and send it to customer
       const paymentSession = crypto.randomBytes(16).toString('hex');
       // const paymentLink = `${req.protocol}://${req.hostname}/api/studio-booking/rental/contract/pay/${paymentSession}`;
-      await RentalContracts.updateOne({
-        _id: req.params.contractId,
-        status: ContractStatus.waitingForPayment,
-        actionAt: new Date(),
-        paymentLink: paymentSession,
-      });
+      await RentalContracts.updateOne(
+        {
+          _id: req.params.contractId,
+        },
+        {
+          status: ContractStatus.waitingForPayment,
+          actionAt: new Date(),
+          paymentLink: paymentSession,
+        },
+      );
+
+      await paymentExpiration.add(
+        { contractId: contract.id },
+        { delay: contract.stageExpiration * 60 * 60 * 1000 },
+      );
     }
   } else {
     if (
@@ -214,10 +243,14 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
       ),
     );
 
-  // TODO: record the transaction from payment gateway webhook
   await RentalContracts.updateOne(
     { paymentLink: req.params.paymentSession },
     { status: ContractStatus.ongoing, checkoutAt: new Date() },
+  );
+
+  await onGoingExpiration.add(
+    { contractId: contract.id },
+    { delay: new Date(contract.deadline).getTime() - new Date().getTime() },
   );
 
   res.status(200).json({ message: 'success' });

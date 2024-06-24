@@ -11,6 +11,7 @@ export * from './utils/api-feature';
 export * from './utils/generateToken';
 export * from './utils/bucket';
 export * from './utils/file';
+export * from './utils/date';
 
 export * from './middlewares/global-error-handling.middleware';
 export * from './middlewares/database-connection';

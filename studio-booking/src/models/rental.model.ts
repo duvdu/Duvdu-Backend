@@ -1,6 +1,14 @@
 import { Icategory, Iuser, MODELS } from '@duvdu-v1/duvdu';
 import { model, Types, Schema } from 'mongoose';
 
+export enum RentalUnits {
+  minutes = 'minutes',
+  hours = 'hours',
+  days = 'days',
+  months = 'months',
+  weeks = 'weeks',
+}
+
 export interface Irental {
   id: string;
   user: Types.ObjectId | Iuser;
@@ -18,7 +26,7 @@ export interface Irental {
   searchKeywords: string[];
   insurance: number;
   showOnHome: boolean;
-  projectScale: { unit: string; minimum: number; maximum: number; pricerPerUnit: number };
+  projectScale: { unit: RentalUnits; minimum: number; maximum: number; pricerPerUnit: number };
   isDeleted: boolean;
   rate: { ratersCounter: number; totalRates: number };
   createdAt: Date;
@@ -44,7 +52,12 @@ export const Rentals = model<Irental>(
       searchKeywords: [String],
       insurance: Number,
       showOnHome: { type: Boolean, default: true },
-      projectScale: { unit: String, minimum: Number, maximum: Number, pricerPerUnit: Number },
+      projectScale: {
+        unit: { type: String, enum: RentalUnits },
+        minimum: Number,
+        maximum: Number,
+        pricerPerUnit: Number,
+      },
       isDeleted: { type: Boolean, default: false },
       rate: { ratersCounter: Number, totalRates: Number },
     },

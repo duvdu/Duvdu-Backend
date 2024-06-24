@@ -5,7 +5,14 @@ export const create = [
   param('projectId').isMongoId(),
   body('details').isString(),
   body('projectScale.numberOfUnits').isInt({ min: 1 }),
-  body('bookingDate').isString().bail().isISO8601(),
+  body('startDate')
+    .isString()
+    .bail()
+    .isISO8601()
+    .custom((val) => {
+      if (new Date(val).getTime() < new Date().getTime()) throw new Error();
+      return true;
+    }),
   globalValidatorMiddleware,
 ];
 

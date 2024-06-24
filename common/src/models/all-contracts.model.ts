@@ -9,7 +9,7 @@ export interface Icontract {
   sp: Types.ObjectId | Iuser;
   contract: Types.ObjectId;
   ref: string;
-  cycle:string
+  cycle: string;
 }
 
 export const Contracts = model<Icontract>(
@@ -19,6 +19,28 @@ export const Contracts = model<Icontract>(
     sp: { type: Schema.Types.ObjectId, ref: MODELS.user },
     contract: { type: Schema.Types.ObjectId, refPath: 'ref' },
     ref: String,
-    cycle:{type:String , default:null}
+    cycle: { type: String, default: null },
   }),
+);
+
+export interface IcontractReport {
+  reporter: Types.ObjectId | Iuser;
+  contract: Types.ObjectId | Icontract;
+  ref: string;
+  desc: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export const ContractReports = model<IcontractReport>(
+  'contract_reports',
+  new Schema<IcontractReport>(
+    {
+      reporter: { type: Schema.Types.ObjectId, ref: MODELS.user },
+      contract: { type: Schema.Types.ObjectId, refPath: 'ref' },
+      ref: String,
+      desc: String,
+    },
+    { collection: 'contract_reports', timestamps: true },
+  ),
 );

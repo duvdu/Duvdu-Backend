@@ -22,7 +22,7 @@ export interface IrentalContract {
   insurance: number;
   projectScale: { unit: string; numberOfUnits: number; unitPrice: number };
   totalPrice: number;
-  bookingDate: Date;
+  deadline: Date;
   stageExpiration: number;
   actionAt: Date;
   checkoutAt: Date;
@@ -44,7 +44,7 @@ export const RentalContracts = model<IrentalContract>(
       insurance: Number,
       projectScale: { unit: String, numberOfUnits: Number, unitPrice: Number },
       totalPrice: Number,
-      bookingDate: Date,
+      deadline: Date,
       stageExpiration: Number, // hours
       actionAt: Date,
       checkoutAt: Date,
