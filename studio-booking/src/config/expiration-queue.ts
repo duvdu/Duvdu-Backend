@@ -6,17 +6,17 @@ import { ContractStatus, RentalContracts } from '../models/rental-contracts.mode
 
 export const pendingExpiration = new Queue<{ contractId: string }>(
   'rental_pending_expiration',
-  env.redis.uri,
+  env.redis.queue,
 );
 
 export const paymentExpiration = new Queue<{ contractId: string }>(
   'rental_payment_expiration',
-  env.redis.uri,
+  env.redis.queue,
 );
 
 export const onGoingExpiration = new Queue<{ contractId: string }>(
   'rental_ongoing_expiration',
-  env.redis.uri,
+  env.redis.queue,
 );
 
 pendingExpiration.process(async (job) => {

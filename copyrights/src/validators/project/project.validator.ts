@@ -10,7 +10,7 @@ export const create = [
   body('searchKeywords.*').isString().trim().isLength({ min: 3 }).withMessage('searchKeywordLength'),
   body('showOnHome').isBoolean().toBoolean().withMessage('showOnHomeBoolean'),
   body('tags').isArray().withMessage('tagsArray'),
-  body('tags.*').isString().trim().isLength({ min: 3 }).withMessage('tagLength'),
+  body('tags.*').isMongoId().withMessage('tagLength'),
   body('subCategory').isMongoId().withMessage('subCategoryInvalid'),
   body('location.lat').isFloat({ min: -90, max: 90 }).withMessage('latInvalid'),
   body('location.lng').isFloat({ min: -180, max: 180 }).withMessage('lngInvalid'),
@@ -47,7 +47,7 @@ export const findAll = [
     .isISO8601()
     .customSanitizer((val) => (val ? new Date(val) : new Date()))
     .withMessage('endDateISO8601'),
-  query('tags').optional().isString().withMessage('tagsString'),
+  query('tags').optional().isMongoId().withMessage('tagsString'),
   query('subCategory').optional().isString().withMessage('subCategoryString'),
   query('limit').optional().isInt({ min: 1 }),
   query('page').optional().isInt({ min: 1 }),

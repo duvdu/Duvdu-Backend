@@ -25,6 +25,7 @@ export const createProjectHandler: CreateProjectHandler = async (req, res, next)
       req.body.subCategory,
       req.body.tags,
       CYCLES.studioBooking,
+      req.lang
     );
 
     (req.body.tags as any) = filteredTags;

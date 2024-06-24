@@ -73,13 +73,16 @@ export const getProjectsHandler: RequestHandler<
             input: '$tags',
             as: 'tag',
             in: {
-              $cond: {
-                if: { $eq: ['ar', req.lang] },
-                then: '$$tag.ar',
-                else: '$$tag.en',
-              },
-            },
-          },
+              _id: '$$tag._id',
+              title: {
+                $cond: {
+                  if: { $eq: ['ar', req.lang] },
+                  then: '$$tag.ar',
+                  else: '$$tag.en'
+                }
+              }
+            }
+          }
         },
         subCategory: {
           $cond: {
