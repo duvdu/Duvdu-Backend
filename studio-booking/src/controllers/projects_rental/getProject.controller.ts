@@ -10,25 +10,29 @@ export const getProjectHandler: RequestHandler = async (req, res, next) => {
       $set: {
         subCategory: {
           $cond: {
-            if: {
-              $eq: [req.lang, 'en'],
-            },
+            if: { $eq: [req.lang, 'en'] },
             then: '$subCategory.en',
             else: '$subCategory.ar',
           },
         },
         tags: {
-          $cond: {
-            if: {
-              $eq: [req.lang, 'en'],
-            },
-            then: '$tags.en',
-            else: '$tags.ar',
-          },
-        },
-      },
+          $map: {
+            input: '$tags',
+            as: 'tag',
+            in: {
+              _id: '$$tag._id',
+              title: {
+                $cond: {
+                  if: { $eq: [req.lang, 'en'] },
+                  then: '$$tag.en',
+                  else: '$$tag.ar',
+                }
+              }
+            }
+          }
+        }
+      }
     },
-
     {
       $lookup: {
         from: MODELS.category,
@@ -61,9 +65,7 @@ export const getProjectHandler: RequestHandler = async (req, res, next) => {
         as: 'userDetails',
       },
     },
-    {
-      $unwind: '$userDetails',
-    },
+    { $unwind: '$userDetails' },
     {
       $set: {
         user: {
@@ -97,6 +99,7 @@ export const getProjectHandler: RequestHandler = async (req, res, next) => {
       $unset: ['userDetails', 'categoryDetails'],
     },
   ];
+  
 
   const project = (
     await Rentals.aggregate([

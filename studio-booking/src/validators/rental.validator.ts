@@ -7,7 +7,7 @@ export const create = [
   body('category').isMongoId(),
   body('subCategory').isMongoId(),
   body('tags').isArray(),
-  body('tags.*').isString(),
+  body('tags.*').isMongoId(),
   body('title').isString().bail().trim().isLength({ min: 5 }),
   body('phoneNumber').isMobilePhone(['ar-EG']),
   body('email').isEmail(),

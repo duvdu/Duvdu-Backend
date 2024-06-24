@@ -9,23 +9,28 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
       $set: {
         subCategory: {
           $cond: {
-            if: {
-              $eq: [req.lang, 'en'],
-            },
+            if: { $eq: [req.lang, 'en'] },
             then: '$subCategory.en',
             else: '$subCategory.ar',
           },
         },
         tags: {
-          $cond: {
-            if: {
-              $eq: [req.lang, 'en'],
-            },
-            then: '$tags.en',
-            else: '$tags.ar',
-          },
-        },
-      },
+          $map: {
+            input: '$tags',
+            as: 'tag',
+            in: {
+              _id: '$$tag._id',
+              title: {
+                $cond: {
+                  if: { $eq: [req.lang, 'en'] },
+                  then: '$$tag.en',
+                  else: '$$tag.ar',
+                }
+              }
+            }
+          }
+        }
+      }
     },
     {
       $lookup: {
@@ -59,9 +64,7 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
         as: 'userDetails',
       },
     },
-    {
-      $unwind: '$userDetails',
-    },
+    { $unwind: '$userDetails' },
     {
       $set: {
         user: {
@@ -98,6 +101,7 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
       $unset: ['userDetails', 'categoryDetails'],
     },
   ];
+  
 
   const resultCount = await Rentals.countDocuments({
     ...req.pagination.filter,

@@ -22,6 +22,7 @@ export const env = {
   redis: {
     uri: process.env.REDIS_HOST as string,
     pass: process.env.REDIS_PASS as string,
+    queue : process.env.REDIS_QUEUE as string
   },
   aws: {
     s3: {
