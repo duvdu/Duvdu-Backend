@@ -90,6 +90,28 @@ spec:
                   name: chat-srv
                   port: 
                     number: 3000
+
+    - host: duvdu.com
+      http:
+        paths:
+          - path: /api/users/?(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: auth-srv
+                port:
+                  number: 3000
+
+    - host: www.duvdu.com
+      http:
+        paths:
+          - path: /api/users/?(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: auth-srv
+                port:
+                  number: 3000
   tls:
     - hosts:
         - api.duvdu.com
