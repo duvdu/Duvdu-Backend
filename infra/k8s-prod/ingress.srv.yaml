@@ -94,22 +94,22 @@ spec:
     - host: duvdu.com
       http:
         paths:
-          - path: /api/users/?(.*)
+          - path: /?(.*)
             pathType: Prefix
             backend:
               service:
-                name: auth-srv
+                name: client-srv
                 port:
                   number: 3000
 
     - host: www.duvdu.com
       http:
         paths:
-          - path: /api/users/?(.*)
+          - path: /?(.*)
             pathType: Prefix
             backend:
               service:
-                name: auth-srv
+                name: client-srv
                 port:
                   number: 3000
   tls:
