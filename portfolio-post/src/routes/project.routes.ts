@@ -13,7 +13,7 @@ router.route('/crm').get( isauthenticated , isauthorized(PERMISSIONS.getCrmPortf
 router.route('/').post( 
   isauthenticated,
   isauthorized(PERMISSIONS.createProtfolioProjectHandler),
-  globalUploadMiddleware(FOLDERS.portfolio_post).fields([
+  globalUploadMiddleware(FOLDERS.portfolio_post , {maxSize:100 * 1024 * 1024}).fields([
     { name: 'attachments', maxCount: 10 },
     { name: 'cover', maxCount: 1 },
   ]),
@@ -26,7 +26,7 @@ router.route('/:projectId')
   .patch(
     isauthenticated,
     isauthorized(PERMISSIONS.updatePortfolioProjectHandler),
-    globalUploadMiddleware(FOLDERS.portfolio_post).fields([
+    globalUploadMiddleware(FOLDERS.portfolio_post , {maxSize:100 * 1024 * 1024}).fields([
       { name: 'attachments', maxCount: 10 },
       { name: 'cover', maxCount: 1 },
     ]),
