@@ -40,6 +40,7 @@ app.use(cors(corsOptions));
   app.use('/api/team', router);
   
   app.use(globalErrorHandlingMiddleware);
+  
 })();
 
 
