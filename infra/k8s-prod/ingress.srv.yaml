@@ -10,87 +10,6 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: www.api.duvdu.com
-      http:
-        paths:
-          - path: /api/users/?(.*)
-            pathType: Prefix
-            backend: 
-              service:
-                  name: auth-srv
-                  port: 
-                    number: 3000
-          - path: /api/category/?(.*)
-            pathType: Prefix
-            backend: 
-              service:
-                  name: category-srv
-                  port: 
-                    number: 3000
-          - path: /api/projects/?(.*)
-            pathType: Prefix
-            backend: 
-              service:
-                  name: portfolio-post-srv
-                  port: 
-                    number: 3000
-          - path: /api/rentals/?(.*)
-            pathType: Prefix
-            backend: 
-              service:
-                  name: studio-booking-srv
-                  port: 
-                    number: 3000
-          - path: /api/copyrights/?(.*)
-            pathType: Prefix
-            backend: 
-              service:
-                  name: copyright-srv
-                  port: 
-                    number: 3000
-          - path: /api/analysis/?(.*)
-            pathType: Prefix
-            backend: 
-              service:
-                  name: analysis-srv
-                  port: 
-                    number: 3000
-          - path: /api/producers/?(.*)
-            pathType: Prefix
-            backend: 
-              service:
-                  name: producer-srv
-                  port: 
-                    number: 3000
-          - path: /api/contracts/?(.*)
-            pathType: Prefix
-            backend: 
-              service:
-                  name: contract-srv
-                  port: 
-                    number: 3000
-          - path: /api/team/?(.*)
-            pathType: Prefix
-            backend: 
-              service:
-                  name: team-srv
-                  port: 
-                    number: 3000
-          - path: /api/contracts/?(.*)
-            pathType: Prefix
-            backend: 
-              service:
-                  name: contract-srv
-                  port: 
-                    number: 3000
-          - path: /?(.*)
-            pathType: Prefix
-            backend: 
-              service:
-                  name: chat-srv
-                  port: 
-                    number: 3000
-
     - host: api.duvdu.com
       http:
         paths:
@@ -174,7 +93,8 @@ spec:
   tls:
     - hosts:
         - api.duvdu.com
-        - www.api.duvdu.com
+        - duvdu.com
+        - www.duvdu.com
       secretName: duvdu-tls-secret
 
 ---
@@ -183,7 +103,7 @@ kind: Service
 metadata:
   annotations:
     service.beta.kubernetes.io/do-loadbalancer-enable-proxy-protocol: 'true'
-    service.beta.kubernetes.io/do-loadbalancer-hostname: 'www.api.duvdu.com'
+    service.beta.kubernetes.io/do-loadbalancer-hostname: 'api.duvdu.com'
   labels:
     helm.sh/chart: ingress-nginx-2.0.3
     app.kubernetes.io/name: ingress-nginx
@@ -210,3 +130,84 @@ spec:
     app.kubernetes.io/instance: ingress-nginx
     app.kubernetes.io/component: controller
 
+
+    # - host: www.api.duvdu.com
+    #   http:
+    #     paths:
+    #       - path: /api/users/?(.*)
+    #         pathType: Prefix
+    #         backend: 
+    #           service:
+    #               name: auth-srv
+    #               port: 
+    #                 number: 3000
+    #       - path: /api/category/?(.*)
+    #         pathType: Prefix
+    #         backend: 
+    #           service:
+    #               name: category-srv
+    #               port: 
+    #                 number: 3000
+    #       - path: /api/projects/?(.*)
+    #         pathType: Prefix
+    #         backend: 
+    #           service:
+    #               name: portfolio-post-srv
+    #               port: 
+    #                 number: 3000
+    #       - path: /api/rentals/?(.*)
+    #         pathType: Prefix
+    #         backend: 
+    #           service:
+    #               name: studio-booking-srv
+    #               port: 
+    #                 number: 3000
+    #       - path: /api/copyrights/?(.*)
+    #         pathType: Prefix
+    #         backend: 
+    #           service:
+    #               name: copyright-srv
+    #               port: 
+    #                 number: 3000
+    #       - path: /api/analysis/?(.*)
+    #         pathType: Prefix
+    #         backend: 
+    #           service:
+    #               name: analysis-srv
+    #               port: 
+    #                 number: 3000
+    #       - path: /api/producers/?(.*)
+    #         pathType: Prefix
+    #         backend: 
+    #           service:
+    #               name: producer-srv
+    #               port: 
+    #                 number: 3000
+    #       - path: /api/contracts/?(.*)
+    #         pathType: Prefix
+    #         backend: 
+    #           service:
+    #               name: contract-srv
+    #               port: 
+    #                 number: 3000
+    #       - path: /api/team/?(.*)
+    #         pathType: Prefix
+    #         backend: 
+    #           service:
+    #               name: team-srv
+    #               port: 
+    #                 number: 3000
+    #       - path: /api/contracts/?(.*)
+    #         pathType: Prefix
+    #         backend: 
+    #           service:
+    #               name: contract-srv
+    #               port: 
+    #                 number: 3000
+    #       - path: /?(.*)
+    #         pathType: Prefix
+    #         backend: 
+    #           service:
+    #               name: chat-srv
+    #               port: 
+    #                 number: 3000
