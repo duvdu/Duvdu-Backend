@@ -19,7 +19,7 @@ app.use(express.json());
 app.set('trust proxy', true);
 
 const corsOptions = {
-  origin: ['*', 'http://localhost:3000', 'http://localhost:3001' , 'https://duvdu.com'],
+  origin: ['http://localhost:3000', 'http://localhost:3001' , 'https://duvdu.com' , 'https://www.duvdu.com'],
   credentials: true,
   exposedHeaders: ['set-cookie'],
 };
