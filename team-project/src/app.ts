@@ -11,12 +11,13 @@ export const app = express();
 app.use(express.json());
 
 app.set('trust proxy', true);
-const corsOptions = {
-  origin: ['http://localhost:3000', 'http://localhost:3001' , 'https://duvdu.com' , 'https://www.duvdu.com'],
-  credentials: true,
-  exposedHeaders: ['set-cookie']
-};
-app.use(cors(corsOptions));
+app.use(
+  cors({
+    origin: ['*','http://localhost:3000', 'http://localhost:3001' , 'https://duvdu.com' , 'https://www.duvdu.com'],
+    credentials: true,
+    exposedHeaders: ['set-cookie'],
+  }),
+);
 
 (async () => {
   const store = await sessionStore(env.redis.uri, env.redis.pass);
