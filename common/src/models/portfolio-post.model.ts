@@ -21,6 +21,7 @@ export interface IprojectCycle {
     projectScale: { unit: string; minimum: number; maximum: number; pricerPerUnit: number };
     isDeleted: boolean;
     rate: { ratersCounter: number; totalRates: number };
+    duration:number;
 }
 
 export const ProjectCycle = model<IprojectCycle>(MODELS.portfolioPost , new Schema<IprojectCycle>({
@@ -42,4 +43,5 @@ export const ProjectCycle = model<IprojectCycle>(MODELS.portfolioPost , new Sche
   projectScale: { unit: String, minimum: Number, maximum: Number, pricerPerUnit: Number },
   isDeleted:{type:Boolean , default:false},
   rate: { ratersCounter: Number, totalRates: Number },
+  duration:{type:Number , default:0}
 },{timestamps:true , collection:MODELS.portfolioPost}));
