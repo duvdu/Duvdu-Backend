@@ -169,7 +169,7 @@ export const getProjectsHandler:GetProjectsHandler = async (req,res)=>{
         location: 1,
         address: 1,
         searchKeyWords: 1,
-        insurance: 1,
+        duration: 1,
         showOnHome: 1,
         projectScale: 1,
         rate: 1,

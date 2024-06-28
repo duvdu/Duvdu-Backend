@@ -17,11 +17,11 @@ export interface IprojectCycle {
     location:{lat:number , lng:number};
     address:string;
     searchKeyWords:string[];
-    insurance: number;
     showOnHome: boolean;
     projectScale: { unit: string; minimum: number; maximum: number; pricerPerUnit: number };
     isDeleted: boolean;
     rate: { ratersCounter: number; totalRates: number };
+    duration:number;
 }
 
 export const ProjectCycle = model<IprojectCycle>(MODELS.portfolioPost , new Schema<IprojectCycle>({
@@ -39,9 +39,9 @@ export const ProjectCycle = model<IprojectCycle>(MODELS.portfolioPost , new Sche
   location:{lat:{type:Number , default:0} , lng:{type:Number , default:0}},
   address:{type:String , default:null},
   searchKeyWords:[String],
-  insurance:{type:Number , default:0},
   showOnHome:{type:Boolean , default:true},
   projectScale: { unit: String, minimum: Number, maximum: Number, pricerPerUnit: Number },
   isDeleted:{type:Boolean , default:false},
   rate: { ratersCounter: Number, totalRates: Number },
+  duration:{type:Number , default:0}
 },{timestamps:true , collection:MODELS.portfolioPost}));

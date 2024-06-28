@@ -8,7 +8,7 @@
   "tools": "Tools must be an array of objects with name and unitPrice.",
   "location": "Location must be an object with valid latitude and longitude.",
   "searchKeywords": "Search keywords must be an array of strings with at least 3 characters.",
-  "insurance": "Insurance must be a non-negative float.",
+  "insurance": "duration must be a negative number.",
   "showOnHome": "Show on home must be a boolean.",
   "projectScale": "Project scale must be an object with unit, minimum, maximum, and pricePerUnit.",
   "subCategoryId": "SubCategory ID must be a valid Mongo ID.",
