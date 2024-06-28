@@ -41,14 +41,15 @@ export const env = {
 };
 
 export const checkEnvVariables = () => {
-  console.log(env.redis.uri);
-  console.log(env.redis.pass);
+  console.log(env.redis.queue);
+
 
   if (!env.mongoDb.uri) throw new Error('env:MONGO_URI must be defined');
   if (!env.jwt.secret) throw new Error('env:JWT_KEY must be defined');
   if (!env.expressSession.secret) return new Error('env:SESSION_SECRET must be defined');
   if (!env.redis.uri) return new Error('env:REDIS_HOST must be defined');
   if (!env.redis.pass) return new Error('env:REDIS_PASS must be defined');
+  if (!env.redis.queue) return new Error('env:REDIS_PASS must be defined');
   if (!env.aws.s3.access) return new Error('env:BUCKET_ACESS_KEY must be defined');
   if (!env.aws.s3.secret) return new Error('env:BUCKET_SECRET_KEY must be defined');
   if (!env.aws.s3.name) return new Error('env:BUCKET_NAME must be defined');

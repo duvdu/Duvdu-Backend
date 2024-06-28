@@ -13,11 +13,7 @@ import {
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-import {
-  onGoingExpiration,
-  paymentExpiration,
-  pendingExpiration,
-} from '../../config/expiration-queue';
+
 import { ContractStatus, RentalContracts } from '../../models/rental-contracts.model';
 import { Rentals } from '../../models/rental.model';
 
@@ -45,7 +41,7 @@ export const createContractHandler: RequestHandler<
         req.lang,
       ),
     );
-
+    
   const deadline: Date = addToDate(
     new Date(req.body.startDate),
     project.projectScale.unit,
@@ -73,10 +69,13 @@ export const createContractHandler: RequestHandler<
     status: ContractStatus.pending,
   });
 
-  await pendingExpiration.add(
-    { contractId: contract.id },
-    { delay: (stageExpiration || 0) * 60 * 60 * 1000 },
-  );
+  console.log(contract);
+  
+
+  // await pendingExpiration.add(
+  //   { contractId: contract._id.toString() },
+  //   { delay: (stageExpiration || 0) * 60 * 60 * 1000 },
+  // );
 
   await Contracts.create({
     customer: contract.customer,
@@ -177,10 +176,10 @@ export const contractAction: RequestHandler<
         },
       );
 
-      await paymentExpiration.add(
-        { contractId: contract.id },
-        { delay: contract.stageExpiration * 60 * 60 * 1000 },
-      );
+      // await paymentExpiration.add(
+      //   { contractId: contract.id },
+      //   { delay: contract.stageExpiration * 60 * 60 * 1000 },
+      // );
     }
   } else {
     if (
@@ -248,10 +247,10 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
     { status: ContractStatus.ongoing, checkoutAt: new Date() },
   );
 
-  await onGoingExpiration.add(
-    { contractId: contract.id },
-    { delay: new Date(contract.deadline).getTime() - new Date().getTime() },
-  );
+  // await onGoingExpiration.add(
+  //   { contractId: contract.id },
+  //   { delay: new Date(contract.deadline).getTime() - new Date().getTime() },
+  // );
 
   res.status(200).json({ message: 'success' });
 };
