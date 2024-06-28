@@ -56,127 +56,131 @@ export const getProducersPagination: RequestHandler<
 };
 
 
-export const getProducersHandler:GetProducersHandler = async (req,res)=>{
+export const getProducersHandler:GetProducersHandler = async (req,res,next)=>{
 
-  const { filter, skip, limit } = req.pagination; 
+  try {
+    const { filter, skip, limit } = req.pagination; 
 
-  const producers = await Producer.aggregate([
-    {
-      $match: filter,
-    },
-    {
-      $sort: { createdAt: -1 },
-    },
-    {
-      $skip: skip,
-    },
-    {
-      $limit: limit,
-    },
-    {
-      $lookup: {
-        from: MODELS.user,
-        localField: 'user',
-        foreignField: '_id',
-        as: 'user',
+    const producers = await Producer.aggregate([
+      {
+        $match: filter,
       },
-    },
-    {
-      $unwind: '$user',
-    },
-    {
-      $lookup: {
-        from: MODELS.category, 
-        localField: 'category',
-        foreignField: '_id',
-        as: 'categoryData',
+      {
+        $sort: { createdAt: -1 },
       },
-    },
-    {
-      $unwind: '$categoryData',
-    },
-    {
-      $project: {
-        _id: 1,
-        subCategories: {
-          $map: {
-            input: '$subCategories',
-            as: 'subCat',
-            in: {
-              title: {
-                $cond: {
-                  if: { $eq: ['ar', req.lang] },
-                  then: '$$subCat.title.ar',
-                  else: '$$subCat.title.en',
-                },
-              },
-              tags: {
-                $map: {
-                  input: '$$subCat.tags',
-                  as: 'tag',
-                  in: {
-                    title: {
-                      $cond: {
-                        if: { $eq: ['ar', req.lang] },
-                        then: '$$tag.ar',
-                        else: '$$tag.en',
-                      },
-                    },
-                    _id: '$$tag._id',
+      {
+        $skip: skip,
+      },
+      {
+        $limit: limit,
+      },
+      {
+        $lookup: {
+          from: MODELS.user,
+          localField: 'user',
+          foreignField: '_id',
+          as: 'user',
+        },
+      },
+      {
+        $unwind: '$user',
+      },
+      {
+        $lookup: {
+          from: MODELS.category, 
+          localField: 'category',
+          foreignField: '_id',
+          as: 'categoryData',
+        },
+      },
+      {
+        $unwind: '$categoryData',
+      },
+      {
+        $project: {
+          _id: 1,
+          subCategories: {
+            $map: {
+              input: '$subCategories',
+              as: 'subCat',
+              in: {
+                title: {
+                  $cond: {
+                    if: { $eq: ['ar', req.lang] },
+                    then: '$$subCat.title.ar',
+                    else: '$$subCat.title.en',
                   },
                 },
+                tags: {
+                  $map: {
+                    input: '$$subCat.tags',
+                    as: 'tag',
+                    in: {
+                      title: {
+                        $cond: {
+                          if: { $eq: ['ar', req.lang] },
+                          then: '$$tag.ar',
+                          else: '$$tag.en',
+                        },
+                      },
+                      _id: '$$tag._id',
+                    },
+                  },
+                },
+                _id: '$$subCat._id',
               },
-              _id: '$$subCat._id',
             },
           },
-        },
-        minBudget: 1,
-        maxBudget: 1,
-        searchKeywords: 1,
-        createdAt: 1,
-        updatedAt: 1,
-        category: {
-          _id: '$categoryData._id',
-          image: {
-            $concat: [process.env.BUCKET_HOST, '/', '$categoryData.image'],
-          },
-          title: {
-            $cond: {
-              if: { $eq: ['ar', req.lang] },
-              then: '$categoryData.title.ar',
-              else: '$categoryData.title.en',
+          minBudget: 1,
+          maxBudget: 1,
+          searchKeywords: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          category: {
+            _id: '$categoryData._id',
+            image: {
+              $concat: [process.env.BUCKET_HOST, '/', '$categoryData.image'],
+            },
+            title: {
+              $cond: {
+                if: { $eq: ['ar', req.lang] },
+                then: '$categoryData.title.ar',
+                else: '$categoryData.title.en',
+              },
             },
           },
-        },
-        user: {
-          profileImage: {
-            $cond: [
-              { $eq: ['$user.profileImage', null] },
-              null,
-              { $concat: [process.env.BUCKET_HOST, '/', '$user.profileImage'] },
-            ],
+          user: {
+            profileImage: {
+              $cond: [
+                { $eq: ['$user.profileImage', null] },
+                null,
+                { $concat: [process.env.BUCKET_HOST, '/', '$user.profileImage'] },
+              ],
+            },
+            username: '$user.username',
+            isOnline: '$user.isOnline',
+            acceptedProjectsCounter: '$user.acceptedProjectsCounter',
+            name: '$user.name',
+            rate: '$user.rate',
+            rank: '$user.rank',
+            projectsView: '$user.projectsView',
           },
-          username: '$user.username',
-          isOnline: '$user.isOnline',
-          acceptedProjectsCounter: '$user.acceptedProjectsCounter',
-          name: '$user.name',
-          rate: '$user.rate',
-          rank: '$user.rank',
-          projectsView: '$user.projectsView',
         },
       },
-    },
-  ]);
+    ]);
   
 
-  const resultCount = await Producer.countDocuments(filter);
-  res.status(200).json({
-    message:'success',
-    pagination:{
-      currentPage:req.pagination.page,
-      resultCount,
-      totalPages:Math.ceil(resultCount/req.pagination.limit)
-    },
-    data:producers
-  });
+    const resultCount = await Producer.countDocuments(filter);
+    res.status(200).json({
+      message:'success',
+      pagination:{
+        currentPage:req.pagination.page,
+        resultCount,
+        totalPages:Math.ceil(resultCount/req.pagination.limit)
+      },
+      data:producers
+    });
+  } catch (error) {
+    next(error);
+  }
 };
