@@ -76,7 +76,6 @@ spec:
                 secretKeyRef:
                   name: redis-host
                   key: REDIS_HOST
-            - name: REDIS_PASS
             - name: REDIS_QUEUE
               valueFrom:
                 secretKeyRef:
