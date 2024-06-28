@@ -59,13 +59,6 @@ export const getProjectAnalysis: RequestHandler<
   if (matchedPeriod.createdAt) topAddressesPipeline.unshift({ $match: matchedPeriod });
   const addressStats = await ProjectCycle.aggregate(topAddressesPipeline);
 
-  const insuranceStatsPipeline: PipelineStage[] = [
-    { $group: { _id: null, totalInsurance: { $sum: '$insurance' } } },
-  ];
-  if (matchedPeriod.createdAt) insuranceStatsPipeline.unshift({ $match: matchedPeriod });
-  const insuranceStats = await ProjectCycle.aggregate(insuranceStatsPipeline);
-  const totalInsurance = insuranceStats.length > 0 ? insuranceStats[0].totalInsurance : 0;
-
   const showOnHomeCount = await ProjectCycle.countDocuments({
     showOnHome: true,
     ...matchedPeriod,
@@ -82,7 +75,6 @@ export const getProjectAnalysis: RequestHandler<
       totalCount,
       topUsers,
       addressStats,
-      totalInsurance,
       showOnHomeCount,
       deletedProjectsCount,
     },
