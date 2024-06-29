@@ -1,6 +1,5 @@
-import { SuccessResponse ,PaginationResponse, Inotification } from '@duvdu-v1/duvdu';
+import { SuccessResponse, PaginationResponse, Inotification } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
-
 
 export interface GetLoggedUserNotificationHandler
   extends RequestHandler<
@@ -17,4 +16,17 @@ export interface UpdateOneWatchNotificationHandler
   extends RequestHandler<{ notificationId: string }, SuccessResponse<unknown>, unknown, unknown> {}
 
 export interface GetNotificationsCrmHandler
- extends RequestHandler<unknown , PaginationResponse<{data:Inotification[]}> , unknown , unknown>{}
+  extends RequestHandler<
+    unknown,
+    PaginationResponse<{ data: Inotification[] }>,
+    unknown,
+    unknown
+  > {}
+
+
+export interface SendNotificationForSpecificTopicHandler
+  extends RequestHandler<unknown , SuccessResponse , {topic:string , message:string , title:string} , unknown>{}
+  
+
+export interface SendNotificationMultiUserHandler
+extends RequestHandler<unknown , SuccessResponse , {users:string[] , message:string , title:string} , unknown>{}

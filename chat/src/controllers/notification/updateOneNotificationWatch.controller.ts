@@ -9,9 +9,9 @@ export const updateOneWatchNotificationHandler: UpdateOneWatchNotificationHandle
   res,
 ) => {
   await Notification.findOneAndUpdate(
-    { targetUser: req.loggedUser?.id , _id:req.params.notificationId },
+    { targetUser: req.loggedUser?.id, _id: req.params.notificationId },
     { watched: true },
   );
-  
+
   res.status(200).json({ message: 'success' });
 };
