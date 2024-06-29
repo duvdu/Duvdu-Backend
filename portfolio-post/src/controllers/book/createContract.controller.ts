@@ -3,16 +3,22 @@ import 'express-async-errors';
 import {
   BadRequestError,
   Bucket,
+  Channels,
   Contracts,
   CYCLES,
   Files,
   FOLDERS,
   NotAllowedError,
   NotFound,
+  Notification,
+  NotificationDetails,
+  NotificationType,
   ProjectCycle,
 } from '@duvdu-v1/duvdu';
 
+import { NewNotificationPublisher } from '../../event/publisher/newNotification.publisher';
 import { ContractStatus, ProjectContract } from '../../models/projectContract.model';
+import { natsWrapper } from '../../nats-wrapper';
 import { calculateTotalPrice } from '../../services/checkToolsAndFunctions.service';
 import { getBestExpirationTime } from '../../services/getBestExpirationTime.service';
 import { CreateContractHandler } from '../../types/contract.endpoint';
@@ -108,7 +114,30 @@ export const createContractHandler: CreateContractHandler = async (req, res, nex
     });
 
     // send notification to sp
+
+    const notification = await Notification.create({
+      sourceUser:req.loggedUser.id,
+      targetUser:contract.sp,
+      type:NotificationType.new_project_contract,
+      target:contract._id,
+      message:NotificationDetails.newProjectContract.title,
+      title:NotificationDetails.newProjectContract.message
+    });
+  
+    const populatedNotification = await (
+      await notification.save()
+    ).populate('sourceUser', 'isOnline profileImage username');
+
+    await new NewNotificationPublisher(natsWrapper.client).publish({
+      notificationDetails:{message:notification.message , title:notification.title},
+      populatedNotification,
+      socketChannel:Channels.new_project_contract,
+      targetUser:notification.targetUser.toString()
+    });
     // add expiration queue
+    // const delay = contract.stageExpiration * 3600 * 1000;
+    // await pendingQueue.add({contractId:contract._id.toString()} , {delay});
+
 
     res.status(201).json(<any>{ message: 'success', data: contract });
   } catch (error) {

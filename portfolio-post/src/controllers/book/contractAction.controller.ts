@@ -2,9 +2,11 @@ import 'express-async-errors';
 
 import crypto from 'crypto';
 
-import { BadRequestError, NotAllowedError, NotFound, Users } from '@duvdu-v1/duvdu';
+import { BadRequestError, Channels, NotAllowedError, NotFound, Notification, NotificationDetails, NotificationType, Users } from '@duvdu-v1/duvdu';
 
+import { NewNotificationPublisher } from '../../event/publisher/newNotification.publisher';
 import { ContractStatus, ProjectContract } from '../../models/projectContract.model';
+import { natsWrapper } from '../../nats-wrapper';
 import { ContractActionHandler } from '../../types/contract.endpoint';
 
 
@@ -28,11 +30,32 @@ export const contractActionHandler:ContractActionHandler = async (req,res,next)=
 
   if (isSp) {
 
-    if (req.body.action === 'reject' && contract.status === ContractStatus.pending)
+    if (req.body.action === 'reject' && contract.status === ContractStatus.pending){
       await ProjectContract.updateOne(
         { _id: req.params.contractId },
         { status: ContractStatus.rejected, rejectedBy: 'sp', actionAt: new Date() },
       );
+      // send notification to customer 
+      const notification = await Notification.create({
+        sourceUser:req.loggedUser.id,
+        targetUser:contract.customer,
+        type:NotificationType.update_project_contract,
+        target:contract._id,
+        message:NotificationDetails.updateProjectContract.title,
+        title:NotificationDetails.updateProjectContract.message
+      });
+    
+      const populatedNotification = await (
+        await notification.save()
+      ).populate('sourceUser', 'isOnline profileImage username');
+  
+      await new NewNotificationPublisher(natsWrapper.client).publish({
+        notificationDetails:{message:notification.message , title:notification.title},
+        populatedNotification,
+        socketChannel:Channels.update_project_contract,
+        targetUser:notification.targetUser.toString()
+      });
+    }
     else if (req.body.action === 'accept' && contract.status === ContractStatus.pending) {
       const spUser = await Users.findOne({ _id: req.loggedUser.id }, { avaliableContracts: 1 });
     
@@ -54,14 +77,63 @@ export const contractActionHandler:ContractActionHandler = async (req,res,next)=
           paymentLink: paymentSession,
         },
       );
+
+      // send notification to user
+      const notification = await Notification.create({
+        sourceUser:req.loggedUser.id,
+        targetUser:contract.customer,
+        type:NotificationType.update_project_contract,
+        target:contract._id,
+        message:NotificationDetails.updateProjectContract.title,
+        title:NotificationDetails.updateProjectContract.message
+      });
+    
+      const populatedNotification = await (
+        await notification.save()
+      ).populate('sourceUser', 'isOnline profileImage username');
+  
+      await new NewNotificationPublisher(natsWrapper.client).publish({
+        notificationDetails:{message:notification.message , title:notification.title},
+        populatedNotification,
+        socketChannel:Channels.update_project_contract,
+        targetUser:notification.targetUser.toString()
+      });
+
+      // add expiration for first payment
+      // const delay = contract.stageExpiration * 3600 * 1000;
+
+      // await firstPayMentQueue.add({contractId:contract._id.toString()} , {delay});
+
     } else if (
       req.body.action === 'reject' &&
           contract.status === ContractStatus.updateAfterFirstPayment
-    )
+    ){
       await ProjectContract.updateOne(
         { _id: req.params.contractId },
         { status: ContractStatus.rejected, rejectedBy: 'sp', actionAt: new Date() },
       );
+
+      // send notification to user
+      const notification = await Notification.create({
+        sourceUser:req.loggedUser.id,
+        targetUser:contract.customer,
+        type:NotificationType.update_project_contract,
+        target:contract._id,
+        message:NotificationDetails.updateProjectContract.title,
+        title:NotificationDetails.updateProjectContract.message
+      });
+          
+      const populatedNotification = await (
+        await notification.save()
+      ).populate('sourceUser', 'isOnline profileImage username');
+        
+      await new NewNotificationPublisher(natsWrapper.client).publish({
+        notificationDetails:{message:notification.message , title:notification.title},
+        populatedNotification,
+        socketChannel:Channels.update_project_contract,
+        targetUser:notification.targetUser.toString()
+      });
+    }
     else if (
       req.body.action === 'accept' &&
           contract.status === ContractStatus.updateAfterFirstPayment
@@ -75,6 +147,31 @@ export const contractActionHandler:ContractActionHandler = async (req,res,next)=
           paymentLink: paymentSession,
         },
       );
+
+      // send notification to user
+      const notification = await Notification.create({
+        sourceUser:req.loggedUser.id,
+        targetUser:contract.customer,
+        type:NotificationType.update_project_contract,
+        target:contract._id,
+        message:NotificationDetails.updateProjectContract.title,
+        title:NotificationDetails.updateProjectContract.message
+      });
+          
+      const populatedNotification = await (
+        await notification.save()
+      ).populate('sourceUser', 'isOnline profileImage username');
+        
+      await new NewNotificationPublisher(natsWrapper.client).publish({
+        notificationDetails:{message:notification.message , title:notification.title},
+        populatedNotification,
+        socketChannel:Channels.update_project_contract,
+        targetUser:notification.targetUser.toString()
+      });
+
+      // add second payment expiration
+      // const delay = contract.stageExpiration * 3600 * 1000;
+      // await secondPayMentQueue.add({contractId:contract._id.toString()} , {delay});
     } else
       return next(
         new NotAllowedError(
@@ -95,19 +192,67 @@ export const contractActionHandler:ContractActionHandler = async (req,res,next)=
     else if (
       req.body.action === 'accept' &&
           contract.status === ContractStatus.waitingForFirstPayment
-    )
+    ){
       await ProjectContract.updateOne(
         { _id: req.params.contractId },
         { status: ContractStatus.updateAfterFirstPayment, actionAt: new Date() },
       );
+
+      // send notification to sp
+      const notification = await Notification.create({
+        sourceUser:req.loggedUser.id,
+        targetUser:contract.sp,
+        type:NotificationType.update_project_contract,
+        target:contract._id,
+        message:NotificationDetails.updateProjectContract.title,
+        title:NotificationDetails.updateProjectContract.message
+      });
+                
+      const populatedNotification = await (
+        await notification.save()
+      ).populate('sourceUser', 'isOnline profileImage username');
+              
+      await new NewNotificationPublisher(natsWrapper.client).publish({
+        notificationDetails:{message:notification.message , title:notification.title},
+        populatedNotification,
+        socketChannel:Channels.update_project_contract,
+        targetUser:notification.targetUser.toString()
+      });
+
+      // add update after payment expiration
+      // const delay = contract.stageExpiration * 3600 * 1000;
+      // await updateAfterFirstPaymentQueeu.add({contractId:contract._id.toString()} ,{delay});
+    }
     else if (
       req.body.action === 'reject' &&
           contract.status === ContractStatus.waitingForTotalPayment
-    )
+    ){
       await ProjectContract.updateOne(
         { _id: req.params.contractId },
         { status: ContractStatus.rejected, rejectedBy: 'customer', actionAt: new Date() },
       );
+
+      // send notification to sp
+      const notification = await Notification.create({
+        sourceUser:req.loggedUser.id,
+        targetUser:contract.sp,
+        type:NotificationType.update_project_contract,
+        target:contract._id,
+        message:NotificationDetails.updateProjectContract.title,
+        title:NotificationDetails.updateProjectContract.message
+      });
+                      
+      const populatedNotification = await (
+        await notification.save()
+      ).populate('sourceUser', 'isOnline profileImage username');
+                    
+      await new NewNotificationPublisher(natsWrapper.client).publish({
+        notificationDetails:{message:notification.message , title:notification.title},
+        populatedNotification,
+        socketChannel:Channels.update_project_contract,
+        targetUser:notification.targetUser.toString()
+      });
+    }
     else
       return next(
         new NotAllowedError(
@@ -120,6 +265,5 @@ export const contractActionHandler:ContractActionHandler = async (req,res,next)=
       );
   }
 
-  // TODO: notifications
   res.status(200).json({ message: 'success' });
 };

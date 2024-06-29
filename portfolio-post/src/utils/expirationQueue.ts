@@ -24,6 +24,12 @@ export const secondPayMentQueue = new Queue<IcontarctQueue>(
   env.redis.queue
 );
 
+export const updateAfterFirstPaymentQueeu = new Queue<IcontarctQueue>(
+  'updateAfterFirstPayment-contract-pending',
+  env.redis.queue
+);
+
+
 
 pendingQueue.process(async (job) => {
   try {
@@ -33,7 +39,7 @@ pendingQueue.process(async (job) => {
   }
 });
 
-secondPayMentQueue.process(async (job) => {
+firstPayMentQueue.process(async (job) => {
   try {
     await ProjectContract.findOneAndUpdate({_id:job.data.contractId , status:ContractStatus.waitingForFirstPayment} , {status:ContractStatus.canceled , actionAt: new Date()});
   } catch (error) {
@@ -48,4 +54,14 @@ secondPayMentQueue.process(async (job) => {
     return new Error('Failed to cancelled producer contract');
   }
 });
+
+updateAfterFirstPaymentQueeu.process(async (job) => {
+  try {
+    await ProjectContract.findOneAndUpdate({_id:job.data.contractId , status:ContractStatus.updateAfterFirstPayment} , {status:ContractStatus.canceled , actionAt: new Date()});
+  } catch (error) {
+    return new Error('Failed to cancelled producer contract');
+  }
+});
+
+
 
