@@ -1,5 +1,9 @@
 import 'express-async-errors';
-import { globalErrorHandlingMiddleware, languageHeaderMiddleware, sessionStore } from '@duvdu-v1/duvdu';
+import {
+  globalErrorHandlingMiddleware,
+  languageHeaderMiddleware,
+  sessionStore,
+} from '@duvdu-v1/duvdu';
 import cors from 'cors';
 import express, { RequestHandler } from 'express';
 import session from 'express-session';
@@ -12,14 +16,19 @@ app.set('trust proxy', true);
 app.use(express.json());
 app.use(
   cors({
-    origin: ['*','http://localhost:3000', 'http://localhost:3001' , 'https://duvdu.com' , 'https://www.duvdu.com'],
+    origin: [
+      '*',
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'https://duvdu.com',
+      'https://www.duvdu.com',
+    ],
     credentials: true,
     exposedHeaders: ['set-cookie'],
   }),
 );
 
-
-let mySession:RequestHandler;
+let mySession: RequestHandler;
 
 const initializeSessionStore = async () => {
   const store = await sessionStore(env.redis.uri, env.redis.pass);

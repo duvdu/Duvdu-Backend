@@ -19,7 +19,7 @@ const messagesData = [
   {
     sender: user2,
     receiver: user1,
-    content: 'I\'m doing well, thank you!',
+    content: "I'm doing well, thank you!",
     reactions: [{ type: 'love', user: user2 }],
     watched: false,
   },
@@ -33,7 +33,7 @@ const messagesData = [
   {
     sender: user2,
     receiver: user1,
-    content: 'I\'m doing well, thank you!',
+    content: "I'm doing well, thank you!",
     reactions: [{ type: 'love', user: user2 }],
     watched: false,
   },
@@ -41,13 +41,13 @@ const messagesData = [
     sender: user1,
     receiver: user2,
     content: 'Hello, how are you?',
-    reactions: [{ type: 'like', user: user1}],
+    reactions: [{ type: 'like', user: user1 }],
     watched: false,
   },
   {
     sender: user2,
     receiver: user1,
-    content: 'I\'m doing well, thank you!',
+    content: "I'm doing well, thank you!",
     reactions: [{ type: 'love', user: user2 }],
     watched: false,
   },
@@ -62,7 +62,10 @@ const messagesData = [
     sender: user3,
     receiver: user1,
     content: 'Sure, I would love to!',
-    reactions: [{ type: 'like', user: user1 }, { type: 'thumbsUp', user: user3 }],
+    reactions: [
+      { type: 'like', user: user1 },
+      { type: 'thumbsUp', user: user3 },
+    ],
     watched: false,
   },
   {
@@ -76,7 +79,10 @@ const messagesData = [
     sender: user3,
     receiver: user1,
     content: 'Sure, I would love to!',
-    reactions: [{ type: 'like', user:user1 }, { type: 'thumbsUp', user: user3 }],
+    reactions: [
+      { type: 'like', user: user1 },
+      { type: 'thumbsUp', user: user3 },
+    ],
     watched: false,
   },
   {
@@ -90,7 +96,10 @@ const messagesData = [
     sender: user3,
     receiver: user1,
     content: 'Sure, I would love to!',
-    reactions: [{ type: 'like', user: user1 }, { type: 'thumbsUp', user: user3 }],
+    reactions: [
+      { type: 'like', user: user1 },
+      { type: 'thumbsUp', user: user3 },
+    ],
     watched: false,
   },
   {
@@ -104,7 +113,10 @@ const messagesData = [
     sender: user2,
     receiver: user3,
     content: 'Sure, I would love to!',
-    reactions: [{ type: 'like', user: user2 }, { type: 'thumbsUp', user: user3 }],
+    reactions: [
+      { type: 'like', user: user2 },
+      { type: 'thumbsUp', user: user3 },
+    ],
     watched: false,
   },
   {
@@ -118,7 +130,10 @@ const messagesData = [
     sender: user2,
     receiver: user3,
     content: 'Sure, I would love to!',
-    reactions: [{ type: 'like', user: user2 }, { type: 'thumbsUp', user: user3}],
+    reactions: [
+      { type: 'like', user: user2 },
+      { type: 'thumbsUp', user: user3 },
+    ],
     watched: false,
   },
   {
@@ -132,7 +147,10 @@ const messagesData = [
     sender: user2,
     receiver: user3,
     content: 'Sure, I would love to!',
-    reactions: [{ type: 'like', user: user2 }, { type: 'thumbsUp', user: user3 }],
+    reactions: [
+      { type: 'like', user: user2 },
+      { type: 'thumbsUp', user: user3 },
+    ],
     watched: false,
   },
   {
@@ -146,7 +164,10 @@ const messagesData = [
     sender: user2,
     receiver: user4,
     content: 'Sure, I would love to!',
-    reactions: [{ type: 'like', user: user2 }, { type: 'thumbsUp', user: user4 }],
+    reactions: [
+      { type: 'like', user: user2 },
+      { type: 'thumbsUp', user: user4 },
+    ],
     watched: false,
   },
   {
@@ -160,7 +181,10 @@ const messagesData = [
     sender: user2,
     receiver: user4,
     content: 'Sure, I would love to!',
-    reactions: [{ type: 'like', user: user2 }, { type: 'thumbsUp', user: user4 }],
+    reactions: [
+      { type: 'like', user: user2 },
+      { type: 'thumbsUp', user: user4 },
+    ],
     watched: false,
   },
   {
@@ -174,11 +198,13 @@ const messagesData = [
     sender: user2,
     receiver: user4,
     content: 'Sure, I would love to!',
-    reactions: [{ type: 'like', user: user2 }, { type: 'thumbsUp', user: user4 }],
+    reactions: [
+      { type: 'like', user: user2 },
+      { type: 'thumbsUp', user: user4 },
+    ],
     watched: false,
   },
 ];
-  
 
 export const appInit = async () => {
   await dbConnection(env.mongoDb.uri);

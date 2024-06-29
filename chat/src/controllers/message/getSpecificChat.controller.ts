@@ -9,7 +9,6 @@ export const getSpecificChatHandler: GetSpecificChatHandler = async (req, res) =
   const userTwo = new Types.ObjectId(req.loggedUser.id);
   const userOne = new Types.ObjectId(req.params.receiver);
 
-
   const chat = await Message.aggregate([
     {
       $match: {
@@ -132,10 +131,7 @@ export const getSpecificChatHandler: GetSpecificChatHandler = async (req, res) =
                 in: {
                   type: '$$mediaItem.type',
                   url: {
-                    $ifNull: [
-                      { $concat: [process.env.BUCKET_HOST, '/', '$$mediaItem.url'] },
-                      null,
-                    ],
+                    $ifNull: [{ $concat: [process.env.BUCKET_HOST, '/', '$$mediaItem.url'] }, null],
                   },
                 },
               },
@@ -160,9 +156,6 @@ export const getSpecificChatHandler: GetSpecificChatHandler = async (req, res) =
       $limit: req.pagination.limit,
     },
   ]);
-  
-  
-
 
   const resultCount = await Message.countDocuments({
     $or: [
@@ -171,12 +164,15 @@ export const getSpecificChatHandler: GetSpecificChatHandler = async (req, res) =
     ],
   });
 
-  await Message.updateMany({
-    $or: [
-      { sender: userOne, receiver: userTwo, watched: false },
-      { sender: userTwo, receiver: userOne, watched: false },
-    ],
-  }, { $set: { watched: true } });
+  await Message.updateMany(
+    {
+      $or: [
+        { sender: userOne, receiver: userTwo, watched: false },
+        { sender: userTwo, receiver: userOne, watched: false },
+      ],
+    },
+    { $set: { watched: true } },
+  );
 
   res.status(200).json({
     message: 'success',
