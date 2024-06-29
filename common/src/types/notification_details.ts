@@ -18,5 +18,13 @@ export const NotificationDetails = {
   updatedProducerContract:{
     title:'update producer contract',
     message:'update producer contract'
-  }
+  },
+  newProjectContract:{
+    title:'new project contract',
+    message:'new project contract'
+  },
+  updateProjectContract:{
+    title:'update project contract',
+    message:'update project contract'
+  },
 };

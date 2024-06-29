@@ -1,20 +1,28 @@
 import 'express-async-errors';
 
-import { BadRequestError, Bucket, Categories, Files, FOLDERS, NotAllowedError, NotFound, ProjectCycle } from '@duvdu-v1/duvdu';
+import {
+  BadRequestError,
+  Bucket,
+  Categories,
+  Files,
+  FOLDERS,
+  NotAllowedError,
+  NotFound,
+  ProjectCycle,
+} from '@duvdu-v1/duvdu';
 
-import { UpdateProjectHandler } from '../../types/endoints';
+import { UpdateProjectHandler } from '../../types/project.endoints';
 
-
-
-export const updateProjectHandler:UpdateProjectHandler = async (req,res,next)=>{
-
-  const project = await ProjectCycle.findOne({user:req.loggedUser.id , _id:req.params.projectId});
-  if (!project) 
-    return next(new NotAllowedError(undefined , req.lang));
+export const updateProjectHandler: UpdateProjectHandler = async (req, res, next) => {
+  const project = await ProjectCycle.findOne({
+    user: req.loggedUser.id,
+    _id: req.params.projectId,
+  });
+  if (!project) return next(new NotAllowedError(undefined, req.lang));
 
   const category = await Categories.findById(project.category);
-  if (!category) 
-    return next(new NotFound({en:'category not found' , ar:'الفئة غير موجودة'} , req.lang));
+  if (!category)
+    return next(new NotFound({ en: 'category not found', ar: 'الفئة غير موجودة' }, req.lang));
 
   const media = category.media;
 
@@ -33,23 +41,39 @@ export const updateProjectHandler:UpdateProjectHandler = async (req,res,next)=>{
     if (media === 'image' || media === 'audio') {
       if (!cover[0].mimetype.startsWith('image/')) {
         Files.removeFiles(...req.body.attachments, req.body.cover);
-        return next(new BadRequestError({en:'Cover must be an image ' , ar:'يجب أن يكون الغلاف صورة'} ,req.lang));
+        return next(
+          new BadRequestError(
+            { en: 'Cover must be an image ', ar: 'يجب أن يكون الغلاف صورة' },
+            req.lang,
+          ),
+        );
       }
     } else if (media === 'video') {
       if (!cover[0].mimetype.startsWith('video/')) {
         Files.removeFiles(...req.body.attachments, req.body.cover);
-        return next( new BadRequestError({en:'Cover must be a video for video media type' , ar:'يجب أن يكون الغلاف فيديو '} , req.lang));
+        return next(
+          new BadRequestError(
+            { en: 'Cover must be a video for video media type', ar: 'يجب أن يكون الغلاف فيديو ' },
+            req.lang,
+          ),
+        );
       }
-    } 
+    }
     Files.removeFiles(req.body.cover);
   }
 
-  const updatedProject = await ProjectCycle.findOneAndUpdate({_id:req.params.projectId , user:req.loggedUser.id} , req.body , {new:true});
-  if (!updatedProject) 
-    return next(new BadRequestError({en:'failed to update project' , ar:'فشل في تحديث المشروع'} , req.lang));
+  const updatedProject = await ProjectCycle.findOneAndUpdate(
+    { _id: req.params.projectId, user: req.loggedUser.id },
+    req.body,
+    { new: true },
+  );
+  if (!updatedProject)
+    return next(
+      new BadRequestError({ en: 'failed to update project', ar: 'فشل في تحديث المشروع' }, req.lang),
+    );
 
   attachments && (await s3.removeBucketFiles(...project.attachments));
   cover && (await s3.removeBucketFiles(project.cover));
 
-  res.status(200).json({message:'success' , data:updatedProject});
+  res.status(200).json({ message: 'success', data: updatedProject });
 };

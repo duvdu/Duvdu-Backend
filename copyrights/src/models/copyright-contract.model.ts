@@ -12,6 +12,7 @@ export enum ContractStatus {
   rejected = 'rejected',
 }
 
+
 export interface IcopyrightContract {
   id: string;
   customer: Types.ObjectId | Iuser;

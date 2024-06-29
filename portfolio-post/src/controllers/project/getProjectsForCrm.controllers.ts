@@ -2,15 +2,13 @@ import 'express-async-errors';
 
 import { MODELS, ProjectCycle } from '@duvdu-v1/duvdu';
 
-import { GetProjectsForCrmHandler } from '../../types/endoints';
+import { GetProjectsForCrmHandler } from '../../types/project.endoints';
 
-
-
-export const getProjetcsCrm : GetProjectsForCrmHandler = async (req,res)=>{
- 
+export const getProjetcsCrm: GetProjectsForCrmHandler = async (req, res) => {
   const projects = await ProjectCycle.aggregate([
     {
-      $match: req.pagination.filter,    },
+      $match: req.pagination.filter,
+    },
     {
       $sort: { createdAt: -1 },
     },
@@ -108,16 +106,16 @@ export const getProjetcsCrm : GetProjectsForCrmHandler = async (req,res)=>{
         rate: 1,
       },
     },
-  ]);  
+  ]);
   const resultCount = await ProjectCycle.countDocuments(req.pagination.filter);
-      
+
   res.status(200).json({
-    message:'success',
-    pagination:{
-      currentPage:req.pagination.page,
+    message: 'success',
+    pagination: {
+      currentPage: req.pagination.page,
       resultCount,
-      totalPages:Math.ceil(resultCount/req.pagination.limit)
+      totalPages: Math.ceil(resultCount / req.pagination.limit),
     },
-    data:projects
+    data: projects,
   });
 };
