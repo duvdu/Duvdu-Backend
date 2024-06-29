@@ -85,5 +85,6 @@ export * from './events/new-notification.event';
 export * from './events/base-listener';
 export * from './events/base-publisher';
 export * from './events/subject';
+export * from './events/topic-notification.event';
 
 export * from './config/winston';
