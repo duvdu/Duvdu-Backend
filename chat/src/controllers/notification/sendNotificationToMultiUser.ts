@@ -18,9 +18,9 @@ export const sendNotificationToMultiUserHandler:SendNotificationMultiUserHandler
     
     const notificationTokens = users.map(user => user.notificationToken).filter(token => token !== null);
     
-    console.log('Notification Tokens:', notificationTokens);
+    if (notificationTokens.length > 0) 
+      await sendFcmToMultipleUsers(notificationTokens , req.body.title , req.body.message);
   
-    await sendFcmToMultipleUsers(notificationTokens , req.body.title , req.body.message);
     res.status(200).json({message:'success'});
   } catch (error) {
     res.status(500).json(<any>{message:'failed to send fcm notification'});
