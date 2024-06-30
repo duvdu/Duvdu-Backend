@@ -82,6 +82,7 @@ export * from './types/notification_details';
 // events
 
 export * from './events/new-notification.event';
+export * from './events/notification.event';
 export * from './events/base-listener';
 export * from './events/base-publisher';
 export * from './events/subject';

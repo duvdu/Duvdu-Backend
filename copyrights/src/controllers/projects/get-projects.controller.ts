@@ -51,6 +51,7 @@ export const getProjectsHandler: RequestHandler<
   unknown,
   PaginationResponse<{ data: IcopyRights[] }>
 > = async (req, res) => {
+  console.log('page', req.pagination);
   const resultCount = await CopyRights.countDocuments({
     ...req.pagination.filter,
     isDeleted: { $ne: true },
@@ -78,11 +79,11 @@ export const getProjectsHandler: RequestHandler<
                 $cond: {
                   if: { $eq: ['ar', req.lang] },
                   then: '$$tag.ar',
-                  else: '$$tag.en'
-                }
-              }
-            }
-          }
+                  else: '$$tag.en',
+                },
+              },
+            },
+          },
         },
         subCategory: {
           $cond: {

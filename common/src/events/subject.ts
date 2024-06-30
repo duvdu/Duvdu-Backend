@@ -1,4 +1,5 @@
 export enum Subject {
   newNotification = 'new:notification',
-  topicNotification = 'topic:notification'
+  notification = 'notification',
+  topicNotification = 'topic:notification',
 }

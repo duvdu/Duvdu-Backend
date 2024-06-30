@@ -21,7 +21,7 @@ export const createProjectHandler: RequestHandler<
       req.body.subCategory,
       req.body.tags,
       CYCLES.copyRights,
-      req.lang
+      req.lang,
     );
     (req.body.subCategory as any) = subCategoryTitle;
     (req.body.tags as any) = filteredTags;
