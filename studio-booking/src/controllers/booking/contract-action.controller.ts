@@ -9,6 +9,7 @@ import {
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
+import { contractNotification } from './contract-notification.controller';
 import { ContractStatus, RentalContracts } from '../../models/rental-contracts.model';
 
 export const contractAction: RequestHandler<
@@ -43,10 +44,17 @@ export const contractAction: RequestHandler<
       );
 
     if (req.body.action === 'reject') {
-      await RentalContracts.updateOne(
-        { _id: req.params.contractId },
-        { status: ContractStatus.rejected, rejectedBy: 'sp', actionAt: new Date() },
-      );
+      {
+        await RentalContracts.updateOne(
+          { _id: req.params.contractId },
+          { status: ContractStatus.rejected, rejectedBy: 'sp', actionAt: new Date() },
+        );
+        await contractNotification(
+          contract.id,
+          contract.customer.toString(),
+          'the sp refused your rental contract',
+        );
+      }
     } else if (req.body.action === 'accept') {
       const spUser = await Users.findOne({ _id: req.loggedUser.id }, { avaliableContracts: 1 });
       if ((spUser?.avaliableContracts || 0) < 1)
@@ -71,6 +79,12 @@ export const contractAction: RequestHandler<
           actionAt: new Date(),
           paymentLink: paymentSession,
         },
+      );
+
+      await contractNotification(
+        contract.id,
+        contract.customer.toString(),
+        'the sp accepted your rental contract',
       );
 
       // await paymentExpiration.add(
@@ -99,23 +113,13 @@ export const contractAction: RequestHandler<
       { _id: req.params.contractId },
       { status: ContractStatus.rejected, rejectedBy: 'customer', actionAt: new Date() },
     );
-  }
 
-  // TODO: send notification with payment link
-  // const notification = await Notification.create({
-  //   sourceUser: req.loggedUser.id,
-  //   targetUser: isSp ? contract.sp : contract.customer,
-  //   type: NotificationType.new_follower, // TODO: create new notification type
-  //   target: isSp ? contract.sp : contract.customer,
-  //   message: `${isSp ? 'service provider' : 'customer'} ${req.body.action} the contract`,
-  //   title: 'contract action',
-  // });
-  // await new NewNotificationPublisher(natsWrapper.client).publish({
-  //   notificationDetails: { message: notification.message, title: notification.title },
-  //   populatedNotification,
-  //   socketChannel: Channels.new_follower,
-  //   targetUser: notification.targetUser.toString(),
-  // });
+    await contractNotification(
+      contract.id,
+      contract.sp.toString(),
+      'the customer reject your rental contract',
+    );
+  }
 
   res.status(200).json({ message: 'success' });
 };

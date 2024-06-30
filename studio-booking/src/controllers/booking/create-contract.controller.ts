@@ -11,6 +11,7 @@ import {
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
+import { contractNotification } from './contract-notification.controller';
 import { RentalContracts } from '../../models/rental-contracts.model';
 import { Rentals } from '../../models/rental.model';
 
@@ -81,7 +82,7 @@ export const createContractHandler: RequestHandler<
     cycle: CYCLES.studioBooking,
   });
 
-  // TODO: send notification
+  await contractNotification(contract.id, contract.sp.toString(), 'new rental contract created');
 
   res.status(201).json({ message: 'success' });
 };

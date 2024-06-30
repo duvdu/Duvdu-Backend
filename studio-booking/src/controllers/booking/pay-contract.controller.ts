@@ -1,6 +1,7 @@
 import { SuccessResponse, NotFound, BadRequestError } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
+import { contractNotification } from './contract-notification.controller';
 import { RentalContracts, ContractStatus } from '../../models/rental-contracts.model';
 
 export const payContract: RequestHandler<{ paymentSession: string }, SuccessResponse> = async (
@@ -27,6 +28,11 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
     { status: ContractStatus.ongoing, checkoutAt: new Date() },
   );
 
+  await contractNotification(
+    contract.id,
+    contract.sp.toString(),
+    'the customer paied your rental contract',
+  );
   // await onGoingExpiration.add(
   //   { contractId: contract.id },
   //   { delay: new Date(contract.deadline).getTime() - new Date().getTime() },
