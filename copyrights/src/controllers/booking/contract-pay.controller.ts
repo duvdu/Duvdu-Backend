@@ -8,10 +8,10 @@ import {
 import { RequestHandler } from 'express';
 
 // import { contractNotification } from './contract-notification.controller';
-import {
-  onGoingExpiration,
-  updateAfterFirstPaymentExpiration,
-} from '../../config/expiration-queue';
+// import {
+//   onGoingExpiration,
+//   updateAfterFirstPaymentExpiration,
+// } from '../../config/expiration-queue';
 import { NotificationPublisher } from '../../event/publisher/notification.publisher';
 import { CopyrightContracts, ContractStatus } from '../../models/copyright-contract.model';
 import { natsWrapper } from '../../nats-wrapper';
@@ -46,15 +46,15 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
       },
     );
 
-    const appointmentDate = new Date(contract.appointmentDate);
-    await updateAfterFirstPaymentExpiration.add(
-      { contractId: contract.id },
-      {
-        delay:
-          (contract.stageExpiration || 0) * 60 * 60 * 1000 +
-          (appointmentDate.getTime() - new Date().getTime()),
-      },
-    );
+    // const appointmentDate = new Date(contract.appointmentDate);
+    // await updateAfterFirstPaymentExpiration.add(
+    //   { contractId: contract.id },
+    //   {
+    //     delay:
+    //       (contract.stageExpiration || 0) * 60 * 60 * 1000 +
+    //       (appointmentDate.getTime() - new Date().getTime()),
+    //   },
+    // );
 
     await Notification.create({
       targetUser: contract.sp,
@@ -86,10 +86,10 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
     // );
 
     // check after expiration date by 24 hour
-    await onGoingExpiration.add(
-      { contractId: contract.id },
-      { delay: /*new Date(contract.deadline).getTime() - Date.now() + 24 * 60 **/ 60 * 1000 },
-    );
+    // await onGoingExpiration.add(
+    //   { contractId: contract.id },
+    //   { delay: /*new Date(contract.deadline).getTime() - Date.now() + 24 * 60 **/ 60 * 1000 },
+    // );
   } else
     return next(
       new NotAllowedError(
