@@ -28,6 +28,8 @@ export interface IcontractReport {
   contract: Types.ObjectId | Icontract;
   ref: string;
   desc: string;
+  attachments: string[];
+  state: { isClosed: boolean; closedBy: Types.ObjectId; feedback: string };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -39,8 +41,21 @@ export const ContractReports = model<IcontractReport>(
       reporter: { type: Schema.Types.ObjectId, ref: MODELS.user },
       contract: { type: Schema.Types.ObjectId, refPath: 'ref' },
       ref: String,
-      desc: String,
+      desc: { type: String, default: null },
+      attachments: [String],
+      state: {
+        isClosed: {
+          type: Boolean,
+          default: false,
+        },
+        closedBy: {
+          type: Schema.Types.ObjectId,
+          ref: MODELS.user,
+          default: null,
+        },
+        feedback: { type: String, default: null },
+      },
     },
     { collection: 'contract_reports', timestamps: true },
-  ),
+  ).index({ reporter: 1, contract: 1 }, { unique: true }),
 );
