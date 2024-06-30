@@ -1,10 +1,12 @@
-import { FOLDERS, globalUploadMiddleware } from '@duvdu-v1/duvdu';
+import { FOLDERS, globalUploadMiddleware, isauthenticated } from '@duvdu-v1/duvdu';
 import { Router } from 'express';
 
 import * as handlers from '../controllers/complaint';
 import * as val from '../validator/complaint.validator';
 
 const router = Router();
+
+router.use(isauthenticated);
 
 router
   .route('/')
