@@ -10,7 +10,7 @@ import {
 import { RequestHandler } from 'express';
 
 // import { contractNotification } from './contract-notification.controller';
-import { firstPaymentExpiration, totalPaymentExpiration } from '../../config/expiration-queue';
+// import { firstPaymentExpiration, totalPaymentExpiration } from '../../config/expiration-queue';
 import { CopyrightContracts, ContractStatus } from '../../models/copyright-contract.model';
 
 export const contractAction: RequestHandler<
@@ -84,10 +84,10 @@ export const contractAction: RequestHandler<
       //   `copyright contract accpted by the SP, please pay to complete this contract within ${contract.stageExpiration}h`,
       // );
 
-      await firstPaymentExpiration.add(
-        { contractId: contract.id },
-        { delay: (contract.stageExpiration || 0) * 60 * 60 * 1000 },
-      );
+      // await firstPaymentExpiration.add(
+      //   { contractId: contract.id },
+      //   { delay: (contract.stageExpiration || 0) * 60 * 60 * 1000 },
+      // );
     } else if (
       req.body.action === 'reject' &&
       contract.status === ContractStatus.updateAfterFirstPayment
@@ -119,10 +119,10 @@ export const contractAction: RequestHandler<
       //   contract.customer.toString(),
       //   `copyright contract accpted by the SP, please pay to complete this contract within ${contract.stageExpiration}h`,
       // );
-      await totalPaymentExpiration.add(
-        { contractId: contract.id },
-        { delay: (contract.stageExpiration || 0) * 60 * 60 * 1000 },
-      );
+      // await totalPaymentExpiration.add(
+      //   { contractId: contract.id },
+      //   { delay: (contract.stageExpiration || 0) * 60 * 60 * 1000 },
+      // );
     } else
       return next(
         new NotAllowedError(
