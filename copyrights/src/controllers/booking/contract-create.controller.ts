@@ -15,7 +15,7 @@ import {
 import { RequestHandler } from 'express';
 
 // import { contractNotification } from './contract-notification.controller';
-import { pendingExpiration } from '../../config/expiration-queue';
+// import { pendingExpiration } from '../../config/expiration-queue';
 import { ContractStatus, CopyrightContracts } from '../../models/copyright-contract.model';
 
 export const createContractHandler: RequestHandler<
@@ -71,10 +71,10 @@ export const createContractHandler: RequestHandler<
   });
   // await contractNotification(contract.id, contract.sp.toString(), 'copyright contract created');
 
-  await pendingExpiration.add(
-    { contractId: contract.id },
-    { delay: (stageExpiration || 0) * 60 * 60 * 1000 },
-  );
+  // await pendingExpiration.add(
+  //   { contractId: contract.id },
+  //   { delay: (stageExpiration || 0) * 60 * 60 * 1000 },
+  // );
 
   // TODO: send notification
   res.status(201).json({ message: 'success' });

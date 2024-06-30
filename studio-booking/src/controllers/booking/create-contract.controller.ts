@@ -67,7 +67,6 @@ export const createContractHandler: RequestHandler<
     status: ContractStatus.pending,
   });
 
-  console.log(contract);
 
   // await pendingExpiration.add(
   //   { contractId: contract._id.toString() },
