@@ -1,57 +1,83 @@
-{
-  "name": "@duvdu-v1/duvdu",
-  "version": "1.1.134",
-  "main": "./build/index.js",
-  "types": "./build/index.d.ts",
-  "files": [
-    "build/**/*"
-  ],
-  "scripts": {
-    "clean": "rimraf ./build",
-    "build": "npm run clean && tsc",
-    "fix:build": "mv ./build/common/src/* ./build && rm -rf ./build/auth ./build/common",
-    "pub": "git add . && git commit -m \"updates\" && npm version patch && npm run build && npm publish",
-    "lint": "eslint .",
-    "lint:fix": "eslint --fix .",
-    "format": "prettier --write ."
-  },
-  "keywords": [],
-  "author": "motemed khaled",
-  "license": "ISC",
-  "dependencies": {
-    "@duvdu-v1/duvdu": "^1.1.116",
-    "@types/express": "^4.17.21",
-    "@types/express-session": "^1.18.0",
-    "@types/jsonwebtoken": "^9.0.5",
-    "@types/multer": "^1.4.11",
-    "@types/node": "^20.11.0",
-    "@typescript-eslint/eslint-plugin": "^6.19.0",
-    "@typescript-eslint/parser": "^6.19.0",
-    "aws-sdk": "^2.1595.0",
-    "connect-redis": "^7.1.1",
-    "express": "^4.18.2",
-    "express-async-errors": "^3.1.1",
-    "express-session": "^1.18.0",
-    "express-validator": "^7.0.1",
-    "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.0.4",
-    "multer": "^1.4.5-lts.1",
-    "node-nats-streaming": "^0.3.2",
-    "redis": "^4.6.13",
-    "rimraf": "^5.0.5",
-    "typescript": "^5.3.3",
-    "uuid": "^9.0.1",
-    "winston": "^3.13.0",
-    "winston-daily-rotate-file": "^5.0.0"
-  },
-  "devDependencies": {
-    "@types/uuid": "^9.0.8",
-    "del-cli": "^5.1.0",
-    "eslint": "^8.56.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-prettier": "^5.1.3",
-    "prettier": "^3.2.4"
-  },
-  "description": ""
+import { Inotification, NotFound, Users } from '@duvdu-v1/duvdu';
+import SocketIO from 'socket.io';
+
+import admin from './fireBaseConfig';
+
+export async function sendFCMNotification(
+  token: string,
+  title: string,
+  message: string,
+  data: Inotification,
+) {
+  const transformedData: { [key: string]: string } = {};
+  const relevantFields = [
+    '_id',
+    'createdAt',
+    'updatedAt',
+    'title',
+    'message',
+    'watched',
+    'target',
+    'type',
+    'targetUser',
+    'sourceUser',
+  ];
+  relevantFields.forEach((field) => {
+    if (data[field as keyof Inotification]) {
+      transformedData[field] = String(data[field as keyof Inotification]);
+    }
+  });
+
+  const messagePayload = {
+    notification: {
+      title: title,
+      body: message,
+    },
+    apns: {
+      payload: {
+        aps: {
+          contentAvailable: true,
+        },
+      },
+    },
+    data: transformedData,
+    token: token,
+  };
+
+  try {
+    const response = await admin.messaging().send(messagePayload);
+    console.log('Successfully sent FCM notification:', response);
+  } catch (error) {
+    console.error('Error sending FCM notification:', error);
+  }
+}
+
+export async function sendNotificationOrFCM(
+  io: SocketIO.Server,
+  socketChannel: string,
+  targetUserId: string,
+  notificationDetails: { title: string; message: string },
+  populatedNotification: Inotification,
+) {
+  const userSocket = io.sockets.sockets.get(targetUserId);
+
+  if (userSocket) {
+    console.log('user socket true');
+
+    userSocket.join(targetUserId);
+    io.to(targetUserId).emit(socketChannel, {
+      data: populatedNotification,
+    });
+  }
+  const user = await Users.findById(targetUserId);
+  console.log('iam here');
+
+  if (!user) throw new NotFound(`Target user not found ${targetUserId}`);
+  if (user.notificationToken)
+    await sendFCMNotification(
+      user.notificationToken,
+      notificationDetails.title,
+      notificationDetails.message,
+      populatedNotification,
+    );
 }
