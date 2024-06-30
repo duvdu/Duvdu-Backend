@@ -161,6 +161,6 @@ export const getContract: RequestHandler<
 
   res.status(200).json({
     message: 'success',
-    data: contract,
+    data: contract?.[0],
   });
 };
