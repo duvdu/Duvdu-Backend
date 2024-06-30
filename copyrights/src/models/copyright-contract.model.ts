@@ -10,6 +10,7 @@ export enum ContractStatus {
   ongoing = 'ongoing',
   completed = 'completed',
   rejected = 'rejected',
+  complaint = 'complaint',
 }
 
 export interface IcopyrightContract {

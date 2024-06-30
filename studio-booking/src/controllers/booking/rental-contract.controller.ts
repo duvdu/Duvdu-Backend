@@ -13,7 +13,6 @@ import {
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-
 import { ContractStatus, RentalContracts } from '../../models/rental-contracts.model';
 import { Rentals } from '../../models/rental.model';
 
@@ -41,7 +40,7 @@ export const createContractHandler: RequestHandler<
         req.lang,
       ),
     );
-    
+
   const deadline: Date = addToDate(
     new Date(req.body.startDate),
     project.projectScale.unit,
@@ -70,7 +69,6 @@ export const createContractHandler: RequestHandler<
   });
 
   console.log(contract);
-  
 
   // await pendingExpiration.add(
   //   { contractId: contract._id.toString() },

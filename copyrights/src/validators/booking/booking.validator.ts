@@ -50,3 +50,11 @@ export const action = [
 ];
 
 export const pay = [param('paymentSession').isString(), globalValidatorMiddleware];
+
+export const updateContract = [
+  param('contractId').isMongoId().withMessage('contractIdInvalid'),
+  body('details').optional().isString().withMessage('detailsString'),
+  body('totalPrice').optional().isFloat({ gt: 0 }).withMessage('totalPrice'),
+  body('deadline').optional().isISO8601().withMessage('startDateISO8601'),
+  globalValidatorMiddleware,
+];

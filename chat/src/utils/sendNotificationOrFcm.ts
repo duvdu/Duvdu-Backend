@@ -3,8 +3,6 @@ import SocketIO from 'socket.io';
 
 import admin from './fireBaseConfig';
 
-
-
 export async function sendFCMNotification(
   token: string,
   title: string,
@@ -21,6 +19,7 @@ export async function sendFCMNotification(
       title: title,
       body: message,
     },
+
     data: transformedData,
     token: token,
   };
@@ -32,7 +31,6 @@ export async function sendFCMNotification(
     console.error('Error sending FCM notification:', error);
   }
 }
-
 
 export async function sendNotificationOrFCM(
   io: SocketIO.Server,
@@ -50,10 +48,10 @@ export async function sendNotificationOrFCM(
     io.to(targetUserId).emit(socketChannel, {
       data: populatedNotification,
     });
-  } 
+  }
   const user = await Users.findById(targetUserId);
   console.log('iam here');
-  
+
   if (!user) throw new NotFound(`Target user not found ${targetUserId}`);
   if (user.notificationToken)
     await sendFCMNotification(
@@ -63,4 +61,3 @@ export async function sendNotificationOrFCM(
       populatedNotification,
     );
 }
-

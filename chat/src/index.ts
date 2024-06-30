@@ -4,6 +4,7 @@ import { Server } from 'socket.io';
 import { app } from './app';
 import { env, checkEnvVariables } from './config/env';
 import { NewNotificationListener } from './event/listiner/newNotification.listiner';
+import { NotificationListener } from './event/listiner/notification.listener';
 import { natsWrapper } from './nats-wrapper';
 import { handleRedisConnection } from './utils/handle-redis-connection';
 import { SocketServer } from './utils/socketImplementaion';
@@ -29,6 +30,7 @@ const start = async () => {
   });
 
   new NewNotificationListener(natsWrapper.client).listen();
+  new NotificationListener(natsWrapper.client).listen();
 
   await dbConnection(env.mongoDb.uri);
   const server = app.listen(3000, () => {
