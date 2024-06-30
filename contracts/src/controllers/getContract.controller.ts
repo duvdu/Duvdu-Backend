@@ -43,8 +43,22 @@ export const getContract: RequestHandler<
       },
     },
     {
+      $lookup: {
+        from: 'project_contracts',
+        localField: 'contract',
+        foreignField: '_id',
+        as: 'project_contracts',
+      },
+    },
+    {
       $unwind: {
         path: '$producer_contract',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $unwind: {
+        path: '$project_contracts',
         preserveNullAndEmptyArrays: true,
       },
     },
@@ -63,29 +77,17 @@ export const getContract: RequestHandler<
     {
       $set: {
         contract: {
-          $switch: {
-            branches: [
-              {
-                case: {
-                  $ne: ['$copyright_contract', null],
+          $ifNull: [
+            {
+              $ifNull: [
+                '$copyright_contract',
+                {
+                  $ifNull: ['$producer_contract', '$rental_contract', '$project_contracts'],
                 },
-                then: '$copyright_contract',
-              },
-              {
-                case: {
-                  $ne: ['$producer_contract', null],
-                },
-                then: '$producer_contract',
-              },
-              {
-                case: {
-                  $ne: ['$rental_contract', null],
-                },
-                then: '$rental_contract',
-              },
-            ],
-            default: null,
-          },
+              ],
+            },
+            null,
+          ],
         },
       },
     },
