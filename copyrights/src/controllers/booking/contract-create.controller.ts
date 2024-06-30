@@ -14,7 +14,7 @@ import {
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-import { contractNotification } from './contract-notification.controller';
+// import { contractNotification } from './contract-notification.controller';
 import { pendingExpiration } from '../../config/expiration-queue';
 import { ContractStatus, CopyrightContracts } from '../../models/copyright-contract.model';
 
@@ -69,7 +69,7 @@ export const createContractHandler: RequestHandler<
     ref: 'copyright_contracts',
     cycle: CYCLES.copyRights,
   });
-  await contractNotification(contract.id, contract.sp.toString(), 'copyright contract created');
+  // await contractNotification(contract.id, contract.sp.toString(), 'copyright contract created');
 
   await pendingExpiration.add(
     { contractId: contract.id },

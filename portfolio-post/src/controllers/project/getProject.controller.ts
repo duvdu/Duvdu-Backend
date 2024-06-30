@@ -3,14 +3,12 @@ import 'express-async-errors';
 import { MODELS, NotFound, ProjectCycle } from '@duvdu-v1/duvdu';
 import mongoose from 'mongoose';
 
-import { GetProjectHandler } from '../../types/endoints';
+import { GetProjectHandler } from '../../types/project.endoints';
 
-
-export const getProjectHandler:GetProjectHandler = async (req,res,next)=>{
-
+export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
   const projects = await ProjectCycle.aggregate([
     {
-      $match: { _id:new mongoose.Types.ObjectId(req.params.projectId) , isDeleted:false},
+      $match: { _id: new mongoose.Types.ObjectId(req.params.projectId), isDeleted: false },
     },
     {
       $lookup: {
@@ -102,8 +100,8 @@ export const getProjectHandler:GetProjectHandler = async (req,res,next)=>{
     },
   ]);
 
-  if (!projects[0]) 
-    return next(new NotFound({en:'project not found' , ar:'المشروع غير موجود'} , req.lang));
+  if (!projects[0])
+    return next(new NotFound({ en: 'project not found', ar: 'المشروع غير موجود' }, req.lang));
 
-  res.status(200).json({message:'success' , data:projects[0]});
+  res.status(200).json({ message: 'success', data: projects[0] });
 };

@@ -23,15 +23,14 @@ export const env = {
     uri: process.env.REDIS_HOST as string,
     pass: process.env.REDIS_PASS as string,
   },
-  nats:{
-    clusterId:process.env.NATS_CLUSTER_ID,
-    clientId:process.env.NATS_CLIENT_ID,
-    url:process.env.NATS_URL
-  }
+  nats: {
+    clusterId: process.env.NATS_CLUSTER_ID,
+    clientId: process.env.NATS_CLIENT_ID,
+    url: process.env.NATS_URL,
+  },
 };
 
 export const checkEnvVariables = () => {
-
   if (!env.mongoDb.uri) throw new Error('env:MONGO_URI must be defined');
   if (!env.jwt.secret) throw new Error('env:JWT_KEY must be defined');
   if (!env.expressSession.secret) return new Error('env:SESSION_SECRET must be defined');

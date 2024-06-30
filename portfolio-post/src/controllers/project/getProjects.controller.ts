@@ -4,32 +4,37 @@ import { MODELS, ProjectCycle } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import { Types } from 'mongoose';
 
-import { GetProjectsHandler } from '../../types/endoints';
+import { GetProjectsHandler } from '../../types/project.endoints';
 
-export const getProjectsPagination: RequestHandler<unknown, unknown, unknown, {
-  searchKeywords?: string[];
-  location?: { lat: number; lng: number };
-  category?: Types.ObjectId;
-  showOnHome?: boolean;
-  startDate?: Date;
-  endDate?: Date;
-  projectScaleMin?: number;
-  projectScaleMax?: number;
-}> = async (req, res, next) => {
+export const getProjectsPagination: RequestHandler<
+  unknown,
+  unknown,
+  unknown,
+  {
+    searchKeywords?: string[];
+    location?: { lat: number; lng: number };
+    category?: Types.ObjectId;
+    showOnHome?: boolean;
+    startDate?: Date;
+    endDate?: Date;
+    projectScaleMin?: number;
+    projectScaleMax?: number;
+  }
+> = async (req, res, next) => {
   req.pagination.filter = {};
 
   if (req.query.searchKeywords?.length) {
-    req.pagination.filter.$or = req.query.searchKeywords.map(keyword => ({
+    req.pagination.filter.$or = req.query.searchKeywords.map((keyword) => ({
       $or: [
         { name: { $regex: keyword, $options: 'i' } },
         { description: { $regex: keyword, $options: 'i' } },
-        { 'tags.ar': { $regex: keyword, $options: 'i' } }, 
-        { 'tags.en': { $regex: keyword, $options: 'i' } }, 
-        { 'subCategory.ar': { $regex: keyword, $options: 'i' } }, 
-        { 'subCategory.en': { $regex: keyword, $options: 'i' } }, 
-        { 'tools.name': { $regex: keyword, $options: 'i' } }, 
-        { 'functions.name': { $regex: keyword, $options: 'i' } }, 
-        { address: { $regex: keyword, $options: 'i' } }, 
+        { 'tags.ar': { $regex: keyword, $options: 'i' } },
+        { 'tags.en': { $regex: keyword, $options: 'i' } },
+        { 'subCategory.ar': { $regex: keyword, $options: 'i' } },
+        { 'subCategory.en': { $regex: keyword, $options: 'i' } },
+        { 'tools.name': { $regex: keyword, $options: 'i' } },
+        { 'functions.name': { $regex: keyword, $options: 'i' } },
+        { address: { $regex: keyword, $options: 'i' } },
       ],
     }));
   }
@@ -70,10 +75,7 @@ export const getProjectsPagination: RequestHandler<unknown, unknown, unknown, {
   next();
 };
 
-
-
-export const getProjectsHandler:GetProjectsHandler = async (req,res)=>{
-
+export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
   const projects = await ProjectCycle.aggregate([
     {
       $match: { ...req.pagination.filter, isDeleted: false },
@@ -176,16 +178,19 @@ export const getProjectsHandler:GetProjectsHandler = async (req,res)=>{
       },
     },
   ]);
-  
-  const resultCount = await ProjectCycle.countDocuments({...req.pagination.filter , isDeleted:false});
+
+  const resultCount = await ProjectCycle.countDocuments({
+    ...req.pagination.filter,
+    isDeleted: false,
+  });
 
   res.status(200).json({
-    message:'success',
-    pagination:{
-      currentPage:req.pagination.page,
+    message: 'success',
+    pagination: {
+      currentPage: req.pagination.page,
       resultCount,
-      totalPages:Math.ceil(resultCount/req.pagination.limit)
+      totalPages: Math.ceil(resultCount / req.pagination.limit),
     },
-    data:projects
+    data: projects,
   });
 };

@@ -1,0 +1,50 @@
+import 'express-async-errors';
+
+import { BadRequestError, NotAllowedError, NotFound } from '@duvdu-v1/duvdu';
+
+import { ContractStatus, ProjectContract } from '../../models/projectContract.model';
+import { calculateTotalPrice } from '../../services/checkToolsAndFunctions.service';
+import { UpdateContractHandler } from '../../types/contract.endpoint';
+
+
+export const updateContractHandler:UpdateContractHandler = async (req,res,next)=>{
+  const contract = await ProjectContract.findById(req.params.contractId);
+  if (!contract) 
+    return next(new NotFound({en:'contract notfound' , ar:'العقد غير موجود'},req.lang));
+
+  if (contract.sp.toString() != req.loggedUser.id)
+    return next(new NotAllowedError(undefined , req.lang));
+
+  if (contract.status != ContractStatus.updateAfterFirstPayment) 
+    return next(new BadRequestError({en:'invalid contract status' , ar:'حالة العقد غير صالحة'} , req.lang));
+
+  if (req.body.equipment) {
+    const { functions, tools, totalPrice } = await calculateTotalPrice(
+      contract.project.toString(),
+      req.body.equipment,
+      req.lang,
+    );
+
+    contract.tools = tools;
+    contract.functions = functions;
+    contract.equipmentPrice = totalPrice;
+  }
+
+  if (req.body.duration) {
+    
+    (contract.deadline as any) = new Date(
+      new Date(contract.startDate).setDate(
+        new Date(contract.startDate).getDate() + req.body.duration,
+      ),
+    ).toISOString();
+  }
+
+  if (req.body.unitPrice) 
+    contract.projectScale.unitPrice = req.body.unitPrice;
+
+
+  contract.totalPrice = contract.equipmentPrice + (contract.projectScale.unitPrice * contract.projectScale.numberOfUnits);
+  contract.secondPaymentAmount = contract.totalPrice - contract.firstPaymentAmount;
+  await contract.save();
+  res.status(200).json({message:'success' , data:contract});
+};

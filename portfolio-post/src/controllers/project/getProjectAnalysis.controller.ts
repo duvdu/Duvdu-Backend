@@ -2,7 +2,6 @@ import { MODELS, ProjectCycle, SuccessResponse } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import { PipelineStage } from 'mongoose';
 
-
 export const getProjectAnalysis: RequestHandler<
   unknown,
   SuccessResponse<{ data: any }>,
@@ -43,7 +42,7 @@ export const getProjectAnalysis: RequestHandler<
         _id: 1,
         totalProjects: 1,
         username: '$userDetails.username',
-        profileImage: { $concat: [process.env.BUCKET_HOST , '/', '$userDetails.profileImage'] },
+        profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$userDetails.profileImage'] },
       },
     },
     { $sort: { totalProjects: -1 } },

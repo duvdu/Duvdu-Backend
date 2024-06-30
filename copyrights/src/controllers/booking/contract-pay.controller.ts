@@ -7,7 +7,7 @@ import {
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-import { contractNotification } from './contract-notification.controller';
+// import { contractNotification } from './contract-notification.controller';
 import {
   onGoingExpiration,
   updateAfterFirstPaymentExpiration,
@@ -79,11 +79,11 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
         secondPaymentAmount: contract.totalPrice - contract.firstPaymentAmount,
       },
     );
-    await contractNotification(
-      contract.id,
-      contract.sp.toString(),
-      'copyright contract, customer paied the total amount',
-    );
+    // await contractNotification(
+    //   contract.id,
+    //   contract.sp.toString(),
+    //   'copyright contract, customer paied the total amount',
+    // );
 
     // check after expiration date by 24 hour
     await onGoingExpiration.add(

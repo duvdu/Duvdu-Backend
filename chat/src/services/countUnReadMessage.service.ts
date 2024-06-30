@@ -3,11 +3,13 @@ import { Types } from 'mongoose';
 
 export interface UnreadMessageCount {
   _id: string;
-  count: number; 
+  count: number;
 }
 
-export async function getUnreadMessageCounts(receiverId1:string, receiverId2:string):Promise<UnreadMessageCount[]> {
-
+export async function getUnreadMessageCounts(
+  receiverId1: string,
+  receiverId2: string,
+): Promise<UnreadMessageCount[]> {
   const userOne = new Types.ObjectId(receiverId1);
   const userTwo = new Types.ObjectId(receiverId2);
   try {
@@ -16,17 +18,17 @@ export async function getUnreadMessageCounts(receiverId1:string, receiverId2:str
         $match: {
           $or: [
             { sender: userOne, receiver: userTwo },
-            { sender: userTwo, receiver: userOne }
+            { sender: userTwo, receiver: userOne },
           ],
-          watched: false
-        }
+          watched: false,
+        },
       },
       {
         $group: {
           _id: '$sender',
-          count: { $sum: 1 }
-        }
-      }
+          count: { $sum: 1 },
+        },
+      },
     ]).exec();
     return unreadCounts;
   } catch (error) {

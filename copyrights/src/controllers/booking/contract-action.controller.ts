@@ -9,7 +9,7 @@ import {
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-import { contractNotification } from './contract-notification.controller';
+// import { contractNotification } from './contract-notification.controller';
 import { firstPaymentExpiration, totalPaymentExpiration } from '../../config/expiration-queue';
 import { CopyrightContracts, ContractStatus } from '../../models/copyright-contract.model';
 
@@ -52,11 +52,11 @@ export const contractAction: RequestHandler<
         { _id: req.params.contractId },
         { status: ContractStatus.rejected, rejectedBy: 'sp', actionAt: new Date() },
       );
-      await contractNotification(
-        contract.id,
-        contract.customer.toString(),
-        'copyright contract rejected by the SP',
-      );
+      // await contractNotification(
+      //   contract.id,
+      //   contract.customer.toString(),
+      //   'copyright contract rejected by the SP',
+      // );
     } else if (req.body.action === 'accept' && contract.status === ContractStatus.pending) {
       const spUser = await Users.findOne({ _id: req.loggedUser.id }, { avaliableContracts: 1 });
 
@@ -78,11 +78,11 @@ export const contractAction: RequestHandler<
           paymentLink: paymentSession,
         },
       );
-      await contractNotification(
-        contract.id,
-        contract.customer.toString(),
-        `copyright contract accpted by the SP, please pay to complete this contract within ${contract.stageExpiration}h`,
-      );
+      // await contractNotification(
+      //   contract.id,
+      //   contract.customer.toString(),
+      //   `copyright contract accpted by the SP, please pay to complete this contract within ${contract.stageExpiration}h`,
+      // );
 
       await firstPaymentExpiration.add(
         { contractId: contract.id },
@@ -96,11 +96,11 @@ export const contractAction: RequestHandler<
         { _id: req.params.contractId },
         { status: ContractStatus.rejected, rejectedBy: 'sp', actionAt: new Date() },
       );
-      await contractNotification(
-        contract.id,
-        contract.customer.toString(),
-        'copyright contract rejected by the SP',
-      );
+      // await contractNotification(
+      //   contract.id,
+      //   contract.customer.toString(),
+      //   'copyright contract rejected by the SP',
+      // );
     } else if (
       req.body.action === 'accept' &&
       contract.status === ContractStatus.updateAfterFirstPayment
@@ -114,11 +114,11 @@ export const contractAction: RequestHandler<
           paymentLink: paymentSession,
         },
       );
-      await contractNotification(
-        contract.id,
-        contract.customer.toString(),
-        `copyright contract accpted by the SP, please pay to complete this contract within ${contract.stageExpiration}h`,
-      );
+      // await contractNotification(
+      //   contract.id,
+      //   contract.customer.toString(),
+      //   `copyright contract accpted by the SP, please pay to complete this contract within ${contract.stageExpiration}h`,
+      // );
       await totalPaymentExpiration.add(
         { contractId: contract.id },
         { delay: (contract.stageExpiration || 0) * 60 * 60 * 1000 },
@@ -147,11 +147,11 @@ export const contractAction: RequestHandler<
         { _id: req.params.contractId },
         { status: ContractStatus.rejected, rejectedBy: 'customer', actionAt: new Date() },
       );
-      await contractNotification(
-        contract.id,
-        contract.sp.toString(),
-        'copyright contract rejected by the customer',
-      );
+      // await contractNotification(
+      //   contract.id,
+      //   contract.sp.toString(),
+      //   'copyright contract rejected by the customer',
+      // );
     } else if (
       req.body.action === 'reject' &&
       contract.status === ContractStatus.waitingForTotalPayment
@@ -160,11 +160,11 @@ export const contractAction: RequestHandler<
         { _id: req.params.contractId },
         { status: ContractStatus.rejected, rejectedBy: 'customer', actionAt: new Date() },
       );
-      await contractNotification(
-        contract.id,
-        contract.sp.toString(),
-        'copyright contract rejected by the customer',
-      );
+      // await contractNotification(
+      //   contract.id,
+      //   contract.sp.toString(),
+      //   'copyright contract rejected by the customer',
+      // );
     } else
       return next(
         new NotAllowedError(

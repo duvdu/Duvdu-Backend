@@ -1,7 +1,7 @@
 import { BadRequestError, NotFound, SuccessResponse } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-import { contractNotification } from './contract-notification.controller';
+// import { contractNotification } from './contract-notification.controller';
 import { ContractStatus, CopyrightContracts } from '../../models/copyright-contract.model';
 
 export const updateContractHandler: RequestHandler<
@@ -38,11 +38,11 @@ export const updateContractHandler: RequestHandler<
 
   await CopyrightContracts.updateOne({ _id: req.params.contractId }, req.body);
 
-  await contractNotification(
-    contract.id,
-    contract.sp.toString(),
-    `copyright contract, customer updated the contract, please take action within ${contract.stageExpiration}h or ask customer for another update`,
-  );
+  // await contractNotification(
+  //   contract.id,
+  //   contract.sp.toString(),
+  //   `copyright contract, customer updated the contract, please take action within ${contract.stageExpiration}h or ask customer for another update`,
+  // );
   res.status(200).json({ message: 'success' });
 };
 

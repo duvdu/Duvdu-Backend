@@ -13,6 +13,7 @@ export enum ContractStatus {
   complaint = 'complaint',
 }
 
+
 export interface IcopyrightContract {
   id: string;
   customer: Types.ObjectId | Iuser;
