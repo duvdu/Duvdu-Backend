@@ -6,17 +6,18 @@ import { ContractStatus, ProjectContract } from '../../models/projectContract.mo
 import { calculateTotalPrice } from '../../services/checkToolsAndFunctions.service';
 import { UpdateContractHandler } from '../../types/contract.endpoint';
 
-
-export const updateContractHandler:UpdateContractHandler = async (req,res,next)=>{
+export const updateContractHandler: UpdateContractHandler = async (req, res, next) => {
   const contract = await ProjectContract.findById(req.params.contractId);
-  if (!contract) 
-    return next(new NotFound({en:'contract notfound' , ar:'العقد غير موجود'},req.lang));
+  if (!contract)
+    return next(new NotFound({ en: 'contract notfound', ar: 'العقد غير موجود' }, req.lang));
 
   if (contract.sp.toString() != req.loggedUser.id)
-    return next(new NotAllowedError(undefined , req.lang));
+    return next(new NotAllowedError(undefined, req.lang));
 
-  if (contract.status != ContractStatus.updateAfterFirstPayment) 
-    return next(new BadRequestError({en:'invalid contract status' , ar:'حالة العقد غير صالحة'} , req.lang));
+  if (contract.status != ContractStatus.updateAfterFirstPayment)
+    return next(
+      new BadRequestError({ en: 'invalid contract status', ar: 'حالة العقد غير صالحة' }, req.lang),
+    );
 
   if (req.body.equipment) {
     const { functions, tools, totalPrice } = await calculateTotalPrice(
@@ -31,7 +32,6 @@ export const updateContractHandler:UpdateContractHandler = async (req,res,next)=
   }
 
   if (req.body.duration) {
-    
     (contract.deadline as any) = new Date(
       new Date(contract.startDate).setDate(
         new Date(contract.startDate).getDate() + req.body.duration,
@@ -39,12 +39,11 @@ export const updateContractHandler:UpdateContractHandler = async (req,res,next)=
     ).toISOString();
   }
 
-  if (req.body.unitPrice) 
-    contract.projectScale.unitPrice = req.body.unitPrice;
+  if (req.body.unitPrice) contract.projectScale.unitPrice = req.body.unitPrice;
 
-
-  contract.totalPrice = contract.equipmentPrice + (contract.projectScale.unitPrice * contract.projectScale.numberOfUnits);
+  contract.totalPrice =
+    contract.equipmentPrice + contract.projectScale.unitPrice * contract.projectScale.numberOfUnits;
   contract.secondPaymentAmount = contract.totalPrice - contract.firstPaymentAmount;
   await contract.save();
-  res.status(200).json({message:'success' , data:contract});
+  res.status(200).json({ message: 'success', data: contract });
 };

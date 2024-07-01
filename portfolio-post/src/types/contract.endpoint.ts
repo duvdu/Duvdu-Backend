@@ -35,11 +35,16 @@ export interface UpdateContractHandler
           tools: { id: string; units: number }[];
           functions: { id: string; units: number }[];
         };
-        unitPrice:number
+        unitPrice: number;
       }
     >,
     unknown
   > {}
 
 export interface ContractActionHandler
-  extends RequestHandler<{contractId:string} ,SuccessResponse , { action: 'accept' | 'reject' }  , unknown>{}
+  extends RequestHandler<
+    { contractId: string },
+    SuccessResponse,
+    { action: 'accept' | 'reject' },
+    unknown
+  > {}
