@@ -32,7 +32,6 @@ export const create = [
   globalValidatorMiddleware,
 ];
 
-
 export const update = [
   param('contractId').isMongoId(),
   body('equipment.tools').optional().isArray({ min: 1 }),
@@ -41,11 +40,10 @@ export const update = [
   body('equipment.functions').optional().isArray({ min: 1 }),
   body('equipment.functions.*.id').isMongoId(),
   body('equipment.functions.*.units').isInt({ min: 1 }),
-  body('duration').optional().isInt({min:1}),
-  body('unitPrice').optional().isInt({min:1}),
-  globalValidatorMiddleware
+  body('duration').optional().isInt({ min: 1 }),
+  body('unitPrice').optional().isInt({ min: 1 }),
+  globalValidatorMiddleware,
 ];
-
 
 export const action = [
   body('action')

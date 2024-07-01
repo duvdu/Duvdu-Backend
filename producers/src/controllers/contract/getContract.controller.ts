@@ -4,11 +4,9 @@ import mongoose from 'mongoose';
 import { GetContractHandler } from '../../types/endpoints';
 
 export const getContarctHandler: GetContractHandler = async (req, res, next) => {
-
-  
   const contracts = await ProducerContract.aggregate([
     {
-      $match: {_id:new mongoose.Types.ObjectId(req.params.contractId)}
+      $match: { _id: new mongoose.Types.ObjectId(req.params.contractId) },
     },
     {
       $lookup: {
@@ -59,7 +57,7 @@ export const getContarctHandler: GetContractHandler = async (req, res, next) => 
           user: {
             $cond: {
               if: { $eq: ['$producerUser', null] },
-              then: {}, 
+              then: {},
               else: {
                 profileImage: {
                   $cond: [
@@ -139,13 +137,13 @@ export const getContarctHandler: GetContractHandler = async (req, res, next) => 
         status: 1,
         stageExpiration: 1,
         actionAt: 1,
-        rejectedBy:1,
+        rejectedBy: 1,
       },
     },
   ]);
 
-  if (contracts.length === 0) 
-    return next(new NotFound({en:'contract not found' , ar:'العقد غير موجود'} , req.lang));
-  
-  res.status(200).json({message:'success' , data:contracts[0]});
+  if (contracts.length === 0)
+    return next(new NotFound({ en: 'contract not found', ar: 'العقد غير موجود' }, req.lang));
+
+  res.status(200).json({ message: 'success', data: contracts[0] });
 };

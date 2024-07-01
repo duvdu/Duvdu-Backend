@@ -27,8 +27,6 @@
   "limitOptionalInt": "المحدد يجب أن يكون",
   "pageOptionalInt": "المحدد يجب أن يكون",
 
-
-
   "address.required": "العنوان مطلوب",
   "location.lat.invalid": "يجب أن يكون خط العرض بين -90 و 90",
   "location.lng.invalid": "يجب أن يكون خط الطول بين -180 و 180",

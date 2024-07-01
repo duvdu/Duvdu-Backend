@@ -5,22 +5,20 @@ import mongoose from 'mongoose';
 
 import { GetUserContractsHandler } from '../../types/endpoints';
 
-
 export const getContractsPagination: RequestHandler<
   unknown,
   unknown,
   unknown,
   {
-    producer?: string; 
+    producer?: string;
     projectType?: string;
     platform?: string;
     status?: ContractStatus;
     startDate?: Date;
     endDate?: Date;
-    filter?:'i_created'|'i_recieved'
+    filter?: 'i_created' | 'i_recieved';
   }
 > = async (req, res, next) => {
-  
   req.pagination.filter = {};
 
   if (req.query.producer) {
@@ -42,23 +40,19 @@ export const getContractsPagination: RequestHandler<
     };
   }
 
-  if (req.query.filter === 'i_recieved') 
+  if (req.query.filter === 'i_recieved')
     req.pagination.filter['producer.user._id'] = new mongoose.Types.ObjectId(req.loggedUser.id);
 
-  if (req.query.filter === 'i_created') 
+  if (req.query.filter === 'i_created')
     req.pagination.filter['user._id'] = new mongoose.Types.ObjectId(req.loggedUser.id);
-  
-  if (req.query.filter == undefined) 
+
+  if (req.query.filter == undefined)
     req.pagination.filter['user._id'] = new mongoose.Types.ObjectId(req.loggedUser.id);
 
   next();
 };
 
-
-
-export const getContractsHandler:GetUserContractsHandler = async (req,res)=>{
-  
-
+export const getContractsHandler: GetUserContractsHandler = async (req, res) => {
   const contracts = await ProducerContract.aggregate([
     {
       $lookup: {
@@ -109,13 +103,13 @@ export const getContractsHandler:GetUserContractsHandler = async (req,res)=>{
           user: {
             $cond: {
               if: { $eq: ['$producerUser', null] },
-              then: {}, 
+              then: {},
               else: {
                 profileImage: {
                   $cond: [
                     { $eq: ['$producerUser.profileImage', null] },
                     null,
-                    { $concat: [process.env.BUCKET_HOST , '/', '$producerUser.profileImage'] },
+                    { $concat: [process.env.BUCKET_HOST, '/', '$producerUser.profileImage'] },
                   ],
                 },
                 username: '$producerUser.username',
@@ -125,7 +119,7 @@ export const getContractsHandler:GetUserContractsHandler = async (req,res)=>{
                 rate: '$producerUser.rate',
                 rank: '$producerUser.rank',
                 projectsView: '$producerUser.projectsView',
-                _id:'$producerUser._id'
+                _id: '$producerUser._id',
               },
             },
           },
@@ -169,7 +163,7 @@ export const getContractsHandler:GetUserContractsHandler = async (req,res)=>{
         user: {
           _id: '$userDetails._id',
           username: '$userDetails.username',
-          profileImage: { $concat: [process.env.BUCKET_HOST ,'/', '$userDetails.profileImage'] },
+          profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$userDetails.profileImage'] },
           isOnline: '$userDetails.isOnline',
           acceptedProjectsCounter: '$userDetails.acceptedProjectsCounter',
           name: '$userDetails.name',
@@ -190,7 +184,7 @@ export const getContractsHandler:GetUserContractsHandler = async (req,res)=>{
         status: 1,
         stageExpiration: 1,
         actionAt: 1,
-        rejectedBy:1
+        rejectedBy: 1,
       },
     },
     {
@@ -202,7 +196,7 @@ export const getContractsHandler:GetUserContractsHandler = async (req,res)=>{
   ]);
 
   res.status(200).json({
-    message:'success',
-    data:contracts
+    message: 'success',
+    data: contracts,
   });
 };

@@ -24,7 +24,7 @@ export interface IprojectContract {
   attachments: string[];
   projectScale: { unit: string; numberOfUnits: number; unitPrice: number };
   appointmentDate: Date;
-  equipmentPrice:number;
+  equipmentPrice: number;
   totalPrice: number;
   deadline: Date;
   startDate: Date;
@@ -38,7 +38,7 @@ export interface IprojectContract {
   rejectedBy?: 'customer' | 'sp';
   paymentLink: string;
   duration: number;
-  createdAt:Date;
+  createdAt: Date;
 }
 
 export const ProjectContract = model<IprojectContract>(
@@ -85,7 +85,7 @@ export const ProjectContract = model<IprojectContract>(
       rejectedBy: { type: String, enum: ['sp', 'customer'], default: null },
       paymentLink: String,
       duration: { type: Number, default: 0 },
-      equipmentPrice:{type:Number , default:0}
+      equipmentPrice: { type: Number, default: 0 },
     },
     { timestamps: true, collection: 'project_contracts' },
   ),
