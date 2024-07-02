@@ -171,6 +171,7 @@ export const getCategoriesHandler: GetCategoriesHandler = async (req, res) => {
         updatedAt: 1,
         __v: 1,
         image: 1,
+        media:1,
         jobTitles: {
           $map: {
             input: '$jobTitles',

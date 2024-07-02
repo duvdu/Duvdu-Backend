@@ -32,6 +32,7 @@ export const create = [
   body('projectScale.unit').isString().bail().trim().withMessage('projectScale'),
   body('projectScale.minimum').isInt({ min: 1 }).bail().toInt().withMessage('projectScale'),
   body('projectScale.maximum').isInt({ min: 1 }).bail().toInt().withMessage('projectScale'),
+  body('projectScale.current').isInt({ min: 1 }).bail().toInt().withMessage('projectScale'),
   body('projectScale.pricerPerUnit')
     .isFloat({ gt: 0 })
     .bail()
@@ -82,6 +83,12 @@ export const update = [
     .toInt()
     .withMessage('projectScale'),
   body('projectScale.maximum')
+    .optional()
+    .isInt({ min: 1 })
+    .bail()
+    .toInt()
+    .withMessage('projectScale'),
+  body('projectScale.current')
     .optional()
     .isInt({ min: 1 })
     .bail()
