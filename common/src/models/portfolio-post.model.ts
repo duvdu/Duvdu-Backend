@@ -18,10 +18,11 @@ export interface IprojectCycle {
     address:string;
     searchKeyWords:string[];
     showOnHome: boolean;
-    projectScale: { unit: string; minimum: number; maximum: number; pricerPerUnit: number };
+    projectScale: { unit: string; minimum: number; current:number; maximum: number; pricerPerUnit: number };
     isDeleted: boolean;
     rate: { ratersCounter: number; totalRates: number };
     duration:number;
+    submitFiles:{files:string[] , url:string , note:string}
 }
 
 export const ProjectCycle = model<IprojectCycle>(MODELS.portfolioPost , new Schema<IprojectCycle>({
@@ -40,8 +41,9 @@ export const ProjectCycle = model<IprojectCycle>(MODELS.portfolioPost , new Sche
   address:{type:String , default:null},
   searchKeyWords:[String],
   showOnHome:{type:Boolean , default:true},
-  projectScale: { unit: String, minimum: Number, maximum: Number, pricerPerUnit: Number },
+  projectScale: { unit: String, minimum: Number, maximum: Number , current:Number, pricerPerUnit: Number },
   isDeleted:{type:Boolean , default:false},
   rate: { ratersCounter: Number, totalRates: Number },
-  duration:{type:Number , default:0}
+  duration:{type:Number , default:0},
+  submitFiles:{files:[String] , url:{type:String , default:null} , note:{type:String , default:null}}
 },{timestamps:true , collection:MODELS.portfolioPost}));
