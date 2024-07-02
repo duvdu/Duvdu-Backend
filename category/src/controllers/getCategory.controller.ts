@@ -133,6 +133,7 @@ export const getCategoryHandler: GetCategoryHandler = async (req, res, next) => 
         status: 1,
         createdAt: 1,
         updatedAt: 1,
+        media:1,
         __v: 1,
         image: { $concat: [process.env.BUCKET_HOST, '/', '$image'] },
       },
