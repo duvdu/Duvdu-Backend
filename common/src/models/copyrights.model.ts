@@ -10,7 +10,7 @@ export interface IcopyRights {
   user: Types.ObjectId | Iuser;
   category: Types.ObjectId | Icategory;
   price: number;
-  duration: string;
+  duration: { value: number; unit: string };
   address: string;
   location: { lat: number; lng: number };
   searchKeywords: string[];
@@ -29,7 +29,7 @@ export const CopyRights = model<IcopyRights>(
       user: { type: Schema.Types.ObjectId, ref: MODELS.user },
       category: { type: Schema.Types.ObjectId, ref: MODELS.category },
       price: { type: Number, default: 0 },
-      duration: { type: String, default: null },
+      duration: { value: Number, unit: String },
       address: { type: String, default: null },
       searchKeywords: [String],
       showOnHome: { type: Boolean, default: true },

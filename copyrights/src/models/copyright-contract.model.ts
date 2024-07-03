@@ -13,7 +13,6 @@ export enum ContractStatus {
   complaint = 'complaint',
 }
 
-
 export interface IcopyrightContract {
   id: string;
   customer: Types.ObjectId | Iuser;
@@ -25,6 +24,8 @@ export interface IcopyrightContract {
   address: string;
   totalPrice: number;
   deadline: Date;
+  startDate: Date;
+  duration: { value: number; unit: string };
   appointmentDate: Date;
   stageExpiration: number;
   actionAt: Date;
@@ -51,6 +52,8 @@ export const CopyrightContracts = model<IcopyrightContract>(
       location: { lat: Number, lng: Number },
       address: String,
       totalPrice: Number,
+      startDate: Date,
+      duration: { value: Number, unit: String },
       deadline: Date,
       appointmentDate: Date,
       stageExpiration: Number,
