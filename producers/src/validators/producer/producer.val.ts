@@ -16,7 +16,7 @@ export const appendProducerVal = [
   body('subcategory.*.subcategory').isMongoId().withMessage('subcategoryMongoId'),
   body('subcategory.*.tags').isArray({ min: 1 }).withMessage('tagsArray'),
   body('subcategory.*.tags.*').isMongoId().withMessage('tagsMongoId'),
-  globalValidatorMiddleware
+  globalValidatorMiddleware,
 ];
 
 export const updateProducerVal = [
@@ -41,10 +41,7 @@ export const updateProducerVal = [
       if (req.body.maxBudget && req.body.maxBudget > val) return true;
       throw new Error('minBudgetOptional');
     }),
-  body('searchKeywords')
-    .optional()
-    .isArray({ min: 1 })
-    .withMessage('searchKeywordsOptionalArray'),
+  body('searchKeywords').optional().isArray({ min: 1 }).withMessage('searchKeywordsOptionalArray'),
   body('searchKeywords.*').isString().exists().withMessage('searchKeywordsOptionalString'),
   body('subcategory')
     .optional()
@@ -56,7 +53,7 @@ export const updateProducerVal = [
   body('subcategory.*.subcategory').isMongoId().withMessage('subcategoryOptionalMongoId'),
   body('subcategory.*.tags').isArray({ min: 1 }).withMessage('tagsOptionalArray'),
   body('subcategory.*.tags.*').isMongoId().withMessage('tagsOptionalMongoId'),
-  globalValidatorMiddleware
+  globalValidatorMiddleware,
 ];
 
 export const getProducersVal = [
@@ -71,10 +68,10 @@ export const getProducersVal = [
   query('user').optional().isMongoId().withMessage('userOptionalMongoId'),
   query('limit').optional().isInt().withMessage('limitOptionalInt'),
   query('page').optional().isInt().withMessage('pageOptionalInt'),
-  globalValidatorMiddleware
+  globalValidatorMiddleware,
 ];
 
 export const getProducerVal = [
   param('producerId').isMongoId().withMessage('producerIdMongoId'),
-  globalValidatorMiddleware
+  globalValidatorMiddleware,
 ];

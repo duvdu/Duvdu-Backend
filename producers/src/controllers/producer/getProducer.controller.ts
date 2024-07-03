@@ -5,9 +5,7 @@ import mongoose from 'mongoose';
 
 import { GetProducerHandler } from '../../types/endpoints';
 
-
-
-export const getProducerHandler:GetProducerHandler = async (req,res,next)=>{
+export const getProducerHandler: GetProducerHandler = async (req, res, next) => {
   const producers = await Producer.aggregate([
     {
       $match: { _id: new mongoose.Types.ObjectId(req.params.producerId) },
@@ -61,7 +59,7 @@ export const getProducerHandler:GetProducerHandler = async (req,res,next)=>{
                         else: '$$tag.en',
                       },
                     },
-                    _id: '$$tag._id', 
+                    _id: '$$tag._id',
                   },
                 },
               },
@@ -106,9 +104,11 @@ export const getProducerHandler:GetProducerHandler = async (req,res,next)=>{
       },
     },
   ]);
-  
-  if (producers.length == 0) 
-    return next(new NotFound({en:'producer not found' , ar:'لم يتم العثور على المنتج'} , req.lang));
 
-  res.status(200).json({message:'success' , data:producers[0]});
+  if (producers.length == 0)
+    return next(
+      new NotFound({ en: 'producer not found', ar: 'لم يتم العثور على المنتج' }, req.lang),
+    );
+
+  res.status(200).json({ message: 'success', data: producers[0] });
 };

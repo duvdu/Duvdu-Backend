@@ -1,7 +1,5 @@
-import { Publisher , Subject, TopicNotificationEvent } from '@duvdu-v1/duvdu';
+import { Publisher, Subject, TopicNotificationEvent } from '@duvdu-v1/duvdu';
 
-
-
-export class TopicNotificationPublisher extends Publisher<TopicNotificationEvent>{
+export class TopicNotificationPublisher extends Publisher<TopicNotificationEvent> {
   subject: Subject.topicNotification = Subject.topicNotification;
 }

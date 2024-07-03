@@ -21,6 +21,7 @@ export const filterUsers: RequestHandler<
     req.pagination.filter.$or = [
       { 'phoneNumber.number': { $regex: `\\b${req.query.search}\\b`, $options: 'i' } },
       { username: { $regex: `\\b${req.query.search}\\b`, $options: 'i' } },
+      { name: { $regex: `\\b${req.query.search}\\b`, $options: 'i' } },
     ];
   }  if (req.query.username) req.pagination.filter.username = req.query.username;
   if (req.query.phoneNumber) req.pagination.filter['phoneNumber.number'] = req.query.phoneNumber;

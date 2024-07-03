@@ -10,10 +10,10 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
 ) => {
   const contract = await ProjectContract.findOne({ paymentLink: req.params.paymentSession });
   if (!contract) return next(new NotFound(undefined, req.lang));
-  
+
   if (
     new Date(contract.actionAt).getTime() + contract.stageExpiration * 60 * 60 * 1000 <
-      new Date().getTime()
+    new Date().getTime()
   )
     return next(
       new BadRequestError(
@@ -21,7 +21,7 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
         req.lang,
       ),
     );
-  
+
   // TODO: record the transaction from payment gateway webhook
 
   if (contract.status === ContractStatus.waitingForFirstPayment)
@@ -52,6 +52,6 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
         req.lang,
       ),
     );
-  
+
   res.status(200).json({ message: 'success' });
 };

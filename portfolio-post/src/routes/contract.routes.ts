@@ -23,5 +23,9 @@ router.route('/:projectId').post(
 );
 router.get('/pay/:paymentSession', val.pay, handler.payContract);
 
-router.route('/:contractId/contract').patch(isauthenticated , val.update , handler.updateContractHandler);
-router.route('/:contractId/action').post(isauthenticated , val.action , handler.contractActionHandler);
+router
+  .route('/:contractId/contract')
+  .patch(isauthenticated, val.update, handler.updateContractHandler);
+router
+  .route('/:contractId/action')
+  .post(isauthenticated, val.action, handler.contractActionHandler);

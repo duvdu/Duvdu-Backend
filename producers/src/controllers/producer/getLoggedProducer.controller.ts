@@ -5,23 +5,21 @@ import mongoose from 'mongoose';
 
 import { GetLoggedProducerHandler } from '../../types/endpoints';
 
-
-
-export const getLoggedProducerHandler:GetLoggedProducerHandler = async (req,res,next)=>{
+export const getLoggedProducerHandler: GetLoggedProducerHandler = async (req, res, next) => {
   const producers = await Producer.aggregate([
     {
-      $match: { user: new mongoose.Types.ObjectId(req.loggedUser.id) }, 
+      $match: { user: new mongoose.Types.ObjectId(req.loggedUser.id) },
     },
     {
       $lookup: {
-        from: MODELS.user, 
-        localField: 'user', 
-        foreignField: '_id', 
+        from: MODELS.user,
+        localField: 'user',
+        foreignField: '_id',
         as: 'user',
       },
     },
     {
-      $unwind: '$user' 
+      $unwind: '$user',
     },
     {
       $project: {
@@ -69,7 +67,7 @@ export const getLoggedProducerHandler:GetLoggedProducerHandler = async (req,res,
             $cond: [
               { $eq: ['$user.profileImage', null] },
               null,
-              { $concat: [process.env.BUCKET_HOST ,'/', '$user.profileImage'] },
+              { $concat: [process.env.BUCKET_HOST, '/', '$user.profileImage'] },
             ],
           },
           username: '$user.username',
@@ -83,8 +81,10 @@ export const getLoggedProducerHandler:GetLoggedProducerHandler = async (req,res,
       },
     },
   ]);
-  if (producers.length == 0) 
-    return next(new NotFound({en:'producer not found' , ar:'لم يتم العثور على المنتج'} , req.lang));
+  if (producers.length == 0)
+    return next(
+      new NotFound({ en: 'producer not found', ar: 'لم يتم العثور على المنتج' }, req.lang),
+    );
 
-  res.status(200).json({message:'success' , data:producers[0]});
+  res.status(200).json({ message: 'success', data: producers[0] });
 };

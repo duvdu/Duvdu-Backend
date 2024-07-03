@@ -1,4 +1,8 @@
-import { globalErrorHandlingMiddleware, languageHeaderMiddleware, sessionStore } from '@duvdu-v1/duvdu';
+import {
+  globalErrorHandlingMiddleware,
+  languageHeaderMiddleware,
+  sessionStore,
+} from '@duvdu-v1/duvdu';
 import cors from 'cors';
 import express from 'express';
 import session from 'express-session';
@@ -14,17 +18,21 @@ app.set('trust proxy', true);
 
 app.use(
   cors({
-    origin: ['*','http://localhost:3000', 'http://localhost:3001' , 'https://duvdu.com' , 'https://www.duvdu.com'],
+    origin: [
+      '*',
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'https://duvdu.com',
+      'https://www.duvdu.com',
+    ],
     credentials: true,
     exposedHeaders: ['set-cookie'],
   }),
 );
 
-
-(async () => {  
-  
+(async () => {
   const store = await sessionStore(env.redis.uri, env.redis.pass);
-  
+
   app.use(
     session({
       secret: env.expressSession.secret,
@@ -36,11 +44,10 @@ app.use(
         secure: env.environment === 'production',
         httpOnly: true,
       },
-    })
+    }),
   );
 
   app.use(languageHeaderMiddleware);
   mountRoutes(app);
   app.use(globalErrorHandlingMiddleware);
 })();
-
