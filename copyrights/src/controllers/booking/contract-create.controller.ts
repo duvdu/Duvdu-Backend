@@ -11,6 +11,7 @@ import {
   FOLDERS,
   Files,
   CYCLES,
+  addToDate,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
@@ -23,7 +24,7 @@ export const createContractHandler: RequestHandler<
   SuccessResponse,
   {
     details: string;
-    deadline: string;
+    startDate: string;
     appointmentDate: string;
     location: { lat: number; lng: number };
     address: string;
@@ -50,10 +51,17 @@ export const createContractHandler: RequestHandler<
     Files.removeFiles(...req.body.attachments);
   }
 
-  const stageExpiration = await getStageExpiration(new Date(req.body.deadline), req.lang);
+  const deadline = addToDate(
+    new Date(req.body.startDate),
+    project.duration.unit,
+    project.duration.value,
+  ).toISOString();
+  const stageExpiration = await getStageExpiration(new Date(deadline), req.lang);
 
   const contract = await CopyrightContracts.create({
     ...req.body,
+    deadline,
+    duration: project.duration,
     customer: req.loggedUser.id,
     sp: project.user,
     project: project._id,

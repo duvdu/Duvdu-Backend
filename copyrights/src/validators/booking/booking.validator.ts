@@ -13,14 +13,7 @@ export const bookProject = [
       if (new Date(val).getTime() <= Date.now()) throw new Error('startDateFuture');
       return true;
     }),
-  body('deadline')
-    .isISO8601()
-    .custom((val) => {
-      if (new Date(val).getTime() <= Date.now()) throw new Error('startDateFuture');
-      return true;
-    })
-    .withMessage('startDateISO8601'),
-  // body('isInstant').isBoolean().bail().toBoolean(),
+  body('startDate').isString().bail().isISO8601(),
   globalValidatorMiddleware,
 ];
 
@@ -55,6 +48,22 @@ export const updateContract = [
   param('contractId').isMongoId().withMessage('contractIdInvalid'),
   body('details').optional().isString().withMessage('detailsString'),
   body('totalPrice').optional().isFloat({ gt: 0 }).withMessage('totalPrice'),
-  body('deadline').optional().isISO8601().withMessage('startDateISO8601'),
+  body('duration')
+    .optional()
+    .isObject()
+    .bail()
+    .custom((val) => {
+      if (!val.value || !val.unit) throw new Error();
+      return true;
+    }),
+  body('duration.value').optional().isInt({ gt: 0 }),
+  body('duration.unit')
+    .optional()
+    .isString()
+    .bail()
+    .custom((val) => {
+      if (['minutes', 'hours', 'days', 'months', 'weeks'].includes(val)) return true;
+      throw new Error('durationUnit');
+    }),
   globalValidatorMiddleware,
 ];

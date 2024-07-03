@@ -1,4 +1,4 @@
-import { BadRequestError, NotFound, SuccessResponse } from '@duvdu-v1/duvdu';
+import { addToDate, BadRequestError, NotFound, SuccessResponse } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 // import { contractNotification } from './contract-notification.controller';
@@ -10,7 +10,8 @@ export const updateContractHandler: RequestHandler<
   {
     details: string;
     totalPrice: number;
-    deadline: string; // new deadline can't be lower than old deadline
+    duration: { value: number; unit: string };
+    deadline: string; //
   }
 > = async (req, res, next) => {
   // assert contract
@@ -33,6 +34,13 @@ export const updateContractHandler: RequestHandler<
   }
 
   // assert deadline after update
+  if (req.body.duration) {
+    req.body.deadline = addToDate(
+      contract.startDate,
+      req.body.duration.unit as any,
+      req.body.duration.value,
+    ).toISOString();
+  }
   if (req.body.deadline)
     assertDeadline(new Date(req.body.deadline), new Date(contract.deadline), req.lang);
 
