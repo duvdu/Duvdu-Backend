@@ -53,7 +53,7 @@ export const createContractHandler: RequestHandler<
 
   const deadline = addToDate(
     new Date(req.body.startDate),
-    project.duration.unit,
+    project.duration.unit as any,
     project.duration.value,
   ).toISOString();
   const stageExpiration = await getStageExpiration(new Date(deadline), req.lang);

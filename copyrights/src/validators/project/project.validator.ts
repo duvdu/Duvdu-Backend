@@ -4,10 +4,22 @@ import { body, param, query } from 'express-validator';
 export const create = [
   body('category').isMongoId().withMessage('categoryInvalid'),
   body('price').isFloat({ gt: 0 }).withMessage('priceInvalid'),
-  body('duration').isInt().withMessage('durationInvalid'),
+  body('duration').isObject(),
+  body('duration.value').isInt({ gt: 0 }),
+  body('duration.unit')
+    .isString()
+    .bail()
+    .custom((val) => {
+      if (['minutes', 'hours', 'days', 'months', 'weeks'].includes(val)) return true;
+      throw new Error('durationUnit');
+    }),
   body('address').optional().isString().trim().withMessage('addressString'),
   body('searchKeywords').optional().isArray().withMessage('searchKeywordsArray'),
-  body('searchKeywords.*').isString().trim().isLength({ min: 3 }).withMessage('searchKeywordLength'),
+  body('searchKeywords.*')
+    .isString()
+    .trim()
+    .isLength({ min: 3 })
+    .withMessage('searchKeywordLength'),
   body('showOnHome').isBoolean().toBoolean().withMessage('showOnHomeBoolean'),
   body('tags').isArray().withMessage('tagsArray'),
   body('tags.*').isMongoId().withMessage('tagLength'),
@@ -23,7 +35,11 @@ export const update = [
   body('duration').optional().isInt().withMessage('durationInvalid'),
   body('address').optional().isString().trim().withMessage('addressString'),
   body('searchKeywords').optional().isArray().withMessage('searchKeywordsArray'),
-  body('searchKeywords.*').isString().trim().isLength({ min: 3 }).withMessage('searchKeywordLength'),
+  body('searchKeywords.*')
+    .isString()
+    .trim()
+    .isLength({ min: 3 })
+    .withMessage('searchKeywordLength'),
   body('showOnHome').optional().isBoolean().toBoolean().withMessage('showOnHomeBoolean'),
   body('location.lat').optional().isFloat({ min: -90, max: 90 }).withMessage('latInvalid'),
   body('location.lng').optional().isFloat({ min: -180, max: 180 }).withMessage('lngInvalid'),
@@ -61,7 +77,10 @@ export const findAllCrm = [
   globalValidatorMiddleware,
 ];
 
-export const get = [param('projectId').isMongoId().withMessage('projectIdInvalid'), globalValidatorMiddleware];
+export const get = [
+  param('projectId').isMongoId().withMessage('projectIdInvalid'),
+  globalValidatorMiddleware,
+];
 
 export const analysis = [
   query('startDate')
