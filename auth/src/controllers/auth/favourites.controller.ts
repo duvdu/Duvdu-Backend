@@ -51,6 +51,7 @@ export const getFavouriteProjects: RequestHandler<
     .lean();
 
   user?.favourites.forEach((el: any) => {
+    if (!el.project) return undefined;
     el.project.tags = (el.project.tags as { _id: string; en: string; ar: string }[])?.map((el) =>
       req.lang === 'en' ? el.en : el.ar,
     );
