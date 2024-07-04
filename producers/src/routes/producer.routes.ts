@@ -11,28 +11,28 @@ import * as val from '../validators/producer/producer.val';
 
 export const router = express.Router();
 
-router.use(isauthenticated);
 
 router
   .route('/user')
-  .get(handler.getLoggedProducerHandler)
-  .delete(handler.deleteLoggedProducerHandler);
+  .get(isauthenticated,handler.getLoggedProducerHandler)
+  .delete(isauthenticated,handler.deleteLoggedProducerHandler);
 
 router
   .route('/')
-  .post(val.appendProducerVal, handler.appendProducerHandler)
+  .post(isauthenticated,val.appendProducerVal, handler.appendProducerHandler)
   .get(
     val.getProducersVal,
     globalPaginationMiddleware,
     handler.getProducersPagination,
     handler.getProducersHandler,
   )
-  .patch(val.updateProducerVal, handler.updateProducerHandler);
+  .patch(isauthenticated,val.updateProducerVal, handler.updateProducerHandler);
 
 router
   .route('/:producerId')
   .get(val.getProducerVal, handler.getProducerHandler)
   .delete(
+    isauthenticated,
     isauthorized(PERMISSIONS.deleteProducerHandler),
     val.getProducerVal,
     handler.deleteProducerHandler,
