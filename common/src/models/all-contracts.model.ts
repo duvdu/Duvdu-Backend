@@ -13,14 +13,14 @@ export interface Icontract {
 }
 
 export const Contracts = model<Icontract>(
-  'all_contracts',
+  MODELS.allContracts,
   new Schema<Icontract>({
     customer: { type: Schema.Types.ObjectId, ref: MODELS.user },
     sp: { type: Schema.Types.ObjectId, ref: MODELS.user },
     contract: { type: Schema.Types.ObjectId, refPath: 'ref' },
     ref: String,
     cycle: { type: String, default: null },
-  }),
+  } , {timestamps:true , collection:MODELS.allContracts}),
 );
 
 export interface IcontractReport {
@@ -35,7 +35,7 @@ export interface IcontractReport {
 }
 
 export const ContractReports = model<IcontractReport>(
-  'contract_reports',
+  MODELS.contractReports,
   new Schema<IcontractReport>(
     {
       reporter: { type: Schema.Types.ObjectId, ref: MODELS.user },
@@ -56,6 +56,6 @@ export const ContractReports = model<IcontractReport>(
         feedback: { type: String, default: null },
       },
     },
-    { collection: 'contract_reports', timestamps: true },
+    { collection: MODELS.contractReports, timestamps: true },
   ).index({ reporter: 1, contract: 1 }, { unique: true }),
 );

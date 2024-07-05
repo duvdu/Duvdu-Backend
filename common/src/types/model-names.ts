@@ -25,4 +25,6 @@ export enum MODELS {
   userSession = 'user-sessions',
   rank = 'ranks',
   setting = 'settings',
+  allContracts = 'all_contracts',
+  contractReports = 'contract_reports'
 }
