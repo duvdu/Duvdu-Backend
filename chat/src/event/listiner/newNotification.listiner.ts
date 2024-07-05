@@ -11,7 +11,7 @@ export class NewNotificationListener extends Lisener<NewNotificationEvent> {
   async onMessage(data: NewNotificationEvent['data'], msg: Message) {
     console.log('receive new notification');
 
-    const io = getSocketIOInstance();
+    const io = await getSocketIOInstance();
     sendNotificationOrFCM(
       io,
       data.socketChannel,

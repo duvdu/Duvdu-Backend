@@ -10,6 +10,8 @@ import { handleRedisConnection } from './utils/handle-redis-connection';
 import { SocketServer } from './utils/socketImplementaion';
 
 let io: Server | undefined;
+let ioReady: Promise<Server>;
+
 const start = async () => {
   checkEnvVariables();
   await handleRedisConnection();
@@ -29,9 +31,6 @@ const start = async () => {
     natsWrapper.client.close();
   });
 
-  new NewNotificationListener(natsWrapper.client).listen();
-  new NotificationListener(natsWrapper.client).listen();
-
   await dbConnection(env.mongoDb.uri);
   
   const server = app.listen(3000, () => {
@@ -40,15 +39,19 @@ const start = async () => {
 
   const socketServer = new SocketServer(server);
   io = socketServer.io;
+  ioReady = Promise.resolve(io);
   // Set the socket.io instance in the app
   app.set('socketio', socketServer.io);
+
+  new NewNotificationListener(natsWrapper.client).listen();
+  new NotificationListener(natsWrapper.client).listen();
 };
 
-export function getSocketIOInstance(): Server {
-  if (!io) {
+export async function getSocketIOInstance(): Promise<Server> {
+  if (!ioReady) {
     throw new Error('Socket.IO instance has not been initialized');
   }
-  return io;
+  return ioReady;
 }
 
 start();
