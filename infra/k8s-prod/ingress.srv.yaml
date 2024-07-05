@@ -123,6 +123,7 @@ spec:
         - www.duvdu.com
       secretName: duvdu-tls-secret
 
+
 ---
 apiVersion: v1
 kind: Service
