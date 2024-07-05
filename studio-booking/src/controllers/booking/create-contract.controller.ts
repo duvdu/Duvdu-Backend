@@ -67,7 +67,6 @@ export const createContractHandler: RequestHandler<
     status: ContractStatus.pending,
   });
 
-
   // await pendingExpiration.add(
   //   { contractId: contract._id.toString() },
   //   { delay: (stageExpiration || 0) * 60 * 60 * 1000 },
