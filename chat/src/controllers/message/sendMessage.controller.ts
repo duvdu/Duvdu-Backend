@@ -1,9 +1,11 @@
 import 'express-async-errors';
 import {
   Bucket,
+  Contracts,
   Files,
   FOLDERS,
   Message,
+  NotAllowedError,
   NotFound,
   Notification,
   NotificationType,
@@ -27,6 +29,10 @@ export const sendMessageHandler: SendMessageHandler = async (req, res, next) => 
         req.lang,
       ),
     );
+
+  const contract = await Contracts.findOne({$or:[{sp:req.loggedUser.id , customer:req.body.receiver} , {sp:req.body.receiver , customer:req.loggedUser.id}]});
+  if (!contract) 
+    return next(new NotAllowedError(undefined , req.lang));
 
   const attachments = <Express.Multer.File[] | undefined>(req.files as any)?.attachments;
   if (attachments) {
