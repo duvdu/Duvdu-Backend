@@ -1,8 +1,6 @@
-import { incrementProjectsView, MODELS, NotFound, Users } from '@duvdu-v1/duvdu';
+import { incrementProjectsView, MODELS, NotFound, Users, Rentals } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import { Types } from 'mongoose';
-
-import { Rentals } from '../../models/rental.model';
 
 export const getProjectHandler: RequestHandler = async (req, res, next) => {
   const pipelines = [
@@ -26,12 +24,12 @@ export const getProjectHandler: RequestHandler = async (req, res, next) => {
                   if: { $eq: [req.lang, 'en'] },
                   then: '$$tag.en',
                   else: '$$tag.ar',
-                }
-              }
-            }
-          }
-        }
-      }
+                },
+              },
+            },
+          },
+        },
+      },
     },
     {
       $lookup: {
@@ -99,7 +97,6 @@ export const getProjectHandler: RequestHandler = async (req, res, next) => {
       $unset: ['userDetails', 'categoryDetails'],
     },
   ];
-  
 
   const project = (
     await Rentals.aggregate([

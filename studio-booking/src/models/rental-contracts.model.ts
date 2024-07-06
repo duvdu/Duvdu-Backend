@@ -1,7 +1,5 @@
-import { Iuser, MODELS } from '@duvdu-v1/duvdu';
+import { Iuser, MODELS, Irental } from '@duvdu-v1/duvdu';
 import { model, Schema, Types } from 'mongoose';
-
-import { Irental } from './rental.model';
 
 export enum ContractStatus {
   canceled = 'canceled',

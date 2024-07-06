@@ -1,7 +1,5 @@
-import { globalValidatorMiddleware } from '@duvdu-v1/duvdu';
+import { globalValidatorMiddleware, RentalUnits } from '@duvdu-v1/duvdu';
 import { body, param } from 'express-validator';
-
-import { RentalUnits } from '../models/rental.model';
 
 export const create = [
   body('category').isMongoId(),

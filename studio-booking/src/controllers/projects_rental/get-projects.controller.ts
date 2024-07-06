@@ -1,7 +1,5 @@
-import { MODELS, Users } from '@duvdu-v1/duvdu';
+import { MODELS, Users, Rentals } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
-
-import { Rentals } from '../../models/rental.model';
 
 export const getProjectsHandler: RequestHandler = async (req, res) => {
   const pipelines = [
@@ -25,12 +23,12 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
                   if: { $eq: [req.lang, 'en'] },
                   then: '$$tag.en',
                   else: '$$tag.ar',
-                }
-              }
-            }
-          }
-        }
-      }
+                },
+              },
+            },
+          },
+        },
+      },
     },
     {
       $lookup: {
@@ -101,7 +99,6 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
       $unset: ['userDetails', 'categoryDetails'],
     },
   ];
-  
 
   const resultCount = await Rentals.countDocuments({
     ...req.pagination.filter,

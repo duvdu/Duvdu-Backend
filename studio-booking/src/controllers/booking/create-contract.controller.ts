@@ -8,12 +8,12 @@ import {
   Contracts,
   CYCLES,
   Setting,
+  Rentals,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 import { contractNotification } from './contract-notification.controller';
 import { RentalContracts } from '../../models/rental-contracts.model';
-import { Rentals } from '../../models/rental.model';
 
 export const createContractHandler: RequestHandler<
   { projectId: string },

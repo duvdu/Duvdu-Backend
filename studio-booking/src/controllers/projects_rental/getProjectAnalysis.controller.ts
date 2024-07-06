@@ -1,8 +1,6 @@
-import { MODELS, SuccessResponse } from '@duvdu-v1/duvdu';
+import { MODELS, SuccessResponse, Rentals } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import { PipelineStage } from 'mongoose';
-
-import { Rentals } from '../../models/rental.model';
 
 export const getProjectAnalysis: RequestHandler<
   unknown,
