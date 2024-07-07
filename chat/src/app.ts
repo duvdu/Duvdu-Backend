@@ -22,6 +22,7 @@ app.use(
       'http://localhost:3001',
       'https://duvdu.com',
       'https://www.duvdu.com',
+      'https://dashboard.duvdu.com'
     ],
     credentials: true,
     exposedHeaders: ['set-cookie'],

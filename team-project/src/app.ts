@@ -13,7 +13,7 @@ app.use(express.json());
 app.set('trust proxy', true);
 app.use(
   cors({
-    origin: ['*','http://localhost:3000', 'http://localhost:3001' , 'https://duvdu.com' , 'https://www.duvdu.com'],
+    origin: ['*','http://localhost:3000', 'http://localhost:3001' , 'https://duvdu.com' , 'https://www.duvdu.com','https://dashboard.duvdu.com'],
     credentials: true,
     exposedHeaders: ['set-cookie'],
   }),
