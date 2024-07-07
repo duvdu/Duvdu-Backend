@@ -21,7 +21,7 @@ import { ContractStatus, CopyrightContracts } from '../../models/copyright-contr
 
 export const createContractHandler: RequestHandler<
   { projectId: string },
-  SuccessResponse,
+  SuccessResponse<{ data: { contractId: string } }>,
   {
     details: string;
     startDate: string;
@@ -85,7 +85,7 @@ export const createContractHandler: RequestHandler<
   // );
 
   // TODO: send notification
-  res.status(201).json({ message: 'success' });
+  res.status(201).json({ message: 'success', data: { contractId: contract.id } });
 };
 
 const getStageExpiration = async (date: Date, lang: string) => {

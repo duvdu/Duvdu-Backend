@@ -42,10 +42,6 @@ export const contractAction: RequestHandler<
         - project rejected & done
       if action = accept && contract.status = pending
         - project status = waiting for pay 10
-      if action = reject && contract.status = update after first pay
-        - project rejected & done
-      if action = accept && contract.status = update after first pay
-        - project status = waiting for totol payment
     */
     if (req.body.action === 'reject' && contract.status === ContractStatus.pending) {
       await CopyrightContracts.updateOne(
@@ -88,13 +84,60 @@ export const contractAction: RequestHandler<
       //   { contractId: contract.id },
       //   { delay: (contract.stageExpiration || 0) * 60 * 60 * 1000 },
       // );
+    } else
+      return next(
+        new NotAllowedError(
+          {
+            en: 'invalid action, contract status is ' + contract.status,
+            ar: 'invalid action, contract status is ' + contract.status,
+          },
+          req.lang,
+        ),
+      );
+  } else {
+    /*
+      if action = reject && contract.status = waiting for pay 10
+        - project rejected & done
+      if action = accept && contract.status = waiting for pay 10
+        - project status = update after first payment
+      if action = reject && contract.status = waiting for total payment
+        - project rejected & done
+
+      if action = reject && contract.status = update after first pay
+      - project rejected & done
+      if action = accept && contract.status = update after first pay
+        - project status = waiting for totol payment
+    */
+    if (req.body.action === 'reject' && contract.status === ContractStatus.waitingForFirstPayment) {
+      await CopyrightContracts.updateOne(
+        { _id: req.params.contractId },
+        { status: ContractStatus.rejected, rejectedBy: 'customer', actionAt: new Date() },
+      );
+      // await contractNotification(
+      //   contract.id,
+      //   contract.sp.toString(),
+      //   'copyright contract rejected by the customer',
+      // );
+    } else if (
+      req.body.action === 'reject' &&
+      contract.status === ContractStatus.waitingForTotalPayment
+    ) {
+      await CopyrightContracts.updateOne(
+        { _id: req.params.contractId },
+        { status: ContractStatus.rejected, rejectedBy: 'customer', actionAt: new Date() },
+      );
+      // await contractNotification(
+      //   contract.id,
+      //   contract.sp.toString(),
+      //   'copyright contract rejected by the customer',
+      // );
     } else if (
       req.body.action === 'reject' &&
       contract.status === ContractStatus.updateAfterFirstPayment
     ) {
       await CopyrightContracts.updateOne(
         { _id: req.params.contractId },
-        { status: ContractStatus.rejected, rejectedBy: 'sp', actionAt: new Date() },
+        { status: ContractStatus.rejected, rejectedBy: 'customer', actionAt: new Date() },
       );
       // await contractNotification(
       //   contract.id,
@@ -122,48 +165,6 @@ export const contractAction: RequestHandler<
       // await totalPaymentExpiration.add(
       //   { contractId: contract.id },
       //   { delay: (contract.stageExpiration || 0) * 60 * 60 * 1000 },
-      // );
-    } else
-      return next(
-        new NotAllowedError(
-          {
-            en: 'invalid action, contract status is ' + contract.status,
-            ar: 'invalid action, contract status is ' + contract.status,
-          },
-          req.lang,
-        ),
-      );
-  } else {
-    /*
-      if action = reject && contract.status = waiting for pay 10
-        - project rejected & done
-      if action = accept && contract.status = waiting for pay 10
-        - project status = update after first payment
-      if action = reject && contract.status = waiting for total payment
-        - project rejected & done
-    */
-    if (req.body.action === 'reject' && contract.status === ContractStatus.waitingForFirstPayment) {
-      await CopyrightContracts.updateOne(
-        { _id: req.params.contractId },
-        { status: ContractStatus.rejected, rejectedBy: 'customer', actionAt: new Date() },
-      );
-      // await contractNotification(
-      //   contract.id,
-      //   contract.sp.toString(),
-      //   'copyright contract rejected by the customer',
-      // );
-    } else if (
-      req.body.action === 'reject' &&
-      contract.status === ContractStatus.waitingForTotalPayment
-    ) {
-      await CopyrightContracts.updateOne(
-        { _id: req.params.contractId },
-        { status: ContractStatus.rejected, rejectedBy: 'customer', actionAt: new Date() },
-      );
-      // await contractNotification(
-      //   contract.id,
-      //   contract.sp.toString(),
-      //   'copyright contract rejected by the customer',
       // );
     } else
       return next(

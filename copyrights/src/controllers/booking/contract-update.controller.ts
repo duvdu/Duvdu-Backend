@@ -17,7 +17,7 @@ export const updateContractHandler: RequestHandler<
   // assert contract
   const contract = await CopyrightContracts.findOne({
     _id: req.params.contractId,
-    customer: req.loggedUser.id,
+    sp: req.loggedUser.id,
   });
   if (!contract) return next(new NotFound(undefined, req.lang));
 
