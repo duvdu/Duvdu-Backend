@@ -124,7 +124,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: auth-srv
+                name: dashboard-srv
                 port:
                   number: 3000
   tls:
