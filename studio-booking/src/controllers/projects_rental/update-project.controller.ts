@@ -1,7 +1,5 @@
-import { Bucket, Files, FOLDERS, NotAllowedError, SuccessResponse } from '@duvdu-v1/duvdu';
+import { Bucket, Files, FOLDERS, NotAllowedError, SuccessResponse, Rentals } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
-
-import { Rentals } from '../../models/rental.model';
 
 export const updateProjectHandler: RequestHandler<{ projectId: string }, SuccessResponse> = async (
   req,

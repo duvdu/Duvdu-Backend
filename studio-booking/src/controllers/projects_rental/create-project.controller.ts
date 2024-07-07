@@ -1,7 +1,13 @@
-import { Bucket, CYCLES, Files, filterTagsForCategory, FOLDERS, Project } from '@duvdu-v1/duvdu';
+import {
+  Bucket,
+  Rentals,
+  CYCLES,
+  Files,
+  filterTagsForCategory,
+  FOLDERS,
+  Project,
+} from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
-
-import { Rentals } from '../../models/rental.model';
 
 export const createProjectHandler: RequestHandler = async (req, res) => {
   const attachments = <Express.Multer.File[]>(req.files as any).attachments;
@@ -12,7 +18,7 @@ export const createProjectHandler: RequestHandler = async (req, res) => {
     req.body.subCategory,
     req.body.tags,
     CYCLES.studioBooking,
-    req.lang
+    req.lang,
   );
 
   req.body.tags = filteredTags;

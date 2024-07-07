@@ -1,7 +1,5 @@
-import { NotAllowedError } from '@duvdu-v1/duvdu';
+import { NotAllowedError, Rentals } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
-
-import { Rentals } from '../../models/rental.model';
 
 export const removeProjectHandler: RequestHandler = async (req, res, next) => {
   const project = await Rentals.updateOne(
