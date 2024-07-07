@@ -18,8 +18,8 @@ export interface CreateContractHandler
       | 'startDate'
     > & {
       equipment: {
-        tools: { id: string; units: number }[];
-        functions: { id: string; units: number }[];
+        tools: { id: string; units: 1 , unitPrice?:number }[]; // use unit by one for the next scale
+        functions: { id: string; units: 1 , unitPrice?:number }[]; 
       };
     },
     unknown
@@ -36,6 +36,7 @@ export interface UpdateContractHandler
           functions: { id: string; units: number }[];
         };
         unitPrice: number;
+        numberOfUnits:number;
       }
     >,
     unknown

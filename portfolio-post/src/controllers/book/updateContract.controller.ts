@@ -19,31 +19,41 @@ export const updateContractHandler: UpdateContractHandler = async (req, res, nex
       new BadRequestError({ en: 'invalid contract status', ar: 'حالة العقد غير صالحة' }, req.lang),
     );
 
+  // update equipment
+  
   if (req.body.equipment) {
     const { functions, tools, totalPrice } = await calculateTotalPrice(
       contract.project.toString(),
       req.body.equipment,
       req.lang,
     );
-
+    
     contract.tools = tools;
     contract.functions = functions;
-    contract.equipmentPrice = totalPrice;
+    contract.equipmentPrice = +totalPrice;
   }
 
+  // update duration and deadline
   if (req.body.duration) {
-    (contract.deadline as any) = new Date(
+    contract.deadline = new Date(
       new Date(contract.startDate).setDate(
-        new Date(contract.startDate).getDate() + req.body.duration,
-      ),
-    ).toISOString();
+        new Date(contract.startDate).getDate() + req.body.duration
+      )
+    );
+    
   }
 
+  // update number of units
+  if (req.body.numberOfUnits) 
+    contract.projectScale.numberOfUnits = req.body.numberOfUnits;
+
+  // update unit price
   if (req.body.unitPrice) contract.projectScale.unitPrice = req.body.unitPrice;
 
   contract.totalPrice =
     contract.equipmentPrice + contract.projectScale.unitPrice * contract.projectScale.numberOfUnits;
   contract.secondPaymentAmount = contract.totalPrice - contract.firstPaymentAmount;
   await contract.save();
+  
   res.status(200).json({ message: 'success', data: contract });
 };
