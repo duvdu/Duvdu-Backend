@@ -25,10 +25,8 @@ export const create = [
     }),
   body('equipment.tools').optional().isArray({ min: 1 }),
   body('equipment.tools.*.id').isMongoId(),
-  body('equipment.tools.*.units').isInt({ min: 1 }),
   body('equipment.functions').optional().isArray({ min: 1 }),
   body('equipment.functions.*.id').isMongoId(),
-  body('equipment.functions.*.units').isInt({ min: 1 }),
   globalValidatorMiddleware,
 ];
 
@@ -36,12 +34,13 @@ export const update = [
   param('contractId').isMongoId(),
   body('equipment.tools').optional().isArray({ min: 1 }),
   body('equipment.tools.*.id').isMongoId(),
-  body('equipment.tools.*.units').isInt({ min: 1 }),
+  body('equipment.tools.*.unitPrice').isInt({ min: 1 }),
   body('equipment.functions').optional().isArray({ min: 1 }),
   body('equipment.functions.*.id').isMongoId(),
-  body('equipment.functions.*.units').isInt({ min: 1 }),
+  body('equipment.functions.*.unitPrice').isInt({ min: 1 }),
   body('duration').optional().isInt({ min: 1 }),
   body('unitPrice').optional().isInt({ min: 1 }),
+  body('numberOfUnits').optional().isInt({ min: 1 }),
   globalValidatorMiddleware,
 ];
 
