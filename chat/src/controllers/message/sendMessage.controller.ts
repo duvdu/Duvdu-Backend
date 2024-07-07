@@ -9,6 +9,7 @@ import {
   NotFound,
   Notification,
   NotificationType,
+  SystemRoles,
   Users,
 } from '@duvdu-v1/duvdu';
 
@@ -31,7 +32,7 @@ export const sendMessageHandler: SendMessageHandler = async (req, res, next) => 
     );
 
   const contract = await Contracts.findOne({$or:[{sp:req.loggedUser.id , customer:req.body.receiver} , {sp:req.body.receiver , customer:req.loggedUser.id}]});
-  if (!contract) 
+  if (!contract && req.loggedUser.role.key != SystemRoles.admin) 
     return next(new NotAllowedError(undefined , req.lang));
 
   const attachments = <Express.Multer.File[] | undefined>(req.files as any)?.attachments;
