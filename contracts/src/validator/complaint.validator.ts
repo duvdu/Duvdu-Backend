@@ -10,8 +10,8 @@ export const create = [
 export const getOne = [param('complaintId').isMongoId(), globalValidatorMiddleware];
 
 export const getAll = [
-  query('limit').isInt().toInt(),
-  query('page').isInt().toInt(),
+  query('limit').optional().isInt().toInt(),
+  query('page').optional().isInt().toInt(),
   globalValidatorMiddleware,
 ];
 

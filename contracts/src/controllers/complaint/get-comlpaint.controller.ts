@@ -12,15 +12,19 @@ export const getComplaintHandler: RequestHandler<
   { complaintId: string },
   SuccessResponse<{ data: IcontractReport }>
 > = async (req, res, next) => {
-  const complaint = await ContractReports.findById(req.params.complaintId)
+  const complaint = await ContractReports.findOne(
+    req.loggedUser.role.key === 'admin'
+      ? { _id: req.params.complaintId }
+      : { _id: req.params.complaintId, reporter: req.loggedUser.id },
+  )
     .populate([
       {
         path: 'reporter',
         select: 'name username profileImage isOnline',
       },
-      {
-        path: 'contract',
-      },
+      // {
+      //   path: 'contract',
+      // },
     ])
     .lean();
 
