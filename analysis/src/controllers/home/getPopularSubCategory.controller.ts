@@ -73,6 +73,7 @@ export const getPopularSubCategoriesHandler:GetPopularSubCategoriesHandler = asy
       $project: {
         _id: 0,
         subCategories: 1,
+        cycle:1
       },
     },
   ]);
