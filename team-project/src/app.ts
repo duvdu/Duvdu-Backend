@@ -1,10 +1,13 @@
-import { globalErrorHandlingMiddleware, languageHeaderMiddleware , sessionStore } from '@duvdu-v1/duvdu';
+import {
+  globalErrorHandlingMiddleware,
+  languageHeaderMiddleware,
+  sessionStore,
+} from '@duvdu-v1/duvdu';
 import cors from 'cors';
 import express from 'express';
 import session from 'express-session';
 
 import { env } from './config/env';
-import { router } from './routes/teamProject.routes';
 
 export const app = express();
 
@@ -13,7 +16,14 @@ app.use(express.json());
 app.set('trust proxy', true);
 app.use(
   cors({
-    origin: ['*','http://localhost:3000', 'http://localhost:3001' , 'https://duvdu.com' , 'https://www.duvdu.com','https://dashboard.duvdu.com'],
+    origin: [
+      '*',
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'https://duvdu.com',
+      'https://www.duvdu.com',
+      'https://dashboard.duvdu.com',
+    ],
     credentials: true,
     exposedHeaders: ['set-cookie'],
   }),
@@ -33,19 +43,10 @@ app.use(
         secure: env.environment === 'production',
         httpOnly: true,
       },
-    })
+    }),
   );
 
   app.use(languageHeaderMiddleware);
 
-  app.use('/api/team', router);
-  
   app.use(globalErrorHandlingMiddleware);
-  
 })();
-
-
-
-
-
-
