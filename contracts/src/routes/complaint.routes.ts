@@ -1,4 +1,9 @@
-import { FOLDERS, globalUploadMiddleware, isauthenticated } from '@duvdu-v1/duvdu';
+import {
+  FOLDERS,
+  globalPaginationMiddleware,
+  globalUploadMiddleware,
+  isauthenticated,
+} from '@duvdu-v1/duvdu';
 import { Router } from 'express';
 
 import * as handlers from '../controllers/complaint';
@@ -15,7 +20,12 @@ router
     val.create,
     handlers.createComplaintHandler,
   )
-  .get(val.getAll, handlers.getComplaintsPagination, handlers.getComplaintsHandler);
+  .get(
+    val.getAll,
+    globalPaginationMiddleware,
+    handlers.getComplaintsPagination,
+    handlers.getComplaintsHandler,
+  );
 
 router.get('/:complaintId', val.getOne, handlers.getComplaintHandler);
 router.post('/:complaintId/close', val.close, handlers.closeComplaintHandler);

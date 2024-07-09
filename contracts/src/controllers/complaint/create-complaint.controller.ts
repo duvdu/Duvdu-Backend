@@ -15,7 +15,10 @@ export const createComplaintHandler: RequestHandler<unknown, SuccessResponse> = 
   next,
 ) => {
   const attachments = <Express.Multer.File[]>(req.files as any)?.attachments;
-  const contract = await Contracts.findOne({ contract: req.body.contractId });
+  const contract = await Contracts.findOne({
+    contract: req.body.contractId,
+    $or: [{ sp: req.loggedUser.id }, { customer: req.loggedUser.id }],
+  });
   if (!contract) return next(new NotFound(undefined, req.lang));
 
   const s3 = new Bucket();

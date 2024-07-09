@@ -55,13 +55,13 @@ export const getComplaintsHandler: RequestHandler<
         path: 'reporter',
         select: 'name username profileImage isOnline',
       },
-      {
-        path: 'contract',
-      },
+      //   {
+      //     path: 'contract',
+      //   },
     ])
     .lean();
 
-  complaints.forEach((complaint) => {
+  complaints.forEach((complaint: IcontractReport) => {
     (complaint.reporter as Iuser).profileImage =
       process.env.BUCKET_HOST + '/' + (complaint?.reporter as Iuser).profileImage;
 
