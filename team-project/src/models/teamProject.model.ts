@@ -1,5 +1,5 @@
-import { Icategory, MODELS } from '@duvdu-v1/duvdu';
-import { Document, model, Schema, Types } from 'mongoose';
+import { CYCLES, Icategory, Iuser, MODELS } from '@duvdu-v1/duvdu';
+import { model, Schema, Types } from 'mongoose';
 
 export enum UserStatus {
   accepted = 'accepted',
@@ -7,21 +7,22 @@ export enum UserStatus {
   pending = 'pending',
 }
 
-export interface IteamProject extends Document {
-  user: Types.ObjectId;
+export interface ITeamProject {
+  user: Types.ObjectId | Iuser;
   cover: string;
   title: string;
   desc: string;
   location: { lat: number; lng: number };
   address: string;
+  cycle: string;
   creatives: [
     {
       category: Types.ObjectId | Icategory;
       users: [
         {
-          user: Types.ObjectId;
+          user: Types.ObjectId | Iuser;
           attachments: string[];
-          duration: Date;
+          duration: number;
           startDate: Date;
           workHours: number;
           hourPrice: number;
@@ -36,10 +37,10 @@ export interface IteamProject extends Document {
   isDeleted: boolean;
 }
 
-const UserSchema = new Schema<IteamProject['creatives'][0]['users'][0]>({
+const UserSchema = new Schema<ITeamProject['creatives'][0]['users'][0]>({
   user: { type: Schema.Types.ObjectId, ref: MODELS.user },
   attachments: [String],
-  duration: Date,
+  duration: { type: Number, default: 0 },
   startDate: Date,
   workHours: { type: Number, default: 0 },
   hourPrice: { type: Number, default: 0 },
@@ -49,7 +50,7 @@ const UserSchema = new Schema<IteamProject['creatives'][0]['users'][0]>({
   status: { type: String, enum: UserStatus, default: UserStatus.pending },
 });
 
-const CreativeSchema = new Schema<IteamProject['creatives'][0]>({
+const CreativeSchema = new Schema<ITeamProject['creatives'][0]>({
   category: {
     type: Schema.Types.ObjectId,
     required: true,
@@ -58,9 +59,9 @@ const CreativeSchema = new Schema<IteamProject['creatives'][0]>({
   users: [UserSchema],
 });
 
-export const TeamProject = model<IteamProject>(
+export const TeamProject = model<ITeamProject>(
   MODELS.teamProject,
-  new Schema<IteamProject>(
+  new Schema<ITeamProject>(
     {
       user: { type: Schema.Types.ObjectId, ref: MODELS.user },
       cover: { type: String, default: null },
@@ -70,6 +71,7 @@ export const TeamProject = model<IteamProject>(
       address: { type: String, default: null },
       creatives: [CreativeSchema],
       isDeleted: { type: Boolean, default: false },
+      cycle: { type: String, default: CYCLES.teamProject },
     },
     {
       timestamps: true,
@@ -77,12 +79,75 @@ export const TeamProject = model<IteamProject>(
       toJSON: {
         transform(doc, ret) {
           if (ret.cover) ret.cover = process.env.BUCKET_HOST + '/' + ret.cover;
-          if (ret.attachments)
-            ret.attachments = ret.attachments.map(
-              (el: string) => process.env.BUCKET_HOST + '/' + el,
-            );
+          if (ret.creatives && ret.creatives.length > 0) {
+            ret.creatives.forEach((creative: any) => {
+              if (creative.users && creative.users.length > 0) {
+                creative.users.forEach((user: any) => {
+                  if (user.attachments && user.attachments.length > 0) {
+                    user.attachments = user.attachments.map(
+                      (attachment: string) => process.env.BUCKET_HOST + '/' + attachment,
+                    );
+                  }
+                });
+              }
+            });
+          }
         },
       },
     },
+  ),
+);
+
+// contract
+export enum ContractStatus {
+  canceled = 'canceled',
+  pending = 'pending',
+  waitingForTotalPayment = 'waiting-for-total-payment',
+  ongoing = 'ongoing',
+  completed = 'completed',
+  rejected = 'rejected',
+}
+
+export interface ITeamContract {
+  sp: Types.ObjectId | Iuser;
+  customer: Types.ObjectId | Iuser;
+  project: Types.ObjectId | ITeamProject;
+  startDate: Date;
+  duration: Date;
+  workHours: number;
+  hourPrice: number;
+  deadLine: Date;
+  details: string;
+  totalAmount: number;
+  actionAt: Date;
+  rejectedBy?: 'customer' | 'sp';
+  paymentLink: string;
+  stageExpiration: number;
+  status: ContractStatus;
+  cycle: CYCLES;
+}
+
+export const TeamContract = model<ITeamContract>(
+  'team_contracts',
+  new Schema<ITeamContract>(
+    {
+      sp: { type: Schema.Types.ObjectId, ref: MODELS.user },
+      customer: { type: Schema.Types.ObjectId, ref: MODELS.user },
+      project: { type: Schema.Types.ObjectId, ref: MODELS.teamProject },
+      startDate: Date,
+      duration: Date,
+      workHours: { type: Number, default: 0 },
+      hourPrice: { type: Number, default: 0 },
+      deadLine: Date,
+      details: { type: String, default: null },
+      totalAmount: { type: Number, default: 0 },
+      actionAt: Date,
+      rejectedBy: { type: String, enum: ['customer', 'sp'] },
+      paymentLink: { type: String, default: null },
+      stageExpiration: { type: Number, default: 0 },
+      status: { type: String, enum: ContractStatus, default: ContractStatus.pending },
+      cycle: { type: String, default: CYCLES.teamProject },
+    },
+    { timestamps: true, collection: 'team_contracts' },
   ),
 );
