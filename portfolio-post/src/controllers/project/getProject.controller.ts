@@ -1,6 +1,6 @@
 import 'express-async-errors';
 
-import { MODELS, NotFound, ProjectCycle } from '@duvdu-v1/duvdu';
+import { Contracts, MODELS, NotFound, ProjectCycle } from '@duvdu-v1/duvdu';
 import mongoose from 'mongoose';
 
 import { GetProjectHandler } from '../../types/project.endoints';
@@ -8,7 +8,7 @@ import { GetProjectHandler } from '../../types/project.endoints';
 export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
   const projects = await ProjectCycle.aggregate([
     {
-      $match: { _id: new mongoose.Types.ObjectId(req.params.projectId), isDeleted: false },
+      $match: { _id: new mongoose.Types.ObjectId(req.params.projectId), isDeleted: { $ne: true } },
     },
     {
       $lookup: {
@@ -45,11 +45,23 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
         _id: 1,
         user: {
           profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$user.profileImage'] },
-          isOnline: '$user.isOnline',
-          username: '$user.username',
-          name: '$user.name',
-          rank: '$user.rank',
+          coverImage: { $concat: [process.env.BUCKET_HOST, '/', '$user.coverImage'] },
+          isOnline: 1,
+          username: 1,
+          name: 1,
+          rank: 1,
           projectsView: '$user.projectsView',
+          category: {
+            _id: 1,
+            title: req.lang === 'en' ? '$user.category.title.en' : '$user.category.title.ar',
+          },
+          profileViews: 1,
+          about: 1,
+          isAvaliableToInstantProjects: 1,
+          pricePerHour: 1,
+          hasVerificationBadge: 1,
+          rate: 1,
+          likes: 1,
         },
         category: {
           title: '$category.title.' + req.lang,
@@ -102,6 +114,12 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
 
   if (!projects[0])
     return next(new NotFound({ en: 'project not found', ar: 'المشروع غير موجود' }, req.lang));
-
+  const canChat = !!(await Contracts.findOne({
+    $or: [
+      { sp: req.loggedUser?.id, customer: projects[0].customer },
+      { customer: req.loggedUser?.id, sp: projects[0].sp },
+    ],
+  }));
+  projects[0].user.canChat = canChat;
   res.status(200).json({ message: 'success', data: projects[0] });
 };
