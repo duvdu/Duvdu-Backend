@@ -105,7 +105,7 @@ export const updateContractHandler: UpdateContractHandler = async (req, res, nex
       NotificationType.updated_producer_contract,
       NotificationDetails.updatedProducerContract.title,
       NotificationDetails.updatedProducerContract.message,
-      Channels.updated_producer_contract,
+      Channels.update_contract,
     );
     const delay = updatedContract.stageExpiration * 3600 * 1000;
     await UpdateContractQueue.add(
@@ -130,7 +130,7 @@ export const updateContractHandler: UpdateContractHandler = async (req, res, nex
       NotificationType.updated_producer_contract,
       NotificationDetails.updatedProducerContract.title,
       NotificationDetails.updatedProducerContract.message,
-      Channels.updated_producer_contract,
+      Channels.update_contract,
     );
 
   if (
@@ -145,7 +145,7 @@ export const updateContractHandler: UpdateContractHandler = async (req, res, nex
       NotificationType.updated_producer_contract,
       NotificationDetails.updatedProducerContract.title,
       NotificationDetails.updatedProducerContract.message,
-      Channels.updated_producer_contract,
+      Channels.update_contract,
     );
 
   res.status(200).json({ message: 'success', data: updatedContract! });

@@ -120,7 +120,7 @@ export const createContractHandler: CreateContractHandler = async (req, res, nex
       NotificationType.new_project_contract,
       NotificationDetails.newProjectContract.title,
       NotificationDetails.newProjectContract.message,
-      Channels.new_project_contract,
+      Channels.new_contract,
     );
     
     // add expiration queue

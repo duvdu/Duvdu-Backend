@@ -74,11 +74,11 @@ export const createContractHandler: CreateContractHandler = async (req, res, nex
       NotificationType.new_producer_contract,
       NotificationDetails.newProducerContract.title,
       NotificationDetails.newProducerContract.message,
-      Channels.new_producer_contract,
+      Channels.new_contract,
     );
 
-    // const delay = contract.stageExpiration * 3600 * 1000;
-    const delay = 1*60 * 1000;
+    const delay = contract.stageExpiration * 3600 * 1000;
+    // const delay = 1*60 * 1000;
     await createContractQueue.add(
       {
         contractId: contract._id.toString(),

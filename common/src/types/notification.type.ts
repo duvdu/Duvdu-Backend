@@ -5,4 +5,6 @@ export enum NotificationType {
     updated_producer_contract = 'updated_producer_contract',
     new_project_contract = 'new_project_contract',
     update_project_contract = 'update_project_contract',
+    new_team_contract = 'new_team_contract',
+    update_team_contract = 'update_team_contract'
 }

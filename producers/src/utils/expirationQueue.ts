@@ -33,7 +33,7 @@ createContractQueue.process(async (job) => {
         NotificationType.updated_producer_contract ,
         NotificationDetails.updatedProducerContract.title,
         NotificationDetails.updatedProducerContract.message,
-        Channels.updated_producer_contract
+        Channels.update_contract
       );
     }
   } catch (error) {
@@ -67,7 +67,7 @@ UpdateContractQueue.process(async (job) => {
         NotificationType.updated_producer_contract ,
         NotificationDetails.updatedProducerContract.title,
         NotificationDetails.updatedProducerContract.message,
-        Channels.updated_producer_contract
+        Channels.update_contract
       );
     }
   } catch (error) {
