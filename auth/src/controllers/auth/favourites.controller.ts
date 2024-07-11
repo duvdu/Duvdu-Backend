@@ -41,7 +41,7 @@ export const getFavouriteProjects: RequestHandler<
       populate: [
         { path: 'user', select: 'name username profileImage isOnline' },
         {
-          path: 'creatives.creative',
+          path: 'creatives',
           select: 'name username profileImage isOnline',
           options: { strictPopulate: false },
         },
@@ -66,16 +66,9 @@ export const getFavouriteProjects: RequestHandler<
     )
       el.project.user.profileImage = process.env.BUCKET_HOST + '/' + el.project.user.profileImage;
     if (el.project.creatives)
-      el.project.creatives = (
-        el.project.creatives as { creative: { profileImage?: string } }[]
-      )?.map((el) => ({
+      el.project.creatives = (el.project.creatives as { profileImage?: string }[])?.map((el) => ({
         ...el,
-        creative: {
-          ...el.creative,
-          profileImage: el.creative.profileImage
-            ? process.env.BUCKET_HOST + '/' + el.creative.profileImage
-            : null,
-        },
+        profileImage: el.profileImage ? process.env.BUCKET_HOST + '/' + el.profileImage : null,
       }));
     if (el.project.tags)
       el.project.tags = (el.project.tags as { _id: string; en: string; ar: string }[])?.map((el) =>
