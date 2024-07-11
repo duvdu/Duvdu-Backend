@@ -14,7 +14,7 @@ export const getBookmarkHandler: GetBookmarkHandler = async (req, res, next) => 
         populate: [
           { path: 'user', select: 'name username profileImage isOnline' },
           {
-            path: 'creatives.creative',
+            path: 'creatives',
             select: 'name username profileImage isOnline',
             options: { strictPopulate: false },
           },
@@ -24,7 +24,7 @@ export const getBookmarkHandler: GetBookmarkHandler = async (req, res, next) => 
       options: { skip: req.pagination.skip, limit: req.pagination.limit, sort: { createdAt: -1 } },
     })
     .lean();
-  if (!bookmark) return next(new NotFound(undefined , req.lang));
+  if (!bookmark) return next(new NotFound(undefined, req.lang));
 
   bookmark.projects.forEach((el: any) => {
     if (!el.project?.type) return;
@@ -36,17 +36,10 @@ export const getBookmarkHandler: GetBookmarkHandler = async (req, res, next) => 
     el.project.user.profileImage = el.project.user.profileImage
       ? process.env.BUCKET_HOST + '/' + el.project.user.profileImage
       : null;
-    el.project.creatives = (el.project.creatives as { creative: { profileImage?: string } }[])?.map(
-      (el) => ({
-        ...el,
-        creative: {
-          ...el.creative,
-          profileImage: el.creative.profileImage
-            ? process.env.BUCKET_HOST + '/' + el.creative.profileImage
-            : null,
-        },
-      }),
-    );
+    el.project.creatives = (el.project.creatives as { profileImage?: string }[])?.map((el) => ({
+      ...el,
+      profileImage: el.profileImage ? process.env.BUCKET_HOST + '/' + el.profileImage : null,
+    }));
 
     if (el.project.tags)
       el.project.tags = (el.project.tags as { _id: string; en: string; ar: string }[])?.map((el) =>
