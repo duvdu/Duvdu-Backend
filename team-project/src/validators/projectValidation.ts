@@ -1,6 +1,6 @@
-import { globalValidatorMiddleware } from '@duvdu-v1/duvdu';
+import { globalPaginationMiddleware, globalValidatorMiddleware } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
-import { body } from 'express-validator';
+import { body, param, query } from 'express-validator';
 
 const parseRequestBody: RequestHandler = (req, res, next) => {
   req.body = JSON.parse(JSON.stringify(req.body));
@@ -27,4 +27,42 @@ export const create = [
   body('creatives.*.users.*.hourPrice').isInt({ min: 1 }).withMessage('Invalid hourPrice'),
   body('creatives.*.users.*.details').isString().withMessage('Invalid details'),
   globalValidatorMiddleware,
+];
+
+export const addCreative = [
+  param('teamId').isMongoId(),
+  body('user').isMongoId(),
+  body('duration').isInt({ min: 1 }).withMessage('Invalid duration'),
+  body('startDate').isISO8601().withMessage('Invalid start date'),
+  body('workHours').isInt({ min: 1 }).withMessage('Invalid workHours'),
+  body('hourPrice').isInt({ min: 1 }).withMessage('Invalid hourPrice'),
+  body('details').isString().withMessage('Invalid details'),
+  body('category').isMongoId(),
+  globalValidatorMiddleware
+];
+
+export const deleteCreative = [
+  param('teamId').isMongoId(),
+  body('category').isMongoId(),
+  body('user').isMongoId(),
+  globalValidatorMiddleware
+];
+
+
+export const getAll = [
+  query('searchKeywords').optional().isArray(),
+  query('category').optional().isString(),
+  query('maxBudget').optional().isNumeric(),
+  query('minBudget').optional().isNumeric(),
+  query('user').optional().isMongoId(),
+  query('creative').optional().isMongoId(),
+  query('isDeleted').optional().isBoolean().toBoolean(),
+  query('limit').optional().isInt({min:1}),
+  query('page').optional().isInt({min:1}),
+  globalPaginationMiddleware
+];
+
+export const getOne = [
+  param('teamId').isMongoId(),
+  globalValidatorMiddleware
 ];

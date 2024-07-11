@@ -21,6 +21,7 @@ export const getContracts: RequestHandler<
 
   const contracts = await Contracts.aggregate([
     { $match: filter },
+    { $sort: { createdAt: -1 } },
     {
       $lookup: {
         from: 'copyright_contracts',
@@ -54,8 +55,22 @@ export const getContracts: RequestHandler<
       },
     },
     {
+      $lookup: {
+        from: 'team_contracts',
+        localField: 'contract',
+        foreignField: '_id',
+        as: 'team_contracts',
+      },
+    },
+    {
       $unwind: {
         path: '$producer_contract',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $unwind: {
+        path: '$team_contracts',
         preserveNullAndEmptyArrays: true,
       },
     },
@@ -85,7 +100,7 @@ export const getContracts: RequestHandler<
               $ifNull: [
                 '$copyright_contract',
                 {
-                  $ifNull: ['$producer_contract', '$rental_contract' , '$project_contracts'],
+                  $ifNull: ['$producer_contract', '$rental_contract' , '$project_contracts' , '$team_contracts'],
                 },
               ],
             },

@@ -5,6 +5,7 @@ import {
   Bucket,
   Categories,
   Channels,
+  Contracts,
   CYCLES,
   Files,
   FOLDERS,
@@ -17,7 +18,6 @@ import { sendNotification } from './sendNotification';
 import { TeamContract, TeamProject } from '../../models/teamProject.model';
 import { getBestExpirationTime } from '../../services/getBestExpirationTime.service';
 import { CreateProjectHandler } from '../../types/project.endpoints';
-import { pendingQueue } from '../../utils/expirationQueue';
 
 export const createProjectHandler: CreateProjectHandler = async (req, res, next) => {
   const files = req.files as { [fieldName: string]: Express.Multer.File[] };
@@ -81,11 +81,11 @@ export const createProjectHandler: CreateProjectHandler = async (req, res, next)
         ).toString(),
         req.lang,
       );
-
+      
       // create contract
       const contract = await TeamContract.create({
-        sp: req.loggedUser?.id,
-        customer: user.user,
+        sp: user.user,
+        customer: req.loggedUser.id,
         project: team._id,
         startDate: user.startDate,
         duration: user.duration,
@@ -94,15 +94,26 @@ export const createProjectHandler: CreateProjectHandler = async (req, res, next)
         deadLine: user.deadLine,
         details: user.details,
         totalAmount: user.totalAmount,
+        attachments:user.attachments,
         actionAt: new Date(),
         cycle: CYCLES.teamProject,
         stageExpiration,
+        category:creative.category
+      });
+
+      // create contract an all contracts 
+      await Contracts.create({
+        contract: contract._id,
+        customer: contract.customer,
+        sp: contract.sp,
+        cycle: CYCLES.teamProject,
+        ref: 'team_contracts',
       });
 
       // send notification to user
       await sendNotification(
-        contract.sp.toString(),
         contract.customer.toString(),
+        contract.sp.toString(),
         contract._id.toString(),
         NotificationType.new_team_contract,
         NotificationDetails.newTeamContract.title,
@@ -111,8 +122,8 @@ export const createProjectHandler: CreateProjectHandler = async (req, res, next)
       );
 
       // use pending expiration
-      const delay = contract.stageExpiration * 3600 * 1000;
-      pendingQueue.add({contractId:contract._id.toString()} , {delay});
+      // const delay = contract.stageExpiration * 3600 * 1000;
+      // pendingQueue.add({contractId:contract._id.toString()} , {delay});
     }
   }
 

@@ -45,6 +45,7 @@ export interface AddCreativeHandler
     },
     unknown
   > {}
+  
 
 export interface DeleteCreativeHandler
   extends RequestHandler<
@@ -70,3 +71,9 @@ export interface GetProjectHandler
 
 export interface DeleteProjectHandler
   extends RequestHandler<{ teamId: string }, SuccessResponse, unknown, unknown> {}
+
+export interface GetTeamsCrmHandler
+extends RequestHandler<unknown , PaginationResponse<{data:ITeamProject[]}> , unknown , unknown>{}
+
+export interface GetTeamCrmHandler
+extends RequestHandler<{teamId:string} , SuccessResponse<{data:ITeamProject}> , unknown , unknown>{}

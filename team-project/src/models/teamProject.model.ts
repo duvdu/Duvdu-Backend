@@ -112,12 +112,14 @@ export interface ITeamContract {
   sp: Types.ObjectId | Iuser;
   customer: Types.ObjectId | Iuser;
   project: Types.ObjectId | ITeamProject;
+  category: Types.ObjectId | Icategory;
   startDate: Date;
   duration: Date;
   workHours: number;
   hourPrice: number;
   deadLine: Date;
   details: string;
+  attachments:string [];
   totalAmount: number;
   actionAt: Date;
   rejectedBy?: 'customer' | 'sp';
@@ -134,6 +136,7 @@ export const TeamContract = model<ITeamContract>(
       sp: { type: Schema.Types.ObjectId, ref: MODELS.user },
       customer: { type: Schema.Types.ObjectId, ref: MODELS.user },
       project: { type: Schema.Types.ObjectId, ref: MODELS.teamProject },
+      category:{type:Schema.Types.ObjectId , ref:MODELS.category},
       startDate: Date,
       duration: Date,
       workHours: { type: Number, default: 0 },
@@ -147,6 +150,7 @@ export const TeamContract = model<ITeamContract>(
       stageExpiration: { type: Number, default: 0 },
       status: { type: String, enum: ContractStatus, default: ContractStatus.pending },
       cycle: { type: String, default: CYCLES.teamProject },
+      attachments:[String]
     },
     { timestamps: true, collection: 'team_contracts' },
   ),
