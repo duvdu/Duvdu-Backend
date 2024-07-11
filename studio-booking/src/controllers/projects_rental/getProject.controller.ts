@@ -1,4 +1,11 @@
-import { incrementProjectsView, MODELS, NotFound, Users, Rentals } from '@duvdu-v1/duvdu';
+import {
+  incrementProjectsView,
+  MODELS,
+  NotFound,
+  Users,
+  Rentals,
+  Contracts,
+} from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import { Types } from 'mongoose';
 
@@ -72,12 +79,19 @@ export const getProjectHandler: RequestHandler = async (req, res, next) => {
           profileImage: {
             $concat: [process.env.BUCKET_HOST, '/', '$userDetails.profileImage'],
           },
+          coverImage: { $concat: [process.env.BUCKET_HOST, '/', '$userDetails.coverImage'] },
           isOnline: '$userDetails.isOnline',
           acceptedProjectsCounter: '$userDetails.acceptedProjectsCounter',
           name: '$userDetails.name',
           rate: '$userDetails.rate',
           rank: '$userDetails.rank',
           projectsView: '$userDetails.projectsView',
+          profileViews: '$userDetails.profileViews',
+          about: '$userDetails.about',
+          isAvaliableToInstantProjects: '$userDetails.isAvaliableToInstantProjects',
+          pricePerHour: '$userDetails.pricePerHour',
+          hasVerificationBadge: '$userDetails.hasVerificationBadge',
+          likes: '$userDetails.likes',
         },
         attachments: {
           $map: {
@@ -120,7 +134,13 @@ export const getProjectHandler: RequestHandler = async (req, res, next) => {
     );
   }
   await incrementProjectsView(project.user._id);
-
+  const canChat = !!(await Contracts.findOne({
+    $or: [
+      { sp: req.loggedUser?.id, customer: project.customer },
+      { customer: req.loggedUser?.id, sp: project.sp },
+    ],
+  }));
+  project.user.canChat = canChat;
   res.status(200).json({
     message: 'success',
     data: project,
