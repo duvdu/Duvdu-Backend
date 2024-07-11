@@ -1,5 +1,8 @@
-import { CYCLES, Iuser, MODELS } from '@duvdu-v1/duvdu';
 import { model, Schema, Types } from 'mongoose';
+
+import { MODELS } from './../types/model-names';
+import { CYCLES } from '../types/cycles';
+import { Iuser } from '../types/User';
 
 
 export interface IProjectReview {
@@ -26,7 +29,7 @@ export const ProjectReview = model<IProjectReview>(MODELS.projectReview , new Sc
   cycle:{type:String , enum:CYCLES},
   rate:{type:Number , default:0},
   comment:{type:String , default:null}
-},{timestamps:true}));
+},{timestamps:true , collection:MODELS.projectReview}));
 
 
 export const ContractReview = model<IContractReview>(MODELS.contractReview , new Schema<IContractReview>({
@@ -35,4 +38,4 @@ export const ContractReview = model<IContractReview>(MODELS.contractReview , new
   cycle:{type:String , enum:CYCLES},
   rate:{type:Number , default:0},
   comment:{type:String , default:null}
-},{timestamps:true}));
+},{timestamps:true , collection:MODELS.contractReview}));

@@ -26,5 +26,7 @@ export enum MODELS {
   rank = 'ranks',
   setting = 'settings',
   allContracts = 'all_contracts',
-  contractReports = 'contract_reports'
+  contractReports = 'contract_reports',
+  projectReview = 'project_reviews',
+  contractReview = 'contract_review',
 }

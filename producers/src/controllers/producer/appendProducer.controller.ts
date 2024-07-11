@@ -52,7 +52,9 @@ export const appendProducerHandler: AppendProducerHandler = async (req, res, nex
         tags: validTags.map((tag: any) => ({
           ar: tag.ar,
           en: tag.en,
+          _id: tag._id
         })),
+        _id: validSub._id
       };
     });
 
