@@ -1,4 +1,11 @@
-import { BadRequestError, Bucket, SuccessResponse, Users, redisClient } from '@duvdu-v1/duvdu';
+import {
+  BadRequestError,
+  Bucket,
+  SuccessResponse,
+  Users,
+  redisClient,
+  Setting,
+} from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 export const updateDefaultImagesCrm: RequestHandler<
@@ -13,21 +20,28 @@ export const updateDefaultImagesCrm: RequestHandler<
 
   if (profileImage) {
     await bucket.saveBucketFiles('defaults', profileImage);
-    const oldDefaultProfile = (await redisClient.get('default_profile')) || 'defaults/profile.jpg';
-    await bucket.removeBucketFiles(oldDefaultProfile);
-    await redisClient.set('default_profile', 'defaults/' + profileImage.filename);
+    const appSettings = await Setting.findOneAndUpdate(
+      {},
+      { default_profile: 'defaults/' + profileImage.filename },
+    );
+    if (!appSettings) throw new Error('app settings not found');
+    await bucket.removeBucketFiles(appSettings?.default_profile);
     await Users.updateMany(
-      { profileImage: oldDefaultProfile },
+      { profileImage: appSettings?.default_profile },
       { profileImage: 'defaults/' + profileImage.filename },
     );
   }
   if (coverImage) {
     await bucket.saveBucketFiles('defaults', coverImage);
-    const oldDefaultCover = (await redisClient.get('default_cover')) || 'defaults/cover.jpg';
-    await bucket.removeBucketFiles(oldDefaultCover);
+    const appSettings = await Setting.findOneAndUpdate(
+      {},
+      { default_cover: 'defaults/' + coverImage.filename },
+    );
+    if (!appSettings) throw new Error('app settings not found');
+    await bucket.removeBucketFiles(appSettings?.default_cover);
     await redisClient.set('default_cover', 'defaults/' + coverImage.filename);
     await Users.updateMany(
-      { coverImage: oldDefaultCover },
+      { coverImage: appSettings?.default_cover },
       { coverImage: 'defaults/' + coverImage.filename },
     );
   }
