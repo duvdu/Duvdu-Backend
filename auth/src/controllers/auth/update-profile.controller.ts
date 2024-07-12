@@ -15,21 +15,21 @@ export const updateProfileHandler: UpdateProfileHandler = async (req, res, next)
   const profile = await Users.findById(req.loggedUser.id);
   if (!profile) return next(new NotFound({en:'no user found' , ar: 'المستخدم غير موجود'} , req.lang));
 
-  const coverImage = <Express.Multer.File[] | undefined>(req.files as any).coverImage;
-  const profileImage = <Express.Multer.File[] | undefined>(req.files as any).profileImage;
+  const coverImage = <Express.Multer.File[] | undefined>(req.files as any).coverImage || [];
+  const profileImage = <Express.Multer.File[] | undefined>(req.files as any).profileImage || [];
   if (req.body.category) {
     const category = await Categories.findById(req.body.category);
     if (!category) return next(new NotFound({en:'category not found' , ar:'الفئة غير موجودة'} , req.lang));
   }
 
   const s3 = new Bucket();
-  if (coverImage) {
+  if (coverImage?.length) {
     await s3.saveBucketFiles(FOLDERS.auth, ...coverImage);
     req.body.coverImage = `${FOLDERS.auth}/${coverImage[0].filename}`;
     if (profile.coverImage) await s3.removeBucketFiles(profile.coverImage);
     Files.removeFiles(req.body.coverImage);
   }
-  if (profileImage) {
+  if (profileImage?.length) {
     await s3.saveBucketFiles(FOLDERS.auth, ...profileImage);
     req.body.profileImage = `${FOLDERS.auth}/${profileImage[0].filename}`;
     if (profile.profileImage && !profile.profileImage.startsWith('defaults'))
@@ -42,6 +42,11 @@ export const updateProfileHandler: UpdateProfileHandler = async (req, res, next)
 
   if (user.category) 
     (user.category as any).title = (user.category as any).title[req.lang];
+  if (user.profileImage) 
+    user.profileImage = `${process.env.BUCKET_HOST}/${user.profileImage}`;
+
+  if (user.coverImage) 
+    user.coverImage = `${process.env.BUCKET_HOST}/${user.coverImage}`;
 
   res.status(200).json({ message: 'success', data: user });
 };

@@ -26,13 +26,7 @@ export const updateProfileVal = [
   body('about')
     .optional()
     .isString().withMessage('aboutInvalid'),
-  body('isAvaliableToInstantProjects')
-    .optional()
-    .custom((val) => {
-      if (val === 'true' || val === 'false') return true;
-      throw new Error('');
-    })
-    .customSanitizer((val) => (val === 'true' ? true : false)).withMessage('isAvaliableInvalid'),
+  body('isAvaliableToInstantProjects').optional().isBoolean().toBoolean().withMessage('isAvaliableInvalid'),
   body('pricePerHour')
     .optional()
     .isFloat().withMessage('priceInvalid')
