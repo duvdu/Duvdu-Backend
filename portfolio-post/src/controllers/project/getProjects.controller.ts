@@ -197,6 +197,8 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
         showOnHome: 1,
         projectScale: 1,
         rate: 1,
+        updatedAt:1,
+        createdAt:1
       },
     },
   ]);

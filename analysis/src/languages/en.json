@@ -18,6 +18,7 @@
   "comment": "Comment is required and must be a string.",
   "rate": "Rate must be a float between 1 and 5.",
   "project": "Project must be a valid Mongo ID.",
+  "contract": "contract must be a valid Mongo ID.",
   "cycle": "Cycle must be a valid value.",
   "reviewId": "Review ID must be a valid Mongo ID.",
   "searchKeywordsArray": "Search keywords must be an array with at least one element.",
