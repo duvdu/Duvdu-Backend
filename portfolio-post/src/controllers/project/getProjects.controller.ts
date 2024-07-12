@@ -1,6 +1,6 @@
 import 'express-async-errors';
 
-import { MODELS, ProjectCycle } from '@duvdu-v1/duvdu';
+import { MODELS, ProjectCycle, Users } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import { Types } from 'mongoose';
 
@@ -123,6 +123,7 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
       $project: {
         _id: 1,
         user: {
+          _id:'$user._id',
           profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$user.profileImage'] },
           isOnline: '$user.isOnline',
           username: '$user.username',
@@ -170,6 +171,7 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
             input: { $ifNull: ['$creatives', []] },
             as: 'creative',
             in: {
+              _id:'$$creative._id',
               profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$$creative.profileImage'] },
               isOnline: '$$creative.isOnline',
               username: '$$creative.username',
@@ -200,6 +202,18 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
       },
     },
   ]);
+
+
+  if (req.loggedUser?.id) {
+    const user = await Users.findById(req.loggedUser.id, { favourites: 1 });
+    console.log('yes yes');
+    
+    projects.forEach((project) => {
+      project.isFavourite = user?.favourites.some(
+        (el: any) => el.project.toString() === project._id.toString(),
+      );
+    });
+  }
 
   const resultCount = await ProjectCycle.countDocuments({
     ...req.pagination.filter,

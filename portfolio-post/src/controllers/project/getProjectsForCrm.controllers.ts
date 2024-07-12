@@ -52,6 +52,7 @@ export const getProjetcsCrm: GetProjectsForCrmHandler = async (req, res) => {
       $project: {
         _id: 1,
         user: {
+          _id:'$user._id',
           profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$user.profileImage'] },
           isOnline: '$user.isOnline',
           username: '$user.username',
@@ -116,6 +117,7 @@ export const getProjetcsCrm: GetProjectsForCrmHandler = async (req, res) => {
               likes: '$$creative.likes',
               followCount:'$$creative.followCount',
               address:'$$creative.address',
+              _id:'$$creative._id',
             },
           },
         },
