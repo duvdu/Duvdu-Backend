@@ -5,6 +5,7 @@ import {
   globalUploadMiddleware,
   isauthenticated,
   isauthorized,
+  optionalAuthenticated,
   PERMISSIONS,
 } from '@duvdu-v1/duvdu';
 import express from 'express';
@@ -49,7 +50,7 @@ router
     checkRequiredFields({ fields: ['cover', 'attachments'] }),
     handler.createProjectHandler,
   )
-  .get(globalPaginationMiddleware, handler.getProjectsPagination, handler.getProjectsHandler);
+  .get(optionalAuthenticated,globalPaginationMiddleware, handler.getProjectsPagination, handler.getProjectsHandler);
 
 router
   .route('/:projectId')
@@ -66,7 +67,7 @@ router
     val.update,
     handler.updateProjectHandler,
   )
-  .get(val.getProject, handler.getProjectHandler)
+  .get(optionalAuthenticated,val.getProject, handler.getProjectHandler)
   .delete(
     isauthenticated,
     isauthorized(PERMISSIONS.removePortfolioProjectHandler),
