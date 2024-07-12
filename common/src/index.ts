@@ -63,7 +63,7 @@ export * from './models/allProjects.model';
 export * from './models/report.model';
 export * from './models/messages.model';
 export * from './models/notification.model';
-export * from './models/teamProject.model';
+// export * from './models/teamProject.model';
 // export * from './models/contracts.model';
 export * from './models/producer.model';
 export * from './models/follow.model';
@@ -74,6 +74,7 @@ export * from './models/settings.model';
 export * from './models/all-contracts.model';
 export * from './models/producer_contracts.model';
 export * from './models/rental.model';
+export * from './models/Review.model';
 
 export * from './services/category.service';
 export * from './services/projectView.service';

@@ -49,7 +49,7 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
         NotificationType.update_project_contract,
         NotificationDetails.updateProjectContract.title,
         NotificationDetails.updateProjectContract.message,
-        Channels.update_project_contract,
+        Channels.update_contract,
       );
 
     } else if (req.body.action === 'accept' && contract.status === ContractStatus.pending) {
@@ -82,7 +82,7 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
         NotificationType.update_project_contract,
         NotificationDetails.updateProjectContract.title,
         NotificationDetails.updateProjectContract.message,
-        Channels.update_project_contract,
+        Channels.update_contract,
       );
 
       // add expiration for first payment
@@ -106,7 +106,7 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
         NotificationType.update_project_contract,
         NotificationDetails.updateProjectContract.title,
         NotificationDetails.updateProjectContract.message,
-        Channels.update_project_contract,
+        Channels.update_contract,
       );
 
     } else if (
@@ -131,7 +131,7 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
         NotificationType.update_project_contract,
         NotificationDetails.updateProjectContract.title,
         NotificationDetails.updateProjectContract.message,
-        Channels.update_project_contract,
+        Channels.update_contract,
       );
 
       // add second payment expiration
@@ -170,7 +170,7 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
         NotificationType.update_project_contract,
         NotificationDetails.updateProjectContract.title,
         NotificationDetails.updateProjectContract.message,
-        Channels.update_project_contract,
+        Channels.update_contract,
       );
 
 
@@ -194,7 +194,7 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
         NotificationType.update_project_contract,
         NotificationDetails.updateProjectContract.title,
         NotificationDetails.updateProjectContract.message,
-        Channels.update_project_contract,
+        Channels.update_contract,
       );
       
     } else

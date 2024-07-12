@@ -38,7 +38,7 @@ pendingQueue.process(async (job) => {
       NotificationType.update_project_contract ,
       NotificationDetails.updateProjectContract.title,
       NotificationDetails.updateProjectContract.message,
-      Channels.update_project_contract
+      Channels.update_contract
     );
   } catch (error) {
     return new Error('Failed to cancelled project contract');
@@ -57,7 +57,7 @@ firstPayMentQueue.process(async (job) => {
       NotificationType.update_project_contract ,
       NotificationDetails.updateProjectContract.title,
       NotificationDetails.updateProjectContract.message,
-      Channels.update_project_contract
+      Channels.update_contract
     );
   } catch (error) {
     return new Error('Failed to cancelled project contract');
@@ -76,7 +76,7 @@ secondPayMentQueue.process(async (job) => {
       NotificationType.update_project_contract ,
       NotificationDetails.updateProjectContract.title,
       NotificationDetails.updateProjectContract.message,
-      Channels.update_project_contract
+      Channels.update_contract
     );
   } catch (error) {
     return new Error('Failed to cancelled project contract');
@@ -95,7 +95,7 @@ updateAfterFirstPaymentQueeu.process(async (job) => {
       NotificationType.update_project_contract ,
       NotificationDetails.updateProjectContract.title,
       NotificationDetails.updateProjectContract.message,
-      Channels.update_project_contract
+      Channels.update_contract
     );
   } catch (error) {
     return new Error('Failed to cancelled project contract');
