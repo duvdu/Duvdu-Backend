@@ -14,6 +14,7 @@ export const getPopularSubCategoriesHandler:GetPopularSubCategoriesHandler = asy
       $project: {
         _id: 0,
         categoryId: '$_id',
+        cycle:'$cycle',
         categoryTitle: {
           $cond: {
             if: { $eq: ['ar', req.lang] },
@@ -65,6 +66,7 @@ export const getPopularSubCategoriesHandler:GetPopularSubCategoriesHandler = asy
             title: '$subCategoryTitle',
             tags: '$tags',
             image: '$image',
+            cycle:'$cycle'
           },
         },
       },
@@ -73,7 +75,6 @@ export const getPopularSubCategoriesHandler:GetPopularSubCategoriesHandler = asy
       $project: {
         _id: 0,
         subCategories: 1,
-        cycle:1
       },
     },
   ]);

@@ -92,6 +92,8 @@ export const getProjectHandler: RequestHandler = async (req, res, next) => {
           pricePerHour: '$userDetails.pricePerHour',
           hasVerificationBadge: '$userDetails.hasVerificationBadge',
           likes: '$userDetails.likes',
+          followCount:'$userDetails.followCount',
+          address:'$userDetails.address',
         },
         attachments: {
           $map: {

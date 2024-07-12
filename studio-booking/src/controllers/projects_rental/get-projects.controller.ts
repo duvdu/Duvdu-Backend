@@ -71,15 +71,21 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
           profileImage: {
             $concat: [process.env.BUCKET_HOST, '/', '$userDetails.profileImage'],
           },
-          cover: {
-            $concat: [process.env.BUCKET_HOST, '/', '$userDetails.cover'],
-          },
+          coverImage: { $concat: [process.env.BUCKET_HOST, '/', '$userDetails.coverImage'] },
           isOnline: '$userDetails.isOnline',
           acceptedProjectsCounter: '$userDetails.acceptedProjectsCounter',
           name: '$userDetails.name',
           rate: '$userDetails.rate',
           rank: '$userDetails.rank',
           projectsView: '$userDetails.projectsView',
+          profileViews: '$userDetails.profileViews',
+          about: '$userDetails.about',
+          isAvaliableToInstantProjects: '$userDetails.isAvaliableToInstantProjects',
+          pricePerHour: '$userDetails.pricePerHour',
+          hasVerificationBadge: '$userDetails.hasVerificationBadge',
+          likes: '$userDetails.likes',
+          followCount:'$userDetails.followCount',
+          address:'$userDetails.address',
         },
         attachments: {
           $map: {

@@ -14,6 +14,7 @@ export const getDiscoverTagsHandler:GetDiscoverTagsHandler = async (req,res)=>{
       $project: {
         _id: 0,
         categoryId: '$_id',
+        cycle:'$cycle',
         categoryTitle: {
           $cond: {
             if: { $eq: ['ar', req.lang] },
@@ -51,6 +52,7 @@ export const getDiscoverTagsHandler:GetDiscoverTagsHandler = async (req,res)=>{
             _id: '$subCategoryId',
             title: '$subCategoryTitle',
             image: '$image',
+            cycle:'$cycle'
           },
         },
       },
