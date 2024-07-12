@@ -63,9 +63,7 @@ export const getProducersHandler: GetProducersHandler = async (req, res, next) =
       {
         $match: filter,
       },
-      {
-        $sort: { createdAt: -1 },
-      },
+      { $sort: { createdAt: -1 } },
       {
         $skip: skip,
       },

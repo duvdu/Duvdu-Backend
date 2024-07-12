@@ -9,9 +9,7 @@ export const getProjetcsCrm: GetProjectsForCrmHandler = async (req, res) => {
     {
       $match: { ...req.pagination.filter },
     },
-    {
-      $sort: { createdAt: -1 },
-    },
+    { $sort: { createdAt: -1 } },
     {
       $skip: req.pagination.skip,
     },

@@ -80,9 +80,7 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
     {
       $match: { ...req.pagination.filter, isDeleted: false },
     },
-    {
-      $sort: { createdAt: -1 },
-    },
+    { $sort: { createdAt: -1 } },
     {
       $skip: req.pagination.skip,
     },

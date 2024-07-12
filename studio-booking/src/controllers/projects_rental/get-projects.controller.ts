@@ -118,6 +118,7 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
         isDeleted: { $ne: true },
       },
     },
+    { $sort: { createdAt: -1 } },
     {
       $skip: req.pagination.skip,
     },

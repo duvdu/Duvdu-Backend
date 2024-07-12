@@ -12,6 +12,18 @@
   "expirationTimeInt": "Each expiration time must be an integer greater than 0.",
   "settingIdMongoId": "Setting ID must be a valid Mongo ID.",
   "expirationIdMongoId": "Expiration ID must be a valid Mongo ID.",
-  "timeInt": "Time must be an integer greater than 0."
+  "timeInt": "Time must be an integer greater than 0.",
+
+
+  "comment": "Comment is required and must be a string.",
+  "rate": "Rate must be a float between 1 and 5.",
+  "project": "Project must be a valid Mongo ID.",
+  "cycle": "Cycle must be a valid value.",
+  "reviewId": "Review ID must be a valid Mongo ID.",
+  "searchKeywordsArray": "Search keywords must be an array with at least one element.",
+  "searchKeywordsString": "Each search keyword must be a string.",
+  "user": "User must be a valid Mongo ID.",
+  "limit": "Limit must be an integer greater than or equal to 1.",
+  "page": "Page must be an integer greater than or equal to 1."
 
 }

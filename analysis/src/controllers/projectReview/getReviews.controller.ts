@@ -41,7 +41,7 @@ export const getProjectReviewsHandler:GetProjectReviewsHandler = async (req,res)
   const reviews = await ProjectReview.find(req.pagination.filter)
     .skip(req.pagination.skip)
     .limit(req.pagination.limit)
-    .populate([{ path: 'creatives.users.user', select: 'profileImage projectsView rank rate name acceptedProjectsCounter isOnline username' }]);
+    .populate([{ path: 'user', select: 'profileImage projectsView rank rate name acceptedProjectsCounter isOnline username' }]);
 
   const resultCount = await ProjectReview.countDocuments(req.pagination.filter);
 
