@@ -8,7 +8,7 @@ import { GetProjectReviewHandler } from '../../types/endpoints/projectView.endpo
 
 export const getProjectReviewHandler:GetProjectReviewHandler = async (req,res,next)=>{
   const review = await ProjectReview.findById(req.params.reviewId)
-    .populate([{ path: 'creatives.users.user', select: 'profileImage projectsView rank rate name acceptedProjectsCounter isOnline username' }]);
+    .populate([{ path: 'user', select: 'profileImage projectsView rank rate name acceptedProjectsCounter isOnline username' }]);
 
   if (!review) 
     return next(new NotFound({en:'review not found' , ar:'لم يتم العثور على المراجعة'} , req.lang));

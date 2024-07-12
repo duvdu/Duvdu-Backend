@@ -1,4 +1,4 @@
-import { checkRequiredFields, FOLDERS, globalPaginationMiddleware, globalUploadMiddleware, isauthenticated } from '@duvdu-v1/duvdu';
+import { checkRequiredFields, FOLDERS, globalPaginationMiddleware, globalUploadMiddleware, isauthenticated, isauthorized, PERMISSIONS } from '@duvdu-v1/duvdu';
 import express from 'express';
 
 import * as controllers from '../controllers/project';
@@ -8,11 +8,12 @@ export const router = express.Router();
 
 
 
-router.route('/crm').get( val.getAll , globalPaginationMiddleware , controllers.getProjectsPagination , controllers.getTeamsCrmHandler);
-router.route('/crm/:teamId').get(val.getOne , controllers.getCrmTeamHandler);
+router.route('/crm').get(isauthenticated , isauthorized(PERMISSIONS.getCrmTeamProjectHandler) , val.getAll , globalPaginationMiddleware , controllers.getProjectsPagination , controllers.getTeamsCrmHandler);
+router.route('/crm/:teamId').get(isauthenticated , isauthorized(PERMISSIONS.getCrmTeamProjectHandler),val.getOne , controllers.getCrmTeamHandler);
 
 router.route('/').post(
   isauthenticated,
+  isauthorized(PERMISSIONS.createTeamProjectHandler),
   globalUploadMiddleware(FOLDERS.team_project, {
     maxSize: 100 * 1024 * 1024,
     fileTypes: ['video', 'image'],

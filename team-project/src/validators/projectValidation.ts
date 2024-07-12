@@ -9,60 +9,59 @@ const parseRequestBody: RequestHandler = (req, res, next) => {
 
 export const create = [
   parseRequestBody,
-  body('title').exists().isString().withMessage('Title is required'),
-  body('desc').exists().isString().withMessage('Description is required'),
+  body('title').exists().isString().withMessage('title'),
+  body('desc').exists().isString().withMessage('desc'),
   body('location.lat').isFloat({ min: -90, max: 90 }).withMessage('locationLatFloat'),
   body('location.lng').isFloat({ min: -180, max: 180 }).withMessage('locationLngFloat'),
-  body('address').exists().isString(),
-  body('creatives').isArray({ min: 1 }).withMessage('Creatives are required'),
-  body('creatives.*.category').isMongoId().withMessage('Invalid category ID'),
+  body('address').exists().isString().withMessage('address'),
+  body('creatives').isArray({ min: 1 }).withMessage('creatives'),
+  body('creatives.*.category').isMongoId().withMessage('creativesCategory'),
   body('creatives.*.users')
     .optional()
     .isArray({ min: 1 })
-    .withMessage('Users are required for each creative'),
-  body('creatives.*.users.*.user').isMongoId().withMessage('Invalid user ID'),
-  body('creatives.*.users.*.duration').isInt({ min: 1 }).withMessage('Invalid duration'),
-  body('creatives.*.users.*.startDate').isISO8601().withMessage('Invalid start date'),
-  body('creatives.*.users.*.workHours').isInt({ min: 1 }).withMessage('Invalid workHours'),
-  body('creatives.*.users.*.hourPrice').isInt({ min: 1 }).withMessage('Invalid hourPrice'),
-  body('creatives.*.users.*.details').isString().withMessage('Invalid details'),
+    .withMessage('creativesUsers'),
+  body('creatives.*.users.*.user').isMongoId().withMessage('creativesUsersUser'),
+  body('creatives.*.users.*.duration').isInt({ min: 1 }).withMessage('creativesUsersDuration'),
+  body('creatives.*.users.*.startDate').isISO8601().withMessage('creativesUsersStartDate'),
+  body('creatives.*.users.*.workHours').isInt({ min: 1 }).withMessage('creativesUsersWorkHours'),
+  body('creatives.*.users.*.hourPrice').isInt({ min: 1 }).withMessage('creativesUsersHourPrice'),
+  body('creatives.*.users.*.details').isString().withMessage('creativesUsersDetails'),
   globalValidatorMiddleware,
 ];
 
 export const addCreative = [
-  param('teamId').isMongoId(),
-  body('user').isMongoId(),
-  body('duration').isInt({ min: 1 }).withMessage('Invalid duration'),
-  body('startDate').isISO8601().withMessage('Invalid start date'),
-  body('workHours').isInt({ min: 1 }).withMessage('Invalid workHours'),
-  body('hourPrice').isInt({ min: 1 }).withMessage('Invalid hourPrice'),
-  body('details').isString().withMessage('Invalid details'),
-  body('category').isMongoId(),
+  param('teamId').isMongoId().withMessage('teamId'),
+  body('user').isMongoId().withMessage('user'),
+  body('duration').isInt({ min: 1 }).withMessage('duration'),
+  body('startDate').isISO8601().withMessage('startDate'),
+  body('workHours').isInt({ min: 1 }).withMessage('workHours'),
+  body('hourPrice').isInt({ min: 1 }).withMessage('hourPrice'),
+  body('details').isString().withMessage('details'),
+  body('category').isMongoId().withMessage('category'),
   globalValidatorMiddleware
 ];
 
 export const deleteCreative = [
-  param('teamId').isMongoId(),
-  body('category').isMongoId(),
-  body('user').isMongoId(),
+  param('teamId').isMongoId().withMessage('teamId'),
+  body('category').isMongoId().withMessage('category'),
+  body('user').isMongoId().withMessage('user'),
   globalValidatorMiddleware
 ];
 
-
 export const getAll = [
-  query('searchKeywords').optional().isArray(),
-  query('category').optional().isString(),
-  query('maxBudget').optional().isNumeric(),
-  query('minBudget').optional().isNumeric(),
-  query('user').optional().isMongoId(),
-  query('creative').optional().isMongoId(),
-  query('isDeleted').optional().isBoolean().toBoolean(),
-  query('limit').optional().isInt({min:1}),
-  query('page').optional().isInt({min:1}),
+  query('searchKeywords').optional().isArray().withMessage('searchKeywords'),
+  query('category').optional().isString().withMessage('category'),
+  query('maxBudget').optional().isNumeric().withMessage('maxBudget'),
+  query('minBudget').optional().isNumeric().withMessage('minBudget'),
+  query('user').optional().isMongoId().withMessage('user'),
+  query('creative').optional().isMongoId().withMessage('creative'),
+  query('isDeleted').optional().isBoolean().toBoolean().withMessage('isDeleted'),
+  query('limit').optional().isInt({ min: 1 }).withMessage('limit'),
+  query('page').optional().isInt({ min: 1 }).withMessage('page'),
   globalPaginationMiddleware
 ];
 
 export const getOne = [
-  param('teamId').isMongoId(),
+  param('teamId').isMongoId().withMessage('teamId'),
   globalValidatorMiddleware
 ];
