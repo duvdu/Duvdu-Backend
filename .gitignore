@@ -10,3 +10,4 @@ docker
 dockerfile.dev
 Dockerfile-dev
 .wakatime-project
+logs
