@@ -41,8 +41,8 @@ export const env = {
 };
 
 export const checkEnvVariables = () => {
-  console.log(env.redis.uri, env.redis.pass);
-
+  console.log(env.redis.uri);
+  console.log(env.redis.pass);
   if (!env.mongoDb.uri) throw new Error('env:MONGO_URI must be defined');
   if (!env.jwt.secret) throw new Error('env:JWT_KEY must be defined');
   if (!env.expressSession.secret) return new Error('env:SESSION_SECRET must be defined');
