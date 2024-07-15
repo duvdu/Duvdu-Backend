@@ -20,28 +20,30 @@ app.use(
   }),
 );
 
-// (async () => {
-//   const store = await sessionStore(env.redis.uri, env.redis.pass);
+(async () => {
+  const store = await sessionStore(env.redis.uri, env.redis.pass);
 
-//   app.use(
-//     session({
-//       secret: env.expressSession.secret,
-//       resave: false,
-//       saveUninitialized: false,
-//       store,
-//       cookie: {
-//         sameSite: 'none',
-//         secure: env.environment === 'production',
-//         httpOnly: true,
-//       },
-//     })
-//   );
+  app.use(
+    session({
+      secret: env.expressSession.secret,
+      resave: false,
+      saveUninitialized: false,
+      store,
+      cookie: {
+        sameSite: 'none',
+        secure: env.environment === 'production',
+        httpOnly: true,
+      },
+    })
+  );
 
-// })();
 
-app.use(languageHeaderMiddleware);
-mountRoutes(app);
-app.use(globalErrorHandlingMiddleware);
+  app.use(languageHeaderMiddleware);
+  mountRoutes(app);
+  app.use(globalErrorHandlingMiddleware);
+  
+})();
+
 
 
 
