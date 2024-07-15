@@ -18,6 +18,7 @@ import { sendNotification } from './sendNotification';
 import { TeamContract, TeamProject } from '../../models/teamProject.model';
 import { getBestExpirationTime } from '../../services/getBestExpirationTime.service';
 import { CreateProjectHandler } from '../../types/project.endpoints';
+// import { pendingQueue } from '../../utils/expirationQueue';
 
 export const createProjectHandler: CreateProjectHandler = async (req, res, next) => {
   const files = req.files as { [fieldName: string]: Express.Multer.File[] };
@@ -95,7 +96,6 @@ export const createProjectHandler: CreateProjectHandler = async (req, res, next)
         details: user.details,
         totalAmount: user.totalAmount,
         attachments:user.attachments,
-        actionAt: new Date(),
         cycle: CYCLES.teamProject,
         stageExpiration,
         category:creative.category
@@ -121,9 +121,9 @@ export const createProjectHandler: CreateProjectHandler = async (req, res, next)
         Channels.new_contract,
       );
 
-      // use pending expiration
+      // TODO: use pending expiration
       // const delay = contract.stageExpiration * 3600 * 1000;
-      // pendingQueue.add({contractId:contract._id.toString()} , {delay});
+      // pendingQueue.add({contractId:contract._id.toString() , lang:req.lang} , {delay});
     }
   }
 

@@ -7,6 +7,7 @@ import { sendNotification } from './sendNotification';
 import { TeamContract, TeamProject, UserStatus } from '../../models/teamProject.model';
 import { getBestExpirationTime } from '../../services/getBestExpirationTime.service';
 import { AddCreativeHandler } from '../../types/project.endpoints';
+// import { pendingQueue } from '../../utils/expirationQueue';
 
 
 export const addCreativeHandler:AddCreativeHandler = async (req,res,next)=>{
@@ -83,7 +84,6 @@ export const addCreativeHandler:AddCreativeHandler = async (req,res,next)=>{
     deadLine: user.deadLine,
     details: user.details,
     totalAmount: user.totalAmount,
-    actionAt: new Date(),
     cycle: CYCLES.teamProject,
     attachments:user.attachments,
     stageExpiration,
@@ -111,8 +111,9 @@ export const addCreativeHandler:AddCreativeHandler = async (req,res,next)=>{
   );
 
   // use pending expiration
+  // TODO:
   // const delay = contract.stageExpiration * 3600 * 1000;
-  // pendingQueue.add({contractId:contract._id.toString()} , {delay});
+  // pendingQueue.add({contractId:contract._id.toString() , lang:req.lang} , {delay});
 
   res.status(200).json({message:'success' , data:project});
 };

@@ -11,8 +11,9 @@ import * as val from '../validators/book.val';
 
 export const router = express.Router();
 
+router.use(isauthenticated);
+
 router.route('/:projectId').post(
-  isauthenticated,
   globalUploadMiddleware(FOLDERS.portfolio_post, {
     maxSize: 100 * 1024 * 1024,
     fileTypes: ['video', 'image'],
@@ -21,11 +22,11 @@ router.route('/:projectId').post(
   checkRequiredFields({ fields: ['attachments'] }),
   handler.createContractHandler,
 );
-router.get('/pay/:paymentSession', val.pay, handler.payContract);
+router.post('/pay/:paymentSession' , val.pay, handler.payContract);
 
 router
   .route('/:contractId/contract')
-  .patch(isauthenticated, val.update, handler.updateContractHandler);
+  .patch( val.update, handler.updateContractHandler);
 router
   .route('/:contractId/action')
-  .post(isauthenticated, val.action, handler.contractActionHandler);
+  .post( val.action, handler.contractActionHandler);

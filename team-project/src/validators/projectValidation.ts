@@ -65,3 +65,18 @@ export const getOne = [
   param('teamId').isMongoId().withMessage('teamId'),
   globalValidatorMiddleware
 ];
+
+
+export const action = [
+  body('action')
+    .isString()
+    .bail()
+    .custom((val) => {
+      if (['reject', 'accept'].includes(val)) return true;
+      throw new Error();
+    }),
+  param('contractId').isMongoId(),
+  globalValidatorMiddleware,
+];
+
+export const pay = [param('paymentSession').isString(), globalValidatorMiddleware];
