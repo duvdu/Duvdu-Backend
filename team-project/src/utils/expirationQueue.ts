@@ -2,39 +2,66 @@ import { Channels, NotificationDetails, NotificationType } from '@duvdu-v1/duvdu
 import Queue from 'bull';
 
 import { env } from '../config/env';
+import { updateUserStatus } from '../controllers/contract/updateUserStatus';
 import { sendSystemNotification } from '../controllers/project/sendNotification';
-import { ContractStatus, TeamContract } from '../models/teamProject.model';
+import { ContractStatus, TeamContract, UserStatus } from '../models/teamProject.model';
 
 interface IcontarctQueue {
   contractId: string;
+  lang:string
 }
 
-export const pendingQueue = new Queue<IcontarctQueue>('project-contract-pending', env.redis.queue);
+export const pendingQueue = new Queue<IcontarctQueue>('team-contract-pending', env.redis.queue);
 
-export const secondPayMentQueue = new Queue<IcontarctQueue>(
+export const PayMentQueue = new Queue<IcontarctQueue>(
   'secondPayment-contract-pending',
   env.redis.queue,
 );
 
-export const updateAfterFirstPaymentQueeu = new Queue<IcontarctQueue>(
-  'updateAfterFirstPayment-contract-pending',
-  env.redis.queue,
-);
 
 pendingQueue.process(async (job) => {
   try {
     const contract = await TeamContract.findOneAndUpdate(
       { _id: job.data.contractId, status: ContractStatus.pending },
       { status: ContractStatus.canceled, actionAt: new Date() },
+      {new:true}
+    );
+    console.log(contract);
+    
+    if (contract) {
+      await updateUserStatus(contract.project.toString() , contract.category.toString() , contract.sp.toString() , UserStatus.canceled , job.data.lang);
+      await sendSystemNotification([contract?.sp!.toString() || '' , contract?.customer!.toString() || ''],
+        contract?._id.toString() || '' ,
+        NotificationType.update_team_contract ,
+        NotificationDetails.updateTeamContract.title,
+        NotificationDetails.updateTeamContract.message,
+        Channels.update_contract
+      );
+    }
+
+  } catch (error) {
+    return new Error('Failed to cancelled project contract');
+  }
+});
+
+PayMentQueue.process(async (job) => {
+  try {
+    const contract = await TeamContract.findOneAndUpdate(
+      { _id: job.data.contractId, status: ContractStatus.waitingForTotalPayment },
+      { status: ContractStatus.canceled, actionAt: new Date() },
+      {new : true}
     );
 
-    await sendSystemNotification([contract?.sp!.toString() || '' , contract?.customer!.toString() || ''],
-      contract?._id.toString() || '' ,
-      NotificationType.update_project_contract ,
-      NotificationDetails.updateProjectContract.title,
-      NotificationDetails.updateProjectContract.message,
-      Channels.update_contract
-    );
+    if (contract) {
+      await updateUserStatus(contract!.project.toString() , contract!.category.toString() , contract!.sp.toString() , UserStatus.canceled , job.data.lang);
+      await sendSystemNotification([contract?.sp!.toString() || '' , contract?.customer!.toString() || ''],
+        contract?._id.toString() || '' ,
+        NotificationType.update_team_contract ,
+        NotificationDetails.updateTeamContract.title,
+        NotificationDetails.updateTeamContract.message,
+        Channels.update_contract
+      );
+    }
   } catch (error) {
     return new Error('Failed to cancelled project contract');
   }

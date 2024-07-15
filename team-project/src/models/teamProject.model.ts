@@ -5,6 +5,7 @@ export enum UserStatus {
   accepted = 'accepted',
   rejected = 'rejected',
   pending = 'pending',
+  canceled = 'canceled'
 }
 
 export interface ITeamProject {
@@ -127,6 +128,9 @@ export interface ITeamContract {
   stageExpiration: number;
   status: ContractStatus;
   cycle: CYCLES;
+  createdAt:Date;
+  paymentAmount:number;
+  totalCheckoutAt:Date
 }
 
 export const TeamContract = model<ITeamContract>(
@@ -150,7 +154,9 @@ export const TeamContract = model<ITeamContract>(
       stageExpiration: { type: Number, default: 0 },
       status: { type: String, enum: ContractStatus, default: ContractStatus.pending },
       cycle: { type: String, default: CYCLES.teamProject },
-      attachments:[String]
+      paymentAmount:{type:Number , default:0},
+      attachments:[String],
+      totalCheckoutAt:Date
     },
     { timestamps: true, collection: 'team_contracts' },
   ),
