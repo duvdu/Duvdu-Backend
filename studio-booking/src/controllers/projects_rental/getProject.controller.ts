@@ -135,7 +135,7 @@ export const getProjectHandler: RequestHandler = async (req, res, next) => {
       (el: any) => el.project.toString() === project._id.toString(),
     );
   }
-  await incrementProjectsView(project.user._id);
+  await incrementProjectsView(project.user._id , project._id , req.lang);
   const canChat = !!(await Contracts.findOne({
     $or: [
       { sp: req.loggedUser?.id, customer: project.customer },
