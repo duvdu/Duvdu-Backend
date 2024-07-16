@@ -5,3 +5,4 @@ export * from './getLoggedProducer.controller';
 export * from './getProducer.controller';
 export * from './deleteProducer.controller';
 export * from './deleteLoggedProducer.controller';
+export * from './producerAnalysis';

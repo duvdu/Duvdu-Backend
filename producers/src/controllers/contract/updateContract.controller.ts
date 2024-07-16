@@ -15,7 +15,7 @@ import {
 
 import { sendNotification } from './sendNotification';
 import { UpdateContractHandler } from '../../types/endpoints';
-import { UpdateContractQueue } from '../../utils/expirationQueue';
+// import { UpdateContractQueue } from '../../utils/expirationQueue';
 
 export const updateContractHandler: UpdateContractHandler = async (req, res, next) => {
   const contract = await ProducerContract.findById(req.params.contractId);
@@ -107,15 +107,15 @@ export const updateContractHandler: UpdateContractHandler = async (req, res, nex
       NotificationDetails.updatedProducerContract.message,
       Channels.update_contract,
     );
-    const delay = updatedContract.stageExpiration * 3600 * 1000;
-    await UpdateContractQueue.add(
-      {
-        contractId: contract._id.toString(),
-      },
-      {
-        delay,
-      },
-    );
+    // const delay = updatedContract.stageExpiration * 3600 * 1000;
+    // await UpdateContractQueue.add(
+    //   {
+    //     contractId: contract._id.toString(),
+    //   },
+    //   {
+    //     delay,
+    //   },
+    // );
   }
 
   if (

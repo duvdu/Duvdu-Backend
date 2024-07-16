@@ -75,3 +75,10 @@ export const getProducerVal = [
   param('producerId').isMongoId().withMessage('producerIdMongoId'),
   globalValidatorMiddleware,
 ];
+
+
+export const getProducerAnalysis = [
+  query('startDate').optional().isISO8601().toDate().withMessage('startDate'),
+  query('endDate').optional().isISO8601().toDate().withMessage('endDate'),
+  globalValidatorMiddleware,
+];

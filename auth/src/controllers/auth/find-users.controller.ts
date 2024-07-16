@@ -25,7 +25,7 @@ export const filterUsers: RequestHandler<
     ];
   }  if (req.query.username) req.pagination.filter.username = req.query.username;
   if (req.query.phoneNumber) req.pagination.filter['phoneNumber.number'] = req.query.phoneNumber;
-  if (req.query.category) req.pagination.filter.category = req.query.category;
+  if (req.query.category) req.pagination.filter.category = new mongoose.Types.ObjectId(req.query.category);
   if (req.query.priceFrom) req.pagination.filter.price = { $gte: req.query.priceFrom };
   if (req.query.priceTo)
     req.pagination.filter.price = { ...req.pagination.filter.price, $lte: req.query.priceTo };

@@ -12,6 +12,8 @@ import * as val from '../validators/producer/producer.val';
 export const router = express.Router();
 
 
+router.route('/crm/analysis').get(isauthenticated , isauthorized(PERMISSIONS.getProducerAnalysis) , val.getProducerAnalysis , handler.getProducerAnalysis);
+
 router
   .route('/user')
   .get(isauthenticated,handler.getLoggedProducerHandler)
@@ -33,7 +35,6 @@ router
   .get(val.getProducerVal, handler.getProducerHandler)
   .delete(
     isauthenticated,
-    isauthorized(PERMISSIONS.deleteProducerHandler),
     val.getProducerVal,
     handler.deleteProducerHandler,
   );
