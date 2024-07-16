@@ -27,24 +27,24 @@ export enum PERMISSIONS {
   getRolesHandler = 'get roles',
   getRoleHandler = 'get role',
   removeRoleHandler = 'remove role',
-  // portfolio-post
-  createProtfolioProjectHandler = 'create portfolio project',
-  updatePortfolioProjectHandler = 'update portfolio project',
-  removePortfolioProjectHandler = 'remove portfolio project',
-  getCrmPortfolioProjectsHandlers = 'get crm portfolio projects',
-  getAnalysisHandler = 'get analysis handler',
+  // project
+  createProjectHandler = 'create project project',
+  updateProjectHandler = 'update project project',
+  removeProjectHandler = 'remove project project',
+  getCrmProjectsHandlers = 'get crm project projects',
+  getAnalysisHandler = 'get project analysis handler',
   // copyrights
   createCopyrightHandler = 'create copyright project',
   updateCopyrightHandler = 'update copyright project',
   removeCopyrightHandler = 'remove copyright project',
   getCrmCopyrightsHandlers = 'get crm copyright projects',
   getCopyrightAnalysisHandler = 'get copyright analysis handler',
-  // studio-booking
-  createStudioProjectHandler = 'create studio project',
-  updateStudioProjectHandler = 'update studio project',
-  removeStudioProjectHandler = 'remove studio project',
-  getCrmStudioProjectsHandlers = 'get crm studio projects',
-  getStudioAnalysisHandler = 'get studio analysis handler',
+  // Rental-booking
+  createRentalProjectHandler = 'create Rental project',
+  updateRentalProjectHandler = 'update Rental project',
+  removeRentalProjectHandler = 'remove Rental project',
+  getCrmRentalProject = 'get crm rental projects',
+  getRentalAnalysisHandler = 'get Rental analysis handler',
   // reports
   getAllReportsHandler = 'get all reports',
   getReportHandler = 'get report',
@@ -61,7 +61,7 @@ export enum PERMISSIONS {
   updateTeamProjectHandler = 'update team project',
   deleteTeamProjectHandler = 'delete team project',
   // producer
-  deleteProducerHandler = 'delete producer',
+  getProducerAnalysis = 'get producer analysis',
   // rank
   createRankHandler = 'create rank',
   updateRankHandler = 'update rank',
@@ -111,11 +111,11 @@ export const permissions = {
     PERMISSIONS.updateRoleHandler,
     PERMISSIONS.removeRoleHandler,
   ],
-  portfolioPost: [
-    PERMISSIONS.createProtfolioProjectHandler,
-    PERMISSIONS.updatePortfolioProjectHandler,
-    PERMISSIONS.removePortfolioProjectHandler,
-    PERMISSIONS.getCrmPortfolioProjectsHandlers,
+  Post: [
+    PERMISSIONS.createProjectHandler,
+    PERMISSIONS.updateProjectHandler,
+    PERMISSIONS.removeProjectHandler,
+    PERMISSIONS.getCrmProjectsHandlers,
     PERMISSIONS.getAnalysisHandler,
   ],
   copyrights: [
@@ -125,12 +125,12 @@ export const permissions = {
     PERMISSIONS.getCrmCopyrightsHandlers,
     PERMISSIONS.getCopyrightAnalysisHandler,
   ],
-  studioBooking: [
-    PERMISSIONS.createStudioProjectHandler,
-    PERMISSIONS.updateStudioProjectHandler,
-    PERMISSIONS.removeStudioProjectHandler,
-    PERMISSIONS.getCrmStudioProjectsHandlers,
-    PERMISSIONS.getStudioAnalysisHandler,
+  RentalBooking: [
+    PERMISSIONS.createRentalProjectHandler,
+    PERMISSIONS.updateRentalProjectHandler,
+    PERMISSIONS.removeRentalProjectHandler,
+    PERMISSIONS.getRentalAnalysisHandler,
+    PERMISSIONS.getCrmRentalProject,
   ],
   booking: [PERMISSIONS.booking],
   teamProject:[
@@ -151,5 +151,8 @@ export const permissions = {
     PERMISSIONS.createSettingHandler,
     PERMISSIONS.updateSettingHandler,
     PERMISSIONS.deleteSettingHandler
+  ],
+  producer:[
+    PERMISSIONS.getProducerAnalysis,
   ]
 };
