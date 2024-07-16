@@ -5,8 +5,7 @@ import { env } from '../config/env';
 
 export const generateAccessToken = (payload: IjwtPayload) =>
   jwt.sign(payload, env.jwt.secret, {
-    // expiresIn: env.environment === 'development' ? 5 * 24 * 60 * 60 : '1d',
-    expiresIn: env.environment === 'development' ? '1d': '1d',
+    expiresIn: env.environment === 'development' ? '1d': '1h',
   });
 
 export const generateRefreshToken = (payload: { id: string }) =>

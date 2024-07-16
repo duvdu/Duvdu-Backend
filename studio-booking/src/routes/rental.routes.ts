@@ -4,7 +4,9 @@ import {
   globalPaginationMiddleware,
   globalUploadMiddleware,
   isauthenticated,
+  isauthorized,
   optionalAuthenticated,
+  PERMISSIONS,
 } from '@duvdu-v1/duvdu';
 import { Router } from 'express';
 
@@ -37,7 +39,10 @@ router
     handlers.getProjectsHandler,
   );
 
-router.get('/analysis', isauthenticated, handlers.getProjectAnalysis);
+router.get('/analysis', isauthenticated , isauthorized(PERMISSIONS.getRentalAnalysisHandler), handlers.getProjectAnalysis);
+router.get('/crm' , isauthenticated , isauthorized(PERMISSIONS.getCrmRentalProject) , val.getAll , globalPaginationMiddleware , handlers.getProjectsPagination , handlers.getProjectsCrmHandler);
+router.get('/crm/:projectId' , isauthenticated , isauthorized(PERMISSIONS.getCrmRentalProject), val.getOne , handlers.getProjectCrmHandler);
+
 
 router
   .route('/:projectId')

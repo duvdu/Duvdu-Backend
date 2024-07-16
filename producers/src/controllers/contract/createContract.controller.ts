@@ -20,7 +20,6 @@ import {
 import { sendNotification } from './sendNotification';
 import { getBestExpirationTime } from '../../services/getBestExpirationTime.service';
 import { CreateContractHandler } from '../../types/endpoints';
-import { createContractQueue } from '../../utils/expirationQueue';
 
 export const createContractHandler: CreateContractHandler = async (req, res, next) => {
   try {
@@ -77,16 +76,16 @@ export const createContractHandler: CreateContractHandler = async (req, res, nex
       Channels.new_contract,
     );
 
-    const delay = contract.stageExpiration * 3600 * 1000;
-    // const delay = 1*60 * 1000;
-    await createContractQueue.add(
-      {
-        contractId: contract._id.toString(),
-      },
-      {
-        delay,
-      },
-    );
+    // const delay = contract.stageExpiration * 3600 * 1000;
+    // // const delay = 1*60 * 1000;
+    // await createContractQueue.add(
+    //   {
+    //     contractId: contract._id.toString(),
+    //   },
+    //   {
+    //     delay,
+    //   },
+    // );
 
     await Contracts.create({
       contract: contract._id,
