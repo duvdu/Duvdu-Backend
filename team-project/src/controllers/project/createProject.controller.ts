@@ -24,10 +24,14 @@ export const createProjectHandler: CreateProjectHandler = async (req, res, next)
   const files = req.files as { [fieldName: string]: Express.Multer.File[] };
   const creatives = req.body.creatives;
 
+  console.log(files);
+  
   const s3 = new Bucket();
   // handle cover
   await s3.saveBucketFiles(FOLDERS.team_project, ...files['cover']);
   req.body.cover = `${FOLDERS.team_project}/${files['cover'][0].filename}`;
+  console.log(req.body.cover);
+  
   Files.removeFiles(req.body.cover);
 
   // validate user and upload attachments
@@ -43,7 +47,7 @@ export const createProjectHandler: CreateProjectHandler = async (req, res, next)
 
         user.attachments = [];
         const key = `creatives[${creatives.indexOf(creative)}][users][${creative.users.indexOf(user)}][attachments]`;
-        if (key?.length) await s3.saveBucketFiles(FOLDERS.team_project, ...files[key]);
+        if (key?.length && Array.isArray(files[key])) await s3.saveBucketFiles(FOLDERS.team_project, ...files[key]);
 
         for (let i = 0; i < key.length; i++) {
           const fileArray = files[key];
