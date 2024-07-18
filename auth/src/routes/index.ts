@@ -7,6 +7,7 @@ import { oauthRoutes } from './oauth.routes';
 import { planRoutes } from './plan.routes';
 import { router as reportRoutes } from './report.routes';
 import { roleRoutes } from './role.routes';
+import { splashRoutes } from './splash.routes';
 import { termsRoutes } from './term.routes';
 import { ticketsRoutes } from './ticket.routes';
 
@@ -21,5 +22,6 @@ router.use('/plans', planRoutes);
 router.use('/roles', roleRoutes);
 router.use('/report', reportRoutes);
 router.use('/follow', followRouter);
+router.use('/splash', splashRoutes);
 
 export const apiRoutes = router;
