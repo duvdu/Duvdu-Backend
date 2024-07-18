@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { SystemRoles, Roles, Users, VerificationReason } from '@duvdu-v1/duvdu';
 import passport from 'passport';
 import { Strategy as AppleStrategy } from 'passport-apple';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth2';
 
 import { env } from '../../config/env';
-import { generateAccessToken } from '../../utils/generateToken';
+// import { generateAccessToken } from '../../utils/generateToken';
 
 passport.serializeUser((user, done) => {
   done(null, user);
@@ -44,14 +45,14 @@ passport.use(
       }
       console.log(true);
       
-      const Token = generateAccessToken({
-        id: user.id,
-        isBlocked: { value: false },
-        isVerified: false,
-        role: { key: role.key, permissions: role.permissions },
-      });
+      // const Token = generateAccessToken({
+      //   id: user.id,
+      //   isBlocked: { value: false },
+      //   isVerified: false,
+      //   role: { key: role.key, permissions: role.permissions },
+      // });
 
-      user.token = Token;
+      // user.token = Token;
       await user.save();
       return done(null, user);
     },
