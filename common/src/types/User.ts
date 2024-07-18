@@ -24,7 +24,7 @@ export interface Iuser {
   password?: string;
   verificationCode?: { code?: string; expireAt?: string; reason?: VerificationReason };
   isVerified: boolean;
-  refreshTokens?: {fingerprint:string , clientType:string , token:string};
+  refreshTokens?: {fingerprint:string , clientType:string , token:string}[];
   profileImage?: string;
   coverImage?: string;
   location?: { lat: number; lng: number };
