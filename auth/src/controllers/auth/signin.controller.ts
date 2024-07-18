@@ -5,52 +5,115 @@ import { comparePassword } from '../../utils/bcrypt';
 import { generateBrowserFingerprint } from '../../utils/generateFingerPrint';
 import { generateAccessToken, generateRefreshToken } from '../../utils/generateToken';
 
-export const signinHandler: SigninHandler = async (req, res, next) => {
-  
-  const user = await Users.findOne({ username: req.body.username });
+// export const signinHandler: SigninHandler = async (req, res, next) => {
+//   try {
+//     const { username, password, notificationToken } = req.body;
 
-  if (!user || !(await comparePassword(req.body.password, user.password || '')))
-    return next(new UnauthenticatedError({ar:'خطا ف  الاسم او كلمة المرور ' , en:'invalid username or password'} , req.lang));
+//     const user = await Users.findOne({ username });
+//     if (!user || !(await comparePassword(password, user.password || ''))) {
+//       return next(new UnauthenticatedError({ ar: 'اسم المستخدم أو كلمة المرور غير صحيحة', en: 'Invalid username or password' }, req.lang));
+//     }
+
+//     if (!user.isVerified && user.verificationCode!.reason === VerificationReason.signup) {
+//       return next(new BadRequestError({ en: `Account not verified: ${VerificationReason.signup}`, ar: `الحساب غير موثق: ${VerificationReason.signup}` }, req.lang));
+//     }
+
+//     const role = await Roles.findById(user.role);
+//     if (!role) {
+//       return next(new UnauthenticatedError({ en: 'User role not found', ar: 'دور المستخدم غير موجود' }, req.lang));
+//     }
+
+//     const fingerprint = await generateBrowserFingerprint();
+//     const userAgent = req.headers['user-agent'];
+//     const clientType = userAgent && /mobile|android|touch|webos/i.test(userAgent) ? 'mobile' : 'web';
+//     const refreshToken = generateRefreshToken({ id: user.id });
+
+//     let existingSession = await userSession.findOne({ user: user._id, fingerPrint: fingerprint, clientType });
+
+//     if (existingSession) {
+//       existingSession.refreshToken = refreshToken;
+//       existingSession.fingerPrint = fingerprint;
+//       await existingSession.save();
+//     } else {
+//       existingSession = await userSession.create({
+//         user: user._id,
+//         fingerPrint: fingerprint,
+//         accessToken: '',
+//         refreshToken,
+//         clientType,
+//         userAgent
+//       });
+//     }
+
+//     const accessToken = generateAccessToken({
+//       id: user.id,
+//       isVerified: user.isVerified,
+//       isBlocked: user.isBlocked,
+//       role: { key: role.key, permissions: role.permissions },
+//     });
+
+//     const existingTokenIndex = user.refreshTokens.findIndex(rt => rt.clientType === clientType);
+//     if (existingTokenIndex > -1) {
+//       user.refreshTokens[existingTokenIndex] = { token: refreshToken, clientType, fingerPrint: fingerprint };
+//     } else {
+//       user.refreshTokens.push({ token: refreshToken, clientType, fingerPrint: fingerprint });
+//     }
+//     user.notificationToken = notificationToken || null;
+//     await user.save();
+
+//     req.session.access = accessToken;
+//     req.session.refresh = refreshToken;
+
+//     res.status(200).json({ message: 'success' });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
+
+
+export const signinHandler: SigninHandler = async (req, res, next) => {
+  const { username, password } = req.body;
+  const user = await Users.findOne({ username });
+  if (!user || !(await comparePassword(password, user.password || ''))) 
+    return next(new UnauthenticatedError({ en: 'Invalid username or password', ar: 'اسم المستخدم أو كلمة المرور غير صحيحة' }, req.lang));
+  
 
   if (!user.isVerified && (user.verificationCode!.reason = VerificationReason.signup)) 
     return next(new BadRequestError({en:`Account not verified reason : ${VerificationReason.signup}` , ar:`سبب عدم توثيق الحساب : ${VerificationReason.signup}`} , req.lang));
 
   const role = await Roles.findById(user.role);
-  if (!role) return next(new UnauthenticatedError({en:'user dont have a role' , ar: 'المستخدم ليس لديه دور'} , req.lang));
-  
+  if (!role) 
+    return next(new UnauthenticatedError({ en: 'User role not found', ar: 'دور المستخدم غير موجود' }, req.lang));
+    
+
   const fingerprint = await generateBrowserFingerprint();
   const userAgent = req.headers['user-agent'];
-  let clientType = 'web';
-
-  if (userAgent && /mobile|android|touch|webos/i.test(userAgent))
-    clientType = 'mobile';
-
-  await userSession.findOneAndDelete({ user: user._id, fingerPrint: fingerprint, clientType });
-
-
+  const clientType = userAgent && /mobile|android|touch|webos/i.test(userAgent) ? 'mobile' : 'web';    
+  const refreshToken = generateRefreshToken({id:user._id.toString()});
   const accessToken = generateAccessToken({
     id: user.id,
     isVerified: user.isVerified,
     isBlocked: user.isBlocked,
     role: { key: role.key, permissions: role.permissions },
   });
-  const refreshToken = generateRefreshToken({ id: user.id });
 
-  await userSession.create({
-    user: user._id,
-    fingerPrint: fingerprint,
-    accessToken,
-    refreshToken,
-    clientType,
-    userAgent
-  });
+  // Update or replace existing session and token
+  const sessionData = { user: user._id, fingerPrint: fingerprint, clientType, refreshToken };
+  await userSession.findOneAndUpdate({ user: user._id, fingerPrint: fingerprint, clientType }, sessionData, { upsert: true });
+
+  // Update or add the new refresh token
+  const tokenIndex = user.refreshTokens?.findIndex(rt => rt.clientType === clientType && rt.fingerprint === fingerprint) || -1;
+  if (tokenIndex !== -1) {
+      user.refreshTokens![tokenIndex] = { token: refreshToken, clientType, fingerprint: fingerprint };
+  } else {
+    user.refreshTokens?.push({ token: refreshToken, clientType, fingerprint: fingerprint });
+  }
+
+  await user.save();
 
   req.session.access = accessToken;
   req.session.refresh = refreshToken;
-  user.token = refreshToken;
-  user.notificationToken = req.body.notificationToken?req.body.notificationToken:null;
-  
-  await user.save();
 
-  res.status(200).json({ message: 'success' });
+  res.status(200).json({ message:'success'});
 };

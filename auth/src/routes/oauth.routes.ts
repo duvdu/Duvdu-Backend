@@ -19,16 +19,16 @@ router.get(
 );
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-router.get('/google/success', (req, res) => {
-  console.log('hello here');
-  req.session.access = (req.user as Iuser).token;
-  req.session.refresh = generateRefreshToken({id:(req.user as Iuser).id});
-  res.redirect('/profile');
-});
-router.get('/google/failure', (req, res) => {
-  console.log('fail');
-  res.send('helllo metoo');
-});
+// router.get('/google/success', (req, res) => {
+//   console.log('hello here');
+//   req.session.access = (req.user as Iuser).token;
+//   req.session.refresh = generateRefreshToken({id:(req.user as Iuser).id});
+//   res.redirect('/profile');
+// });
+// router.get('/google/failure', (req, res) => {
+//   console.log('fail');
+//   res.send('helllo metoo');
+// });
 
 router.get('/apple', passport.authenticate('apple'));
 

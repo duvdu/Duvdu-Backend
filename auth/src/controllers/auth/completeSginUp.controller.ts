@@ -69,37 +69,29 @@ export const completeSginupHandler: CompleteSginUpHandler = async (req,res,next)
   };
 
 
-  const fingerprint = await generateBrowserFingerprint(); 
-
+  const fingerprint = await generateBrowserFingerprint();
+  const userAgent = req.headers['user-agent'];
+  const clientType = userAgent && /mobile|android|touch|webos/i.test(userAgent) ? 'mobile' : 'web';    
+  const refreshToken = generateRefreshToken({id:user._id.toString()});
   const accessToken = generateAccessToken({
     id: user.id,
-    isBlocked: { value: false },
-    isVerified: false,
+    isVerified: user.isVerified,
+    isBlocked: user.isBlocked,
     role: { key: role.key, permissions: role.permissions },
   });
-  const refreshToken = generateRefreshToken({ id: user.id });
-  
-  let userSessionDoc = await userSession.findOne({ user: user._id, fingerPrint: fingerprint }).exec();
-  const userAgent = req.headers['user-agent'];
-  let clientType = 'web';
 
-  if (userAgent && /mobile|android|touch|webos/i.test(userAgent))
-    clientType = 'mobile';
-  if (userSessionDoc) {
-    await userSessionDoc.updateOne({ accessToken, refreshToken });
+  // Update or replace existing session and token
+  const sessionData = { user: user._id, fingerPrint: fingerprint, clientType, refreshToken };
+  await userSession.findOneAndUpdate({ user: user._id, fingerPrint: fingerprint, clientType }, sessionData, { upsert: true });
+
+  // Update or add the new refresh token
+  const tokenIndex = user.refreshTokens?.findIndex(rt => rt.clientType === clientType && rt.fingerprint === fingerprint) || -1;
+  if (tokenIndex !== -1) {
+      user.refreshTokens![tokenIndex] = { token: refreshToken, clientType, fingerprint: fingerprint };
   } else {
-    userSessionDoc = await userSession.create({
-      user: user._id,
-      fingerPrint: fingerprint,
-      accessToken,
-      refreshToken,
-      clientType,
-      userAgent
-    });
+    user.refreshTokens?.push({ token: refreshToken, clientType, fingerprint: fingerprint });
   }
 
-
-  user.token = accessToken;
   await user.save();
 
   req.session.access = accessToken;
