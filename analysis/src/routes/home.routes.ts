@@ -7,3 +7,4 @@ export const router = express.Router();
 router.get('/trendycategory', handler.getTrendyCategoriesHandler);
 router.get('/discovertags', handler.getDiscoverTagsHandler);
 router.get('/popularsubcategory', handler.getPopularSubCategoriesHandler);
+router.get('/minutes-per-visit', handler.getMinutesPerVisitByDayAndLocation);
