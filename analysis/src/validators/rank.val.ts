@@ -4,14 +4,14 @@ import { body ,param, query } from 'express-validator';
 
 export const createRankVal = [
   body('rank').isString().exists().withMessage('rank'),
-  body('actionCount').isInt({min:1}).withMessage('actionCount'),
+  body('actionCount').isInt({min:0}).withMessage('actionCount'),
   globalValidatorMiddleware
 ];
 
 export const updateRankVal = [
   param('rankId').isMongoId().withMessage('rankId'),
   body('rank').optional().isString().exists().withMessage('rank'),
-  body('actionCount').optional().isInt({min:1}).withMessage('actionCount'),
+  body('actionCount').optional().isInt({min:0}).withMessage('actionCount'),
   globalValidatorMiddleware
 ];
 
