@@ -1,4 +1,4 @@
-import { SuccessResponse, NotAllowedError, CopyRights } from '@duvdu-v1/duvdu';
+import { SuccessResponse, NotAllowedError, CopyRights, Project, MODELS } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 export const removeProjectHandler: RequestHandler<{ projectId: string }, SuccessResponse> = async (
@@ -15,6 +15,15 @@ export const removeProjectHandler: RequestHandler<{ projectId: string }, Success
     { isDeleted: true },
   );
   if (!project) return next(new NotAllowedError(undefined , req.lang));
+
+  await Project.findOneAndDelete({
+    project: {
+      type: project.id,
+      ref: MODELS.copyrights,
+    },
+    user: req.loggedUser.id,
+    ref: MODELS.copyrights,
+  });
 
   res.status(200).json({ message: 'success' });
 };
