@@ -8,7 +8,6 @@ router.post(
   globalUploadMiddleware('setting' as any).single('cover'),
   async (req, res, next) => {
     const { title, subTitle } = req.body;
-    if (!title || !subTitle) return next(new BadRequestError());
 
     if (!req.file) return next(new BadRequestError('cover not found'));
     await new Bucket().saveBucketFiles('setting', req.file);
@@ -31,7 +30,7 @@ router.get('/', async (req, res) => {
   }
 
   setting.splash.forEach((el) => {
-    el.cover = process.env.BUCKET_URL + '/' + el.cover;
+    el.cover = process.env.BUCKET_HOST + '/' + el.cover;
   });
 
   res.status(200).json(setting.splash);
@@ -51,10 +50,10 @@ router.delete('/:id', async (req, res) => {
     return res.status(404).json({ message: 'Splash item not found' });
   }
 
+  await new Bucket().removeBucketFiles(setting.splash[splashIndex].cover);
   setting.splash.splice(splashIndex, 1);
   await setting.save();
 
-  await new Bucket().removeBucketFiles(setting.splash[splashIndex].cover);
   res.status(200).json(setting);
 });
 
