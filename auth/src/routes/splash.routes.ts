@@ -8,7 +8,6 @@ router.post(
   globalUploadMiddleware('setting' as any).single('cover'),
   async (req, res, next) => {
     const { title, subTitle } = req.body;
-    if (!title || !subTitle) return next(new BadRequestError());
 
     if (!req.file) return next(new BadRequestError('cover not found'));
     await new Bucket().saveBucketFiles('setting', req.file);
@@ -55,7 +54,7 @@ router.delete('/:id', async (req, res) => {
   setting.splash.splice(splashIndex, 1);
   await setting.save();
 
-  res.status(200).json(setting);
+  res.status(204).json();
 });
 
 export const splashRoutes = router;
