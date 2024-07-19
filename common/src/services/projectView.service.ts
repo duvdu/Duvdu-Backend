@@ -8,10 +8,11 @@ import { Iuser } from '../types/User';
 
 type UserDocument = Document & Iuser;
 
+
 export const incrementProjectsView = async (userId: string , projectId:string , lang:string) => {
   try {
     const user = await Users.findById(userId) as UserDocument;
-    const project = await Project.findOne({project:projectId});
+    const project = await Project.findOne({'project.type':projectId});
     if (!user) 
       throw new NotFound({en:'user not found' , ar:'لم يتم العثور على المستخدم'} , lang);
     
