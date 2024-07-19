@@ -51,6 +51,14 @@ export const getContract: RequestHandler<
       },
     },
     {
+      $lookup: {
+        from: 'team_contracts',
+        localField: 'contract',
+        foreignField: '_id',
+        as: 'team_contracts',
+      },
+    },
+    {
       $unwind: {
         path: '$producer_contract',
         preserveNullAndEmptyArrays: true,
@@ -75,6 +83,12 @@ export const getContract: RequestHandler<
       },
     },
     {
+      $unwind: {
+        path: '$team_contracts',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
       $set: {
         contract: {
           $ifNull: [
@@ -82,7 +96,7 @@ export const getContract: RequestHandler<
               $ifNull: [
                 '$copyright_contract',
                 {
-                  $ifNull: ['$producer_contract', '$rental_contract', '$project_contracts'],
+                  $ifNull: ['$producer_contract', '$rental_contract', '$project_contracts','$team_contracts'],
                 },
               ],
             },
