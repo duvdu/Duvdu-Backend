@@ -5,6 +5,7 @@ import { body ,param, query } from 'express-validator';
 export const createRankVal = [
   body('rank').isString().exists().withMessage('rank'),
   body('actionCount').isInt({min:0}).withMessage('actionCount'),
+  body('color').exists().isString(),
   globalValidatorMiddleware
 ];
 
@@ -12,6 +13,7 @@ export const updateRankVal = [
   param('rankId').isMongoId().withMessage('rankId'),
   body('rank').optional().isString().exists().withMessage('rank'),
   body('actionCount').optional().isInt({min:0}).withMessage('actionCount'),
+  body('color').optional().exists().isString(),
   globalValidatorMiddleware
 ];
 

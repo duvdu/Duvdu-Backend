@@ -24,10 +24,10 @@ declare global {
 
 
 export interface CreateRankHandler
-extends RequestHandler<unknown , SuccessResponse<{data:Irank}> , Pick<Irank , 'actionCount' | 'rank'> , unknown >{}
+extends RequestHandler<unknown , SuccessResponse<{data:Irank}> , Pick<Irank , 'actionCount' | 'rank' | 'color'> , unknown >{}
 
 export interface UpdateRankHandler
-extends RequestHandler<{rankId:string} , SuccessResponse<{data:Irank}> , Partial<Pick<Irank , 'actionCount' | 'rank'>> , unknown>{}
+extends RequestHandler<{rankId:string} , SuccessResponse<{data:Irank}> , Partial<Pick<Irank , 'actionCount' | 'rank' | 'color'>> , unknown>{}
 
 export interface GetRankHandler
 extends RequestHandler<{rankId:string} , SuccessResponse<{data:Irank}> , unknown , unknown>{}
