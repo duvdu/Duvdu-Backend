@@ -73,14 +73,4 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-userSchema.post(/^find/, async function (docs) {
-  if (Array.isArray(docs)) {
-    for (const doc of docs) {
-      await updateRankForUser(doc);
-    }
-  } else {
-    await updateRankForUser(docs);
-  }
-});
-
 export const Users = model<Iuser>(MODELS.user, userSchema);
