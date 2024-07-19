@@ -41,18 +41,12 @@ export const getProjectsPagination: RequestHandler<
 
   if (req.query.minBudget !== undefined) 
     req.pagination.filter['creatives.users.totalAmount'] = { $gte: req.query.minBudget };
-  
-
-  if (req.query.user) 
-    req.pagination.filter.user = new mongoose.Types.ObjectId(req.query.user);
 
   if (req.query.isDeleted) 
     req.pagination.filter.isDeleted = req.query.isDeleted;
   
   if (req.query.creative) 
     req.pagination.filter['creatives.users.user'] = new mongoose.Types.ObjectId(req.query.creative);
-  
-
 
   next();
 };
@@ -60,7 +54,7 @@ export const getProjectsPagination: RequestHandler<
 
 
 export const getProjectsHandler:GetProjectsHandler = async (req,res)=>{
-  const projects = await TeamProject.find({ ...req.pagination.filter, isDeleted: { $ne: true } })
+  const projects = await TeamProject.find({ ...req.pagination.filter , user:req.loggedUser.id, isDeleted: { $ne: true } })
     .skip(req.pagination.skip)
     .limit(req.pagination.limit)
     .populate([
@@ -69,7 +63,7 @@ export const getProjectsHandler:GetProjectsHandler = async (req,res)=>{
       { path: 'creatives.users.user', select: 'profileImage projectsView rank rate name acceptedProjectsCounter isOnline username' },
     ]);
 
-  const resultCount = await TeamProject.countDocuments({ ...req.pagination.filter, isDeleted: { $ne: true } });
+  const resultCount = await TeamProject.countDocuments({ ...req.pagination.filter , user:req.loggedUser.id, isDeleted: { $ne: true } });
 
   const transformedProjects: ITeamProject[] = [];
 

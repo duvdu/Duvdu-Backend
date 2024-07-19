@@ -30,10 +30,10 @@ router.route('/').post(
   checkRequiredFields({ fields: ['cover'] }),
   controllers.createProjectHandler
 )
-  .get( val.getAll , globalPaginationMiddleware , controllers.getProjectsPagination , controllers.getProjectsHandler);
+  .get( isauthenticated , val.getAll , globalPaginationMiddleware , controllers.getProjectsPagination , controllers.getProjectsHandler);
 
 router.route('/:teamId')
-  .get( val.getOne , controllers.getProjectHandler)
+  .get( isauthenticated , val.getOne , controllers.getProjectHandler)
   .delete(isauthenticated , val.getOne , controllers.deleteProjectHandler);
 
 
