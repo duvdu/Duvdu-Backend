@@ -79,6 +79,7 @@ export * from './models/projectViews.model';
 
 export * from './services/category.service';
 export * from './services/projectView.service';
+export * from './services/rank.service';
 export * from './types/notification.type';
 export * from './types/notification_details';
 
