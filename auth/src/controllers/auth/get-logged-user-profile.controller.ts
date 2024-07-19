@@ -6,7 +6,7 @@ export const getLoggedUserProfileHandler: GetLoggedUserProfileHandler = async (r
   
   const user = await Users.findById(req.loggedUser?.id)
     .select(
-      '-googleId -appleId -password -verificationCode.code -verificationCode.expireAt -token -role -favourites',
+      '-googleId -appleId -password -verificationCode.code -verificationCode.expireAt -refreshTokens -role -favourites',
     ).populate({path:'category' , select:'title'})
     .lean();
   if (!user) return next(new UnauthenticatedError(undefined, req.lang));
