@@ -81,15 +81,15 @@ export const completeSginupHandler: CompleteSginUpHandler = async (req,res,next)
   });
 
   // Update or replace existing session and token
-  const sessionData = { user: user._id, fingerPrint: fingerprint, clientType, refreshToken };
-  await userSession.findOneAndUpdate({ user: user._id, fingerPrint: fingerprint, clientType }, sessionData, { upsert: true });
+  const sessionData = { user: user._id, fingerPrint: fingerprint, clientType, refreshToken , userAgent };
+  await userSession.findOneAndUpdate({ user: user._id, fingerPrint: fingerprint, clientType  , userAgent}, sessionData, { upsert: true });
 
   // Update or add the new refresh token
-  const tokenIndex = user.refreshTokens?.findIndex(rt => rt.clientType === clientType && rt.fingerprint === fingerprint) || -1;
+  const tokenIndex = user.refreshTokens?.findIndex(rt => rt.clientType === clientType && rt.fingerprint === fingerprint && rt.userAgent === userAgent) || -1;
   if (tokenIndex !== -1) {
-      user.refreshTokens![tokenIndex] = { token: refreshToken, clientType, fingerprint: fingerprint };
+      user.refreshTokens![tokenIndex] = { token: refreshToken, clientType, fingerprint: fingerprint , userAgent:userAgent! };
   } else {
-    user.refreshTokens?.push({ token: refreshToken, clientType, fingerprint: fingerprint });
+    user.refreshTokens?.push({ token: refreshToken, clientType, fingerprint: fingerprint , userAgent:userAgent!});
   }
 
   await user.save();

@@ -52,8 +52,16 @@ export const getProjectAnalysis: RequestHandler<
   const topUsers = await ProjectCycle.aggregate(topUsersPipeline);
 
   const topAddressesPipeline: PipelineStage[] = [
-    { $group: { _id: '$location', totalProjects: { $sum: 1 } } },
+    { $group: { _id: { location: '$location', address: '$address' }, totalProjects: { $sum: 1 } } },
     { $sort: { totalProjects: -1 } },
+    { 
+      $project: { 
+        _id: 0, 
+        location: '$_id.location', 
+        address: '$_id.address', 
+        totalProjects: 1 
+      } 
+    }
   ];
   if (matchedPeriod.createdAt) topAddressesPipeline.unshift({ $match: matchedPeriod });
   const addressStats = await ProjectCycle.aggregate(topAddressesPipeline);

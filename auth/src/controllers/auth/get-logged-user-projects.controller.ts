@@ -1,13 +1,13 @@
-import { NotFound, Project, SuccessResponse, Users } from '@duvdu-v1/duvdu';
+import { MODELS, NotFound, Project, SuccessResponse, Users } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 export const getLoggedUserProjects: RequestHandler<
   unknown,
   SuccessResponse<{ data: any }>
 > = async (req, res) => {
-  const count = await Project.countDocuments({ user: req.loggedUser.id });
+  const count = await Project.countDocuments({ user: req.loggedUser.id , ref: {$in:[MODELS.portfolioPost , 'rentals']} });
 
-  const projects = await Project.find({ user: req.loggedUser.id })
+  const projects = await Project.find({ user: req.loggedUser.id , ref: {$in:[MODELS.portfolioPost , 'rentals']} })
     .populate({
       path: 'project.type',
       select: 'cover title name creatives cycle',
@@ -81,9 +81,9 @@ export const getUserProjectsByUsername: RequestHandler<
   const targetUser = await Users.findOne({ username: req.params.username }, { _id: 1 });
   if (!targetUser) return next(new NotFound());
 
-  const count = await Project.countDocuments({ user: targetUser.id });
+  const count = await Project.countDocuments({ user: targetUser.id , ref: {$in:[MODELS.portfolioPost , 'rentals']}});
 
-  const projects = await Project.find({ user: targetUser.id })
+  const projects = await Project.find({ user: targetUser.id , ref: {$in:[MODELS.portfolioPost , 'rentals']} })
     .populate({
       path: 'project.type',
       select: 'cover title name creatives cycle',

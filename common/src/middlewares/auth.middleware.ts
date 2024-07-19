@@ -25,7 +25,14 @@ export const isauthenticated: RequestHandler = async (req, res, next) => {
   } catch (error) {
     try {
       const payload = <{id:string}>verify((req as any).session.refresh, process.env.JWT_KEY!);
-      const user = await Users.findById(payload.id);
+      const user = await Users.findOne({
+        _id: payload.id,
+        refreshTokens: {
+          $elemMatch: {
+            token: (req as any).session.refresh
+          }
+        }
+      });  
       if (!user) 
         return res.status(423).json({ message: 'token expired' });
 

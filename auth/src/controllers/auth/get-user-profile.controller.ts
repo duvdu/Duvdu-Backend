@@ -5,7 +5,7 @@ import { GetUserProfileHandler } from '../../types/endpoints/user.endpoints';
 export const getUserProfileHandler: GetUserProfileHandler = async (req, res, next) => {
   const user = await Users.findOne({ username: req.params.username })
     .select(
-      '-googleId -appleId -phoneNumber -password -verificationCode.code -verificationCode.expireAt -token -role -avaliableContracts -favourites',
+      '-googleId -appleId -phoneNumber -password -verificationCode.code -verificationCode.expireAt -refreshTokens -role -avaliableContracts -favourites',
     )
     .populate({ path: 'category', select: 'title' });
   if (!user) return next(new NotFound(undefined, req.lang));
