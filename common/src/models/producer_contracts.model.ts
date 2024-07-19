@@ -15,6 +15,7 @@ export enum ContractStatus {
 
 export interface IproducerContarct {
     producer:Types.ObjectId | Iuser,
+    sp:Types.ObjectId | Iuser,
     user:Types.ObjectId | Iuser,
     platform:string;
     projectDetails:string;
@@ -34,6 +35,7 @@ export interface IproducerContarct {
 
 export const ProducerContract = model<IproducerContarct>(MODELS.producerContract , new Schema<IproducerContarct>({
   producer:{type:Schema.Types.ObjectId , ref:MODELS.user},
+  sp:{type:Schema.Types.ObjectId , ref:MODELS.user},
   user:{type:Schema.Types.ObjectId , ref:MODELS.user},
   platform:{type:String , default:null},
   projectDetails:{type:String , default:null},
