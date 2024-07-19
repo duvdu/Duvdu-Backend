@@ -1,10 +1,31 @@
+import { SuccessResponse } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import mongoose from 'mongoose';
 
-export const contractAnalysis: RequestHandler = async (req, res) => {
+export const contractAnalysis: RequestHandler<
+  unknown,
+  SuccessResponse<any>,
+  unknown,
+  {
+    dateFrom?: string;
+    dateTo?: string;
+  }
+> = async (req, res) => {
+  const filter: any = { $match: {} };
+  if (req.query.dateFrom || req.query.dateTo) {
+    filter.$match.createdAt = {};
+    if (req.query.dateFrom) {
+      filter.$match.createdAt.$gte = new Date(req.query.dateFrom);
+    }
+    if (req.query.dateTo) {
+      filter.$match.createdAt.$lte = new Date(req.query.dateTo);
+    }
+  }
+
   const copyrightContracts = await mongoose.connection.db
     .collection('copyright_contracts')
     .aggregate([
+      filter,
       {
         $facet: {
           totalPriceCount: [
@@ -309,11 +330,11 @@ export const contractAnalysis: RequestHandler = async (req, res) => {
                           input: [
                             'canceled',
                             'pending',
-                            'waiting-for-payment',  
+                            'waiting-for-payment',
                             'ongoing',
                             'completed',
                             'rejected',
-                            'complaint'
+                            'complaint',
                           ],
                           as: 'status',
                           in: {
@@ -397,7 +418,7 @@ export const contractAnalysis: RequestHandler = async (req, res) => {
                           input: [
                             'canceled',
                             'pending',
-                            'waiting-for-total-payment',  
+                            'waiting-for-total-payment',
                             'ongoing',
                             'completed',
                             'rejected',
