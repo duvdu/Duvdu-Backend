@@ -101,6 +101,4 @@ router.route('/profile/:username').get(optionalAuthenticated, handlers.getUserPr
 
 router.route('/verify').post(val.verify, handlers.verifyHandler);
 
-router.route('/refresh').post(handlers.askRefreshTokenHandler);
-
 export const authRoutes = router;
