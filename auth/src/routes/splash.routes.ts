@@ -8,6 +8,7 @@ router.post(
   globalUploadMiddleware('setting' as any).single('cover'),
   async (req, res, next) => {
     const { title, subTitle } = req.body;
+    if (!title || !subTitle) return next(new BadRequestError());
 
     if (!req.file) return next(new BadRequestError('cover not found'));
     await new Bucket().saveBucketFiles('setting', req.file);
