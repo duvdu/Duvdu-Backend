@@ -45,7 +45,11 @@ export const updatePhoneNumberHandler: RequestHandler<
     expireAt: new Date(Date.now() + 60 * 1000).toString(),
   };
   currentUser.isVerified = false;
-  currentUser.token = undefined;
+  const tokenIndex = currentUser.refreshTokens?.findIndex(rt => rt.token === req.session.refresh) || -1;
+
+  if (tokenIndex !== -1) 
+    currentUser.refreshTokens?.splice(tokenIndex , 1);
+
   await currentUser.save();
 
   //TODO: send OTP
