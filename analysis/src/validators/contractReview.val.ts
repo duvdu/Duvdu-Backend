@@ -28,7 +28,8 @@ export const getAll = [
   query('searchKeywords').optional().isArray({ min: 1 }).withMessage('searchKeywordsArray'),
   query('searchKeywords.*').optional().isString().withMessage('searchKeywordsString'),
   query('contract').optional().isMongoId().withMessage('contract'),
-  query('user').optional().isMongoId().withMessage('user'),
+  query('sp').optional().isString().withMessage('user'),
+  query('user').optional().isMongoId().withMessage('customer'),
   query('limit').optional().isInt({ min: 1 }).withMessage('limit'),
   query('page').optional().isInt({ min: 1 }).withMessage('page'),
   globalValidatorMiddleware

@@ -12,7 +12,7 @@ export const updateReviewHandler:UpdateReviewHandler = async (req,res,next)=>{
   if (!review) 
     return next(new NotFound({en:'review not found' , ar:'لم يتم العثور على المراجعة'} , req.lang));
     
-  if (review.user.toString() != req.loggedUser.id) 
+  if (review.customer.toString() != req.loggedUser.id) 
     return next(new NotAllowedError(undefined , req.lang));
 
   const updatedReview = await ContractReview.findByIdAndUpdate(req.params.reviewId , req.body , {new:true});

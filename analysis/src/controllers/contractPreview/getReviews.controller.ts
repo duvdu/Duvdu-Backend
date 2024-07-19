@@ -1,6 +1,6 @@
 import 'express-async-errors';
 
-import { ContractReview } from '@duvdu-v1/duvdu';
+import { ContractReview, Users } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import mongoose from 'mongoose';
 
@@ -15,9 +15,10 @@ export const getProjectsPagination: RequestHandler<
   {
     searchKeywords?: string[];
     contract?: string;
-    user?: string;
+    sp?: string;
+    customer?: string;
   }
-> = (req, res, next) => {
+> = async (req, res, next) => {
   req.pagination.filter = {};
 
   if (req.query.searchKeywords) 
@@ -25,8 +26,13 @@ export const getProjectsPagination: RequestHandler<
       comment: { $regex: keyword, $options: 'i' },
     }));
   
-  if (req.query.user) 
-    req.pagination.filter.user = new mongoose.Types.ObjectId(req.query.user);
+  if (req.query.sp){
+    const user = await Users.findOne({username:req.query.sp});
+    req.pagination.filter.user = new mongoose.Types.ObjectId(user?._id);
+  }
+
+  if (req.query.customer) 
+    req.pagination.filter.user = new mongoose.Types.ObjectId(req.query.customer);
 
   if (req.query.contract) 
     req.pagination.filter.contract = new mongoose.Types.ObjectId(req.query.contract);
@@ -39,7 +45,11 @@ export const getReviewsHandler:GetReviewsHandler = async (req,res)=>{
   const reviews = await ContractReview.find(req.pagination.filter)
     .skip(req.pagination.skip)
     .limit(req.pagination.limit)
-    .populate([{ path: 'user', select: 'profileImage projectsView rank rate name acceptedProjectsCounter isOnline username' }]);
+    .sort({createAt:-1})
+    .populate([
+      { path: 'sp', select: 'profileImage projectsView rank rate name acceptedProjectsCounter isOnline username' },
+      { path: 'customer', select: 'profileImage projectsView rank rate name acceptedProjectsCounter isOnline username' },
+    ]);
 
   const resultCount = await ContractReview.countDocuments(req.pagination.filter);
 
