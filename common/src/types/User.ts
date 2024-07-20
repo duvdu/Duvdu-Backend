@@ -47,6 +47,6 @@ export interface Iuser {
   favourites: { project: Types.ObjectId; cycle: string }[];
   address:string,
   likes:number,
-  rank:{title:string , nextRangPercentage:number},
+  rank:{title:string | null , nextRangPercentage:number , nextRankTitle:string | null},
   projectsView:number
 }
