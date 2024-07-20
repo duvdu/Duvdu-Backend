@@ -141,7 +141,7 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
         (el: any) => el.project.toString() === projects[0]._id.toString(),
       );
     }
-    await incrementProjectsView(projects[0].user._id , projects[0]._id , req.lang);
+    await incrementProjectsView(projects[0].user._id  , MODELS.portfolioPost, projects[0]._id , req.lang);
 
 
 
