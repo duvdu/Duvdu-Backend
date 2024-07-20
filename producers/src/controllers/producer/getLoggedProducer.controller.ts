@@ -22,6 +22,21 @@ export const getLoggedProducerHandler: GetLoggedProducerHandler = async (req, re
       $unwind: '$category',
     },
     {
+      $set: {
+        category: {
+          _id: '$category._id',
+          image: { $concat: [process.env.BUCKET_HOST, '/', '$category.image'] },
+          title: {
+            $cond: {
+              if: { $eq: [req.lang, 'ar'] },
+              then: '$category.title.ar',
+              else: '$category.title.en',
+            },
+          },
+        },
+      },
+    },
+    {
       $lookup: {
         from: MODELS.user,
         localField: 'user',
