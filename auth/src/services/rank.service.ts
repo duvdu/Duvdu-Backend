@@ -1,9 +1,6 @@
 import { NotFound, Rank, Users } from '@duvdu-v1/duvdu';
 
 
-
-
-
 export const updateRankForUser = async (userId: string , lang:string) => {
   const user = await Users.findById(userId);
   if (!user) throw new NotFound(undefined, lang);
@@ -19,13 +16,15 @@ export const updateRankForUser = async (userId: string , lang:string) => {
       const actionsNeeded = nextRank.actionCount - currentRank.actionCount;
       const actionsCompleted = user.acceptedProjectsCounter - currentRank.actionCount;
       user.rank.nextRangPercentage = (actionsCompleted / actionsNeeded) * 100;
+      user.rank.nextRankTitle = nextRank.rank;
     } else {
       user.rank.nextRangPercentage = 100;
     }
 
   } else {
-    user.rank.title = '';
+    user.rank.title = null ;
     user.rank.nextRangPercentage = 0; 
+    user.rank.nextRankTitle = null;
   }
 
   await user.save();

@@ -8,7 +8,7 @@ import { Iuser } from '../types/User';
 
 type UserDocument = Document & Iuser;
 
-export const incrementProjectsView = async (userId: string, projectId: string, lang: string) => {
+export const incrementProjectsView = async (userId: string , ref:string, projectId: string, lang: string) => {
   try {
     const user = (await Users.findById(userId)) as UserDocument;
     const project = await Project.findOne({ 'project.type': projectId });
@@ -22,19 +22,13 @@ export const incrementProjectsView = async (userId: string, projectId: string, l
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-
-    const update = await ProjectView.updateOne(
+  
+    await ProjectView.updateOne(
       { user: userId, project: project._id, date: today },
-      { $inc: { count: 1 }, $setOnInsert: { ref: project.cycle, date: today } },
+      { $inc: { count: 1 }, $setOnInsert: { ref: ref , date: today } },
       { upsert: true },
     );
 
-    if (!update.upsertedId) {
-      await ProjectView.updateOne(
-        { user: userId, project: project._id, date: today },
-        { $inc: { count: 1 } },
-      );
-    }
   } catch (error) {
     console.error('Error incrementing projectsView:', error);
     throw error;

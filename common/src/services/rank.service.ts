@@ -17,13 +17,15 @@ export const updateRankForUser = async (user: UserDocument) => {
       const actionsNeeded = nextRank.actionCount - currentRank.actionCount;
       const actionsCompleted = user.acceptedProjectsCounter - currentRank.actionCount;
       user.rank.nextRangPercentage = (actionsCompleted / actionsNeeded) * 100;
+      user.rank.nextRankTitle = nextRank.rank;
     } else {
       user.rank.nextRangPercentage = 100;
     }
 
   } else {
-    user.rank.title = '';
+    user.rank.title = null;
     user.rank.nextRangPercentage = 0; 
+    user.rank.nextRankTitle = null;
   }
 
   return user.save();
