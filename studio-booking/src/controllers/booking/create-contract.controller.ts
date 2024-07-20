@@ -58,6 +58,8 @@ export const createContractHandler: RequestHandler<
       numberOfUnits: req.body.projectScale.numberOfUnits,
       unitPrice: project.projectScale.pricerPerUnit,
     },
+    location: project.location,
+    address: project.address,
 
     totalPrice: (req.body.projectScale.numberOfUnits * project.projectScale.pricerPerUnit).toFixed(
       2,

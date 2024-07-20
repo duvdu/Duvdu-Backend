@@ -84,6 +84,41 @@ export const contractAction: RequestHandler<
       //   { contractId: contract.id },
       //   { delay: (contract.stageExpiration || 0) * 60 * 60 * 1000 },
       // );
+    } else if (
+      req.body.action === 'reject' &&
+      contract.status === ContractStatus.updateAfterFirstPayment
+    ) {
+      await CopyrightContracts.updateOne(
+        { _id: req.params.contractId },
+        { status: ContractStatus.rejected, rejectedBy: 'sp', actionAt: new Date() },
+      );
+      // await contractNotification(
+      //   contract.id,
+      //   contract.customer.toString(),
+      //   'copyright contract rejected by the SP',
+      // );
+    } else if (
+      req.body.action === 'accept' &&
+      contract.status === ContractStatus.updateAfterFirstPayment
+    ) {
+      const paymentSession = crypto.randomBytes(16).toString('hex');
+      await CopyrightContracts.updateOne(
+        { _id: req.params.contractId },
+        {
+          status: ContractStatus.waitingForTotalPayment,
+          actionAt: new Date(),
+          paymentLink: paymentSession,
+        },
+      );
+      // await contractNotification(
+      //   contract.id,
+      //   contract.customer.toString(),
+      //   `copyright contract accpted by the SP, please pay to complete this contract within ${contract.stageExpiration}h`,
+      // );
+      // await totalPaymentExpiration.add(
+      //   { contractId: contract.id },
+      //   { delay: (contract.stageExpiration || 0) * 60 * 60 * 1000 },
+      // );
     } else
       return next(
         new NotAllowedError(
@@ -130,41 +165,6 @@ export const contractAction: RequestHandler<
       //   contract.id,
       //   contract.sp.toString(),
       //   'copyright contract rejected by the customer',
-      // );
-    } else if (
-      req.body.action === 'reject' &&
-      contract.status === ContractStatus.updateAfterFirstPayment
-    ) {
-      await CopyrightContracts.updateOne(
-        { _id: req.params.contractId },
-        { status: ContractStatus.rejected, rejectedBy: 'customer', actionAt: new Date() },
-      );
-      // await contractNotification(
-      //   contract.id,
-      //   contract.customer.toString(),
-      //   'copyright contract rejected by the SP',
-      // );
-    } else if (
-      req.body.action === 'accept' &&
-      contract.status === ContractStatus.updateAfterFirstPayment
-    ) {
-      const paymentSession = crypto.randomBytes(16).toString('hex');
-      await CopyrightContracts.updateOne(
-        { _id: req.params.contractId },
-        {
-          status: ContractStatus.waitingForTotalPayment,
-          actionAt: new Date(),
-          paymentLink: paymentSession,
-        },
-      );
-      // await contractNotification(
-      //   contract.id,
-      //   contract.customer.toString(),
-      //   `copyright contract accpted by the SP, please pay to complete this contract within ${contract.stageExpiration}h`,
-      // );
-      // await totalPaymentExpiration.add(
-      //   { contractId: contract.id },
-      //   { delay: (contract.stageExpiration || 0) * 60 * 60 * 1000 },
       // );
     } else
       return next(

@@ -12,6 +12,17 @@ export const getLoggedProducerHandler: GetLoggedProducerHandler = async (req, re
     },
     {
       $lookup: {
+        from: MODELS.category,
+        localField: 'category',
+        foreignField: '_id',
+        as: 'category',
+      },
+    },
+    {
+      $unwind: '$category',
+    },
+    {
+      $lookup: {
         from: MODELS.user,
         localField: 'user',
         foreignField: '_id',
@@ -61,7 +72,8 @@ export const getLoggedProducerHandler: GetLoggedProducerHandler = async (req, re
         searchKeywords: 1,
         createdAt: 1,
         updatedAt: 1,
-        category: 1,
+        'category._id': 1,
+        'category.title': 1,
         user: {
           profileImage: {
             $cond: [

@@ -19,6 +19,8 @@ export interface IrentalContract {
   details: string;
   insurance: number;
   projectScale: { unit: string; numberOfUnits: number; unitPrice: number };
+  location: { lat: number; lng: number };
+  address: string;
   totalPrice: number;
   startDate: Date;
   deadline: Date;
@@ -42,6 +44,8 @@ export const RentalContracts = model<IrentalContract>(
       details: { type: String, default: null },
       insurance: { type: Number, default: null },
       projectScale: { unit: String, numberOfUnits: Number, unitPrice: Number },
+      location: { lat: Number, lng: Number },
+      address: String,
       totalPrice: Number,
       startDate: Date,
       deadline: Date,
