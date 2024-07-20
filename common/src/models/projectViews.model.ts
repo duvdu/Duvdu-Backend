@@ -7,7 +7,7 @@ import { MODELS } from '../types/model-names';
 
 enum RefModels {
     copyright = MODELS.portfolioPost,
-    studio = MODELS.studioBooking
+    studio = 'rentals'
   }
 
   interface IProjectView {

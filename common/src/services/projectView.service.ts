@@ -23,18 +23,12 @@ export const incrementProjectsView = async (userId: string , ref:string, project
     const today = new Date();
     today.setHours(0, 0, 0, 0);
   
-    const update = await ProjectView.updateOne(
+    await ProjectView.updateOne(
       { user: userId, project: project._id, date: today },
       { $inc: { count: 1 }, $setOnInsert: { ref: ref , date: today } },
       { upsert: true },
     );
 
-    if (!update.upsertedId) {
-      await ProjectView.updateOne(
-        { user: userId, project: project._id, date: today },
-        { $inc: { count: 1 } },
-      );
-    }
   } catch (error) {
     console.error('Error incrementing projectsView:', error);
     throw error;
