@@ -147,7 +147,7 @@ export const getSpecificChatHandler: GetSpecificChatHandler = async (req, res) =
       },
     },
     {
-      $sort: { createdAt: -1 },
+      $sort: { createdAt: 1 },
     },
     {
       $skip: req.pagination.skip,
