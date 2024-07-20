@@ -24,7 +24,7 @@ export const incrementProjectsView = async (userId: string , ref:string, project
     today.setHours(0, 0, 0, 0);
   
     await ProjectView.updateOne(
-      { user: userId, project: project._id, date: today },
+      { user: userId, project: projectId, date: today },
       { $inc: { count: 1 }, $setOnInsert: { ref: ref , date: today } },
       { upsert: true },
     );
