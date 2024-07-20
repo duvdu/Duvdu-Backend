@@ -133,7 +133,7 @@ RequestHandler<unknown , SuccessResponse , unknown , unknown> = async (req,res)=
       $addFields: {
         projectDetails: {
           $cond: {
-            if: { $eq: ['$ref', 'portfolioPost'] },
+            if: { $eq: ['$ref', MODELS.portfolioPost] },
             then: '$portfolioPostDetails',
             else: '$studioBookingDetails'
           }
