@@ -56,7 +56,7 @@ export const updateContract = [
       if (!val.value || !val.unit) throw new Error();
       return true;
     }),
-  body('duration.value').optional().isInt({ gt: 0 }),
+  body('duration.value').optional().isInt({ gt: 0 }).bail().toInt(),
   body('duration.unit')
     .optional()
     .isString()
