@@ -81,7 +81,7 @@ export const addCreativeHandler:AddCreativeHandler = async (req,res,next)=>{
     duration: user.duration,
     workHours: user.workHours,
     hourPrice: user.hourPrice,
-    deadLine: user.deadLine,
+    deadline: user.deadLine,
     details: user.details,
     totalAmount: user.totalAmount,
     cycle: CYCLES.teamProject,
