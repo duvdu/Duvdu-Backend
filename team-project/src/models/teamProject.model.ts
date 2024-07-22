@@ -118,7 +118,7 @@ export interface ITeamContract {
   duration: Date;
   workHours: number;
   hourPrice: number;
-  deadLine: Date;
+  deadline: Date;
   details: string;
   attachments:string [];
   totalAmount: number;
@@ -145,7 +145,7 @@ export const TeamContract = model<ITeamContract>(
       duration: Date,
       workHours: { type: Number, default: 0 },
       hourPrice: { type: Number, default: 0 },
-      deadLine: Date,
+      deadline: Date,
       details: { type: String, default: null },
       totalAmount: { type: Number, default: 0 },
       actionAt: Date,

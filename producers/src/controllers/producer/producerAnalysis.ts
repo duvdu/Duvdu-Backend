@@ -84,7 +84,7 @@ export const getProducerAnalysis: RequestHandler<
         _id: 1,
         totalMaxBudget: 1,
         'userDetails.username': 1,
-        'userDetails.profileImage': { $concat: [process.env.BUCKET_HOST, '$userDetails.profileImage'] },
+        'userDetails.profileImage': { $concat: [process.env.BUCKET_HOST ,'/', '$userDetails.profileImage'] },
       },
     },
     { $sort: { totalMaxBudget: -1 } },
@@ -115,69 +115,6 @@ export const getProducerAnalysis: RequestHandler<
   ];
   if (matchedPeriod.createdAt) keywordStatsPipeline.unshift({ $match: matchedPeriod });
   const keywordStats = await Producer.aggregate(keywordStatsPipeline);
-
-  // const topProducersPipeline: PipelineStage[] = [
-  //   { $match: matchedPeriod },
-  //   { $group: { _id: '$producer', totalContracts: { $sum: 1 } } },
-  //   {
-  //     $lookup: {
-  //       from: MODELS.producer,
-  //       localField: '_id',
-  //       foreignField: '_id',
-  //       as: 'producerDetails',
-  //     },
-  //   },
-  //   { $unwind: '$producerDetails' },
-  //   {
-  //     $lookup: {
-  //       from: MODELS.user,
-  //       localField: 'producerDetails.user',
-  //       foreignField: '_id',
-  //       as: 'producerDetails.user',
-  //     },
-  //   },
-  //   { $unwind: '$producerDetails.user' },
-  //   {
-  //     $lookup: {
-  //       from: MODELS.category,
-  //       localField: 'producerDetails.category',
-  //       foreignField: '_id',
-  //       as: 'producerDetails.category',
-  //     },
-  //   },
-  //   { $unwind: '$producerDetails.category' },
-  //   {
-  //     $project: {
-  //       _id: 1,
-  //       totalContracts: 1,
-  //       'producerDetails.user.profileImage': { $concat: [process.env.BUCKET_HOST, 'producerDetails.user.profileImage'] },
-  //       'producerDetails.user.username': 1,
-  //       'producerDetails.category.title': `$producerDetails.category.title.${req.lang}`,
-  //       'producerDetails.subCategories': {
-  //         $map: {
-  //           input: '$producerDetails.subCategories',
-  //           as: 'subCategory',
-  //           in: {
-  //             title: `$$subCategory.title.${req.lang}`,
-  //             tags: {
-  //               $map: {
-  //                 input: '$$subCategory.tags',
-  //                 as: 'tag',
-  //                 in: `$$tag.${req.lang}`
-  //               }
-  //             }
-  //           }
-  //         }
-  //       },
-  //       'producerDetails.maxBudget': 1,
-  //       'producerDetails.minBudget': 1,
-  //       'producerDetails.searchKeywords': 1,
-  //     },
-  //   },
-  //   { $sort: { totalContracts: -1 } },
-  //   { $limit: 10 },
-  // ];
-  // const topProducers = await ProducerContract.aggregate(topProducersPipeline);
 
   const topProducersPipeline: PipelineStage[] = [
     { $match: matchedPeriod },
@@ -213,7 +150,7 @@ export const getProducerAnalysis: RequestHandler<
       $project: {
         _id: 1,
         totalContracts: 1,
-        'producerDetails.user.profileImage': { $concat: [process.env.BUCKET_HOST, 'producerDetails.user.profileImage'] },
+        'producerDetails.user.profileImage': { $concat: [process.env.BUCKET_HOST ,'/', 'producerDetails.user.profileImage'] },
         'producerDetails.user.username': 1,
         'producerDetails.category.title': `$producerDetails.category.title.${req.lang}`,
         'producerDetails.subCategories': {
