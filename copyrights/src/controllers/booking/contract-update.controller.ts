@@ -36,7 +36,7 @@ export const updateContractHandler: RequestHandler<
   // assert deadline after update
   if (req.body.duration) {
     req.body.deadline = addToDate(
-      contract.startDate,
+      new Date(contract.startDate),
       req.body.duration.unit as any,
       req.body.duration.value,
     ).toISOString();

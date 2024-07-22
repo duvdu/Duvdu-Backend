@@ -6,6 +6,6 @@ import { copyrightRoutes } from './project.routes';
 const router = Router();
 
 router.use('/contract', bookingRoutes);
-router.use('*', copyrightRoutes);
+router.use('/', copyrightRoutes);
 
 export const apiRoutes = router;

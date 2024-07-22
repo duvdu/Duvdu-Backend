@@ -26,6 +26,12 @@ router
   );
 
 router.get(
+  '/analysis',
+  isauthenticated,
+  isauthorized(PERMISSIONS.getCopyrightAnalysisHandler),
+  handlers.getProjectAnalysis,
+);
+router.get(
   '/crm',
   isauthenticated,
   isauthorized(PERMISSIONS.getCrmCopyrightsHandlers),
@@ -33,13 +39,6 @@ router.get(
   globalPaginationMiddleware,
   handlers.getProjectsPagination,
   handlers.getCrmProjectsHandler,
-);
-
-router.get(
-  '/analysis',
-  isauthenticated,
-  isauthorized(PERMISSIONS.getCopyrightAnalysisHandler),
-  handlers.getProjectAnalysis,
 );
 
 router
