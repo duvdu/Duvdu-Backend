@@ -5,7 +5,6 @@ import { RequestHandler } from 'express';
 
 import { GetRanksHandler } from '../../types/endpoints/rank.endpoints';
 
-
 export const getRanksPagination: RequestHandler<
   unknown,
   unknown,
@@ -47,20 +46,20 @@ export const getRanksPagination: RequestHandler<
   next();
 };
 
-
-
-export const getRanksHandler:GetRanksHandler = async (req,res)=>{
-  const ranks = await Rank.find(req.pagination.filter).skip(req.pagination.skip).limit(req.pagination.limit);
+export const getRanksHandler: GetRanksHandler = async (req, res) => {
+  const ranks = await Rank.find(req.pagination.filter)
+    .skip(req.pagination.skip)
+    .limit(req.pagination.limit);
 
   const resultCount = await Rank.countDocuments(req.pagination.filter);
 
   res.status(200).json({
-    message:'success',
-    pagination:{
-      currentPage:req.pagination.page,
+    message: 'success',
+    pagination: {
+      currentPage: req.pagination.page,
       resultCount,
-      totalPages:Math.ceil(resultCount/req.pagination.limit)
+      totalPages: Math.ceil(resultCount / req.pagination.limit),
     },
-    data:ranks
+    data: ranks,
   });
 };

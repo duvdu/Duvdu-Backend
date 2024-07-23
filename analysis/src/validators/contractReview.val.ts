@@ -5,23 +5,26 @@ export const create = [
   body('comment').exists().withMessage('comment').isString().withMessage('comment'),
   body('rate').isFloat({ min: 1, max: 5 }).withMessage('rate'),
   body('contract').isMongoId().withMessage('contract'),
-  body('cycle').isString().withMessage('cycle').custom(val => {
-    if (Object.values(CYCLES).includes(val)) return true;
-    throw new Error('cycle');
-  }),
-  globalValidatorMiddleware
+  body('cycle')
+    .isString()
+    .withMessage('cycle')
+    .custom((val) => {
+      if (Object.values(CYCLES).includes(val)) return true;
+      throw new Error('cycle');
+    }),
+  globalValidatorMiddleware,
 ];
 
 export const update = [
   param('reviewId').isMongoId().withMessage('reviewId'),
   body('comment').optional().exists().withMessage('comment').isString().withMessage('comment'),
   body('rate').optional().isFloat({ min: 1, max: 5 }).withMessage('rate'),
-  globalValidatorMiddleware
+  globalValidatorMiddleware,
 ];
 
 export const getOne = [
   param('reviewId').isMongoId().withMessage('reviewId'),
-  globalValidatorMiddleware
+  globalValidatorMiddleware,
 ];
 
 export const getAll = [
@@ -32,5 +35,5 @@ export const getAll = [
   query('user').optional().isMongoId().withMessage('customer'),
   query('limit').optional().isInt({ min: 1 }).withMessage('limit'),
   query('page').optional().isInt({ min: 1 }).withMessage('page'),
-  globalValidatorMiddleware
+  globalValidatorMiddleware,
 ];

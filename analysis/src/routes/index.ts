@@ -7,13 +7,11 @@ import { router as rankRoutes } from './rank.routes';
 import { router as settingRoutes } from './setting.routes';
 import { router as userAnalysisRoutes } from './userAnalysis.routes';
 
-
-
-export const mountRoutes = (app:Application)=>{
-  app.use('/api/analysis/rank' , rankRoutes);
-  app.use('/api/analysis/home' , homeRoutes);
-  app.use('/api/analysis/setting' , settingRoutes);
-  app.use('/api/analysis/contract-review' , contractRoutes);
-  app.use('/api/analysis/project-review' , projectReview);
-  app.use('/api/analysis/user' , userAnalysisRoutes);
+export const mountRoutes = (app: Application) => {
+  app.use('/api/analysis/rank', rankRoutes);
+  app.use('/api/analysis/home', homeRoutes);
+  app.use('/api/analysis/setting', settingRoutes);
+  app.use('/api/analysis/contract-review', contractRoutes);
+  app.use('/api/analysis/project-review', projectReview);
+  app.use('/api/analysis/user', userAnalysisRoutes);
 };

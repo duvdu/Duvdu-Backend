@@ -3,15 +3,17 @@ import { RequestHandler } from 'express';
 import 'express-async-errors';
 import mongoose from 'mongoose';
 
-
-
-export const userAnalysisHandler:
-RequestHandler<unknown , SuccessResponse , unknown , unknown> = async (req,res)=>{
+export const userAnalysisHandler: RequestHandler<
+  unknown,
+  SuccessResponse,
+  unknown,
+  unknown
+> = async (req, res) => {
   // const userId = '66633b9ae929f30e28756982';
   const userId = req.loggedUser.id;
   const userData = await Users.aggregate([
     {
-      $match: { _id: new mongoose.Types.ObjectId(userId) }
+      $match: { _id: new mongoose.Types.ObjectId(userId) },
     },
     {
       $project: {
@@ -19,12 +21,10 @@ RequestHandler<unknown , SuccessResponse , unknown , unknown> = async (req,res)=
         likes: 1,
         rank: 1,
         projectsView: 1,
-        category:1
-      }
-    }
-  ]
-  );
-
+        category: 1,
+      },
+    },
+  ]);
 
   // get project views analysis
   const now = new Date();
@@ -34,71 +34,69 @@ RequestHandler<unknown , SuccessResponse , unknown , unknown> = async (req,res)=
     {
       $match: {
         user: new mongoose.Types.ObjectId(userId),
-        date: { $gte: oneYearAgo, $lte: now }
-      }
+        date: { $gte: oneYearAgo, $lte: now },
+      },
     },
     {
       $group: {
         _id: {
           year: { $year: '$date' },
-          month: { $month: '$date' }
+          month: { $month: '$date' },
         },
-        totalViews: { $sum: '$count' }
-      }
+        totalViews: { $sum: '$count' },
+      },
     },
     {
       $sort: {
         '_id.year': 1,
-        '_id.month': 1
-      }
-    }
+        '_id.month': 1,
+      },
+    },
   ]);
 
-  const userProjectViews =  result.map(item => ({
+  const userProjectViews = result.map((item) => ({
     year: item._id.year,
     month: item._id.month,
-    totalViews: item.totalViews
+    totalViews: item.totalViews,
   }));
-
 
   // get top project views
   const projectViews = await ProjectView.aggregate([
     {
       $match: {
-        user: new mongoose.Types.ObjectId(userId)
-      }
+        user: new mongoose.Types.ObjectId(userId),
+      },
     },
     {
       $group: {
         _id: '$project',
         totalViews: { $sum: '$count' },
-        ref: { $first: '$ref' }
-      }
+        ref: { $first: '$ref' },
+      },
     },
     {
       $sort: {
-        totalViews: -1
-      }
+        totalViews: -1,
+      },
     },
     {
-      $limit: 3
+      $limit: 3,
     },
     {
       $lookup: {
-        from: MODELS.portfolioPost, 
+        from: MODELS.portfolioPost,
         let: { projectId: '$_id', ref: '$ref' },
         pipeline: [
           {
             $match: {
-              $expr: { $and: [
-                { $eq: ['$_id', '$$projectId'] },
-                { $eq: ['$$ref', MODELS.portfolioPost] }
-              ]}
-            }
-          }
+              $expr: {
+                $and: [{ $eq: ['$_id', '$$projectId'] }, { $eq: ['$$ref', MODELS.portfolioPost] }],
+              },
+            },
+          },
         ],
-        as: 'portfolioPostDetails'
-      }
+        as: 'portfolioPostDetails',
+      },
     },
     {
       $lookup: {
@@ -107,27 +105,24 @@ RequestHandler<unknown , SuccessResponse , unknown , unknown> = async (req,res)=
         pipeline: [
           {
             $match: {
-              $expr: { $and: [
-                { $eq: ['$_id', '$$projectId'] },
-                { $eq: ['$$ref', 'rentals'] }
-              ]}
-            }
-          }
+              $expr: { $and: [{ $eq: ['$_id', '$$projectId'] }, { $eq: ['$$ref', 'rentals'] }] },
+            },
+          },
         ],
-        as: 'studioBookingDetails'
-      }
+        as: 'studioBookingDetails',
+      },
     },
     {
       $unwind: {
         path: '$portfolioPostDetails',
-        preserveNullAndEmptyArrays: true
-      }
+        preserveNullAndEmptyArrays: true,
+      },
     },
     {
       $unwind: {
         path: '$studioBookingDetails',
-        preserveNullAndEmptyArrays: true
-      }
+        preserveNullAndEmptyArrays: true,
+      },
     },
     {
       $addFields: {
@@ -135,40 +130,40 @@ RequestHandler<unknown , SuccessResponse , unknown , unknown> = async (req,res)=
           $cond: {
             if: { $eq: ['$ref', MODELS.portfolioPost] },
             then: '$portfolioPostDetails',
-            else: '$studioBookingDetails'
-          }
-        }
-      }
+            else: '$studioBookingDetails',
+          },
+        },
+      },
     },
     {
       $addFields: {
         'projectDetails.cover': {
-          $concat: [process.env.BUCKET_HOST, '/', '$projectDetails.cover']
+          $concat: [process.env.BUCKET_HOST, '/', '$projectDetails.cover'],
         },
         'projectDetails.attachments': {
           $map: {
             input: '$projectDetails.attachments',
             as: 'attachment',
             in: {
-              $concat: [process.env.BUCKET_HOST, '/', '$$attachment']
-            }
-          }
-        }
-      }
+              $concat: [process.env.BUCKET_HOST, '/', '$$attachment'],
+            },
+          },
+        },
+      },
     },
     {
       $project: {
         _id: 1,
         totalViews: 1,
-        projectDetails: 1 
-      }
-    }
+        projectDetails: 1,
+      },
+    },
   ]);
 
-  const topProjectViews =  projectViews.map(item => ({
+  const topProjectViews = projectViews.map((item) => ({
     projectId: item._id,
     totalViews: item.totalViews,
-    projectDetails: item.projectDetails
+    projectDetails: item.projectDetails,
   }));
 
   // analysis user based his category
@@ -176,18 +171,18 @@ RequestHandler<unknown , SuccessResponse , unknown , unknown> = async (req,res)=
   if (userData && userData[0].category) {
     const userRankInHisCategoryPipeline: mongoose.PipelineStage[] = [
       {
-        $match: { category: new mongoose.Types.ObjectId(userData[0].category) }
+        $match: { category: new mongoose.Types.ObjectId(userData[0].category) },
       },
       {
         $setWindowFields: {
           sortBy: { projectsView: -1 },
           output: {
-            rank: { $rank: {} }
-          }
-        }
+            rank: { $rank: {} },
+          },
+        },
       },
       {
-        $match: { _id: new mongoose.Types.ObjectId(userId) }
+        $match: { _id: new mongoose.Types.ObjectId(userId) },
       },
       {
         $lookup: {
@@ -195,40 +190,39 @@ RequestHandler<unknown , SuccessResponse , unknown , unknown> = async (req,res)=
           let: { userCategory: '$category' },
           pipeline: [
             { $match: { $expr: { $eq: ['$category', '$$userCategory'] } } },
-            { $count: 'totalUsers' }
+            { $count: 'totalUsers' },
           ],
-          as: 'totalUsers'
-        }
+          as: 'totalUsers',
+        },
       },
       {
         $addFields: {
-          totalUsers: { $arrayElemAt: ['$totalUsers.totalUsers', 0] }
-        }
+          totalUsers: { $arrayElemAt: ['$totalUsers.totalUsers', 0] },
+        },
       },
       {
         $project: {
           rank: 1,
           totalUsers: 1,
-          percentile: { $multiply: [{ $divide: ['$rank', '$totalUsers'] }, 100] }
-        }
-      }
+          percentile: { $multiply: [{ $divide: ['$rank', '$totalUsers'] }, 100] },
+        },
+      },
     ];
 
     const result = await Users.aggregate(userRankInHisCategoryPipeline).exec();
 
-
-    // count project created today in the same user category 
+    // count project created today in the same user category
     const categoryObjectId = new mongoose.Types.ObjectId(userData[0].category);
     const startOfDay = new Date();
     startOfDay.setHours(0, 0, 0, 0);
     const endOfDay = new Date();
     endOfDay.setHours(23, 59, 59, 999);
-  
+
     const pipeline = [
       {
         $match: {
-          createdAt: { $gte: startOfDay, $lte: endOfDay }
-        }
+          createdAt: { $gte: startOfDay, $lte: endOfDay },
+        },
       },
       {
         $facet: {
@@ -238,12 +232,12 @@ RequestHandler<unknown , SuccessResponse , unknown , unknown> = async (req,res)=
                 from: MODELS.copyrights,
                 localField: 'project.type',
                 foreignField: '_id',
-                as: 'populatedType'
-              }
+                as: 'populatedType',
+              },
             },
             { $unwind: '$populatedType' },
             { $match: { 'populatedType.category': categoryObjectId } },
-            { $count: 'count' }
+            { $count: 'count' },
           ],
           portfolioPosts: [
             {
@@ -251,12 +245,12 @@ RequestHandler<unknown , SuccessResponse , unknown , unknown> = async (req,res)=
                 from: MODELS.portfolioPost,
                 localField: 'project.type',
                 foreignField: '_id',
-                as: 'populatedType'
-              }
+                as: 'populatedType',
+              },
             },
             { $unwind: '$populatedType' },
             { $match: { 'populatedType.category': categoryObjectId } },
-            { $count: 'count' }
+            { $count: 'count' },
           ],
           rentals: [
             {
@@ -264,14 +258,14 @@ RequestHandler<unknown , SuccessResponse , unknown , unknown> = async (req,res)=
                 from: 'rentals', // Assuming the collection name is 'rentals'
                 localField: 'project.type',
                 foreignField: '_id',
-                as: 'populatedType'
-              }
+                as: 'populatedType',
+              },
             },
             { $unwind: '$populatedType' },
             { $match: { 'populatedType.category': categoryObjectId } },
-            { $count: 'count' }
-          ]
-        }
+            { $count: 'count' },
+          ],
+        },
       },
       {
         $project: {
@@ -279,23 +273,23 @@ RequestHandler<unknown , SuccessResponse , unknown , unknown> = async (req,res)=
             $sum: [
               { $arrayElemAt: ['$copyrights.count', 0] },
               { $arrayElemAt: ['$portfolioPosts.count', 0] },
-              { $arrayElemAt: ['$rentals.count', 0] }
-            ]
-          }
-        }
-      }
+              { $arrayElemAt: ['$rentals.count', 0] },
+            ],
+          },
+        },
+      },
     ];
-  
+
     const counts = await Project.aggregate(pipeline).exec();
 
-    userCategoryRank = {   
+    userCategoryRank = {
       rank: result[0].rank || null,
       totalUsers: result[0].totalUsers || null,
       percentile: result[0].percentile || null,
-      projectsToday : counts[0].total
+      projectsToday: counts[0].total,
     };
   }
-  
+
   // analysis user contracts
 
   const contracts = await Contracts.aggregate([
@@ -303,9 +297,9 @@ RequestHandler<unknown , SuccessResponse , unknown , unknown> = async (req,res)=
       $match: {
         $or: [
           { customer: new mongoose.Types.ObjectId(userId) },
-          { sp: new mongoose.Types.ObjectId(userId) }
-        ]
-      }
+          { sp: new mongoose.Types.ObjectId(userId) },
+        ],
+      },
     },
     {
       $lookup: {
@@ -385,7 +379,12 @@ RequestHandler<unknown , SuccessResponse , unknown , unknown> = async (req,res)=
               $ifNull: [
                 '$copyright_contract',
                 {
-                  $ifNull: ['$producer_contract', '$rental_contract' , '$project_contracts' , '$team_contracts'],
+                  $ifNull: [
+                    '$producer_contract',
+                    '$rental_contract',
+                    '$project_contracts',
+                    '$team_contracts',
+                  ],
                 },
               ],
             },
@@ -396,44 +395,34 @@ RequestHandler<unknown , SuccessResponse , unknown , unknown> = async (req,res)=
     },
     {
       $facet: {
-        ongoing: [
-          { $match: { 'contract.status': 'ongoing' } },
-          { $count: 'count' }
-        ],
-        pending: [
-          { $match: { 'contract.status': 'pending' } },
-          { $count: 'count' }
-        ],
-        completed: [
-          { $match: { 'contract.status': 'completed' } },
-          { $count: 'count' }
-        ]
-      }
+        ongoing: [{ $match: { 'contract.status': 'ongoing' } }, { $count: 'count' }],
+        pending: [{ $match: { 'contract.status': 'pending' } }, { $count: 'count' }],
+        completed: [{ $match: { 'contract.status': 'completed' } }, { $count: 'count' }],
+      },
     },
     {
       $project: {
         ongoingCount: {
-          $ifNull: [{ $arrayElemAt: ['$ongoing.count', 0] }, 0]
+          $ifNull: [{ $arrayElemAt: ['$ongoing.count', 0] }, 0],
         },
         pendingCount: {
-          $ifNull: [{ $arrayElemAt: ['$pending.count', 0] }, 0]
+          $ifNull: [{ $arrayElemAt: ['$pending.count', 0] }, 0],
         },
         completedCount: {
-          $ifNull: [{ $arrayElemAt: ['$completed.count', 0] }, 0]
-        }
-      }
-    }
-  ]);  
+          $ifNull: [{ $arrayElemAt: ['$completed.count', 0] }, 0],
+        },
+      },
+    },
+  ]);
 
   res.status(200).json(<any>{
-    message:'success',
-    data:{
+    message: 'success',
+    data: {
       userData,
       userProjectViews,
       topProjectViews,
       userCategoryRank,
-      contracts
-    }
+      contracts,
+    },
   });
-    
 };

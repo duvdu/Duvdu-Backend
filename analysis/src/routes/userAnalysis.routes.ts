@@ -5,6 +5,4 @@ import * as controllers from '../controllers/userAnalysis';
 
 export const router = express.Router();
 
-
-
-router.route('/').get(isauthenticated , controllers.userAnalysisHandler);
+router.route('/').get(isauthenticated, controllers.userAnalysisHandler);

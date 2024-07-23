@@ -1,19 +1,42 @@
 import { Isetting, SuccessResponse } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-
-
 export interface CreateSettingHandler
-extends RequestHandler<unknown , SuccessResponse<{data:Isetting}> , Pick<Isetting , 'expirationTime'> , unknown>{}
+  extends RequestHandler<
+    unknown,
+    SuccessResponse<{ data: Isetting }>,
+    Pick<Isetting, 'expirationTime'>,
+    unknown
+  > {}
 
 export interface UpdateExpirationHandler
-extends RequestHandler<{settingId:string} , SuccessResponse<{data:Isetting}> , {expirationId:string , time:number} , unknown>{}
+  extends RequestHandler<
+    { settingId: string },
+    SuccessResponse<{ data: Isetting }>,
+    { expirationId: string; time: number },
+    unknown
+  > {}
 
 export interface DeleteExpirationHandler
-extends RequestHandler<{settingId:string} , SuccessResponse<{data:Isetting}> , {expirationId:string} , unknown>{}
+  extends RequestHandler<
+    { settingId: string },
+    SuccessResponse<{ data: Isetting }>,
+    { expirationId: string },
+    unknown
+  > {}
 
 export interface GetSettingHandler
-extends RequestHandler<{settingId:string} , SuccessResponse<{data:Isetting}> , unknown , unknown>{}
+  extends RequestHandler<
+    { settingId: string },
+    SuccessResponse<{ data: Isetting }>,
+    unknown,
+    unknown
+  > {}
 
 export interface AddSettingHandler
-extends RequestHandler<{settingId:string} , SuccessResponse<{data:Isetting}> , {time:number} , unknown>{}
+  extends RequestHandler<
+    { settingId: string },
+    SuccessResponse<{ data: Isetting }>,
+    { time: number },
+    unknown
+  > {}
