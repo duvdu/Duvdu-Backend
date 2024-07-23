@@ -42,7 +42,7 @@ export const signinHandler: SigninHandler = async (req, res, next) => {
   } else {
     user.refreshTokens?.push({ token: refreshToken, clientType, fingerprint: fingerprint , userAgent:userAgent! });
   }
-  user.notificationToken = notificationToken??;
+  user.notificationToken = notificationToken ? notificationToken : null;
   await user.save();
 
   req.session.access = accessToken;
