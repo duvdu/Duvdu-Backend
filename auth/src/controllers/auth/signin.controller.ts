@@ -6,7 +6,7 @@ import { generateBrowserFingerprint } from '../../utils/generateFingerPrint';
 import { generateAccessToken, generateRefreshToken } from '../../utils/generateToken';
 
 export const signinHandler: SigninHandler = async (req, res, next) => {
-  const { username, password } = req.body;
+  const { username, password, notificationToken } = req.body;
   const user = await Users.findOne({ username });
   if (!user || !(await comparePassword(password, user.password || ''))) 
     return next(new UnauthenticatedError({ en: 'Invalid username or password', ar: 'اسم المستخدم أو كلمة المرور غير صحيحة' }, req.lang));
@@ -42,7 +42,7 @@ export const signinHandler: SigninHandler = async (req, res, next) => {
   } else {
     user.refreshTokens?.push({ token: refreshToken, clientType, fingerprint: fingerprint , userAgent:userAgent! });
   }
-
+  user.notificationToken = notificationToken;
   await user.save();
 
   req.session.access = accessToken;
