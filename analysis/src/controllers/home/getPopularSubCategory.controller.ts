@@ -4,9 +4,7 @@ import { Categories } from '@duvdu-v1/duvdu';
 
 import { GetPopularSubCategoriesHandler } from '../../types/endpoints/home.endpoints';
 
-
-
-export const getPopularSubCategoriesHandler:GetPopularSubCategoriesHandler = async (req,res)=>{
+export const getPopularSubCategoriesHandler: GetPopularSubCategoriesHandler = async (req, res) => {
   const categories = await Categories.aggregate([
     { $match: { trend: true } },
     { $unwind: '$subCategories' },
@@ -14,7 +12,7 @@ export const getPopularSubCategoriesHandler:GetPopularSubCategoriesHandler = asy
       $project: {
         _id: 0,
         categoryId: '$_id',
-        cycle:'$cycle',
+        cycle: '$cycle',
         categoryTitle: {
           $cond: {
             if: { $eq: ['ar', req.lang] },
@@ -53,7 +51,7 @@ export const getPopularSubCategoriesHandler:GetPopularSubCategoriesHandler = asy
       },
     },
     {
-      $sample: { size: 100 }
+      $sample: { size: 100 },
     },
     {
       $group: {
@@ -66,7 +64,7 @@ export const getPopularSubCategoriesHandler:GetPopularSubCategoriesHandler = asy
             title: '$subCategoryTitle',
             tags: '$tags',
             image: '$image',
-            cycle:'$cycle'
+            cycle: '$cycle',
           },
         },
       },
@@ -78,5 +76,5 @@ export const getPopularSubCategoriesHandler:GetPopularSubCategoriesHandler = asy
       },
     },
   ]);
-  res.status(200).json({message:'success' , data:categories});
+  res.status(200).json({ message: 'success', data: categories });
 };

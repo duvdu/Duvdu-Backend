@@ -4,11 +4,9 @@ import { Categories } from '@duvdu-v1/duvdu';
 
 import { GetTrendyCategoriesHandler } from '../../types/endpoints/home.endpoints';
 
-
-export const getTrendyCategoriesHandler:GetTrendyCategoriesHandler = async (req,res)=>{
-
+export const getTrendyCategoriesHandler: GetTrendyCategoriesHandler = async (req, res) => {
   const category = await Categories.aggregate([
-    { $match: {trend:true} },
+    { $match: { trend: true } },
     {
       $project: {
         title: {
@@ -76,11 +74,11 @@ export const getTrendyCategoriesHandler:GetTrendyCategoriesHandler = async (req,
     {
       $addFields: {
         image: {
-          $concat: [process.env.BUCKET_HOST, '/', '$image']
-        }
-      }
+          $concat: [process.env.BUCKET_HOST, '/', '$image'],
+        },
+      },
     },
   ]);
 
-  res.status(200).json({message:'success' , data:category});
+  res.status(200).json({ message: 'success', data: category });
 };
