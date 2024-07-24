@@ -63,9 +63,9 @@ export const updateForgetenPasswordHandler: RequestHandler<
   await userSession.findOneAndUpdate({ user: user._id, fingerPrint: fingerprint, clientType , userAgent }, sessionData, { upsert: true });
 
   // Update or add the new refresh token
-  const tokenIndex = user.refreshTokens?.findIndex(rt => rt.clientType === clientType && rt.fingerprint === fingerprint) || -1;
+  const tokenIndex = user.refreshTokens?.findIndex(rt => rt.clientType === clientType && rt.fingerprint === fingerprint);
   if (tokenIndex !== -1) {
-      user.refreshTokens![tokenIndex] = { token: refreshToken, clientType, fingerprint: fingerprint  , userAgent:userAgent!};
+      user.refreshTokens![tokenIndex!] = { token: refreshToken, clientType, fingerprint: fingerprint  , userAgent:userAgent!};
   } else {
     user.refreshTokens?.push({ token: refreshToken, clientType, fingerprint: fingerprint , userAgent:userAgent!});
   }

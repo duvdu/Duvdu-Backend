@@ -45,13 +45,17 @@ export const updatePhoneNumberHandler: RequestHandler<
     expireAt: new Date(Date.now() + 60 * 1000).toString(),
   };
   currentUser.isVerified = false;
-  const tokenIndex = currentUser.refreshTokens?.findIndex(rt => rt.token === req.session.refresh) || -1;
+  const tokenIndex = currentUser.refreshTokens?.findIndex(rt => rt.token === req.session.refresh);
 
   if (tokenIndex !== -1) 
-    currentUser.refreshTokens?.splice(tokenIndex , 1);
+    currentUser.refreshTokens?.splice(tokenIndex! , 1);
 
   await currentUser.save();
 
+  req.session.destroy((err) => {
+    if (err) 
+      throw new Error('Error destroying session');
+  });
   //TODO: send OTP
 
   res.status(200).json(<any>{ message: 'success', code: verificationCode });
