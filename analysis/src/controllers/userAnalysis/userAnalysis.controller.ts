@@ -24,10 +24,7 @@ export const userAnalysisHandler: RequestHandler<
       }
     },
     {
-      $unwind:{
-        path: '$categoryData',
-        preserveNullAndEmptyArrays: true,
-      },
+      $unwind:'$categoryData'
     },
     {
       $project: {
