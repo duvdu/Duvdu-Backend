@@ -9,7 +9,7 @@ export const userAnalysisHandler: RequestHandler<
   unknown,
   unknown
 > = async (req, res) => {
-  // const userId = '66633b9ae929f30e28756982';
+  // const userId = '662b93104566c8d2f8ed6aea';
   const userId = req.loggedUser.id;
 
   const userData = await Users.aggregate([
@@ -18,14 +18,11 @@ export const userAnalysisHandler: RequestHandler<
     },
     {
       $lookup: {
-        from: MODELS.category, 
-        localField: 'category', 
-        foreignField: '_id', 
-        as: 'categoryDetails', 
+        from: MODELS.category,
+        localField: 'category',
+        foreignField: '_id',
+        as: 'categoryDetails',
       },
-    },
-    {
-      $unwind:'$categoryDetails'
     },
     {
       $project: {
@@ -34,8 +31,13 @@ export const userAnalysisHandler: RequestHandler<
         rank: 1,
         projectsView: 1,
         category: {
-          _id:'$categoryDetails._id',
-          title:`$categoryDetails.title.${req.lang}`
+          $ifNull: [
+            {
+              _id: { $arrayElemAt: ['$categoryDetails._id', 0] },
+              title: { $arrayElemAt: [`$categoryDetails.title.${req.lang}`, 0] },
+            },
+            null,
+          ],
         },
       },
     },
