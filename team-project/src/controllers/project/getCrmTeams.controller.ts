@@ -25,7 +25,7 @@ export const getTeamsCrmHandler:GetTeamsCrmHandler = async (req,res)=>{
     const projectObject = project.toObject();
 
     // Update URLs with BUCKET_HOST for profileImage, cover, and attachments
-    if (projectObject.user && (projectObject.user as any).profileImage) {
+    if (projectObject.user && (projectObject.user as any).profileImage && !((projectObject.user as any).profileImage).startsWith(process.env.BUCKET_HOST)) {
       (projectObject.user as any).profileImage = `${process.env.BUCKET_HOST}/${(projectObject.user as any).profileImage}`;
     }
     if (projectObject.cover) {
@@ -36,7 +36,7 @@ export const getTeamsCrmHandler:GetTeamsCrmHandler = async (req,res)=>{
         (creative.category as Icategory).title = (creative.category as any).title[req.lang];
       }
       creative.users.forEach(user => {
-        if (user.user && (user.user as any).profileImage) {
+        if (user.user && (user.user as any).profileImage && !((user.user as any).profileImage).startsWith(process.env.BUCKET_HOST)) {
           (user.user as any).profileImage = `${process.env.BUCKET_HOST}/${(user.user as any).profileImage}`;
         }
         user.attachments = user.attachments.map((attachment: string) => `${process.env.BUCKET_HOST}/${attachment}`);

@@ -16,12 +16,29 @@ export const userAnalysisHandler: RequestHandler<
       $match: { _id: new mongoose.Types.ObjectId(userId) },
     },
     {
+      $lookup:{
+        from: MODELS.category,
+        localField:'category',
+        foreignField:'_id',
+        as:'categoryData'
+      }
+    },
+    {
+      $unwind:{
+        path: '$categoryData',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
       $project: {
         profileViews: 1,
         likes: 1,
         rank: 1,
         projectsView: 1,
-        category: 1,
+        category: {
+          _id:'$categoryData._id',
+          title:`$categoryData.title.${req.lang}`
+        },
       },
     },
   ]);
