@@ -11,20 +11,21 @@ export const userAnalysisHandler: RequestHandler<
 > = async (req, res) => {
   // const userId = '66633b9ae929f30e28756982';
   const userId = req.loggedUser.id;
+
   const userData = await Users.aggregate([
     {
       $match: { _id: new mongoose.Types.ObjectId(userId) },
     },
     {
-      $lookup:{
-        from: MODELS.category,
-        localField:'category',
-        foreignField:'_id',
-        as:'categoryData'
-      }
+      $lookup: {
+        from: MODELS.category, 
+        localField: 'category', 
+        foreignField: '_id', 
+        as: 'categoryDetails', 
+      },
     },
     {
-      $unwind:'$categoryData'
+      $unwind:'$categoryDetails'
     },
     {
       $project: {
@@ -33,8 +34,8 @@ export const userAnalysisHandler: RequestHandler<
         rank: 1,
         projectsView: 1,
         category: {
-          _id:'$categoryData._id',
-          title:`$categoryData.title.${req.lang}`
+          _id:'$categoryDetails._id',
+          title:`$categoryDetails.title.${req.lang}`
         },
       },
     },
@@ -182,10 +183,10 @@ export const userAnalysisHandler: RequestHandler<
 
   // analysis user based his category
   let userCategoryRank;
-  if (userData && userData[0].category) {
+  if (userData && userData[0].category._id) {
     const userRankInHisCategoryPipeline: mongoose.PipelineStage[] = [
       {
-        $match: { category: new mongoose.Types.ObjectId(userData[0].category) },
+        $match: { category: new mongoose.Types.ObjectId(userData[0].category._id) },
       },
       {
         $setWindowFields: {
@@ -226,7 +227,7 @@ export const userAnalysisHandler: RequestHandler<
     const result = await Users.aggregate(userRankInHisCategoryPipeline).exec();
 
     // count project created today in the same user category
-    const categoryObjectId = new mongoose.Types.ObjectId(userData[0].category);
+    const categoryObjectId = new mongoose.Types.ObjectId(userData[0].category._id);
     const startOfDay = new Date();
     startOfDay.setHours(0, 0, 0, 0);
     const endOfDay = new Date();
