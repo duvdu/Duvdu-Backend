@@ -52,7 +52,7 @@ const userSchema = new Schema<Iuser>(
     ],
     address:{type:String , default:null},
     likes:{type:Number , default:0},
-    rank:{title:{type:String , default:null} , nextRankPercentage:{type:Number, default:0} , nextRankTitle:{type:String , default:null}},
+    rank:{title:{type:String , default:null} , nextRankPercentage:{type:Number, default:0} , nextRankTitle:{type:String , default:null} , color:{type:String , default:null}},
     projectsView:{type:Number , default:0}
   },
   {
