@@ -9,14 +9,21 @@ export const create = [
   body('start')
     .isISO8601().withMessage('validStartDate')
     .custom((value) => {
-      if (!isFuture(new Date(value))) throw new Error('futureStartDate');
+      if (!isFuture(new Date(value))) {
+        throw new Error('futureStartDate');
+      }
       return true;
     })
     .toDate(),
   body('end')
     .isISO8601().withMessage('validEndDate')
     .custom((value, { req }) => {
-      if (!isAfter(new Date(value), new Date(req.body.start))) throw new Error('greaterEndDate');
+      if (!req.body.start) {
+        throw new Error('startDateRequired');
+      }
+      if (!isAfter(new Date(value), new Date(req.body.start))) {
+        throw new Error('greaterEndDate');
+      }
       return true;
     })
     .toDate(),
@@ -26,18 +33,23 @@ export const create = [
     .optional()
     .isFloat({ min: 0 }).toFloat().withMessage('positiveMinValue')
     .custom((val, { req }) => {
-      if (req.body.percentage) throw new Error('choiceValueOrPercentage');
+      if (req.body.percentage) {
+        throw new Error('choiceValueOrPercentage');
+      }
       return true;
     }),
   body('percentage')
     .optional()
-    .toFloat().withMessage('percentageMinValue')
+    .isFloat({ min: 0, max: 100 }).withMessage('percentageMinValue')
     .custom((val, { req }) => {
-      if (req.body.value) throw new Error('choiceValueOrPercentage');
+      if (req.body.value) {
+        throw new Error('choiceValueOrPercentage');
+      }
       return true;
     }),
   globalValidatorMiddleware,
 ];
+
 
 export const update = [
   param('couponId').isMongoId().withMessage('validMongoId'),

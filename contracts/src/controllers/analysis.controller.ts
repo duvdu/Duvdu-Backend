@@ -105,13 +105,26 @@ export const contractAnalysis: RequestHandler<
       },
       {
         $project: {
-          totalPriceSum: { $arrayElemAt: ['$totalPriceCount.totalPriceSum', 0] },
-          totalCount: { $arrayElemAt: ['$totalPriceCount.totalCount', 0] },
-          statusCounts: { $arrayElemAt: ['$statusCounts.statusCounts', 0] },
+          totalPriceSum: { $ifNull: [{ $arrayElemAt: ['$totalPriceCount.totalPriceSum', 0] }, 0] },
+          totalCount: { $ifNull: [{ $arrayElemAt: ['$totalPriceCount.totalCount', 0] }, 0] },
+          statusCounts: {
+            $ifNull: [{ $arrayElemAt: ['$statusCounts.statusCounts', 0] }, {
+              canceled: 0,
+              pending: 0,
+              'waiting-for-pay-10': 0,
+              'update-after-first-Payment': 0,
+              'waiting-for-total-payment': 0,
+              ongoing: 0,
+              completed: 0,
+              rejected: 0,
+              complaint: 0
+            }]
+          },
         },
       },
     ])
     .toArray();
+
 
   const producerContracts = await mongoose.connection.db
     .collection('producer-contracts')
@@ -191,13 +204,22 @@ export const contractAnalysis: RequestHandler<
       },
       {
         $project: {
-          totalPriceSum: { $arrayElemAt: ['$totalPriceCount.totalPriceSum', 0] },
-          totalCount: { $arrayElemAt: ['$totalPriceCount.totalCount', 0] },
-          statusCounts: { $arrayElemAt: ['$statusCounts.statusCounts', 0] },
+          totalPriceSum: { $ifNull: [{ $arrayElemAt: ['$totalPriceCount.totalPriceSum', 0] }, 0] },
+          totalCount: { $ifNull: [{ $arrayElemAt: ['$totalPriceCount.totalCount', 0] }, 0] },
+          statusCounts: {
+            $ifNull: [{ $arrayElemAt: ['$statusCounts.statusCounts', 0] }, {
+              canceled: 0,
+              pending: 0,
+              rejected: 0,
+              accepted: 0,
+              'accepted with update': 0
+            }]
+          },
         },
       },
     ])
     .toArray();
+  
 
   const projectContracts = await mongoose.connection.db
     .collection('project_contracts')
@@ -280,13 +302,25 @@ export const contractAnalysis: RequestHandler<
       },
       {
         $project: {
-          totalPriceSum: { $arrayElemAt: ['$totalPriceCount.totalPriceSum', 0] },
-          totalCount: { $arrayElemAt: ['$totalPriceCount.totalCount', 0] },
-          statusCounts: { $arrayElemAt: ['$statusCounts.statusCounts', 0] },
+          totalPriceSum: { $ifNull: [{ $arrayElemAt: ['$totalPriceCount.totalPriceSum', 0] }, 0] },
+          totalCount: { $ifNull: [{ $arrayElemAt: ['$totalPriceCount.totalCount', 0] }, 0] },
+          statusCounts: {
+            $ifNull: [{ $arrayElemAt: ['$statusCounts.statusCounts', 0] }, {
+              canceled: 0,
+              pending: 0,
+              'waiting-for-pay-10': 0,
+              'update-after-first-Payment': 0,
+              'waiting-for-total-payment': 0,
+              ongoing: 0,
+              completed: 0,
+              rejected: 0,
+            }],
+          },
         },
       },
     ])
     .toArray();
+  
 
   const rentalContracts = await mongoose.connection.db
     .collection('rental_contracts')
@@ -368,13 +402,24 @@ export const contractAnalysis: RequestHandler<
       },
       {
         $project: {
-          totalPriceSum: { $arrayElemAt: ['$totalPriceCount.totalPriceSum', 0] },
-          totalCount: { $arrayElemAt: ['$totalPriceCount.totalCount', 0] },
-          statusCounts: { $arrayElemAt: ['$statusCounts.statusCounts', 0] },
+          totalPriceSum: { $ifNull: [{ $arrayElemAt: ['$totalPriceCount.totalPriceSum', 0] }, 0] },
+          totalCount: { $ifNull: [{ $arrayElemAt: ['$totalPriceCount.totalCount', 0] }, 0] },
+          statusCounts: {
+            $ifNull: [{ $arrayElemAt: ['$statusCounts.statusCounts', 0] }, {
+              canceled: 0,
+              pending: 0,
+              'waiting-for-payment': 0,
+              ongoing: 0,
+              completed: 0,
+              rejected: 0,
+              complaint: 0,
+            }],
+          },
         },
       },
     ])
     .toArray();
+  
 
   const teamContracts = await mongoose.connection.db
     .collection('team_contracts')
@@ -455,13 +500,23 @@ export const contractAnalysis: RequestHandler<
       },
       {
         $project: {
-          totalPriceSum: { $arrayElemAt: ['$totalPriceCount.totalPriceSum', 0] },
-          totalCount: { $arrayElemAt: ['$totalPriceCount.totalCount', 0] },
-          statusCounts: { $arrayElemAt: ['$statusCounts.statusCounts', 0] },
+          totalPriceSum: { $ifNull: [{ $arrayElemAt: ['$totalPriceCount.totalPriceSum', 0] }, 0] },
+          totalCount: { $ifNull: [{ $arrayElemAt: ['$totalPriceCount.totalCount', 0] }, 0] },
+          statusCounts: {
+            $ifNull: [{ $arrayElemAt: ['$statusCounts.statusCounts', 0] }, {
+              canceled: 0,
+              pending: 0,
+              'waiting-for-total-payment': 0,
+              ongoing: 0,
+              completed: 0,
+              rejected: 0,
+            }],
+          },
         },
       },
     ])
     .toArray();
+  
 
   res.json({
     copyrightContract: copyrightContracts[0],
