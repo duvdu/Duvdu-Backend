@@ -100,7 +100,12 @@ export const getContracts: RequestHandler<
               $ifNull: [
                 '$copyright_contract',
                 {
-                  $ifNull: ['$producer_contract', '$rental_contract' , '$project_contracts' , '$team_contracts'],
+                  $ifNull: [
+                    '$producer_contract',
+                    '$rental_contract',
+                    '$project_contracts',
+                    '$team_contracts',
+                  ],
                 },
               ],
             },

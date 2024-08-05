@@ -199,7 +199,6 @@ export const contractAnalysis: RequestHandler<
     ])
     .toArray();
 
-
   const projectContracts = await mongoose.connection.db
     .collection('project_contracts')
     .aggregate([

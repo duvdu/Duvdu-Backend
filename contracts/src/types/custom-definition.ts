@@ -13,7 +13,7 @@ declare global {
     interface Request {
       loggedUser: IjwtPayload;
       pagination: Ipagination;
-      lang: 'en'|'ar'
+      lang: 'en' | 'ar';
     }
   }
 }

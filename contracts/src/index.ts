@@ -8,11 +8,7 @@ const start = async () => {
   checkEnvVariables();
   await redisConnection('', ' ');
 
-  await natsWrapper.connect(
-    env.nats.clusterId!,
-    env.nats.clientId!,
-    env.nats.url!
-  );
+  await natsWrapper.connect(env.nats.clusterId!, env.nats.clientId!, env.nats.url!);
 
   natsWrapper.client.on('close', () => {
     console.log('nats connection close ');
@@ -32,6 +28,5 @@ const start = async () => {
     console.log('app listen on port 3000');
   });
 };
-
 
 start();

@@ -8,9 +8,7 @@ export const getTopProjectsViewsHandler: RequestHandler<
   unknown,
   unknown
 > = async (req, res) => {
-
   const projects = await ProjectView.aggregate([
-
     {
       $group: {
         _id: '$project',
@@ -120,15 +118,11 @@ export const getTopProjectsViewsHandler: RequestHandler<
       },
     },
   ]);
-      
+
   // Collect all projectDetails in one array
   const allProjectDetails = projects.reduce((acc, project) => {
     return acc.concat(project.projectDetails);
   }, []);
-      
 
-      
-  res.status(200).json(<any>{message:'success' , data:allProjectDetails});
-
-
+  res.status(200).json(<any>{ message: 'success', data: allProjectDetails });
 };
