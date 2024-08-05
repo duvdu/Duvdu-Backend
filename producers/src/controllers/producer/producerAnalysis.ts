@@ -152,6 +152,7 @@ export const getProducerAnalysis: RequestHandler<
         totalContracts: 1,
         'producerDetails.user.profileImage': { $concat: [process.env.BUCKET_HOST ,'/', 'producerDetails.user.profileImage'] },
         'producerDetails.user.username': 1,
+        'producerDetails.user.name': 1,
         'producerDetails.category.title': `$producerDetails.category.title.${req.lang}`,
         'producerDetails.subCategories': {
           $map: {
