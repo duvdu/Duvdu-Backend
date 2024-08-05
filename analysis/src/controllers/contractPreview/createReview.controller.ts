@@ -26,7 +26,7 @@ export const createReviewHandler: CreateReviewHandler = async (req, res, next) =
       ),
     );
 
-  const contract = await Contracts.findOne({ contract: req.body.contract }).populate('contract');
+  const contract = await Contracts.findOne({ contract: req.body.contract }); //.populate('contract');
   if (!contract)
     return next(
       new NotFound({ en: 'contract not found', ar: 'لم يتم العثور على العقد' }, req.lang),
