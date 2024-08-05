@@ -93,6 +93,23 @@ export const getTopProjectsViewsHandler: RequestHandler<
             },
           },
         },
+        'projectDetails.subCategory': `$projectDetails.subCategory.${req.lang}`,
+        'projectDetails.tags': {
+          $map: {
+            input: '$projectDetails.tags',
+            as: 'tag',
+            in: {
+              _id: '$$tag._id',
+              title: {
+                $cond: {
+                  if: { $eq: ['ar', req.lang] },
+                  then: '$$tag.ar',
+                  else: '$$tag.en',
+                },
+              },
+            },
+          },
+        },
       },
     },
     {
