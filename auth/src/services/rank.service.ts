@@ -11,7 +11,7 @@ export const updateRankForUser = async (userId: string , lang:string) => {
   
   if (currentRank) {
     user.rank.title = currentRank.rank;
-
+    user.rank.color = currentRank.color;
     if (nextRank) {
       const actionsNeeded = nextRank.actionCount - currentRank.actionCount;
       const actionsCompleted = user.acceptedProjectsCounter - currentRank.actionCount;
@@ -25,6 +25,7 @@ export const updateRankForUser = async (userId: string , lang:string) => {
     user.rank.title = null ;
     user.rank.nextRangPercentage = 0; 
     user.rank.nextRankTitle = null;
+    user.rank.color = null;
   }
 
   await user.save();
