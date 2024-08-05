@@ -76,6 +76,7 @@ export * from './models/producer_contracts.model';
 export * from './models/rental.model';
 export * from './models/Review.model';
 export * from './models/projectViews.model';
+export * from './models/coupon.model';
 
 export * from './services/category.service';
 export * from './services/projectView.service';

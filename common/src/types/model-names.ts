@@ -29,5 +29,6 @@ export enum MODELS {
   contractReports = 'contract_reports',
   projectReview = 'project_reviews',
   contractReview = 'contract_review',
-  projectsViews = 'projects_views'
+  projectsViews = 'projects_views',
+  coupon = 'coupons'
 }
