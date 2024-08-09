@@ -15,6 +15,7 @@ export interface ICoupon {
     value:number,
     percentage:number,
     users:{user:Types.ObjectId | Iuser , count:number }[]
+    expired:boolean
 }
 
 
@@ -26,6 +27,7 @@ export const Coupon = model<ICoupon>(MODELS.coupon , new Schema<ICoupon>({
   userCount:{type:Number , default:1},
   value:{type:Number , default:null},
   percentage:{type:Number , default:null},
+  expired:{type:Boolean , default:false},
   start:Date,
   end:Date
 },{timestamps:true , collection:MODELS.coupon}));

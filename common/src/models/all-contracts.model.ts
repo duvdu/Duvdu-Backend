@@ -10,6 +10,7 @@ export interface Icontract {
   contract: Types.ObjectId;
   ref: string;
   cycle: string;
+  coupons: Types.ObjectId []
 }
 
 export const Contracts = model<Icontract>(
@@ -20,6 +21,7 @@ export const Contracts = model<Icontract>(
     contract: { type: Schema.Types.ObjectId, refPath: 'ref' },
     ref: String,
     cycle: { type: String, default: null },
+    coupons:[{type:Schema.Types.ObjectId , ref:MODELS.coupon}]
   } , {timestamps:true , collection:MODELS.allContracts}),
 );
 
