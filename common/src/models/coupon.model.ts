@@ -15,7 +15,8 @@ export interface ICoupon {
     value:number,
     percentage:number,
     users:{user:Types.ObjectId | Iuser , count:number }[]
-    expired:boolean
+    expired:boolean,
+    couponCountAvaliable:number;
 }
 
 
@@ -24,6 +25,7 @@ export const Coupon = model<ICoupon>(MODELS.coupon , new Schema<ICoupon>({
   promoCode:{type:String , unique:true , sparse:true},
   users:[{user:{type:Schema.Types.ObjectId , ref: MODELS.user} , count:{type:Number , default:0}}],
   couponCount:{type:Number , default:1},
+  couponCountAvaliable:{type:Number , default:0},
   userCount:{type:Number , default:1},
   value:{type:Number , default:null},
   percentage:{type:Number , default:null},
