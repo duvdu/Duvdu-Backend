@@ -40,6 +40,8 @@ router
     handler.getCategoriesHandler,
   );
 
+router.get('/sub-categories', handler.getAllSubCategories);
+
 router
   .route('/:categoryId')
   .get(val.getCategoryVal, handler.getCategoryHandler)
