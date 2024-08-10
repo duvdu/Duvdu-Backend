@@ -19,14 +19,10 @@ router.route('/:projectId').post(
     fileTypes: ['video', 'image'],
   }).fields([{ name: 'attachments', maxCount: 10 }]),
   val.create,
-  checkRequiredFields({ fields: ['attachments'] }),
+  // checkRequiredFields({ fields: ['attachments'] }),
   handler.createContractHandler,
 );
-router.post('/pay/:paymentSession' , val.pay, handler.payContract);
+router.post('/pay/:paymentSession', val.pay, handler.payContract);
 
-router
-  .route('/:contractId/contract')
-  .patch( val.update, handler.updateContractHandler);
-router
-  .route('/:contractId/action')
-  .post( val.action, handler.contractActionHandler);
+router.route('/:contractId/contract').patch(val.update, handler.updateContractHandler);
+router.route('/:contractId/action').post(val.action, handler.contractActionHandler);

@@ -12,7 +12,7 @@ import {
   NotFound,
   NotificationDetails,
   NotificationType,
-  ProjectCycle
+  ProjectCycle,
 } from '@duvdu-v1/duvdu';
 
 import { sendNotification } from './sendNotification';
@@ -56,7 +56,7 @@ export const createContractHandler: CreateContractHandler = async (req, res, nex
         ),
       );
 
-    const attachments = <Express.Multer.File[]>(req.files as any).attachments;
+    const attachments = <Express.Multer.File[] | undefined>(req.files as any)?.attachments;
     if (attachments) {
       req.body.attachments = attachments.map((el) => FOLDERS.portfolio_post + '/' + el.filename);
       await new Bucket().saveBucketFiles(FOLDERS.portfolio_post, ...attachments);
@@ -71,7 +71,7 @@ export const createContractHandler: CreateContractHandler = async (req, res, nex
 
     const stageExpiration = await getBestExpirationTime(
       req.body.appointmentDate.toString(),
-      req.lang
+      req.lang,
     );
 
     const { functions, tools, totalPrice } = await calculateTotalPrice(
@@ -122,7 +122,7 @@ export const createContractHandler: CreateContractHandler = async (req, res, nex
       NotificationDetails.newProjectContract.message,
       Channels.new_contract,
     );
-    
+
     // add expiration queue
     // const delay = contract.stageExpiration * 3600 * 1000;
     // await pendingQueue.add({contractId:contract._id.toString()} , {delay});
