@@ -1,4 +1,4 @@
-import {  Iplan, Irole , SuccessResponse } from '@duvdu-v1/duvdu';
+import { Iplan, Irole, SuccessResponse } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 // roles
@@ -24,7 +24,7 @@ export interface GetRoleHandler
 export interface CreatePlanHandler
   extends RequestHandler<
     unknown,
-    SuccessResponse<{ data:Iplan }>,
+    SuccessResponse<{ data: Iplan }>,
     Pick<Iplan, 'title' | 'key' | 'role'>,
     unknown
   > {}
@@ -32,7 +32,7 @@ export interface CreatePlanHandler
 export interface UpdatePlanHandler
   extends RequestHandler<
     { planId: string },
-    SuccessResponse<{data:Iplan}>,
+    SuccessResponse<{ data: Iplan }>,
     Partial<Pick<Iplan, 'title' | 'status'>>,
     unknown
   > {}

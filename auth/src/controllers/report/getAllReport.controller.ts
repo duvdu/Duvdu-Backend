@@ -4,7 +4,6 @@ import { RequestHandler } from 'express';
 
 import { GetReportsHandler } from '../../types/endpoints/report.endpoints';
 
-
 export const getReportsPagination: RequestHandler<
   unknown,
   unknown,
@@ -16,13 +15,12 @@ export const getReportsPagination: RequestHandler<
     isClosed?: boolean;
     closedById?: string;
     feedback?: string;
-    sourceUser?:string;
+    sourceUser?: string;
   }
 > = async (req, res, next) => {
-
   req.pagination.filter = {};
   if (req.query.searchKeywords) {
-    req.pagination.filter.$or = req.query.searchKeywords.map((keyword:string) => ({
+    req.pagination.filter.$or = req.query.searchKeywords.map((keyword: string) => ({
       desc: { $regex: keyword, $options: 'i' },
     }));
   }
@@ -47,8 +45,7 @@ export const getReportsPagination: RequestHandler<
   next();
 };
 
-
-export const getReportsHandler:GetReportsHandler = async(req,res)=>{
+export const getReportsHandler: GetReportsHandler = async (req, res) => {
   const resultCount = await Report.countDocuments(req.pagination.filter);
 
   // Paginate and fetch reports

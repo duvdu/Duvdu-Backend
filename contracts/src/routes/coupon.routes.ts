@@ -7,7 +7,7 @@ import * as val from '../validator/coupon.validator';
 export const router = express.Router();
 
 router.use(isauthenticated);
-router.route('/crm').get(val.getAll, globalPaginationMiddleware , controllers.getCrmCouponsHandler);
+router.route('/crm').get(val.getAll, globalPaginationMiddleware, controllers.getCrmCouponsHandler);
 router.route('/crm/:couponId').get(val.getOne, controllers.getCrmCouponHandler);
 
 router

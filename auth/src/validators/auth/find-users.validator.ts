@@ -12,20 +12,9 @@ export const findUsers = [
       if (val.match(/^[a-z0-9_]+$/)) return true;
       throw new Error('usernameFormat');
     }),
-  query('phoneNumber')
-    .optional()
-    .isMobilePhone('ar-EG')
-    .withMessage('phoneNumberInvalid'),
-  query('category')
-    .optional()
-    .isMongoId()
-    .withMessage('invalidFormat'),
-  query('priceFrom')
-    .optional()
-    .isFloat({ gt: 0 })
-    .withMessage('invalidFormat')
-    .bail()
-    .toFloat(),
+  query('phoneNumber').optional().isMobilePhone('ar-EG').withMessage('phoneNumberInvalid'),
+  query('category').optional().isMongoId().withMessage('invalidFormat'),
+  query('priceFrom').optional().isFloat({ gt: 0 }).withMessage('invalidFormat').bail().toFloat(),
   query('priceTo')
     .optional()
     .isFloat({ gt: 0 })
@@ -43,15 +32,7 @@ export const findUsers = [
     .withMessage('invalidFormat')
     .bail()
     .toBoolean(),
-  query('limit')
-    .optional()
-    .isInt()
-    .withMessage('invalidFormat')
-    .toInt(),
-  query('page')
-    .optional()
-    .isInt()
-    .withMessage('invalidFormat')
-    .toInt(),
+  query('limit').optional().isInt().withMessage('invalidFormat').toInt(),
+  query('page').optional().isInt().withMessage('invalidFormat').toInt(),
   globalValidatorMiddleware,
 ];

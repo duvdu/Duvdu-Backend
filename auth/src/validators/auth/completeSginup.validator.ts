@@ -2,13 +2,8 @@ import { globalValidatorMiddleware } from '@duvdu-v1/duvdu';
 import { body } from 'express-validator';
 
 export const completeSginUpVal = [
-  body('name')
-    .isString()
-    .trim()
-    .isLength({ min: 3, max: 32 })
-    .withMessage('nameInvalid'),
-  body('phoneNumber')
-    .isObject(),
+  body('name').isString().trim().isLength({ min: 3, max: 32 }).withMessage('nameInvalid'),
+  body('phoneNumber').isObject(),
   body('phoneNumber.number')
     .exists()
     .isString()

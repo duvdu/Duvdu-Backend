@@ -1,7 +1,6 @@
 export const NotificationDetails = {
-  newFollow:{
-    title:'new follow',
-    message:'new follow'
+  newFollow: {
+    title: 'new follow',
+    message: 'new follow',
   },
-
 };

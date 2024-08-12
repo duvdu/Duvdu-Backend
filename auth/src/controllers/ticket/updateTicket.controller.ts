@@ -16,7 +16,7 @@ export const updateTicketHandler: UpdateTicketHandler = async (req, res, next) =
     { new: true },
   );
 
-  if (!updateTicket) return next(new NotFound(undefined , req.lang));
+  if (!updateTicket) return next(new NotFound(undefined, req.lang));
 
   res.status(200).json({ message: 'success' });
 };

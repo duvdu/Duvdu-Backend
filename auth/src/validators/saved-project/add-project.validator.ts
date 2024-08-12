@@ -16,9 +16,9 @@ export const createBookmark = [
 
 export const bookmarkParam = [
   param('bookmarkId').isMongoId().withMessage('bookmarkIdInvalid'),
-  query('limit').optional().isInt({min:1}).withMessage('limitInteger'),
-  query('page').optional().isInt({min:1}).withMessage('pageInteger'),
-  globalValidatorMiddleware
+  query('limit').optional().isInt({ min: 1 }).withMessage('limitInteger'),
+  query('page').optional().isInt({ min: 1 }).withMessage('pageInteger'),
+  globalValidatorMiddleware,
 ];
 
 export const updateBookmark = [

@@ -30,21 +30,21 @@ passport.use(
       passReqToCallback: true,
     },
     async (request: any, accessToken: any, refreshToken: any, profile: any, done: any) => {
-      const role = await Roles.findOne({key:SystemRoles.unverified});
+      const role = await Roles.findOne({ key: SystemRoles.unverified });
       if (!role) throw new Error('role not found');
       let user = await Users.findOne({ googleId: profile.id });
       if (!user) {
         user = new Users({
           googleId: profile.id,
-          role:role.id,
-          verificationCode:{
-            reason:VerificationReason.completeSginUp
-          }
+          role: role.id,
+          verificationCode: {
+            reason: VerificationReason.completeSginUp,
+          },
         });
         await user.save();
       }
       console.log(true);
-      
+
       // const Token = generateAccessToken({
       //   id: user.id,
       //   isBlocked: { value: false },

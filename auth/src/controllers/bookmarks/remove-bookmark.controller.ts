@@ -4,7 +4,7 @@ import { RemoveBookmarkHandler } from '../../types/endpoints/saved-projects.endp
 
 export const removeBookmarkHandler: RemoveBookmarkHandler = async (req, res, next) => {
   const bookmark = await Bookmarks.findOne({ _id: req.params.bookmarkId, user: req.loggedUser.id });
-  if (!bookmark) return next(new NotFound(undefined , req.lang));
+  if (!bookmark) return next(new NotFound(undefined, req.lang));
 
   await Bookmarks.deleteOne({ _id: req.params.bookmarkId });
 

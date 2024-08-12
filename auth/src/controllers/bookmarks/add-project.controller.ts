@@ -10,6 +10,6 @@ export const addProjectToBookmarksHandler: AddProjectToBookmarkHandler = async (
       $addToSet: { projects: project?._id },
     },
   );
-  if (!bookmark) return next(new NotFound(undefined , req.lang));
+  if (!bookmark) return next(new NotFound(undefined, req.lang));
   res.status(200).json({ message: 'success' });
 };

@@ -1,4 +1,13 @@
-import { BadRequestError, NotFound, UnauthorizedError , SystemRoles , Roles , Users , SuccessResponse , VerificationReason} from '@duvdu-v1/duvdu';
+import {
+  BadRequestError,
+  NotFound,
+  UnauthorizedError,
+  SystemRoles,
+  Roles,
+  Users,
+  SuccessResponse,
+  VerificationReason,
+} from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 import { hashVerificationCode } from '../../utils/crypto';
@@ -9,13 +18,15 @@ export const verifyHandler: RequestHandler<
   { username: string; code: string }
 > = async (req, res, next) => {
   const user = await Users.findOne({ username: req.body.username });
-  if (!user) return next(new NotFound({en:'User not found' , ar: 'المستخدم غير موجود'} , req.lang));
-  if (!user.verificationCode?.code) return next(new UnauthorizedError(undefined , req.lang));
+  if (!user)
+    return next(new NotFound({ en: 'User not found', ar: 'المستخدم غير موجود' }, req.lang));
+  if (!user.verificationCode?.code) return next(new UnauthorizedError(undefined, req.lang));
   const currentTime = Date.now();
   const expireTime = new Date(user.verificationCode.expireAt || '0').getTime();
-  if (currentTime > expireTime) return next(new BadRequestError({en:'token expired' , ar:'انتهت صلاحية الرمز'} , req.lang));
+  if (currentTime > expireTime)
+    return next(new BadRequestError({ en: 'token expired', ar: 'انتهت صلاحية الرمز' }, req.lang));
   if (user.verificationCode.code !== hashVerificationCode(req.body.code))
-    return next(new BadRequestError({en:'invalid code' , ar:'الرمز غير صالح'} , req.lang));
+    return next(new BadRequestError({ en: 'invalid code', ar: 'الرمز غير صالح' }, req.lang));
 
   user.verificationCode.code = undefined;
   user.verificationCode.expireAt = undefined;
@@ -29,7 +40,7 @@ export const verifyHandler: RequestHandler<
     user.isVerified = true;
     user.verificationCode.reason = undefined;
     const role = await Roles.findOne({ key: SystemRoles.verified });
-    
+
     user.role = role?.id;
   }
 

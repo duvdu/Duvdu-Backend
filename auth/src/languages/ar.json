@@ -37,8 +37,7 @@
   "usernameString": "يجب أن يكون اسم المستخدم سلسلة نصية",
   "codeString": "يجب أن يكون الرمز سلسلة نصية",
   "verificationCodeLength": "يجب أن يكون رمز التحقق مكونًا من 6 أحرف تمامًا",
-  "invalidAddress":"العنوان مطلوب",
-
+  "invalidAddress": "العنوان مطلوب",
 
   "keyRequired": "المفتاح مطلوب",
   "keyString": "يجب أن يكون المفتاح سلسلة نصية",

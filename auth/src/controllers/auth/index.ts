@@ -15,3 +15,7 @@ export * from './favourites.controller';
 export * from './update-default-profile-crm.controller';
 export * from './get-logged-user-projects.controller';
 export * from './logOut.controller';
+export * from './createUser.controller';
+export * from './updateUser.controller';
+export * from './blockUser.controller';
+export * from './unblockUser.controller';

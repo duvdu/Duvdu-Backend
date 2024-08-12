@@ -13,6 +13,6 @@ export const createCouponHandler: RequestHandler<
   >,
   unknown
 > = async (req, res) => {
-  const coupon = await Coupon.create(req.body);
+  const coupon = await Coupon.create({...req.body , couponCountAvaliable:req.body.couponCount});
   res.status(201).json({ message: 'success', data: coupon });
 };

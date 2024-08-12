@@ -26,11 +26,7 @@ router
   .route('/:planId')
   .all(isauthenticated)
   .get(isauthorized(PERMISSIONS.getPlanHandler), val.planId, controllers.getPlanHandler)
-  .patch(
-    isauthorized(PERMISSIONS.updatePlanHandler),
-    val.update,
-    controllers.updatePlanHandler,
-  )
+  .patch(isauthorized(PERMISSIONS.updatePlanHandler), val.update, controllers.updatePlanHandler)
   .delete(isauthorized(PERMISSIONS.removePlanHandler), val.planId, controllers.removePlanHandler);
 
 export const planRoutes = router;

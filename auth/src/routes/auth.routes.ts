@@ -14,6 +14,14 @@ import * as handlers from '../controllers/auth';
 import * as val from '../validators/auth';
 
 const router = Router();
+
+router.route('/crm').post(val.createUser , handlers.createUserHandler);
+router.route('/crm/:userId').patch(uploadProjectMedia(FOLDERS.auth),val.updateUser , handlers.updateUserHandler);
+router.route('/crm/:userId/block').post(val.blockUser , handlers.blockUserHandler)
+  .patch(val.unblockUser , handlers.unBlockUserHandler);
+
+
+
 router
   .route('/find')
   .get(

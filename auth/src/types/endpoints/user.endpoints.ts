@@ -12,8 +12,8 @@ declare module 'express-session' {
   interface SessionData {
     access: string;
     refresh: string;
-    mobileAccess:string;
-    mobileRefresh:string;
+    mobileAccess: string;
+    mobileRefresh: string;
   }
 }
 
@@ -189,4 +189,4 @@ export interface CompleteSginUpHandler
   > {}
 
 export interface LogoutHandler
-extends RequestHandler<unknown , successResponse<unknown> , unknown , unknown>{}
+  extends RequestHandler<unknown, successResponse<unknown>, unknown, unknown> {}

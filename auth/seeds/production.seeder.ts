@@ -1,4 +1,4 @@
-import { dbConnection , PERMISSIONS , Roles , Users} from '@duvdu-v1/duvdu';
+import { dbConnection, PERMISSIONS, Roles, Users } from '@duvdu-v1/duvdu';
 import mongoose from 'mongoose';
 
 import { env } from '.././src/config/env';
@@ -13,10 +13,7 @@ import { env } from '.././src/config/env';
   await Roles.create(
     {
       key: 'un-verified',
-      permissions: [
-        PERMISSIONS.changePassword,
-        PERMISSIONS.updateProfile,
-      ],
+      permissions: [PERMISSIONS.changePassword, PERMISSIONS.updateProfile],
     },
     {
       key: 'verified',

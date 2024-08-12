@@ -10,14 +10,13 @@ export const resendVerificationCodeHandler: ResendVerificationCodeHandler = asyn
   next,
 ) => {
   const user = await Users.findOne({ username: req.body.username });
-  if (!user) return next(new NotFound({en:'User not found' , ar: 'المستخدم غير موجود'} , req.lang));
+  if (!user)
+    return next(new NotFound({ en: 'User not found', ar: 'المستخدم غير موجود' }, req.lang));
   if (!user.verificationCode?.reason) return next(new UnauthorizedError());
   const currentTime = Date.now();
   const expireTime = new Date(user.verificationCode.expireAt || '0').getTime();
   if (currentTime < expireTime)
-    return next(
-      new BadRequestError(`${Math.ceil((expireTime - currentTime) / 1000)}`),
-    );
+    return next(new BadRequestError(`${Math.ceil((expireTime - currentTime) / 1000)}`));
 
   const code = generateRandom6Digit();
   user.verificationCode = {

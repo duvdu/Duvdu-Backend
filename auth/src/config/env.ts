@@ -27,18 +27,17 @@ export const env = {
     secret: process.env.SESSION_SECRET as string,
     allowUseStorage: (process.env.ALLOW_USE_SESSION_STORAGE === 'true') as boolean,
   },
-  nats:{
-    clusterId:process.env.NATS_CLUSTER_ID,
-    clientId:process.env.NATS_CLIENT_ID,
-    url:process.env.NATS_URL
-  }
+  nats: {
+    clusterId: process.env.NATS_CLUSTER_ID,
+    clientId: process.env.NATS_CLIENT_ID,
+    url: process.env.NATS_URL,
+  },
 };
 
 export const checkEnvVariables = () => {
   console.log(env.redis.uri);
   console.log(env.redis.pass);
-  
-  
+
   if (!env.mongoDb.uri) throw new Error('env:MONGO_URI must be defined');
   if (!env.jwt.secret) throw new Error('env:JWT_KEY must be defined');
   if (!env.google.client_id) throw new Error('env:CLIENT_ID must be defined');
@@ -47,5 +46,4 @@ export const checkEnvVariables = () => {
   if (!env.redis.uri) return new Error('env:REDIS_HOST must be defined');
   if (!env.redis.pass) return new Error('env:REDIS_PASS must be defined');
   console.log(env.redis.uri);
-  
 };

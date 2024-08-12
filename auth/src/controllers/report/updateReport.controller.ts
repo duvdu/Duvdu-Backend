@@ -3,24 +3,22 @@ import { NotFound, Report } from '@duvdu-v1/duvdu';
 
 import { UpdateReportHandler } from '../../types/endpoints/report.endpoints';
 
-
-export const updateReportHandler:UpdateReportHandler = async(req,res,next)=>{
+export const updateReportHandler: UpdateReportHandler = async (req, res, next) => {
   const updatedReport = await Report.findByIdAndUpdate(
-    req.params.reportId ,
+    req.params.reportId,
     {
-      'state.isClosed':true,
-      'state.closedBy':req.loggedUser.id,
-      'state.feedback':req.body.feedback
+      'state.isClosed': true,
+      'state.closedBy': req.loggedUser.id,
+      'state.feedback': req.body.feedback,
     },
-    {new:true}
+    { new: true },
   ).populate({
     path: 'project',
     populate: {
       path: 'project.type',
     },
   });
-  if (!updatedReport) 
-    return next(new NotFound(undefined , req.lang));
+  if (!updatedReport) return next(new NotFound(undefined, req.lang));
 
-  res.status(200).json({message:'success' , data:updatedReport });
+  res.status(200).json({ message: 'success', data: updatedReport });
 };

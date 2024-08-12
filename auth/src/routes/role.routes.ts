@@ -20,11 +20,7 @@ router
   .route('/:roleId')
   .all(isauthenticated)
   .get(isauthorized(PERMISSIONS.getRoleHandler), val.roleId, controllers.getRoleHandler)
-  .put(
-    isauthorized(PERMISSIONS.updateRoleHandler),
-    val.update,
-    controllers.updateRoleHandler,
-  )
+  .put(isauthorized(PERMISSIONS.updateRoleHandler), val.update, controllers.updateRoleHandler)
   .delete(isauthorized(PERMISSIONS.removeRoleHandler), val.roleId, controllers.removeRoleHandler);
 
 export const roleRoutes = router;

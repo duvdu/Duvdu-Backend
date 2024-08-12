@@ -10,10 +10,10 @@ export const getCrmCouponHandler: RequestHandler<
 > = async (req, res, next) => {
   const coupon = await Coupon.findById(req.params.couponId);
 
-  if (!coupon) 
+  if (!coupon)
     return next(
       new NotFound({ en: 'coupon not found', ar: 'لم يتم العثور على القسيمة' }, req.lang),
     );
 
-  res.status(200).json({message:'success' , data:coupon});
+  res.status(200).json({ message: 'success', data: coupon });
 };

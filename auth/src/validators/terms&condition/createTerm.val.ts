@@ -11,4 +11,3 @@ export const updateTermVal = [
   check('desc').exists().isString().notEmpty().withMessage('descRequired'),
   globalValidatorMiddleware,
 ];
-

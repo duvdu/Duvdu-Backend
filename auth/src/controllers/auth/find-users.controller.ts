@@ -23,9 +23,11 @@ export const filterUsers: RequestHandler<
       { username: { $regex: `\\b${req.query.search}\\b`, $options: 'i' } },
       { name: { $regex: `\\b${req.query.search}\\b`, $options: 'i' } },
     ];
-  }  if (req.query.username) req.pagination.filter.username = req.query.username;
+  }
+  if (req.query.username) req.pagination.filter.username = req.query.username;
   if (req.query.phoneNumber) req.pagination.filter['phoneNumber.number'] = req.query.phoneNumber;
-  if (req.query.category) req.pagination.filter.category = new mongoose.Types.ObjectId(req.query.category);
+  if (req.query.category)
+    req.pagination.filter.category = new mongoose.Types.ObjectId(req.query.category);
   if (req.query.priceFrom) req.pagination.filter.price = { $gte: req.query.priceFrom };
   if (req.query.priceTo)
     req.pagination.filter.price = { ...req.pagination.filter.price, $lte: req.query.priceTo };
@@ -43,7 +45,7 @@ export const findUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser
 
   const aggregationPipeline = [
     {
-      $match: req.pagination.filter
+      $match: req.pagination.filter,
     },
     {
       $project: {
@@ -65,16 +67,16 @@ export const findUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser
         profileViews: 1,
         rank: 1,
         projectsView: 1,
-        category: 1 // Include category field in the projection
-      }
+        category: 1, // Include category field in the projection
+      },
     },
     {
       $lookup: {
         from: MODELS.category,
         localField: 'category',
         foreignField: '_id',
-        as: 'categoryDetails'
-      }
+        as: 'categoryDetails',
+      },
     },
     {
       $addFields: {
@@ -87,14 +89,14 @@ export const findUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser
                 $cond: {
                   if: { $eq: [req.lang, 'ar'] },
                   then: { $arrayElemAt: ['$categoryDetails.title.ar', 0] },
-                  else: { $arrayElemAt: ['$categoryDetails.title.en', 0] }
-                }
-              }
+                  else: { $arrayElemAt: ['$categoryDetails.title.en', 0] },
+                },
+              },
             },
-            else: null
-          }
-        }
-      }
+            else: null,
+          },
+        },
+      },
     },
     {
       $project: {
@@ -117,8 +119,8 @@ export const findUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser
         rank: 1,
         projectsView: 1,
         category: 1, // Include the category object
-        isFollow: 1
-      }
+        isFollow: 1,
+      },
     },
     {
       $lookup: {
@@ -130,19 +132,19 @@ export const findUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser
               $expr: {
                 $and: [
                   { $eq: ['$following', '$$userId'] },
-                  { $eq: ['$follower', new mongoose.Types.ObjectId(req.loggedUser?.id)] }
-                ]
-              }
-            }
-          }
+                  { $eq: ['$follower', new mongoose.Types.ObjectId(req.loggedUser?.id)] },
+                ],
+              },
+            },
+          },
         ],
-        as: 'isFollow'
-      }
+        as: 'isFollow',
+      },
     },
     {
       $addFields: {
-        isFollow: { $cond: { if: { $gt: [{ $size: '$isFollow' }, 0] }, then: true, else: false } }
-      }
+        isFollow: { $cond: { if: { $gt: [{ $size: '$isFollow' }, 0] }, then: true, else: false } },
+      },
     },
     {
       $lookup: {
@@ -153,32 +155,44 @@ export const findUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser
             $match: {
               $expr: {
                 $or: [
-                  { $and: [{ $eq: ['$sp', new mongoose.Types.ObjectId(req.loggedUser?.id)] }, { $eq: ['$customer', '$$userId'] }] },
-                  { $and: [{ $eq: ['$customer', new mongoose.Types.ObjectId(req.loggedUser?.id)] }, { $eq: ['$sp', '$$userId'] }] }
-                ]
-              }
-            }
-          }
+                  {
+                    $and: [
+                      { $eq: ['$sp', new mongoose.Types.ObjectId(req.loggedUser?.id)] },
+                      { $eq: ['$customer', '$$userId'] },
+                    ],
+                  },
+                  {
+                    $and: [
+                      { $eq: ['$customer', new mongoose.Types.ObjectId(req.loggedUser?.id)] },
+                      { $eq: ['$sp', '$$userId'] },
+                    ],
+                  },
+                ],
+              },
+            },
+          },
         ],
-        as: 'canChatDetails'
-      }
+        as: 'canChatDetails',
+      },
     },
     {
       $addFields: {
-        canChat: { $cond: { if: { $gt: [{ $size: '$canChatDetails' }, 0] }, then: true, else: false } }
-      }
+        canChat: {
+          $cond: { if: { $gt: [{ $size: '$canChatDetails' }, 0] }, then: true, else: false },
+        },
+      },
     },
     {
       $project: {
-        canChatDetails: 0 // Exclude the canChatDetails field
-      }
+        canChatDetails: 0, // Exclude the canChatDetails field
+      },
     },
     {
-      $skip: req.pagination.skip
+      $skip: req.pagination.skip,
     },
     {
-      $limit: req.pagination.limit
-    }
+      $limit: req.pagination.limit,
+    },
   ];
   const users = await Users.aggregate(aggregationPipeline);
 

@@ -4,32 +4,37 @@ import { body } from 'express-validator';
 export const updateProfileVal = [
   body('name')
     .optional()
-    .isString().withMessage('nameInvalid')
-    .isLength({ min: 3 }).withMessage('nameLength'),
+    .isString()
+    .withMessage('nameInvalid')
+    .isLength({ min: 3 })
+    .withMessage('nameLength'),
   body('location')
     .optional()
     .isObject()
     .custom(async (val, { req }) => {
       await body('location.lat')
-        .isFloat({ min: -90, max: 90 }).withMessage('latInvalid')
+        .isFloat({ min: -90, max: 90 })
+        .withMessage('latInvalid')
         .customSanitizer((val) => +val)
         .run(req);
       await body('location.lng')
-        .isFloat({ min: -180, max: 180 }).withMessage('lngInvalid')
+        .isFloat({ min: -180, max: 180 })
+        .withMessage('lngInvalid')
         .customSanitizer((val) => +val)
         .run(req);
     }),
   body('address').optional().exists().isString().withMessage('invalidAddress'),
-  body('category')
+  body('category').optional().isMongoId().withMessage('categoryInvalid'),
+  body('about').optional().isString().withMessage('aboutInvalid'),
+  body('isAvaliableToInstantProjects')
     .optional()
-    .isMongoId().withMessage('categoryInvalid'),
-  body('about')
-    .optional()
-    .isString().withMessage('aboutInvalid'),
-  body('isAvaliableToInstantProjects').optional().isBoolean().toBoolean().withMessage('isAvaliableInvalid'),
+    .isBoolean()
+    .toBoolean()
+    .withMessage('isAvaliableInvalid'),
   body('pricePerHour')
     .optional()
-    .isFloat().withMessage('priceInvalid')
+    .isFloat()
+    .withMessage('priceInvalid')
     .customSanitizer((val) => +val),
   body('password').not().exists().withMessage('passwordNotAllowed'),
   body('username').not().exists().withMessage('usernameNotAllowed'),

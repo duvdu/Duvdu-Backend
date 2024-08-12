@@ -1,7 +1,6 @@
 import { Iterm } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-
 type successResponse<T> = T & {
   message: 'success';
 };

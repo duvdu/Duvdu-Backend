@@ -15,6 +15,11 @@ export enum PERMISSIONS {
   getTicket = 'get-ticket',
   createTerm = 'create-term',
   updateTerm = 'update-term',
+
+  createUser = 'create user',
+  updateUser = 'update user',
+  blockUser = 'block user',
+  unBlockUser = 'un block user',
   // plan
   createPlanHandler = 'create plan',
   updatePlanHandler = 'update plan',
