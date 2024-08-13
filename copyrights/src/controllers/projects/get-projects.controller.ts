@@ -10,12 +10,12 @@ export const getProjectsPagination: RequestHandler<
     search?: string;
     user?: string;
     address?: string;
-    category?: mongoose.Types.ObjectId[];
     priceFrom?: number;
     priceTo?: number;
     isDeleted?: boolean;
     startDate?: Date;
     endDate?: Date;
+    category?: mongoose.Types.ObjectId[];
     tags?: mongoose.Types.ObjectId[];
     subCategory?: mongoose.Types.ObjectId[];
   }

@@ -1,5 +1,6 @@
 import { globalValidatorMiddleware } from '@duvdu-v1/duvdu';
 import { body, param, query } from 'express-validator';
+import mongoose from 'mongoose';
 
 export const appendProducerVal = [
   body('category').isMongoId().withMessage('categoryMongoId'),
@@ -68,6 +69,36 @@ export const getProducersVal = [
   query('user').optional().isMongoId().withMessage('userOptionalMongoId'),
   query('limit').optional().isInt().withMessage('limitOptionalInt'),
   query('page').optional().isInt().withMessage('pageOptionalInt'),
+  query('category')
+    .optional()
+    .customSanitizer((val:string) => (typeof val === 'string' ? val.split(',') : val))
+    .bail()
+    .isArray()
+    .custom((val:string[]) => {
+      return val.every((item: string) => mongoose.Types.ObjectId.isValid(item));
+    })
+    .bail()
+    .customSanitizer((val: string[]) => val.map((el) => new mongoose.Types.ObjectId(el))),
+  query('tags')
+    .optional()
+    .customSanitizer((val: string) => (typeof val === 'string' ? val.split(',') : val))
+    .bail()
+    .isArray()
+    .custom((val:string[]) => {
+      return val.every((item: string) => mongoose.Types.ObjectId.isValid(item));
+    })
+    .bail()
+    .customSanitizer((val: string[]) => val.map((el) => new mongoose.Types.ObjectId(el))),
+  query('subCategory')
+    .optional()
+    .customSanitizer((val:string) => (typeof val === 'string' ? val.split(',') : val))
+    .bail()
+    .isArray()
+    .custom((val:string[]) => {
+      return val.every((item: string) => mongoose.Types.ObjectId.isValid(item));
+    })
+    .bail()
+    .customSanitizer((val: string[]) => val.map((el) => new mongoose.Types.ObjectId(el))),
   globalValidatorMiddleware,
 ];
 

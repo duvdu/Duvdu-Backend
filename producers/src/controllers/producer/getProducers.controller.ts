@@ -12,11 +12,11 @@ export const getProducersPagination: RequestHandler<
   unknown,
   {
     searchKeywords?: string[];
-    category?: string;
+    category?: mongoose.Types.ObjectId[];
+    tags?: mongoose.Types.ObjectId[];
+    subCategory?: mongoose.Types.ObjectId[];
     maxBudget?: number;
     minBudget?: number;
-    tags?: string[];
-    subCategory?: string;
     user?: string;
   }
 > = (req, res, next) => {
@@ -28,10 +28,6 @@ export const getProducersPagination: RequestHandler<
     }));
   }
 
-  if (req.query.category) {
-    req.pagination.filter.category = new mongoose.Types.ObjectId(req.query.category);
-  }
-
   if (req.query.maxBudget !== undefined) {
     req.pagination.filter.maxBudget = { $lte: req.query.maxBudget };
   }
@@ -40,17 +36,17 @@ export const getProducersPagination: RequestHandler<
     req.pagination.filter.minBudget = { $gte: req.query.minBudget };
   }
 
-  if (req.query.subCategory) {
-    req.pagination.filter['subCategories.title.' + req.lang] = req.query.subCategory;
-  }
-
-  if (req.query.tags) {
-    req.pagination.filter['subCategories.tags.' + req.lang] = { $in: req.query.tags };
-  }
-
   if (req.query.user) {
     req.pagination.filter.user = new mongoose.Types.ObjectId(req.query.user);
   }
+
+  if (req.query.category) req.pagination.filter.category = { $in: req.query.category };
+  
+  if (req.query.subCategory) {
+    req.pagination.filter['subCategory._id'] = { $in: req.query.subCategory };
+  }
+  if (req.query.tags) {
+    req.pagination.filter['tags._id'] = { $in: req.query.tags };
 
   next();
 };
