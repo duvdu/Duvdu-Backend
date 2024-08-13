@@ -36,3 +36,9 @@ export const getAll = [
   query('page').optional().isInt({ min: 1 }).withMessage('page'),
   globalValidatorMiddleware,
 ];
+
+
+export const globalSearch = [
+  query('search').isString().exists(),
+  globalValidatorMiddleware
+];
