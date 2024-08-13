@@ -1,5 +1,6 @@
 import { globalValidatorMiddleware } from '@duvdu-v1/duvdu';
 import { body, param, query } from 'express-validator';
+import mongoose from 'mongoose';
 
 export const create = [
   body('address').isString().exists().withMessage('address'),
@@ -113,7 +114,6 @@ export const getAll = [
   query('searchKeywords.*').optional().isString().withMessage('searchKeywords'),
   query('location.lat').optional().isNumeric().withMessage('location'),
   query('location.lng').optional().isNumeric().withMessage('location'),
-  query('category').optional().isMongoId().withMessage('category'),
   query('showOnHome').optional().isBoolean().withMessage('showOnHome'),
   query('startDate').optional().isISO8601().toDate().withMessage('startDate'),
   query('endDate').optional().isISO8601().toDate().withMessage('endDate'),
@@ -121,6 +121,36 @@ export const getAll = [
   query('projectScaleMax').optional().isNumeric().withMessage('projectScale'),
   query('limit').optional().isInt({ min: 1 }).withMessage('limit'),
   query('page').optional().isInt({ min: 1 }).withMessage('page'),
+  query('category')
+    .optional()
+    .customSanitizer((val) => (typeof val === 'string' ? val.split(',') : val))
+    .bail()
+    .isArray()
+    .custom((val) => {
+      return val.every((item: string) => mongoose.Types.ObjectId.isValid(item));
+    })
+    .bail()
+    .customSanitizer((val: string[]) => val.map((el) => new mongoose.Types.ObjectId(el))),
+  query('tags')
+    .optional()
+    .customSanitizer((val) => (typeof val === 'string' ? val.split(',') : val))
+    .bail()
+    .isArray()
+    .custom((val) => {
+      return val.every((item: string) => mongoose.Types.ObjectId.isValid(item));
+    })
+    .bail()
+    .customSanitizer((val: string[]) => val.map((el) => new mongoose.Types.ObjectId(el))),
+  query('subCategory')
+    .optional()
+    .customSanitizer((val) => (typeof val === 'string' ? val.split(',') : val))
+    .bail()
+    .isArray()
+    .custom((val) => {
+      return val.every((item: string) => mongoose.Types.ObjectId.isValid(item));
+    })
+    .bail()
+    .customSanitizer((val: string[]) => val.map((el) => new mongoose.Types.ObjectId(el))),
   globalValidatorMiddleware,
 ];
 

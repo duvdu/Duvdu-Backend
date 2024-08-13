@@ -20,7 +20,6 @@ export const getProjectsPagination: RequestHandler<
     subCategory?: mongoose.Types.ObjectId[];
   }
 > = (req, res, next) => {
-  console.log(req.query.category);
   if (req.query.search) req.pagination.filter.$text = { $search: req.query.search };
   if (req.query.user) req.pagination.filter.user = req.query.user;
   if (req.query.address)

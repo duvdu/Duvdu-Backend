@@ -41,7 +41,7 @@ router
     isauthorized(PERMISSIONS.createProjectHandler),
     globalUploadMiddleware(FOLDERS.portfolio_post, {
       maxSize: 400 * 1024 * 1024,
-      fileTypes: ['video', 'image', 'audio/wav' , 'audio/mpeg' , 'application/pdf'],
+      fileTypes: ['video', 'image', 'audio/wav', 'audio/mpeg', 'application/pdf'],
     }).fields([
       { name: 'attachments', maxCount: 10 },
       { name: 'cover', maxCount: 1 },
@@ -50,7 +50,13 @@ router
     checkRequiredFields({ fields: ['cover', 'attachments'] }),
     handler.createProjectHandler,
   )
-  .get(optionalAuthenticated,globalPaginationMiddleware, handler.getProjectsPagination, handler.getProjectsHandler);
+  .get(
+    optionalAuthenticated,
+    globalPaginationMiddleware,
+    val.getAll,
+    handler.getProjectsPagination,
+    handler.getProjectsHandler,
+  );
 
 router
   .route('/:projectId')
@@ -59,7 +65,7 @@ router
     isauthorized(PERMISSIONS.updateProjectHandler),
     globalUploadMiddleware(FOLDERS.portfolio_post, {
       maxSize: 400 * 1024 * 1024,
-      fileTypes: ['video', 'image', 'audio/wav' , 'audio/mpeg' , 'application/pdf'],
+      fileTypes: ['video', 'image', 'audio/wav', 'audio/mpeg', 'application/pdf'],
     }).fields([
       { name: 'attachments', maxCount: 10 },
       { name: 'cover', maxCount: 1 },
@@ -67,7 +73,7 @@ router
     val.update,
     handler.updateProjectHandler,
   )
-  .get(optionalAuthenticated,val.getProject, handler.getProjectHandler)
+  .get(optionalAuthenticated, val.getProject, handler.getProjectHandler)
   .delete(
     isauthenticated,
     isauthorized(PERMISSIONS.removeProjectHandler),
