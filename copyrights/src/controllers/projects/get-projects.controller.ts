@@ -10,16 +10,17 @@ export const getProjectsPagination: RequestHandler<
     search?: string;
     user?: string;
     address?: string;
-    category?: string;
+    category?: mongoose.Types.ObjectId[];
     priceFrom?: number;
     priceTo?: number;
     isDeleted?: boolean;
     startDate?: Date;
     endDate?: Date;
-    tags?: string;
-    subCategory?: string;
+    tags?: mongoose.Types.ObjectId[];
+    subCategory?: mongoose.Types.ObjectId[];
   }
 > = (req, res, next) => {
+  console.log(req.query.category);
   if (req.query.search) req.pagination.filter.$text = { $search: req.query.search };
   if (req.query.user) req.pagination.filter.user = req.query.user;
   if (req.query.address)
@@ -30,8 +31,7 @@ export const getProjectsPagination: RequestHandler<
       ...req.pagination.filter.price,
       $lte: req.query.priceTo,
     };
-  if (req.query.category)
-    req.pagination.filter.category = new mongoose.Types.ObjectId(req.query.category);
+  if (req.query.category) req.pagination.filter.category = { $in: req.query.category };
   if (req.query.startDate || req.query.endDate)
     req.pagination.filter.createdAt = {
       $gte: req.query.startDate || new Date(0),
@@ -41,10 +41,10 @@ export const getProjectsPagination: RequestHandler<
     req.pagination.filter.isDeleted = req.query.isDeleted ? true : { $ne: true };
   }
   if (req.query.subCategory) {
-    req.pagination.filter[`subCategory.${req.lang}`] = req.query.subCategory;
+    req.pagination.filter['subCategory._id'] = { $in: req.query.subCategory };
   }
   if (req.query.tags) {
-    req.pagination.filter['tags._id'] = new mongoose.Types.ObjectId(req.query.tags);
+    req.pagination.filter['tags._id'] = { $in: req.query.tags };
   }
   next();
 };
