@@ -84,8 +84,8 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
           pricePerHour: '$userDetails.pricePerHour',
           hasVerificationBadge: '$userDetails.hasVerificationBadge',
           likes: '$userDetails.likes',
-          followCount:'$userDetails.followCount',
-          address:'$userDetails.address',
+          followCount: '$userDetails.followCount',
+          address: '$userDetails.address',
         },
         attachments: {
           $map: {
@@ -188,9 +188,6 @@ export const getProjectsPagination: RequestHandler<
   if (req.query.equipments) {
     req.pagination.filter['equipments.name'] = { $in: req.query.equipments };
   }
-  if (req.query.category) {
-    req.pagination.filter.category = req.query.category;
-  }
   if (req.query.pricePerHourFrom || req.query.pricePerHourTo) {
     req.pagination.filter.pricePerHour = {};
     if (req.query.pricePerHourFrom) {
@@ -199,9 +196,6 @@ export const getProjectsPagination: RequestHandler<
     if (req.query.pricePerHourTo) {
       req.pagination.filter.pricePerHour.$lte = req.query.pricePerHourTo;
     }
-  }
-  if (req.query.insurance) {
-    req.pagination.filter.insurance = req.query.insurance;
   }
   if (req.query.showOnHome !== undefined) {
     req.pagination.filter.showOnHome = req.query.showOnHome;
@@ -212,11 +206,12 @@ export const getProjectsPagination: RequestHandler<
       $lte: req.query.endDate || new Date(),
     };
   }
+  if (req.query.category) req.pagination.filter.category = { $in: req.query.category };
   if (req.query.subCategory) {
-    req.pagination.filter[`subCategory.${req.lang}`] = req.query.subCategory;
+    req.pagination.filter['subCategory._id'] = { $in: req.query.subCategory };
   }
   if (req.query.tags) {
-    req.pagination.filter['tags.' + req.lang] = req.query.tags;
+    req.pagination.filter['tags._id'] = { $in: req.query.tags };
   }
   next();
 };
