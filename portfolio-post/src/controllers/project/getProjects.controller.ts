@@ -13,7 +13,9 @@ export const getProjectsPagination: RequestHandler<
   {
     searchKeywords?: string[];
     location?: { lat: number; lng: number };
-    category?: Types.ObjectId;
+    category?: Types.ObjectId[];
+    subCategory?: Types.ObjectId[];
+    tags?: Types.ObjectId[];
     showOnHome?: boolean;
     startDate?: Date;
     endDate?: Date;
@@ -21,17 +23,11 @@ export const getProjectsPagination: RequestHandler<
     projectScaleMax?: number;
   }
 > = async (req, res, next) => {
-  req.pagination.filter = {};
-
   if (req.query.searchKeywords?.length) {
     req.pagination.filter.$or = req.query.searchKeywords.map((keyword) => ({
       $or: [
         { name: { $regex: keyword, $options: 'i' } },
         { description: { $regex: keyword, $options: 'i' } },
-        { 'tags.ar': { $regex: keyword, $options: 'i' } },
-        { 'tags.en': { $regex: keyword, $options: 'i' } },
-        { 'subCategory.ar': { $regex: keyword, $options: 'i' } },
-        { 'subCategory.en': { $regex: keyword, $options: 'i' } },
         { 'tools.name': { $regex: keyword, $options: 'i' } },
         { 'functions.name': { $regex: keyword, $options: 'i' } },
         { address: { $regex: keyword, $options: 'i' } },
@@ -45,7 +41,14 @@ export const getProjectsPagination: RequestHandler<
   }
 
   if (req.query.category) {
-    req.pagination.filter.category = req.query.category;
+    req.pagination.filter.category = { $in: req.query.category };
+  }
+
+  if (req.query.subCategory) {
+    req.pagination.filter['subCategory._id'] = { $in: req.query.subCategory };
+  }
+  if (req.query.tags) {
+    req.pagination.filter['tags._id'] = { $in: req.query.tags };
   }
 
   if (req.query.showOnHome !== undefined) {
@@ -76,6 +79,7 @@ export const getProjectsPagination: RequestHandler<
 };
 
 export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
+  console.log(req.pagination.filter);
   const projects = await ProjectCycle.aggregate([
     {
       $match: { ...req.pagination.filter, isDeleted: false },
@@ -121,7 +125,7 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
       $project: {
         _id: 1,
         user: {
-          _id:'$user._id',
+          _id: '$user._id',
           profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$user.profileImage'] },
           isOnline: '$user.isOnline',
           username: '$user.username',
@@ -137,8 +141,8 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
           pricePerHour: '$user.pricePerHour',
           hasVerificationBadge: '$user.hasVerificationBadge',
           likes: '$user.likes',
-          followCount:'$user.followCount',
-          address:'$user.address',  
+          followCount: '$user.followCount',
+          address: '$user.address',
         },
         category: {
           title: '$category.title.' + req.lang,
@@ -169,7 +173,7 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
             input: { $ifNull: ['$creatives', []] },
             as: 'creative',
             in: {
-              _id:'$$creative._id',
+              _id: '$$creative._id',
               profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$$creative.profileImage'] },
               isOnline: '$$creative.isOnline',
               username: '$$creative.username',
@@ -185,8 +189,8 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
               pricePerHour: '$$creative.pricePerHour',
               hasVerificationBadge: '$$creative.hasVerificationBadge',
               likes: '$$creative.likes',
-              followCount:'$$creative.followCount',
-              address:'$$creative.address',
+              followCount: '$$creative.followCount',
+              address: '$$creative.address',
             },
           },
         },
@@ -197,17 +201,16 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
         showOnHome: 1,
         projectScale: 1,
         rate: 1,
-        updatedAt:1,
-        createdAt:1
+        updatedAt: 1,
+        createdAt: 1,
       },
     },
   ]);
 
-
   if (req.loggedUser?.id) {
     const user = await Users.findById(req.loggedUser.id, { favourites: 1 });
     console.log('yes yes');
-    
+
     projects.forEach((project) => {
       project.isFavourite = user?.favourites.some(
         (el: any) => el.project.toString() === project._id.toString(),

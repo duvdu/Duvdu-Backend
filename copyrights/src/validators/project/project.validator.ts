@@ -1,5 +1,6 @@
 import { globalValidatorMiddleware } from '@duvdu-v1/duvdu';
 import { body, param, query } from 'express-validator';
+import mongoose from 'mongoose';
 
 export const create = [
   body('category').isMongoId().withMessage('categoryInvalid'),
@@ -52,7 +53,16 @@ export const findAll = [
   query('user').optional().isMongoId().withMessage('userInvalid'),
   query('priceFrom').optional().isFloat({ gt: 0 }).toFloat().withMessage('priceFromInvalid'),
   query('priceTo').optional().isFloat({ gt: 0 }).toFloat().withMessage('priceToInvalid'),
-  query('category').optional().isMongoId().withMessage('categoryInvalid'),
+  query('category')
+    .optional()
+    .customSanitizer((val) => (typeof val === 'string' ? val.split(',') : val))
+    .bail()
+    .isArray()
+    .custom((val) => {
+      return val.every((item: string) => mongoose.Types.ObjectId.isValid(item));
+    })
+    .bail()
+    .customSanitizer((val: string[]) => val.map((el) => new mongoose.Types.ObjectId(el))),
   query('startDate')
     .optional()
     .isISO8601()
@@ -63,8 +73,26 @@ export const findAll = [
     .isISO8601()
     .customSanitizer((val) => (val ? new Date(val) : new Date()))
     .withMessage('endDateISO8601'),
-  query('tags').optional().isMongoId().withMessage('tagsString'),
-  query('subCategory').optional().isString().withMessage('subCategoryString'),
+  query('tags')
+    .optional()
+    .customSanitizer((val) => (typeof val === 'string' ? val.split(',') : val))
+    .bail()
+    .isArray()
+    .custom((val) => {
+      return val.every((item: string) => mongoose.Types.ObjectId.isValid(item));
+    })
+    .bail()
+    .customSanitizer((val: string[]) => val.map((el) => new mongoose.Types.ObjectId(el))),
+  query('subCategory')
+    .optional()
+    .customSanitizer((val) => (typeof val === 'string' ? val.split(',') : val))
+    .bail()
+    .isArray()
+    .custom((val) => {
+      return val.every((item: string) => mongoose.Types.ObjectId.isValid(item));
+    })
+    .bail()
+    .customSanitizer((val: string[]) => val.map((el) => new mongoose.Types.ObjectId(el))),
   query('limit').optional().isInt({ min: 1 }),
   query('page').optional().isInt({ min: 1 }),
   globalValidatorMiddleware,
