@@ -8,7 +8,6 @@ import express from 'express';
 import session from 'express-session';
 
 import { env } from './config/env';
-import { passport } from './controllers/auth/passport.controller';
 import { apiRoutes } from './routes';
 
 export const app = express();
@@ -48,9 +47,6 @@ app.use(
       },
     }),
   );
-
-  app.use(passport.initialize());
-  app.use(passport.session());
 
   app.use(languageHeaderMiddleware);
 

@@ -65,8 +65,7 @@ export const updateUserHandler: RequestHandler<
       return next(new NotFound({ en: 'role not found', ar: 'لم يتم العثور على الدور' }, req.lang));
   }
 
-  if (req.body.password)
-    req.body.password = await hashPassword(req.body.password);
+  if (req.body.password) req.body.password = await hashPassword(req.body.password);
 
   const s3 = new Bucket();
   if (coverImage?.length) {

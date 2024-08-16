@@ -15,12 +15,40 @@ import * as val from '../validators/auth';
 
 const router = Router();
 
-router.route('/crm').post(isauthenticated , isauthorized(PERMISSIONS.createUser) , val.createUser , handlers.createUserHandler);
-router.route('/crm/:userId').patch(isauthenticated , isauthorized(PERMISSIONS.updateUser) ,uploadProjectMedia(FOLDERS.auth),val.updateUser , handlers.updateUserHandler);
-router.route('/crm/:userId/block').post(isauthenticated , isauthorized(PERMISSIONS.blockUser) ,val.blockUser , handlers.blockUserHandler)
-  .patch(isauthenticated , isauthorized(PERMISSIONS.unBlockUser) ,val.unblockUser , handlers.unBlockUserHandler);
+router.route('/provider').post( val.loginProvider , handlers.loginWithProviderHandler);
+router.route('/provider/phone').post( isauthenticated ,  val.updatePhoneNumberVal , handlers.updateProviderPhoneNumberHandler);
 
-
+router
+  .route('/crm')
+  .post(
+    isauthenticated,
+    isauthorized(PERMISSIONS.createUser),
+    val.createUser,
+    handlers.createUserHandler,
+  );
+router
+  .route('/crm/:userId')
+  .patch(
+    isauthenticated,
+    isauthorized(PERMISSIONS.updateUser),
+    uploadProjectMedia(FOLDERS.auth),
+    val.updateUser,
+    handlers.updateUserHandler,
+  );
+router
+  .route('/crm/:userId/block')
+  .post(
+    isauthenticated,
+    isauthorized(PERMISSIONS.blockUser),
+    val.blockUser,
+    handlers.blockUserHandler,
+  )
+  .patch(
+    isauthenticated,
+    isauthorized(PERMISSIONS.unBlockUser),
+    val.unblockUser,
+    handlers.unBlockUserHandler,
+  );
 
 router
   .route('/find')

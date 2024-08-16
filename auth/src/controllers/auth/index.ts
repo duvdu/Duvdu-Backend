@@ -19,3 +19,5 @@ export * from './createUser.controller';
 export * from './updateUser.controller';
 export * from './blockUser.controller';
 export * from './unblockUser.controller';
+export * from './loginWithProvider.controller';
+export * from './updateProviderPhone.controller';

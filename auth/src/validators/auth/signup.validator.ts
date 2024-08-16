@@ -57,17 +57,23 @@ export const createUser = [
   globalValidatorMiddleware,
 ];
 
-
 export const updateUser = [
   param('userId').isMongoId(),
-  body('name').optional().isString().trim().isLength({ min: 3, max: 32 }).withMessage('nameInvalid'),
+  body('name')
+    .optional()
+    .isString()
+    .trim()
+    .isLength({ min: 3, max: 32 })
+    .withMessage('nameInvalid'),
   body('phoneNumber').isObject().optional(),
-  body('phoneNumber.number').optional()
+  body('phoneNumber.number')
+    .optional()
     .exists()
     .isString()
     .isMobilePhone('ar-EG')
     .withMessage('phoneNumberInvalid'),
-  body('username').optional()
+  body('username')
+    .optional()
     .isString()
     .isLength({ min: 6, max: 32 })
     .withMessage('lengthBetween')
@@ -75,7 +81,8 @@ export const updateUser = [
       if (val.match(/^[a-z0-9_]+$/)) return true;
       throw new Error('usernameFormat');
     }),
-  body('password').optional()
+  body('password')
+    .optional()
     .isStrongPassword({
       minLength: 8,
       minLowercase: 1,
@@ -85,16 +92,40 @@ export const updateUser = [
     .withMessage('passwordInvalid'),
   body('address').optional().exists().isString().withMessage('invalidAddress'),
   body('role').isMongoId(),
-  globalValidatorMiddleware
+  globalValidatorMiddleware,
 ];
 
 export const blockUser = [
   param('userId').isMongoId(),
-  body('reason').isString().exists({checkFalsy:true}),
-  globalValidatorMiddleware
+  body('reason').isString().exists({ checkFalsy: true }),
+  globalValidatorMiddleware,
 ];
 
-export const unblockUser = [
-  param('userId').isMongoId(),
+export const unblockUser = [param('userId').isMongoId(), globalValidatorMiddleware];
+
+export const loginProvider = [
+  body('googleId').optional().isString().exists().custom((val,{req})=>{
+    if (req.body.appleId) 
+      throw new Error('can not provide apple and google id');
+    return true;
+  }),
+  body('appleId').optional().isString().exists().custom((val,{req})=>{
+    if (req.body.googleId) 
+      throw new Error('can not provide apple and google id');
+    return true;
+  }),
+  body('notificationToken').optional().isString(),
+  body('username')
+    .isString()
+    .isLength({ min: 6, max: 32 })
+    .withMessage('lengthBetween')
+    .custom((val) => {
+      if (val.match(/^[a-z0-9_]+$/)) return true;
+      throw new Error('usernameFormat');
+    }).custom((val,{req})=>{
+      if (!req.body.appleId && !req.body.googleId) 
+        throw new Error('either appleId or googleId must be provided when username is included');
+      return true;
+    }),
   globalValidatorMiddleware
 ];
