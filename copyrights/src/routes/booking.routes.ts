@@ -25,7 +25,7 @@ router.post(
 
 router.post('/:contractId/action', isauthenticated, val.action, contractAction);
 
-router.patch('/:contractId/submit', isauthenticated, val.action, submitFilesHandler);
+router.patch('/:contractId/submit', isauthenticated, val.submitFiles, submitFilesHandler);
 
 router.patch('/:contractId', isauthenticated, val.updateContract, updateContractHandler);
 

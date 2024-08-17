@@ -39,6 +39,7 @@ export interface IprojectContract {
   paymentLink: string;
   duration: number;
   createdAt: Date;
+  submitFiles: { link: string; notes: string };
 }
 
 export const ProjectContract = model<IprojectContract>(
@@ -86,6 +87,10 @@ export const ProjectContract = model<IprojectContract>(
       paymentLink: String,
       duration: { type: Number, default: 0 },
       equipmentPrice: { type: Number, default: 0 },
+      submitFiles: {
+        link: { type: String, default: null },
+        notes: { type: String, default: null },
+      },
     },
     { timestamps: true, collection: 'project_contracts' },
   ),
