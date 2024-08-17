@@ -36,6 +36,7 @@ export interface IcopyrightContract {
   status: ContractStatus;
   rejectedBy?: 'customer' | 'sp';
   paymentLink: string;
+  submitFiles: { link: string; notes: string };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -63,6 +64,10 @@ export const CopyrightContracts = model<IcopyrightContract>(
       firstPaymentAmount: { type: Number, default: null },
       secondPaymentAmount: { type: Number, default: null },
       status: { type: String, enum: ContractStatus },
+      submitFiles: {
+        link: { type: String, default: null },
+        notes: { type: String, default: null },
+      },
       rejectedBy: { type: String, enum: ['sp', 'customer'], default: null },
       paymentLink: { type: String, default: null },
     },
