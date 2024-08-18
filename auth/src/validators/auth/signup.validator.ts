@@ -104,16 +104,22 @@ export const blockUser = [
 export const unblockUser = [param('userId').isMongoId(), globalValidatorMiddleware];
 
 export const loginProvider = [
-  body('googleId').optional().isString().exists().custom((val,{req})=>{
-    if (req.body.appleId) 
-      throw new Error('can not provide apple and google id');
-    return true;
-  }),
-  body('appleId').optional().isString().exists().custom((val,{req})=>{
-    if (req.body.googleId) 
-      throw new Error('can not provide apple and google id');
-    return true;
-  }),
+  body('googleId')
+    .optional()
+    .isString()
+    .exists()
+    .custom((val, { req }) => {
+      if (req.body.appleId) throw new Error('can not provide apple and google id');
+      return true;
+    }),
+  body('appleId')
+    .optional()
+    .isString()
+    .exists()
+    .custom((val, { req }) => {
+      if (req.body.googleId) throw new Error('can not provide apple and google id');
+      return true;
+    }),
   body('notificationToken').optional().isString(),
   body('username')
     .isString()
@@ -122,10 +128,11 @@ export const loginProvider = [
     .custom((val) => {
       if (val.match(/^[a-z0-9_]+$/)) return true;
       throw new Error('usernameFormat');
-    }).custom((val,{req})=>{
-      if (!req.body.appleId && !req.body.googleId) 
+    })
+    .custom((val, { req }) => {
+      if (!req.body.appleId && !req.body.googleId)
         throw new Error('either appleId or googleId must be provided when username is included');
       return true;
     }),
-  globalValidatorMiddleware
+  globalValidatorMiddleware,
 ];

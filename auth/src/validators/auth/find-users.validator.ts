@@ -34,5 +34,6 @@ export const findUsers = [
     .toBoolean(),
   query('limit').optional().isInt().withMessage('invalidFormat').toInt(),
   query('page').optional().isInt().withMessage('invalidFormat').toInt(),
+  query('isAdmin').optional().isBoolean().toBoolean(),
   globalValidatorMiddleware,
 ];

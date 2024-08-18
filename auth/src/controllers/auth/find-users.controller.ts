@@ -1,4 +1,4 @@
-import { Iuser, MODELS, PaginationResponse, Users } from '@duvdu-v1/duvdu';
+import { Iuser, MODELS, PaginationResponse, Roles, SystemRoles, Users } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import mongoose from 'mongoose';
 
@@ -15,8 +15,9 @@ export const filterUsers: RequestHandler<
     priceTo?: number;
     hasVerificationPadge?: boolean;
     isBlocked?: boolean;
+    isAdmin?: boolean;
   }
-> = (req, res, next) => {
+> = async (req, res, next) => {
   if (req.query.search) {
     req.pagination.filter.$or = [
       { 'phoneNumber.number': { $regex: `\\b${req.query.search}\\b`, $options: 'i' } },
@@ -34,6 +35,15 @@ export const filterUsers: RequestHandler<
   if (req.query.hasVerificationPadge !== undefined)
     req.pagination.filter.hasVerificationBadge = req.query.hasVerificationPadge;
   req.pagination.filter['isBlocked.value'] = req.query.isBlocked || false;
+
+  if (req.query.isAdmin != false && req.query.isAdmin != undefined) {
+    const unverifiedRole = await Roles.findOne({ key: SystemRoles.unverified }).select('_id');
+    const verifiedRole = await Roles.findOne({ key: SystemRoles.verified }).select('_id');
+    req.pagination.filter.role = {
+      $nin: [unverifiedRole?._id, verifiedRole?._id],
+    };
+  }
+
   next();
 };
 

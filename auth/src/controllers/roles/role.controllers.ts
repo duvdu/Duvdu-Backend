@@ -1,4 +1,5 @@
-import { BadRequestError, NotFound, Roles, Plans } from '@duvdu-v1/duvdu';
+import { BadRequestError, NotFound, Roles, Plans, SuccessResponse, permissions } from '@duvdu-v1/duvdu';
+import { RequestHandler } from 'express';
 
 import {
   CreateRoleHandler,
@@ -31,7 +32,7 @@ export const removeRoleHandler: RemoveRoleHandler = async (req, res, next) => {
 };
 
 export const getRolesHandler: GetRolesHandler = async (req, res) => {
-  const roles = await Roles.find({ key: { $ne: 'admin' } }).select('key');
+  const roles = await Roles.find({ key: { $ne: 'admin' } }).select('key permissions');
   res.status(200).json({ message: 'success', data: roles });
 };
 
@@ -48,4 +49,11 @@ export const updateRoleHandler: UpdateRoleHandler = async (req, res, next) => {
   );
   if (!role) return next(new NotFound({ en: 'role not found', ar: 'الدور غير موجود' }, req.lang));
   res.status(200).json({ message: 'success' });
+};
+
+export const getAllPermissions: RequestHandler<unknown, SuccessResponse, unknown, unknown> = async (
+  req,
+  res,
+) => {
+  res.status(200).json(<any>{ data: permissions });
 };

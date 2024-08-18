@@ -15,8 +15,10 @@ import * as val from '../validators/auth';
 
 const router = Router();
 
-router.route('/provider').post( val.loginProvider , handlers.loginWithProviderHandler);
-router.route('/provider/phone').post( isauthenticated ,  val.updatePhoneNumberVal , handlers.updateProviderPhoneNumberHandler);
+router.route('/provider').post(val.loginProvider, handlers.loginWithProviderHandler);
+router
+  .route('/provider/phone')
+  .post(isauthenticated, val.updatePhoneNumberVal, handlers.updateProviderPhoneNumberHandler);
 
 router
   .route('/crm')

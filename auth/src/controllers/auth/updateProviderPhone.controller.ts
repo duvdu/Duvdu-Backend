@@ -1,12 +1,16 @@
 import 'express-async-errors';
 
-import { BadRequestError, NotFound, SuccessResponse, Users, VerificationReason } from '@duvdu-v1/duvdu';
+import {
+  BadRequestError,
+  NotFound,
+  SuccessResponse,
+  Users,
+  VerificationReason,
+} from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 import { hashVerificationCode } from '../../utils/crypto';
 import { generateRandom6Digit } from '../../utils/gitRandom6Dugut';
-
-
 
 export const updateProviderPhoneNumberHandler: RequestHandler<
   unknown,
@@ -16,9 +20,14 @@ export const updateProviderPhoneNumberHandler: RequestHandler<
   const currentUser = await Users.findById(req.loggedUser?.id);
   if (!currentUser) return next(new NotFound(undefined, req.lang));
 
-  const user = await Users.findOne({'phoneNumber.number':req.body.phoneNumber});
-  if (user) 
-    return next(new BadRequestError({en:'phone number already exist' , ar:'رقم الهاتف موجود بالفعل'} , req.lang));
+  const user = await Users.findOne({ 'phoneNumber.number': req.body.phoneNumber });
+  if (user)
+    return next(
+      new BadRequestError(
+        { en: 'phone number already exist', ar: 'رقم الهاتف موجود بالفعل' },
+        req.lang,
+      ),
+    );
 
   const verificationCode: string = generateRandom6Digit();
   const hashedVerificationCode: string = hashVerificationCode(verificationCode);
