@@ -67,3 +67,10 @@ export const updateContract = [
     }),
   globalValidatorMiddleware,
 ];
+
+export const submitFiles = [
+  param('contractId').isMongoId(),
+  body('link').isString(),
+  body('notes').isString(),
+  globalValidatorMiddleware,
+];

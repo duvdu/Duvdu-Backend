@@ -5,6 +5,7 @@ import { contractAction } from '../controllers/booking/contract-action.controlle
 import { createContractHandler } from '../controllers/booking/contract-create.controller';
 import { payContract } from '../controllers/booking/contract-pay.controller';
 import { updateContractHandler } from '../controllers/booking/contract-update.controller';
+import { submitFilesHandler } from '../controllers/booking/submit-files.conroller';
 import * as val from '../validators/booking/booking.validator';
 
 const router = Router();
@@ -23,6 +24,8 @@ router.post(
 );
 
 router.post('/:contractId/action', isauthenticated, val.action, contractAction);
+
+router.patch('/:contractId/submit', isauthenticated, val.submitFiles, submitFilesHandler);
 
 router.patch('/:contractId', isauthenticated, val.updateContract, updateContractHandler);
 
