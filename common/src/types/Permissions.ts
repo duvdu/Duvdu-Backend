@@ -32,6 +32,7 @@ export enum PERMISSIONS {
   getRolesHandler = 'get roles',
   getRoleHandler = 'get role',
   removeRoleHandler = 'remove role',
+  getAllPermissions = 'get all permissions',
   // project
   createProjectHandler = 'create project project',
   updateProjectHandler = 'update project project',
@@ -75,7 +76,10 @@ export enum PERMISSIONS {
   //setting
   createSettingHandler = 'create setting',
   updateSettingHandler = 'update setting',
-  deleteSettingHandler = 'delete setting'
+  deleteSettingHandler = 'delete setting',
+
+  // dashboard
+  accessDashboard = 'access dashboard'
 }
 
 export const permissions = {
@@ -115,6 +119,7 @@ export const permissions = {
     PERMISSIONS.updateRoleHandler,
     PERMISSIONS.updateRoleHandler,
     PERMISSIONS.removeRoleHandler,
+    PERMISSIONS.getAllPermissions
   ],
   Post: [
     PERMISSIONS.createProjectHandler,
@@ -159,5 +164,8 @@ export const permissions = {
   ],
   producer:[
     PERMISSIONS.getProducerAnalysis,
+  ],
+  dashboard:[
+    PERMISSIONS.accessDashboard
   ]
 };
