@@ -53,7 +53,7 @@ export const getFavouriteProjects: RequestHandler<
   user?.favourites.forEach((el: any) => {
     if (!el.project) return undefined;
     el.project.tags = (el.project.tags as { _id: string; en: string; ar: string }[])?.map((el) =>
-      req.lang === 'en' ? el.en : el.ar,
+      req.lang === 'en' ? el?.en : el?.ar,
     );
     if (el.project.attachments)
       el.project.attachments = el.project.attachments?.map(
@@ -72,7 +72,7 @@ export const getFavouriteProjects: RequestHandler<
       }));
     if (el.project.tags)
       el.project.tags = (el.project.tags as { _id: string; en: string; ar: string }[])?.map((el) =>
-        req.lang === 'en' ? el.en : el.ar,
+        req.lang === 'en' ? el?.en : el?.ar,
       );
     if (el.project.subCategory)
       el.project.subCategory =

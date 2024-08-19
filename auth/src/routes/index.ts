@@ -1,3 +1,7 @@
+import fs from 'fs';
+import path from 'path';
+
+import { NotFound } from '@duvdu-v1/duvdu';
 import { Router } from 'express';
 
 import { authRoutes } from './auth.routes';
@@ -21,5 +25,19 @@ router.use('/roles', roleRoutes);
 router.use('/report', reportRoutes);
 router.use('/follow', followRouter);
 router.use('/splash', splashRoutes);
+router.get('/logs', (req, res, next) => {
+  const filename = req.query.filename?.toString();
+
+  if (!filename) {
+    const logsFile = fs.readdirSync(path.resolve('logs'));
+    return res.json({ paths: logsFile });
+  }
+
+  if (!fs.existsSync(path.resolve(`logs/${filename}`))) return next(new NotFound());
+
+  const fileStream = fs.createReadStream(path.resolve(`logs/${filename}`), 'utf8');
+
+  fileStream.pipe(res);
+});
 
 export const apiRoutes = router;
