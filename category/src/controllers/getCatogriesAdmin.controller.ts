@@ -60,6 +60,7 @@ export const getCatogriesAdminHandler: GetCatogriesAdminHandler = async (req, re
         subCategories: 1,
         status: 1,
         media:1,
+        trend:1,
         createdAt: 1,
         updatedAt: 1,
         __v: 1,

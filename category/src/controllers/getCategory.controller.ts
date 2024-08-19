@@ -83,6 +83,7 @@ export const getCategoryHandler: GetCategoryHandler = async (req, res, next) => 
           },
         },
         _id: 1,
+        trend:1,
         creativesCounter: 1,
         cycle: 1,
         subCategories: {

@@ -132,6 +132,7 @@ export const getCategoriesHandler: GetCategoriesHandler = async (req, res) => {
           },
         },
         _id: 1,
+        trend:1,
         creativesCounter: 1,
         cycle: 1,
         subCategories: {
