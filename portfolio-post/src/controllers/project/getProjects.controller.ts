@@ -209,8 +209,6 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
 
   if (req.loggedUser?.id) {
     const user = await Users.findById(req.loggedUser.id, { favourites: 1 });
-    console.log('yes yes');
-
     projects.forEach((project) => {
       project.isFavourite = user?.favourites.some(
         (el: any) => el.project.toString() === project._id.toString(),

@@ -1,6 +1,7 @@
-import { CopyRights, Producer, ProjectCycle, Rentals, SuccessResponse, Users } from '@duvdu-v1/duvdu';
+import { MODELS, ProjectCycle, Rentals, SuccessResponse, Users } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import 'express-async-errors';
+import mongoose from 'mongoose';
 
 export const globalSearchHandler: RequestHandler<
   unknown,
@@ -10,7 +11,9 @@ export const globalSearchHandler: RequestHandler<
 > = async (req, res) => {
   const searchKeyword = req.query.search || '';
 
-  const users= await Users.aggregate([
+
+
+  const aggregationPipeline = [
     {
       $match: {
         $or: [
@@ -23,23 +26,151 @@ export const globalSearchHandler: RequestHandler<
     {
       $project: {
         _id: 1,
-        username: 1,
         name: 1,
-        profileImage: {
+        username: 1,
+        profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$profileImage'] },
+        coverImage: { $concat: [process.env.BUCKET_HOST, '/', '$coverImage'] },
+        about: 1,
+        isOnline: 1,
+        isAvaliableToInstantProjects: 1,
+        pricePerHour: 1,
+        hasVerificationBadge: 1,
+        rate: 1,
+        followCount: 1,
+        invalidAddress: 1,
+        likes: 1,
+        address: 1,
+        profileViews: 1,
+        rank: 1,
+        projectsView: 1,
+        category: 1, // Include category field in the projection
+      },
+    },
+    {
+      $lookup: {
+        from: MODELS.category,
+        localField: 'category',
+        foreignField: '_id',
+        as: 'categoryDetails',
+      },
+    },
+    {
+      $addFields: {
+        category: {
           $cond: {
-            if: { $eq: ['$profileImage', null] },
-            then: null,
-            else: { $concat: [process.env.BUCKET_HOST, '/', '$profileImage'] },
+            if: { $gt: [{ $size: '$categoryDetails' }, 0] },
+            then: {
+              _id: { $arrayElemAt: ['$categoryDetails._id', 0] },
+              title: {
+                $cond: {
+                  if: { $eq: [req.lang, 'ar'] },
+                  then: { $arrayElemAt: ['$categoryDetails.title.ar', 0] },
+                  else: { $arrayElemAt: ['$categoryDetails.title.en', 0] },
+                },
+              },
+            },
+            else: null,
           },
         },
       },
     },
-  ]);
+    {
+      $project: {
+        _id: 1,
+        name: 1,
+        username: 1,
+        profileImage: 1,
+        coverImage: 1,
+        about: 1,
+        isOnline: 1,
+        isAvaliableToInstantProjects: 1,
+        pricePerHour: 1,
+        hasVerificationBadge: 1,
+        rate: 1,
+        followCount: 1,
+        invalidAddress: 1,
+        likes: 1,
+        address: 1,
+        profileViews: 1,
+        rank: 1,
+        projectsView: 1,
+        category: 1, // Include the category object
+        isFollow: 1,
+      },
+    },
+    {
+      $lookup: {
+        from: MODELS.follow,
+        let: { userId: '$_id' },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ['$following', '$$userId'] },
+                  { $eq: ['$follower', new mongoose.Types.ObjectId(req.loggedUser?.id)] },
+                ],
+              },
+            },
+          },
+        ],
+        as: 'isFollow',
+      },
+    },
+    {
+      $addFields: {
+        isFollow: { $cond: { if: { $gt: [{ $size: '$isFollow' }, 0] }, then: true, else: false } },
+      },
+    },
+    {
+      $lookup: {
+        from: MODELS.allContracts,
+        let: { userId: '$_id' },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $or: [
+                  {
+                    $and: [
+                      { $eq: ['$sp', new mongoose.Types.ObjectId(req.loggedUser?.id)] },
+                      { $eq: ['$customer', '$$userId'] },
+                    ],
+                  },
+                  {
+                    $and: [
+                      { $eq: ['$customer', new mongoose.Types.ObjectId(req.loggedUser?.id)] },
+                      { $eq: ['$sp', '$$userId'] },
+                    ],
+                  },
+                ],
+              },
+            },
+          },
+        ],
+        as: 'canChatDetails',
+      },
+    },
+    {
+      $addFields: {
+        canChat: {
+          $cond: { if: { $gt: [{ $size: '$canChatDetails' }, 0] }, then: true, else: false },
+        },
+      },
+    },
+    {
+      $project: {
+        canChatDetails: 0, // Exclude the canChatDetails field
+      },
+    }
+  ];
+  const users = await Users.aggregate(aggregationPipeline);
 
 
 
 
-  const projectCycles = await ProjectCycle.aggregate( [
+
+  const projects = await ProjectCycle.aggregate([
     {
       $match: {
         isDeleted: false, 
@@ -55,45 +186,245 @@ export const globalSearchHandler: RequestHandler<
       },
     },
     {
+      $lookup: {
+        from: MODELS.user,
+        localField: 'user',
+        foreignField: '_id',
+        as: 'user',
+      },
+    },
+    {
+      $unwind: '$user',
+    },
+    {
+      $lookup: {
+        from: MODELS.category,
+        localField: 'category',
+        foreignField: '_id',
+        as: 'category',
+      },
+    },
+    {
+      $unwind: '$category',
+    },
+    {
+      $lookup: {
+        from: MODELS.user,
+        localField: 'creatives',
+        foreignField: '_id',
+        as: 'creatives',
+      },
+    },
+    {
       $project: {
-        _id: 1, 
-        name: 1, 
-        description: 1,
-        cover: {
-          $cond: {
-            if: { $eq: ['$cover', null] },
-            then: null,
-            else: { $concat: [process.env.BUCKET_HOST, '/', '$cover'] },
+        _id: 1,
+        user: {
+          _id: '$user._id',
+          profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$user.profileImage'] },
+          isOnline: '$user.isOnline',
+          username: '$user.username',
+          name: '$user.name',
+          rank: '$user.rank',
+          projectsView: '$user.projectsView',
+          coverImage: { $concat: [process.env.BUCKET_HOST, '/', '$user.coverImage'] },
+          acceptedProjectsCounter: '$user.acceptedProjectsCounter',
+          rate: '$user.rate',
+          profileViews: '$user.profileViews',
+          about: '$user.about',
+          isAvaliableToInstantProjects: '$user.isAvaliableToInstantProjects',
+          pricePerHour: '$user.pricePerHour',
+          hasVerificationBadge: '$user.hasVerificationBadge',
+          likes: '$user.likes',
+          followCount: '$user.followCount',
+          address: '$user.address',
+        },
+        category: {
+          title: '$category.title.' + req.lang,
+          _id: '$category._id',
+        },
+        subCategory: '$subCategory.' + req.lang,
+        tags: {
+          $map: {
+            input: '$tags',
+            as: 'tag',
+            in: '$$tag.' + req.lang,
           },
+        },
+        cover: { $concat: [process.env.BUCKET_HOST, '/', '$cover'] },
+        attachments: {
+          $map: {
+            input: '$attachments',
+            as: 'attachment',
+            in: { $concat: [process.env.BUCKET_HOST, '/', '$$attachment'] },
+          },
+        },
+        name: 1,
+        description: 1,
+        tools: 1,
+        functions: 1,
+        creatives: {
+          $map: {
+            input: { $ifNull: ['$creatives', []] },
+            as: 'creative',
+            in: {
+              _id: '$$creative._id',
+              profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$$creative.profileImage'] },
+              isOnline: '$$creative.isOnline',
+              username: '$$creative.username',
+              name: '$$creative.name',
+              rank: '$$creative.rank',
+              projectsView: '$$creative.projectsView',
+              coverImage: { $concat: [process.env.BUCKET_HOST, '/', '$$creative.coverImage'] },
+              acceptedProjectsCounter: '$$creative.acceptedProjectsCounter',
+              rate: '$$creative.rate',
+              profileViews: '$$creative.profileViews',
+              about: '$$creative.about',
+              isAvaliableToInstantProjects: '$$creative.isAvaliableToInstantProjects',
+              pricePerHour: '$$creative.pricePerHour',
+              hasVerificationBadge: '$$creative.hasVerificationBadge',
+              likes: '$$creative.likes',
+              followCount: '$$creative.followCount',
+              address: '$$creative.address',
+            },
+          },
+        },
+        location: 1,
+        address: 1,
+        searchKeyWords: 1,
+        duration: 1,
+        showOnHome: 1,
+        projectScale: 1,
+        rate: 1,
+        updatedAt: 1,
+        createdAt: 1,
+      },
+    },
+  ]);
+
+  if (req.loggedUser?.id) {
+    const user = await Users.findById(req.loggedUser.id, { favourites: 1 });
+    projects.forEach((project) => {
+      project.isFavourite = user?.favourites.some(
+        (el: any) => el.project.toString() === project._id.toString(),
+      );
+    });
+  }
+
+
+
+  // Execute the aggregation pipeline
+  const pipelines = [
+    {
+      $set: {
+        subCategory: {
+          $cond: {
+            if: { $eq: [req.lang, 'en'] },
+            then: '$subCategory.en',
+            else: '$subCategory.ar',
+          },
+        },
+        tags: {
+          $map: {
+            input: '$tags',
+            as: 'tag',
+            in: {
+              _id: '$$tag._id',
+              title: {
+                $cond: {
+                  if: { $eq: [req.lang, 'en'] },
+                  then: '$$tag.en',
+                  else: '$$tag.ar',
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    {
+      $lookup: {
+        from: MODELS.category,
+        localField: 'category',
+        foreignField: '_id',
+        as: 'categoryDetails',
+      },
+    },
+    { $unwind: '$categoryDetails' },
+    {
+      $set: {
+        category: {
+          _id: '$categoryDetails._id',
+          image: { $concat: [process.env.BUCKET_HOST, '/', '$categoryDetails.image'] },
+          title: {
+            $cond: {
+              if: { $eq: [req.lang, 'ar'] },
+              then: '$categoryDetails.title.ar',
+              else: '$categoryDetails.title.en',
+            },
+          },
+        },
+      },
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'user',
+        foreignField: '_id',
+        as: 'userDetails',
+      },
+    },
+    { $unwind: '$userDetails' },
+    {
+      $set: {
+        user: {
+          _id: '$userDetails._id',
+          username: '$userDetails.username',
+          profileImage: {
+            $concat: [process.env.BUCKET_HOST, '/', '$userDetails.profileImage'],
+          },
+          coverImage: { $concat: [process.env.BUCKET_HOST, '/', '$userDetails.coverImage'] },
+          isOnline: '$userDetails.isOnline',
+          acceptedProjectsCounter: '$userDetails.acceptedProjectsCounter',
+          name: '$userDetails.name',
+          rate: '$userDetails.rate',
+          rank: '$userDetails.rank',
+          projectsView: '$userDetails.projectsView',
+          profileViews: '$userDetails.profileViews',
+          about: '$userDetails.about',
+          isAvaliableToInstantProjects: '$userDetails.isAvaliableToInstantProjects',
+          pricePerHour: '$userDetails.pricePerHour',
+          hasVerificationBadge: '$userDetails.hasVerificationBadge',
+          likes: '$userDetails.likes',
+          followCount: '$userDetails.followCount',
+          address: '$userDetails.address',
         },
         attachments: {
           $map: {
             input: '$attachments',
             as: 'attachment',
             in: {
-              $cond: {
-                if: { $eq: ['$$attachment', null] },
-                then: null,
-                else: { $concat: [process.env.BUCKET_HOST, '/', '$$attachment'] },
-              },
+              $concat: [process.env.BUCKET_HOST, '/', '$$attachment'],
             },
           },
         },
+        cover: {
+          $concat: [process.env.BUCKET_HOST, '/', '$cover'],
+        },
       },
-    }
-  ]);
+    },
+    {
+      $unset: ['userDetails', 'categoryDetails'],
+    },
+  ];
 
-
-
-  // Execute the aggregation pipeline
-  const rentals = await Rentals.aggregate( [
+  const rentals = await Rentals.aggregate([
     {
       $match: {
         isDeleted: false, 
         $or: [
-          { title: { $regex: searchKeyword, $options: 'i' } }, 
+          { name: { $regex: searchKeyword, $options: 'i' } }, 
           { description: { $regex: searchKeyword, $options: 'i' } }, 
-          { searchKeywords: { $regex: searchKeyword, $options: 'i' } }, 
+          { searchKeyWords: { $regex: searchKeyword, $options: 'i' } }, 
           { 'subCategory.ar': { $regex: searchKeyword, $options: 'i' } }, 
           { 'subCategory.en': { $regex: searchKeyword, $options: 'i' } }, 
           { 'tags.ar': { $regex: searchKeyword, $options: 'i' } }, 
@@ -101,114 +432,23 @@ export const globalSearchHandler: RequestHandler<
         ],
       },
     },
-    {
-      $project: {
-        _id: 0, 
-        title: 1,
-        description: 1, 
-        cover: {
-          $cond: {
-            if: { $eq: ['$cover', null] },
-            then: null,
-            else: { $concat: [process.env.BUCKET_HOST, '/', '$cover'] },
-          },
-        },
-        attachments: {
-          $map: {
-            input: '$attachments',
-            as: 'attachment',
-            in: {
-              $cond: {
-                if: { $eq: ['$$attachment', null] },
-                then: null,
-                else: { $concat: [process.env.BUCKET_HOST, '/', '$$attachment'] },
-              },
-            },
-          },
-        },
-      },
-    }
+    ...pipelines,
   ]);
 
+  if (req.loggedUser?.id) {
+    const user = await Users.findById(req.loggedUser.id, { favourites: 1 });
 
+    rentals.forEach((project) => {
+      project.isFavourite = user?.favourites.some(
+        (el: any) => el.project.toString() === project._id.toString(),
+      );
+    });
+  }
 
-  const producers = await Producer.aggregate([
-    {
-      $match: {
-        $or: [
-          { searchKeywords: { $regex: searchKeyword, $options: 'i' } },
-          { 'subCategories.title.ar': { $regex: searchKeyword, $options: 'i' } },
-          { 'subCategories.title.en': { $regex: searchKeyword, $options: 'i' } },
-          { 'subCategories.tags.ar': { $regex: searchKeyword, $options: 'i' } },
-          { 'subCategories.tags.en': { $regex: searchKeyword, $options: 'i' } },
-        ],
-      },
-    },
-    {
-      $project: {
-        _id:1,
-        minBudget: 1,
-        maxBudget: 1,
-        subCategories: {
-          $map: {
-            input: {
-              $filter: {
-                input: '$subCategories',
-                as: 'subCategory',
-                cond: {
-                  $or: [
-                    { $regexMatch: { input: '$$subCategory.title.ar', regex: searchKeyword, options: 'i' } }, // Filter by Arabic title
-                    { $regexMatch: { input: '$$subCategory.title.en', regex: searchKeyword, options: 'i' } }, // Filter by English title
-                    { $regexMatch: { input: '$$subCategory.tags.ar', regex: searchKeyword, options: 'i' } }, // Filter by Arabic tags
-                    { $regexMatch: { input: '$$subCategory.tags.en', regex: searchKeyword, options: 'i' } }, // Filter by English tags
-                  ],
-                },
-              },
-            },
-            as: 'filteredSubCategory',
-            in: {
-              title: '$$filteredSubCategory.title', 
-              tags: '$$filteredSubCategory.tags', 
-            },
-          },
-        },
-      },
-    },
-  ]);
-
-
-
-  const copyRights = await CopyRights.aggregate([
-    {
-      $match: {
-        $text: { $search: searchKeyword }, 
-      },
-    },
-    {
-      $project: {
-        _id: 1,
-        user: 1,
-        category: 1,
-        price: 1,
-        duration: 1,
-        address: 1,
-        searchKeywords: 1,
-        showOnHome: 1,
-        cycle: 1,
-        isDeleted: 1,
-        rate: 1,
-        tags: 1,
-        subCategory: 1,
-        location: 1,
-      },
-    }
-  ]);
 
   res.status(200).json(<any>{message:'success' , data:{
     users,
-    projectCycles,
     rentals,
-    producers,
-    copyRights,
+    projects
   }});
 };
