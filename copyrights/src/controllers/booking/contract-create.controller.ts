@@ -12,6 +12,7 @@ import {
   Files,
   CYCLES,
   addToDate,
+  BadRequestError,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
@@ -56,7 +57,7 @@ export const createContractHandler: RequestHandler<
     project.duration.unit as any,
     project.duration.value,
   ).toISOString();
-  const stageExpiration = await getStageExpiration(new Date(deadline), req.lang);
+  const stageExpiration = await getStageExpiration(new Date(deadline).toString(), req.lang);
 
   const contract = await CopyrightContracts.create({
     ...req.body,
@@ -88,26 +89,69 @@ export const createContractHandler: RequestHandler<
   res.status(201).json({ message: 'success', data: { contractId: contract.id } });
 };
 
-const getStageExpiration = async (date: Date, lang: string) => {
-  const setting = await Setting.findOne({});
-  const storedExpirations = setting?.expirationTime.map((el) => el.time);
-  if (!storedExpirations || storedExpirations.length === 0)
-    throw new Error('stored expiry times not exists');
+// const getStageExpiration = async (date: Date, lang: string) => {
+//   const setting = await Setting.findOne({});
+//   const storedExpirations = setting?.expirationTime.map((el) => el.time);
+//   if (!storedExpirations || storedExpirations.length === 0)
+//     throw new Error('stored expiry times not exists');
 
-  const contractTimeToBookingDate = +((date.getTime() - new Date().getTime()) / (1000 * 60 * 60));
-  if (contractTimeToBookingDate < storedExpirations[0] * 3)
-    throw new NotAllowedError(
+//   const contractTimeToBookingDate = +((date.getTime() - new Date().getTime()) / (1000 * 60 * 60));
+//   if (contractTimeToBookingDate < storedExpirations[0] * 3)
+//     throw new NotAllowedError(
+//       {
+//         en: `invalid booking date, minimum allowed booking date must be after ${storedExpirations[0] * 2} hours`,
+//         ar: `invalid booking date, minimum allowed booking date must be after ${storedExpirations[0] * 2} hours`,
+//       },
+//       lang,
+//     );
+//   else if (contractTimeToBookingDate > storedExpirations.at(-1)! * 3)
+//     return storedExpirations.at(-1);
+
+//   const minimumAvailableExpirationStage =
+//     storedExpirations[storedExpirations.findIndex((el) => el * 3 > contractTimeToBookingDate) - 1];
+
+//   return minimumAvailableExpirationStage;
+// };
+
+async function getStageExpiration(isoDate: string, lang: string) {
+  const givenDate = new Date(isoDate);
+  const currentDate = new Date();
+
+  const timeDifferenceInHours = Math.abs(
+    (givenDate.getTime() - currentDate.getTime()) / (1000 * 60 * 60),
+  );
+  console.log(timeDifferenceInHours);
+
+  const settings = await Setting.findOne().exec();
+
+  if (!settings) {
+    throw new NotFound({ en: 'setting not found', ar: 'الإعداد غير موجود' }, lang);
+  }
+
+  const validTimes = settings.expirationTime
+    .map((entry) => entry.time)
+    .filter((time) => time % 2 === 0 && time * 2 <= timeDifferenceInHours);
+
+  if (validTimes.length === 0) {
+    throw new BadRequestError(
       {
-        en: `invalid booking date, minimum allowed booking date must be after ${storedExpirations[0] * 2} hours`,
-        ar: `invalid booking date, minimum allowed booking date must be after ${storedExpirations[0] * 2} hours`,
+        en: `the minimum difference time between booking and now must be at least ${settings.expirationTime[0].time * 2} hour`,
+        ar: `الحد الأدنى للفترة الزمنية بين وقت الحجز والوقت الحالي يجب أن يكون على الأقل ${settings.expirationTime[0].time * 2} ساعة`,
       },
       lang,
     );
-  else if (contractTimeToBookingDate > storedExpirations.at(-1)! * 3)
-    return storedExpirations.at(-1);
+  }
 
-  const minimumAvailableExpirationStage =
-    storedExpirations[storedExpirations.findIndex((el) => el * 3 > contractTimeToBookingDate) - 1];
+  let bestTime = validTimes[0];
+  let smallestDifference = Math.abs(timeDifferenceInHours - validTimes[0]);
 
-  return minimumAvailableExpirationStage;
-};
+  for (const time of validTimes) {
+    const difference = Math.abs(timeDifferenceInHours - time);
+    if (difference < smallestDifference) {
+      smallestDifference = difference;
+      bestTime = time;
+    }
+  }
+
+  return bestTime;
+}

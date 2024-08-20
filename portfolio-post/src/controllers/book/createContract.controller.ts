@@ -79,6 +79,7 @@ export const createContractHandler: CreateContractHandler = async (req, res, nex
       req.body.equipment,
       req.lang,
     );
+    
 
     const unitPriceTotal = project.projectScale.pricerPerUnit * req.body.projectScale.numberOfUnits;
     const allPrice = totalPrice + unitPriceTotal;
