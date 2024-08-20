@@ -153,7 +153,16 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
           $map: {
             input: '$tags',
             as: 'tag',
-            in: '$$tag.' + req.lang,
+            in: {
+              _id: '$$tag._id',
+              title: {
+                $cond: {
+                  if: { $eq: [req.lang, 'en'] },
+                  then: '$$tag.en',
+                  else: '$$tag.ar',
+                },
+              },
+            },
           },
         },
         cover: { $concat: [process.env.BUCKET_HOST, '/', '$cover'] },
