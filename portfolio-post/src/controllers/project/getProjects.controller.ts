@@ -1,8 +1,8 @@
 import 'express-async-errors';
 
-import { MODELS, ProjectCycle, Users } from '@duvdu-v1/duvdu';
+import { Categories, MODELS, ProjectCycle, Users } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
-import { Types } from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 
 import { GetProjectsHandler } from '../../types/project.endoints';
 
@@ -45,8 +45,27 @@ export const getProjectsPagination: RequestHandler<
   }
 
   if (req.query.subCategory) {
-    req.pagination.filter['subCategory._id'] = { $in: req.query.subCategory };
+    const subCategoryIds = req.query.subCategory.map(id => new mongoose.Types.ObjectId(id));
+  
+    const subCategories = await Categories.aggregate([
+      { $unwind: '$subCategories' },
+      { $match: { 'subCategories._id': { $in: subCategoryIds } } },
+      { 
+        $project: { 
+          _id: 0, 
+          title: '$subCategories.title' 
+        }
+      }
+    ]);
+  
+    req.pagination.filter.subCategory = {
+      $or: [
+        { 'subCategory.ar': { $in: subCategories.map(subCat => subCat.title.ar) } },
+        { 'subCategory.en': { $in: subCategories.map(subCat => subCat.title.en) } }
+      ]
+    };
   }
+
   if (req.query.tags) {
     req.pagination.filter['tags._id'] = { $in: req.query.tags };
   }

@@ -1,5 +1,6 @@
-import { MODELS, Users, Rentals } from '@duvdu-v1/duvdu';
+import { MODELS, Users, Rentals, Categories } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
+import mongoose from 'mongoose';
 
 export const getProjectsHandler: RequestHandler = async (req, res) => {
   const pipelines = [
@@ -165,9 +166,9 @@ export const getProjectsPagination: RequestHandler<
     startDate?: Date;
     endDate?: Date;
     tags?: string;
-    subCategory?: string;
+    subCategory?: string[];
   }
-> = (req, res, next) => {
+> = async (req, res, next) => {
   req.pagination.filter = {};
 
   if (req.query.searchKeywords) {
@@ -207,9 +208,29 @@ export const getProjectsPagination: RequestHandler<
     };
   }
   if (req.query.category) req.pagination.filter.category = { $in: req.query.category };
+
   if (req.query.subCategory) {
-    req.pagination.filter['subCategory._id'] = { $in: req.query.subCategory };
+    const subCategoryIds = req.query.subCategory.map(id => new mongoose.Types.ObjectId(id));
+  
+    const subCategories = await Categories.aggregate([
+      { $unwind: '$subCategories' },
+      { $match: { 'subCategories._id': { $in: subCategoryIds } } },
+      { 
+        $project: { 
+          _id: 0, 
+          title: '$subCategories.title' 
+        }
+      }
+    ]);
+  
+    req.pagination.filter.subCategory = {
+      $or: [
+        { 'subCategory.ar': { $in: subCategories.map(subCat => subCat.title.ar) } },
+        { 'subCategory.en': { $in: subCategories.map(subCat => subCat.title.en) } }
+      ]
+    };
   }
+
   if (req.query.tags) {
     req.pagination.filter['tags._id'] = { $in: req.query.tags };
   }
