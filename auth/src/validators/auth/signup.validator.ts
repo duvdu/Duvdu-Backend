@@ -123,15 +123,10 @@ export const loginProvider = [
   body('notificationToken').optional().isString(),
   body('username')
     .isString()
-    .isLength({ min: 6, max: 32 })
-    .withMessage('lengthBetween')
-    .custom((val) => {
-      if (val.match(/^[a-z0-9_]+$/)) return true;
-      throw new Error('usernameFormat');
-    })
     .custom((val, { req }) => {
-      if (!req.body.appleId && !req.body.googleId)
+      if (!req.body.appleId && !req.body.googleId) {
         throw new Error('either appleId or googleId must be provided when username is included');
+      }
       return true;
     }),
   globalValidatorMiddleware,

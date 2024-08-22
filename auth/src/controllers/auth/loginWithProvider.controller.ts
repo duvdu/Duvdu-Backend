@@ -22,6 +22,24 @@ export const loginWithProviderHandler: RequestHandler<
   Partial<Pick<Iuser, 'googleId' | 'appleId' | 'username' | 'notificationToken'>>,
   unknown
 > = async (req, res, next) => {
+  if (req.body.username!.length < 6) {
+    let username = req.body.username!.toLowerCase();
+      
+    if (username.length <= 6) {
+      const randomChar = String.fromCharCode(97 + Math.floor(Math.random() * 26));
+      const randomNumber = Math.floor(Math.random() * 10);
+      
+      username = `${username}${randomChar}${randomNumber}`;
+      
+      if (username.length <= 6) {
+        username = username.padEnd(7, randomChar);
+      }
+    }
+    req.body.username = username.toLowerCase();
+    console.log(req.body.username);
+    
+  }
+
   let role;
   let user = await Users.findOne({
     $or: [{ appleId: req.body.appleId, googleId: req.body.googleId }],
