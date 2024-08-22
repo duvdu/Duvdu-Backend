@@ -81,6 +81,7 @@ export const update = [
 export const getOne = [param('projectId').isMongoId(), globalValidatorMiddleware];
 
 export const getAll = [
+  query('instant').optional().isBoolean().toBoolean(),
   query('searchKeywords').optional().isArray().withMessage('searchKeywords'),
   query('searchKeywords.*').optional().isString().withMessage('searchKeywords'),
   query('location.lat').optional().isNumeric().withMessage('location'),

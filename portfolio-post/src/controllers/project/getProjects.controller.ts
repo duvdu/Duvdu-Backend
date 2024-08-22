@@ -2,7 +2,7 @@ import 'express-async-errors';
 
 import { Categories, MODELS, ProjectCycle, Users } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
-import mongoose, { Types } from 'mongoose';
+import mongoose, { PipelineStage, Types } from 'mongoose';
 
 import { GetProjectsHandler } from '../../types/project.endoints';
 
@@ -21,8 +21,10 @@ export const getProjectsPagination: RequestHandler<
     endDate?: Date;
     projectScaleMin?: number;
     projectScaleMax?: number;
+    instant?:boolean;
   }
 > = async (req, res, next) => {
+  if (req.query.instant != undefined) req.pagination.filter.instant = req.query.instant;
   if (req.query.searchKeywords?.length) {
     req.pagination.filter.$or = req.query.searchKeywords.map((keyword) => ({
       $or: [
@@ -63,10 +65,10 @@ export const getProjectsPagination: RequestHandler<
     const arabicTitles = subCategories.map(subCat => subCat.title.ar);
     const englishTitles = subCategories.map(subCat => subCat.title.en);
   
-      req.pagination.filter['$or'] = [
-        { 'subCategory.ar': { $in: arabicTitles } },
-        { 'subCategory.en': { $in: englishTitles } }
-      ];
+    req.pagination.filter['$or'] = [
+      { 'subCategory.ar': { $in: arabicTitles } },
+      { 'subCategory.en': { $in: englishTitles } }
+    ];
     
   
   }
@@ -104,17 +106,21 @@ export const getProjectsPagination: RequestHandler<
 };
 
 export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
-  console.log(req.pagination.filter);
-  const projects = await ProjectCycle.aggregate([
+
+
+  let isInstant = undefined;
+  if (req.pagination.filter.instant != undefined) 
+    isInstant = req.pagination.filter.instant;
+  delete req.pagination.filter.instant;
+
+  
+
+  const countPipeline = [
     {
-      $match: { ...req.pagination.filter, isDeleted: false },
-    },
-    { $sort: { createdAt: -1 } },
-    {
-      $skip: req.pagination.skip,
-    },
-    {
-      $limit: req.pagination.limit,
+      $match: {
+        ...req.pagination.filter,
+        isDeleted: { $ne: true },
+      },
     },
     {
       $lookup: {
@@ -124,9 +130,50 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
         as: 'user',
       },
     },
+    { $unwind: '$user' },
+    ...(isInstant !== undefined ? [{
+      $match: {
+        'user.isAvaliableToInstantProjects': isInstant,
+      },
+    }] : []),
     {
-      $unwind: '$user',
+      $count: 'totalCount'
+    }
+  ];
+  
+  const countResult = await ProjectCycle.aggregate(countPipeline);
+  const resultCount = countResult.length > 0 ? countResult[0].totalCount : 0;
+
+
+  const pipeline: PipelineStage[] = [
+    {
+      $match: {
+        ...req.pagination.filter,
+        isDeleted: { $ne: true },
+      },
     },
+    { $sort: { createdAt: -1 } },
+    { $skip: req.pagination.skip },
+    { $limit: req.pagination.limit },
+    {
+      $lookup: {
+        from: MODELS.user,
+        localField: 'user',
+        foreignField: '_id',
+        as: 'user',
+      },
+    },
+    { $unwind: '$user' },
+  ];
+  
+  if (isInstant !== undefined) {    pipeline.push({
+    $match: {
+      'user.isAvaliableToInstantProjects': isInstant,
+    },
+  });
+  }
+  
+  pipeline.push(
     {
       $lookup: {
         from: MODELS.category,
@@ -135,9 +182,7 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
         as: 'category',
       },
     },
-    {
-      $unwind: '$category',
-    },
+    { $unwind: '$category' },
     {
       $lookup: {
         from: MODELS.user,
@@ -146,6 +191,7 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
         as: 'creatives',
       },
     },
+    // Project final fields
     {
       $project: {
         _id: 1,
@@ -238,9 +284,12 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
         updatedAt: 1,
         createdAt: 1,
       },
-    },
-  ]);
-
+    }
+  );
+  
+  // Execute the aggregation pipeline
+  const projects = await ProjectCycle.aggregate(pipeline);
+  
   if (req.loggedUser?.id) {
     const user = await Users.findById(req.loggedUser.id, { favourites: 1 });
     projects.forEach((project) => {
@@ -249,11 +298,6 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
       );
     });
   }
-
-  const resultCount = await ProjectCycle.countDocuments({
-    ...req.pagination.filter,
-    isDeleted: false,
-  });
 
   res.status(200).json({
     message: 'success',

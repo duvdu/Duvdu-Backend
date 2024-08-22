@@ -1,9 +1,15 @@
 import { MODELS, Users, Rentals, Categories } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
-import mongoose from 'mongoose';
+import mongoose, { PipelineStage } from 'mongoose';
 
 export const getProjectsHandler: RequestHandler = async (req, res) => {
-  const pipelines = [
+
+  let isInstant = undefined;
+  if (req.pagination.filter.instant != undefined) 
+    isInstant = req.pagination.filter.instant;
+  delete req.pagination.filter.instant;
+
+  const pipelines: PipelineStage[] = [
     {
       $set: {
         subCategory: {
@@ -64,14 +70,24 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
       },
     },
     { $unwind: '$userDetails' },
+  ];
+  
+  // Conditionally add the $match stage for isAvaliableToInstantProjects
+  if (isInstant !== undefined) {
+    pipelines.push({
+      $match: {
+        'userDetails.isAvaliableToInstantProjects': isInstant,
+      },
+    });
+  }
+  
+  pipelines.push(
     {
       $set: {
         user: {
           _id: '$userDetails._id',
           username: '$userDetails.username',
-          profileImage: {
-            $concat: [process.env.BUCKET_HOST, '/', '$userDetails.profileImage'],
-          },
+          profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$userDetails.profileImage'] },
           coverImage: { $concat: [process.env.BUCKET_HOST, '/', '$userDetails.coverImage'] },
           isOnline: '$userDetails.isOnline',
           acceptedProjectsCounter: '$userDetails.acceptedProjectsCounter',
@@ -92,25 +108,17 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
           $map: {
             input: '$attachments',
             as: 'attachment',
-            in: {
-              $concat: [process.env.BUCKET_HOST, '/', '$$attachment'],
-            },
+            in: { $concat: [process.env.BUCKET_HOST, '/', '$$attachment'] },
           },
         },
-        cover: {
-          $concat: [process.env.BUCKET_HOST, '/', '$cover'],
-        },
+        cover: { $concat: [process.env.BUCKET_HOST, '/', '$cover'] },
       },
     },
     {
       $unset: ['userDetails', 'categoryDetails'],
-    },
-  ];
-
-  const resultCount = await Rentals.countDocuments({
-    ...req.pagination.filter,
-    isDeleted: { $ne: true },
-  });
+    }
+  );
+  
 
   const projects = await Rentals.aggregate([
     {
@@ -128,6 +136,18 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
     },
     ...pipelines,
   ]);
+
+  const count = await Rentals.aggregate([
+    {
+      $match: {
+        ...req.pagination.filter,
+        isDeleted: { $ne: true },
+      },
+    },
+    ...pipelines,
+  ]);
+
+  const resultCount = count.length;
 
   if (req.loggedUser?.id) {
     const user = await Users.findById(req.loggedUser.id, { favourites: 1 });
@@ -167,10 +187,12 @@ export const getProjectsPagination: RequestHandler<
     endDate?: Date;
     tags?: string;
     subCategory?: string[];
+    instant?:boolean;
   }
 > = async (req, res, next) => {
   req.pagination.filter = {};
 
+  if (req.query.instant != undefined) req.pagination.filter.instant = req.query.instant;
   if (req.query.searchKeywords) {
     req.pagination.filter.$or = req.query.searchKeywords.map((keyword) => ({
       desc: { $regex: keyword, $options: 'i' },
@@ -229,10 +251,10 @@ export const getProjectsPagination: RequestHandler<
     const englishTitles = subCategories.map(subCat => subCat.title.en);
   
     // Ensure that at least one of the title arrays has content
-      req.pagination.filter['$or'] = [
-        { 'subCategory.ar': { $in: arabicTitles } },
-        { 'subCategory.en': { $in: englishTitles } }
-      ];
+    req.pagination.filter['$or'] = [
+      { 'subCategory.ar': { $in: arabicTitles } },
+      { 'subCategory.en': { $in: englishTitles } }
+    ];
     
   
   }

@@ -1,12 +1,13 @@
 import { PaginationResponse, CopyRights, IcopyRights, MODELS, Categories } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
-import mongoose from 'mongoose';
+import mongoose  , {PipelineStage} from 'mongoose';
 
 export const getProjectsPagination: RequestHandler<
   unknown,
   unknown,
   unknown,
   {
+    instant?:boolean;
     search?: string;
     user?: string;
     address?: string;
@@ -20,6 +21,7 @@ export const getProjectsPagination: RequestHandler<
     subCategory?: mongoose.Types.ObjectId[];
   }
 > = async (req, res, next) => {
+  if (req.query.instant != undefined) req.pagination.filter.instant = req.query.instant;
   if (req.query.search) req.pagination.filter.$text = { $search: req.query.search };
   if (req.query.user) req.pagination.filter.user = req.query.user;
   if (req.query.address)
@@ -79,12 +81,50 @@ export const getProjectsHandler: RequestHandler<
   unknown,
   PaginationResponse<{ data: IcopyRights[] }>
 > = async (req, res) => {
-  const resultCount = await CopyRights.countDocuments({
-    ...req.pagination.filter,
-    isDeleted: { $ne: true },
+
+  let isInstant = undefined;
+  if (req.pagination.filter.instant != undefined) 
+    isInstant = req.pagination.filter.instant;
+  delete req.pagination.filter.instant;
+  
+
+  const countPipeline : PipelineStage[] = [
+    {
+      $match: {
+        ...req.pagination.filter,
+        isDeleted: { $ne: true },
+      },
+    },
+  ];
+  
+  countPipeline.push({
+    $lookup: {
+      from: MODELS.user,
+      localField: 'user',
+      foreignField: '_id',
+      as: 'userDetails',
+    },
   });
 
-  const projects = await CopyRights.aggregate([
+  if (isInstant !== undefined) {
+    countPipeline.push({
+      $match: {
+        'userDetails.isAvaliableToInstantProjects': isInstant,
+      },
+    });
+  }
+
+  countPipeline.push({ $unwind: '$userDetails' });
+  
+  countPipeline.push({
+    $count: 'totalCount'
+  });
+  
+  const countResult = await CopyRights.aggregate(countPipeline);
+  const resultCount = countResult.length > 0 ? countResult[0].totalCount : 0;
+
+
+  const pipeline : PipelineStage[] = [
     {
       $match: {
         ...req.pagination.filter,
@@ -95,7 +135,48 @@ export const getProjectsHandler: RequestHandler<
     { $skip: req.pagination.skip },
     { $limit: req.pagination.limit },
     {
-      $addFields: {
+      $lookup: {
+        from: MODELS.user,
+        localField: 'user',
+        foreignField: '_id',
+        as: 'userDetails',
+      },
+    },
+    { $unwind: '$userDetails' },
+  ];
+  
+  // Conditionally add the $match stage for isInstant
+  if (isInstant !== undefined) {
+    pipeline.push({
+      $match: {
+        'userDetails.isAvaliableToInstantProjects': isInstant,
+      },
+    });
+  }
+  
+  pipeline.push(
+    {
+      $lookup: {
+        from: MODELS.category,
+        localField: 'category',
+        foreignField: '_id',
+        as: 'category',
+      },
+    },
+    { $unwind: '$category' },
+    {
+      $set: {
+        category: {
+          _id: '$category._id',
+          image: { $concat: [process.env.BUCKET_HOST, '/', '$category.image'] },
+          title: {
+            $cond: {
+              if: { $eq: [req.lang, 'ar'] },
+              then: '$category.title.ar',
+              else: '$category.title.en',
+            },
+          },
+        },
         tags: {
           $map: {
             input: '$tags',
@@ -122,62 +203,17 @@ export const getProjectsHandler: RequestHandler<
       },
     },
     {
-      $lookup: {
-        from: MODELS.user,
-        localField: 'user',
-        foreignField: '_id',
-        as: 'userDetails',
-      },
-    },
-    {
-      $lookup: {
-        from: MODELS.category,
-        localField: 'category',
-        foreignField: '_id',
-        as: 'category',
-      },
-    },
-    { $unwind: '$category' },
-    {
-      $set: {
-        category: {
-          _id: '$category._id',
-          image: { $concat: [process.env.BUCKET_HOST, '/', '$category.image'] },
-          title: {
-            $cond: {
-              if: { $eq: [req.lang, 'ar'] },
-              then: '$category.title.ar',
-              else: '$category.title.en',
-            },
-          },
-        },
-      },
-    },
-    {
-      $addFields: {
-        user: {
-          $cond: {
-            if: { $eq: [{ $size: '$userDetails' }, 0] },
-            then: null,
-            else: {
-              $arrayElemAt: ['$userDetails', 0],
-            },
-          },
-        },
-      },
-    },
-    {
       $project: {
         _id: 1,
         user: {
-          acceptedProjectsCounter: '$user.acceptedProjectsCounter',
-          profileImage: { $concat: [process.env.BUCKET_HOST + '/', '$user.profileImage'] },
-          name: '$user.name',
-          username: '$user.username',
-          isOnline: '$user.isOnline',
-          rank: '$user.rank',
-          projectsView: '$user.projectsView',
-          rate: '$user.rate',
+          acceptedProjectsCounter: '$userDetails.acceptedProjectsCounter',
+          profileImage: { $concat: [process.env.BUCKET_HOST + '/', '$userDetails.profileImage'] },
+          name: '$userDetails.name',
+          username: '$userDetails.username',
+          isOnline: '$userDetails.isOnline',
+          rank: '$userDetails.rank',
+          projectsView: '$userDetails.projectsView',
+          rate: '$userDetails.rate',
         },
         category: {
           _id: 1,
@@ -194,8 +230,11 @@ export const getProjectsHandler: RequestHandler<
         tags: 1,
         subCategory: 1,
       },
-    },
-  ]);
+    }
+  );
+  
+  // Run the aggregation pipeline
+  const projects = await CopyRights.aggregate(pipeline);
 
   res.status(200).json({
     message: 'success',

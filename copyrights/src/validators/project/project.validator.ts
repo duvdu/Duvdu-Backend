@@ -48,6 +48,7 @@ export const update = [
 ];
 
 export const findAll = [
+  query('instant').optional().isBoolean().toBoolean(),
   query('search').optional().isLength({ min: 3 }).withMessage('searchLength'),
   query('address').optional().isLength({ min: 3 }).withMessage('addressLength'),
   query('user').optional().isMongoId().withMessage('userInvalid'),
