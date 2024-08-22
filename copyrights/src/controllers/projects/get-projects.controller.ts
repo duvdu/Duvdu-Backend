@@ -40,26 +40,35 @@ export const getProjectsPagination: RequestHandler<
     req.pagination.filter.isDeleted = req.query.isDeleted ? true : { $ne: true };
   }
 
+
+
   if (req.query.subCategory) {
-    const subCategoryIds = req.query.subCategory.map(id => new mongoose.Types.ObjectId(id));
-  
+    const subCategoryIds = req.query.subCategory.map(id => new mongoose.Types.ObjectId(id));  
+    // Step 1: Retrieve the subcategory titles from the Category model
     const subCategories = await Categories.aggregate([
       { $unwind: '$subCategories' },
       { $match: { 'subCategories._id': { $in: subCategoryIds } } },
       { 
         $project: { 
           _id: 0, 
-          title: '$subCategories.title' 
+          'title.ar': '$subCategories.title.ar',
+          'title.en': '$subCategories.title.en'
         }
       }
     ]);
   
-    req.pagination.filter.subCategory = {
-      $or: [
-        { 'subCategory.ar': { $in: subCategories.map(subCat => subCat.title.ar) } },
-        { 'subCategory.en': { $in: subCategories.map(subCat => subCat.title.en) } }
-      ]
-    };
+    // Construct the filter for the subCategory titles in both Arabic and English
+    const arabicTitles = subCategories.map(subCat => subCat.title.ar);
+    const englishTitles = subCategories.map(subCat => subCat.title.en);
+  
+    // Ensure that at least one of the title arrays has content
+    if (arabicTitles.length > 0 || englishTitles.length > 0) {
+      req.pagination.filter['$or'] = [
+        { 'subCategory.ar': { $in: arabicTitles } },
+        { 'subCategory.en': { $in: englishTitles } }
+      ];
+    }
+  
   }
 
   if (req.query.tags) {

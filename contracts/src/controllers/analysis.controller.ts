@@ -22,7 +22,7 @@ export const contractAnalysis: RequestHandler<
     }
   }
 
-  const copyrightContracts = await mongoose.connection.db
+  const copyrightContracts = await mongoose.connection.db!
     .collection('copyright_contracts')
     .aggregate([
       filter,
