@@ -63,13 +63,11 @@ export const getProjectsPagination: RequestHandler<
     const arabicTitles = subCategories.map(subCat => subCat.title.ar);
     const englishTitles = subCategories.map(subCat => subCat.title.en);
   
-    // Ensure that at least one of the title arrays has content
-    if (arabicTitles.length > 0 || englishTitles.length > 0) {
       req.pagination.filter['$or'] = [
         { 'subCategory.ar': { $in: arabicTitles } },
         { 'subCategory.en': { $in: englishTitles } }
       ];
-    }
+    
   
   }
 
