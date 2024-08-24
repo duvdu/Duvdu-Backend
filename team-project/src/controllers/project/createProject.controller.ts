@@ -24,7 +24,6 @@ export const createProjectHandler: CreateProjectHandler = async (req, res, next)
   const files = req.files as { [fieldName: string]: Express.Multer.File[] };
   const creatives = req.body.creatives;
 
-  console.log(files);
   
   const s3 = new Bucket();
   // handle cover

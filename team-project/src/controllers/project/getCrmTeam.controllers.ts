@@ -2,7 +2,7 @@ import 'express-async-errors';
 
 import { Icategory, NotFound } from '@duvdu-v1/duvdu';
 
-import { TeamProject } from '../../models/teamProject.model';
+import { TeamContract, TeamProject } from '../../models/teamProject.model';
 import { GetTeamCrmHandler } from '../../types/project.endpoints';
 
 
@@ -27,17 +27,32 @@ export const getCrmTeamHandler:GetTeamCrmHandler = async (req,res,next)=>{
   if (projectObject.cover) {
     projectObject.cover = `${process.env.BUCKET_HOST}/${projectObject.cover}`;
   }
-  projectObject.creatives.forEach(creative => {
+  
+  for (const creative of projectObject.creatives) {
     if (creative.category && (creative.category as any).title) {
       (creative.category as Icategory).title = (creative.category as any).title[req.lang];
     }
-    creative.users.forEach(user => {
+  
+    for (const user of creative.users) {
       if (user.user && (user.user as any).profileImage && !((user.user as any).profileImage).startsWith(process.env.BUCKET_HOST)) {
         (user.user as any).profileImage = `${process.env.BUCKET_HOST}/${(user.user as any).profileImage}`;
       }
+  
       user.attachments = user.attachments.map((attachment: string) => `${process.env.BUCKET_HOST}/${attachment}`);
-    });
-  });
+  
+      const contract = await TeamContract.findOne({
+        sp: (user.user as any)._id,
+        customer: projectObject.user,
+        project: projectObject._id,
+      });
+  
+      if (contract) {
+        (user as any).contract = contract._id;
+      } else {
+        (user as any).contract = null;
+      }
+    }
+  }
 
 
   res.status(200).json({message:'success' , data:projectObject});
