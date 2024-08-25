@@ -28,7 +28,7 @@ export const updateProfileHandler: UpdateProfileHandler = async (req, res, next)
   if (coverImage?.length) {
     await s3.saveBucketFiles(FOLDERS.auth, ...coverImage);
     req.body.coverImage = `${FOLDERS.auth}/${coverImage[0].filename}`;
-    if (profile.coverImage) await s3.removeBucketFiles(profile.coverImage);
+    if (profile.coverImage && !profile.coverImage.startsWith('defaults')) await s3.removeBucketFiles(profile.coverImage);
     Files.removeFiles(req.body.coverImage);
   }
   if (profileImage?.length) {
