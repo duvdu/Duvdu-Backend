@@ -68,7 +68,7 @@ export const updateUserHandler: RequestHandler<
   if (req.body.password) req.body.password = await hashPassword(req.body.password);
 
   const s3 = new Bucket();
-  if (coverImage?.length) {
+  if (coverImage?.length  && !profile.coverImage?.startsWith('defaults')) {
     await s3.saveBucketFiles(FOLDERS.auth, ...coverImage);
     req.body.coverImage = `${FOLDERS.auth}/${coverImage[0].filename}`;
     if (profile.coverImage) await s3.removeBucketFiles(profile.coverImage);
