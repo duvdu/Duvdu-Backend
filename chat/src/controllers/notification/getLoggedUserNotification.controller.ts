@@ -11,15 +11,16 @@ export const getLoggedUserNotificationHandler: GetLoggedUserNotificationHandler 
   const notifications = await Notification.find({ targetUser: req.loggedUser?.id })
     .limit(req.pagination.limit)
     .skip(req.pagination.skip)
-    .sort({ watchied: -1, createdAt: -1 })
+    .sort({ watched: -1, createdAt: -1 })
     .populate([
       {path:'sourceUser' , select:'name username profileImage'}
     ]);
 
   const unWatchiedCount = await Notification.countDocuments({
     targetUser: req.loggedUser?.id,
-    watchied: false,
+    watched: false,
   });
+
 
   const resultCount = await Notification.countDocuments({ targetUser: req.loggedUser?.id });
 

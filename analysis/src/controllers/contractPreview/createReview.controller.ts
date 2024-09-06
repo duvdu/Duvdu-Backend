@@ -12,7 +12,7 @@ import { CreateReviewHandler } from '../../types/endpoints/contractReview.endpoi
 
 export const createReviewHandler: CreateReviewHandler = async (req, res, next) => {
   const review = await ContractReview.findOne({
-    user: req.loggedUser.id,
+    customer: req.loggedUser.id,
     contract: req.body.contract,
   });
   if (review)

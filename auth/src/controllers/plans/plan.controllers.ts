@@ -1,4 +1,4 @@
-import { BadRequestError, NotFound, Roles, Plans, Users } from '@duvdu-v1/duvdu';
+import {  NotFound, Roles, Plans } from '@duvdu-v1/duvdu';
 
 import {
   CreatePlanHandler,
@@ -24,17 +24,17 @@ export const updatePlanHandler: UpdatePlanHandler = async (req, res, next) => {
 export const removePlanHandler: RemovePlanHandler = async (req, res, next) => {
   const plan = await Plans.findByIdAndDelete(req.params.planId);
   if (!plan) return next(new NotFound({ en: 'plan not found', ar: 'الخطة غير موجودة' }, req.lang));
-  const users = await Users.countDocuments({ plan: req.params.planId });
-  if (users > 0)
-    return next(
-      new BadRequestError(
-        {
-          en: `already ${users} subscriped in this plan`,
-          ar: 'بالفعل ${users} مشتركين في هذه الخطة',
-        },
-        req.lang,
-      ),
-    );
+  // const users = await Users.countDocuments({ plan: req.params.planId });
+  // if (users > 0)
+  //   return next(
+  //     new BadRequestError(
+  //       {
+  //         en: `already ${users} subscriped in this plan`,
+  //         ar: 'بالفعل ${users} مشتركين في هذه الخطة',
+  //       },
+  //       req.lang,
+  //     ),
+  //   );
   res.status(204).json();
 };
 
