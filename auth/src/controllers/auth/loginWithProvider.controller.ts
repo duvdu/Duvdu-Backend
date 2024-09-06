@@ -22,8 +22,10 @@ export const loginWithProviderHandler: RequestHandler<
   Partial<Pick<Iuser, 'googleId' | 'appleId' | 'username' | 'notificationToken'>>,
   unknown
 > = async (req, res, next) => {
-  if (req.body.username!.length < 6) {
-    let username = req.body.username!.toLowerCase();
+  console.log( /\s/.test(req.body.username!));
+  
+  if (req.body.username!.length < 6 || /\s/.test(req.body.username!)) {
+    let username = req.body.username!.replace(/\s/g, '').toLowerCase();
       
     if (username.length <= 6) {
       const randomChar = String.fromCharCode(97 + Math.floor(Math.random() * 26));
@@ -35,10 +37,10 @@ export const loginWithProviderHandler: RequestHandler<
         username = username.padEnd(7, randomChar);
       }
     }
-    req.body.username = username.toLowerCase();
-    console.log(req.body.username);
     
+    req.body.username = username.toLowerCase();
   }
+  console.log(req.body.username);
 
   let role;
   let user = await Users.findOne({
@@ -51,7 +53,7 @@ export const loginWithProviderHandler: RequestHandler<
       req.body.username = `${req.body.username}${Math.floor(100000 + Math.random() * 900000)}`;
     }
 
-    role = await Roles.findOne({ key: SystemRoles.unverified });
+    role = await Roles.findOne({ key: SystemRoles.verified });
     if (!role) return next(new NotFound(undefined, req.lang));
 
     user = await Users.create({
