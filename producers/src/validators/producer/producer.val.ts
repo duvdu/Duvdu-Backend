@@ -1,5 +1,6 @@
 import { globalValidatorMiddleware } from '@duvdu-v1/duvdu';
 import { body, param, query } from 'express-validator';
+import mongoose from 'mongoose';
 
 export const appendProducerVal = [
   body('category').isMongoId().withMessage('categoryMongoId'),
@@ -60,14 +61,30 @@ export const getProducersVal = [
   query('searchKeywords').optional().isArray().withMessage('searchKeywordsOptionalArray'),
   query('searchKeywords.*').optional().isString().withMessage('searchKeywordsOptionalString'),
   query('category').optional().isMongoId().withMessage('categoryOptionalMongoId'),
-  query('maxBudget').optional().isNumeric().withMessage('maxBudgetOptionalNumeric'),
-  query('minBudget').optional().isNumeric().withMessage('minBudgetOptionalNumeric'),
-  query('tags').optional().isArray().withMessage('tagsOptionalArray'),
-  query('tags.*').optional().isString().withMessage('tagsOptionalString'),
-  query('subCategory').optional().isString().withMessage('subCategoryOptionalString'),
+  query('maxBudget').optional().isInt({gt:0}).toInt().withMessage('maxBudgetOptionalNumeric'),
+  query('minBudget').optional().isInt({gt:0}).toInt().withMessage('minBudgetOptionalNumeric'),
+  query('tags')
+    .optional()
+    .customSanitizer((val) => (typeof val === 'string' ? val.split(',') : val))
+    .bail()
+    .isArray()
+    .custom((val) => {
+      return val.every((item: string) => mongoose.Types.ObjectId.isValid(item));
+    })
+    .bail(),
+  query('subCategory')
+    .optional()
+    .customSanitizer((val) => (typeof val === 'string' ? val.split(',') : val))
+    .bail()
+    .isArray()
+    .custom((val) => {
+      return val.every((item: string) => mongoose.Types.ObjectId.isValid(item));
+    })
+    .bail(),
   query('user').optional().isMongoId().withMessage('userOptionalMongoId'),
   query('limit').optional().isInt().withMessage('limitOptionalInt'),
   query('page').optional().isInt().withMessage('pageOptionalInt'),
+  query('instant').optional().isBoolean().toBoolean(),
   globalValidatorMiddleware,
 ];
 

@@ -2,7 +2,7 @@ import 'express-async-errors';
 
 import { MODELS, Producer } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
-import mongoose from 'mongoose';
+import mongoose, { PipelineStage, Types } from 'mongoose';
 
 import { GetProducersHandler } from '../../types/endpoints';
 
@@ -15,13 +15,15 @@ export const getProducersPagination: RequestHandler<
     category?: string;
     maxBudget?: number;
     minBudget?: number;
-    tags?: string[];
-    subCategory?: string;
+    tags?: Types.ObjectId[];
+    subCategory?: Types.ObjectId[];
     user?: string;
+    instant?:boolean;
   }
 > = (req, res, next) => {
   req.pagination.filter = {};
 
+  if (req.query.instant != undefined) req.pagination.filter.instant = req.query.instant;
   if (req.query.searchKeywords) {
     req.pagination.filter.$or = req.query.searchKeywords.map((keyword: string) => ({
       searchKeywords: { $regex: keyword, $options: 'i' },
@@ -41,12 +43,21 @@ export const getProducersPagination: RequestHandler<
   }
 
   if (req.query.subCategory) {
-    req.pagination.filter['subCategories.title.' + req.lang] = req.query.subCategory;
+    console.log(req.query.subCategory);
+    
+    req.pagination.filter['subCategories'] = {
+      $elemMatch: {
+        _id: { $in: req.query.subCategory.map(el => new mongoose.Types.ObjectId(el)) }
+      }
+    };
   }
 
   if (req.query.tags) {
-    req.pagination.filter['subCategories.tags.' + req.lang] = { $in: req.query.tags };
-  }
+    req.pagination.filter['subCategories'] = {
+      $elemMatch: {
+        tags: { $elemMatch: { _id: { $in: req.query.tags.map(el => new mongoose.Types.ObjectId(el)) } } }
+      }
+    };  }
 
   if (req.query.user) {
     req.pagination.filter.user = new mongoose.Types.ObjectId(req.query.user);
@@ -57,18 +68,20 @@ export const getProducersPagination: RequestHandler<
 
 export const getProducersHandler: GetProducersHandler = async (req, res, next) => {
   try {
-    const { filter, skip, limit } = req.pagination;
 
-    const producers = await Producer.aggregate([
+    let isInstant = undefined;
+    if (req.pagination.filter.instant != undefined) 
+      isInstant = req.pagination.filter.instant;
+    delete req.pagination.filter.instant;
+    
+    
+  
+    const countPipeline = [
       {
-        $match: filter,
-      },
-      { $sort: { createdAt: -1 } },
-      {
-        $skip: skip,
-      },
-      {
-        $limit: limit,
+        $match: {
+          ...req.pagination.filter,
+          isDeleted: { $ne: true },
+        },
       },
       {
         $lookup: {
@@ -78,94 +91,136 @@ export const getProducersHandler: GetProducersHandler = async (req, res, next) =
           as: 'user',
         },
       },
+      { $unwind: '$user' },
+      ...(isInstant !== undefined ? [{
+        $match: {
+          'user.isAvaliableToInstantProjects': isInstant,
+        },
+      }] : []),
       {
-        $unwind: '$user',
+        $count: 'totalCount'
+      }
+    ];
+    
+    // Execute count aggregation
+    const countResult = await Producer.aggregate(countPipeline);
+    const resultCount = countResult.length > 0 ? countResult[0].totalCount : 0;
+
+    const pipeline : PipelineStage[] = [
+      {
+        $match: {
+          ...req.pagination.filter,
+          isDeleted: { $ne: true },
+        },
       },
+      { $sort: { createdAt: -1 } },
+      { $skip: req.pagination.skip },
+      { $limit: req.pagination.limit },
       {
         $lookup: {
-          from: MODELS.category,
-          localField: 'category',
+          from: MODELS.user,
+          localField: 'user',
           foreignField: '_id',
-          as: 'categoryData',
+          as: 'user',
         },
       },
-      {
-        $unwind: '$categoryData',
-      },
-      {
-        $project: {
-          _id: 1,
-          subCategories: {
-            $map: {
-              input: '$subCategories',
-              as: 'subCat',
-              in: {
-                title: {
-                  $cond: {
-                    if: { $eq: ['ar', req.lang] },
-                    then: '$$subCat.title.ar',
-                    else: '$$subCat.title.en',
-                  },
-                },
-                tags: {
-                  $map: {
-                    input: '$$subCat.tags',
-                    as: 'tag',
-                    in: {
-                      title: {
-                        $cond: {
-                          if: { $eq: ['ar', req.lang] },
-                          then: '$$tag.ar',
-                          else: '$$tag.en',
-                        },
-                      },
-                      _id: '$$tag._id',
-                    },
-                  },
-                },
-                _id: '$$subCat._id',
-              },
-            },
-          },
-          minBudget: 1,
-          maxBudget: 1,
-          searchKeywords: 1,
-          createdAt: 1,
-          updatedAt: 1,
-          category: {
-            _id: '$categoryData._id',
-            image: {
-              $concat: [process.env.BUCKET_HOST, '/', '$categoryData.image'],
-            },
-            title: {
-              $cond: {
-                if: { $eq: ['ar', req.lang] },
-                then: '$categoryData.title.ar',
-                else: '$categoryData.title.en',
-              },
-            },
-          },
-          user: {
-            profileImage: {
-              $cond: [
-                { $eq: ['$user.profileImage', null] },
-                null,
-                { $concat: [process.env.BUCKET_HOST, '/', '$user.profileImage'] },
-              ],
-            },
-            username: '$user.username',
-            isOnline: '$user.isOnline',
-            acceptedProjectsCounter: '$user.acceptedProjectsCounter',
-            name: '$user.name',
-            rate: '$user.rate',
-            rank: '$user.rank',
-            projectsView: '$user.projectsView',
-          },
-        },
-      },
-    ]);
+      { $unwind: '$user' },
+    ];
 
-    const resultCount = await Producer.countDocuments(filter);
+    if (isInstant !== undefined) {
+      pipeline.push({
+        $match: {
+          'user.isAvaliableToInstantProjects': isInstant,
+        },
+      });
+    }
+
+    pipeline.push( {
+      $lookup: {
+        from: MODELS.category,
+        localField: 'category',
+        foreignField: '_id',
+        as: 'categoryData',
+      },
+    },
+    {
+      $unwind: '$categoryData',
+    },
+    {
+      $project: {
+        _id: 1,
+        subCategories: {
+          $map: {
+            input: '$subCategories',
+            as: 'subCat',
+            in: {
+              title: {
+                $cond: {
+                  if: { $eq: ['ar', req.lang] },
+                  then: '$$subCat.title.ar',
+                  else: '$$subCat.title.en',
+                },
+              },
+              tags: {
+                $map: {
+                  input: '$$subCat.tags',
+                  as: 'tag',
+                  in: {
+                    title: {
+                      $cond: {
+                        if: { $eq: ['ar', req.lang] },
+                        then: '$$tag.ar',
+                        else: '$$tag.en',
+                      },
+                    },
+                    _id: '$$tag._id',
+                  },
+                },
+              },
+              _id: '$$subCat._id',
+            },
+          },
+        },
+        minBudget: 1,
+        maxBudget: 1,
+        searchKeywords: 1,
+        createdAt: 1,
+        updatedAt: 1,
+        category: {
+          _id: '$categoryData._id',
+          image: {
+            $concat: [process.env.BUCKET_HOST, '/', '$categoryData.image'],
+          },
+          title: {
+            $cond: {
+              if: { $eq: ['ar', req.lang] },
+              then: '$categoryData.title.ar',
+              else: '$categoryData.title.en',
+            },
+          },
+        },
+        user: {
+          profileImage: {
+            $cond: [
+              { $eq: ['$user.profileImage', null] },
+              null,
+              { $concat: [process.env.BUCKET_HOST, '/', '$user.profileImage'] },
+            ],
+          },
+          username: '$user.username',
+          isOnline: '$user.isOnline',
+          acceptedProjectsCounter: '$user.acceptedProjectsCounter',
+          name: '$user.name',
+          rate: '$user.rate',
+          rank: '$user.rank',
+          projectsView: '$user.projectsView',
+          _id: '$user._id',
+        },
+      },
+    }
+    );
+    const producers = await Producer.aggregate(pipeline);
+
     res.status(200).json({
       message: 'success',
       pagination: {

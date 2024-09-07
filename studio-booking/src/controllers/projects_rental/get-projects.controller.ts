@@ -259,7 +259,6 @@ export const getProjectsPagination: RequestHandler<
   
   }
 
-
   if (req.query.tags) {
     req.pagination.filter['tags._id'] = { $in: req.query.tags };
   }
