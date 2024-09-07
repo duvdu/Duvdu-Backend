@@ -112,6 +112,12 @@ export const loginProvider = [
       if (req.body.appleId) throw new Error('can not provide apple and google id');
       return true;
     }),
+  body('name')
+    .optional()
+    .isString()
+    .trim()
+    .isLength({ min: 3, max: 32 })
+    .withMessage('nameInvalid'),
   body('appleId')
     .optional()
     .isString()

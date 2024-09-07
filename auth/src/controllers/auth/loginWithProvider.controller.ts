@@ -19,7 +19,7 @@ import { generateRefreshToken } from '../../utils/generateToken';
 export const loginWithProviderHandler: RequestHandler<
   unknown,
   SuccessResponse,
-  Partial<Pick<Iuser, 'googleId' | 'appleId' | 'username' | 'notificationToken'>>,
+  Partial<Pick<Iuser, 'googleId' | 'appleId' | 'username' | 'notificationToken' | 'name'>>,
   unknown
 > = async (req, res, next) => {
   console.log( /\s/.test(req.body.username!));
