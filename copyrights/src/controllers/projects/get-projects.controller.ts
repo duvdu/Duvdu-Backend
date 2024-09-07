@@ -19,8 +19,10 @@ export const getProjectsPagination: RequestHandler<
     endDate?: Date;
     tags?: mongoose.Types.ObjectId[];
     subCategory?: mongoose.Types.ObjectId[];
+    duration?:number;
   }
 > = async (req, res, next) => {
+  if (req.query.duration) req.pagination.filter['duration.value'] ={$eq: req.query.duration};
   if (req.query.instant != undefined) req.pagination.filter.instant = req.query.instant;
   if (req.query.search) req.pagination.filter.$text = { $search: req.query.search };
   if (req.query.user) req.pagination.filter.user = req.query.user;

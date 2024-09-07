@@ -48,6 +48,7 @@ export const update = [
 ];
 
 export const findAll = [
+
   query('instant').optional().isBoolean().toBoolean(),
   query('search').optional().isLength({ min: 3 }).withMessage('searchLength'),
   query('address').optional().isLength({ min: 3 }).withMessage('addressLength'),
@@ -96,6 +97,7 @@ export const findAll = [
     .customSanitizer((val: string[]) => val.map((el) => new mongoose.Types.ObjectId(el))),
   query('limit').optional().isInt({ min: 1 }),
   query('page').optional().isInt({ min: 1 }),
+  query('duration').optional().isInt({ gt: 0 }).toInt(),
   globalValidatorMiddleware,
 ];
 
