@@ -11,7 +11,7 @@ export const getProducersPagination: RequestHandler<
   unknown,
   unknown,
   {
-    searchKeywords?: string[];
+    search: string;
     category?: string;
     maxBudget?: number;
     minBudget?: number;
@@ -24,10 +24,8 @@ export const getProducersPagination: RequestHandler<
   req.pagination.filter = {};
 
   if (req.query.instant != undefined) req.pagination.filter.instant = req.query.instant;
-  if (req.query.searchKeywords) {
-    req.pagination.filter.$or = req.query.searchKeywords.map((keyword: string) => ({
-      searchKeywords: { $regex: keyword, $options: 'i' },
-    }));
+  if (req.query.search) {
+    req.pagination.filter.$or =  { $regex: req.query.search, $options: 'i' };
   }
 
   if (req.query.category) {

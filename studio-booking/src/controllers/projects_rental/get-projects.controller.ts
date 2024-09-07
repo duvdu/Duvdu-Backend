@@ -175,7 +175,7 @@ export const getProjectsPagination: RequestHandler<
   unknown,
   unknown,
   {
-    searchKeywords?: string[];
+    search: string;
     location?: { lat: number; lng: number };
     equipments?: string[];
     category?: string;
@@ -193,10 +193,8 @@ export const getProjectsPagination: RequestHandler<
   req.pagination.filter = {};
 
   if (req.query.instant != undefined) req.pagination.filter.instant = req.query.instant;
-  if (req.query.searchKeywords) {
-    req.pagination.filter.$or = req.query.searchKeywords.map((keyword) => ({
-      desc: { $regex: keyword, $options: 'i' },
-    }));
+  if (req.query.search) {
+    req.pagination.filter.$or = { $regex: req.query.search, $options: 'i' };
   }
   if (req.query.location) {
     req.pagination.filter.location = {

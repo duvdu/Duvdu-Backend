@@ -11,7 +11,7 @@ export const getProjectsPagination: RequestHandler<
   unknown,
   unknown,
   {
-    searchKeywords?: string[];
+    search?: string;
     location?: { lat: number; lng: number };
     category?: Types.ObjectId[];
     subCategory?: Types.ObjectId[];
@@ -27,16 +27,15 @@ export const getProjectsPagination: RequestHandler<
 > = async (req, res, next) => {
   if (req.query.duration) req.pagination.filter.duration ={$eq: req.query.duration};
   if (req.query.instant != undefined) req.pagination.filter.instant = req.query.instant;
-  if (req.query.searchKeywords?.length) {
-    req.pagination.filter.$or = req.query.searchKeywords.map((keyword) => ({
-      $or: [
-        { name: { $regex: keyword, $options: 'i' } },
-        { description: { $regex: keyword, $options: 'i' } },
-        { 'tools.name': { $regex: keyword, $options: 'i' } },
-        { 'functions.name': { $regex: keyword, $options: 'i' } },
-        { address: { $regex: keyword, $options: 'i' } },
-      ],
-    }));
+  if (req.query.search) {
+    req.pagination.filter = {$or: [
+      { name: { $regex: req.query.search, $options: 'i' } },
+      { description: { $regex: req.query.search, $options: 'i' } },
+      { 'tools.name': { $regex: req.query.search, $options: 'i' } },
+      { 'functions.name': { $regex: req.query.search, $options: 'i' } },
+      { address: { $regex: req.query.search, $options: 'i' } },
+    ]};
+    
   }
 
   if (req.query.location) {

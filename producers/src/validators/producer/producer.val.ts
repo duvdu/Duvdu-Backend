@@ -58,8 +58,7 @@ export const updateProducerVal = [
 ];
 
 export const getProducersVal = [
-  query('searchKeywords').optional().isArray().withMessage('searchKeywordsOptionalArray'),
-  query('searchKeywords.*').optional().isString().withMessage('searchKeywordsOptionalString'),
+  query('search').optional().isString().withMessage('searchKeywordsOptionalString'),
   query('category').optional().isMongoId().withMessage('categoryOptionalMongoId'),
   query('maxBudget').optional().isInt({gt:0}).toInt().withMessage('maxBudgetOptionalNumeric'),
   query('minBudget').optional().isInt({gt:0}).toInt().withMessage('minBudgetOptionalNumeric'),

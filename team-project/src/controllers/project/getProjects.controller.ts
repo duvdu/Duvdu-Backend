@@ -14,7 +14,7 @@ export const getProjectsPagination: RequestHandler<
   unknown,
   unknown,
   {
-    searchKeywords?: string[];
+    search: string;
     category?: string;
     maxBudget?: number;
     minBudget?: number;
@@ -25,11 +25,11 @@ export const getProjectsPagination: RequestHandler<
 > = (req, res, next) => {
   req.pagination.filter = {};
 
-  if (req.query.searchKeywords) 
-    req.pagination.filter.$or = req.query.searchKeywords.map((keyword: string) => ({
-      title: { $regex: keyword, $options: 'i' },
-      desc: { $regex: keyword, $options: 'i' }
-    }));
+  if (req.query.search) 
+    req.pagination.filter.$or = {
+      title: { $regex: req.query.search, $options: 'i' },
+      desc: { $regex: req.query.search, $options: 'i' }
+    };
   
 
   if (req.query.category) 

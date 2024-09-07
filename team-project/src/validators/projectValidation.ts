@@ -49,7 +49,7 @@ export const deleteCreative = [
 ];
 
 export const getAll = [
-  query('searchKeywords').optional().isArray().withMessage('searchKeywords'),
+  query('search').optional().isString().withMessage('searchKeywords'),
   query('category').optional().isString().withMessage('category'),
   query('maxBudget').optional().isNumeric().withMessage('maxBudget'),
   query('minBudget').optional().isNumeric().withMessage('minBudget'),

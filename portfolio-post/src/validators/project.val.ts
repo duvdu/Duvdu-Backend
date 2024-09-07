@@ -111,8 +111,7 @@ export const getProject = [
 
 export const getAll = [
   query('instant').optional().isBoolean().toBoolean(),
-  query('searchKeywords').optional().isArray().withMessage('searchKeywords'),
-  query('searchKeywords.*').optional().isString().withMessage('searchKeywords'),
+  query('search').optional().isString().withMessage('searchKeywords'),
   query('location.lat').optional().isFloat().toFloat().withMessage('location'),
   query('location.lng').optional().isFloat().toFloat().withMessage('location'),
   query('showOnHome').optional().isBoolean().withMessage('showOnHome'),
