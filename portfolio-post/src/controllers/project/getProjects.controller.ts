@@ -22,8 +22,10 @@ export const getProjectsPagination: RequestHandler<
     projectScaleMin?: number;
     projectScaleMax?: number;
     instant?:boolean;
+    duration?:number;
   }
 > = async (req, res, next) => {
+  if (req.query.duration) req.pagination.filter.duration ={$eq: req.query.duration};
   if (req.query.instant != undefined) req.pagination.filter.instant = req.query.instant;
   if (req.query.searchKeywords?.length) {
     req.pagination.filter.$or = req.query.searchKeywords.map((keyword) => ({
@@ -75,7 +77,9 @@ export const getProjectsPagination: RequestHandler<
 
 
   if (req.query.tags) {
-    req.pagination.filter['tags._id'] = { $in: req.query.tags };
+    req.pagination.filter['tags'] = {
+      $elemMatch: { _id: { $in: req.query.tags.map(el => new mongoose.Types.ObjectId(el)) } }
+    };
   }
 
   if (req.query.showOnHome !== undefined) {
