@@ -13,7 +13,7 @@ interface uploadOptions {
   fileFilter?(req: Request, file: Express.Multer.File, callback: multer.FileFilterCallback): void;
 }
 
-export const globalUploadMiddleware = (folder: FOLDERS, options?: uploadOptions) =>
+export const globalUploadMiddleware = (folder: string, options?: uploadOptions) =>
   multer({
     storage: multer.diskStorage({
       destination: path.resolve(`media/${folder}`),

@@ -1,35 +1,44 @@
-import { SuccessResponse, Favourites, MODELS } from '@duvdu-v1/duvdu';
+import { SuccessResponse, Bookmarks, BookmarkProjects, Bucket, NotFound } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import mongoose, { PipelineStage } from 'mongoose';
 
-export const addToFavourite: RequestHandler<
-  { projectId: string },
+export const addToBookmark: RequestHandler<
+  { bookmarkId: string; projectId: string },
   SuccessResponse<{ data: any }>
 > = async (req, res, next) => {
-  const post = await Favourites.create({
-    project: req.params.projectId,
+  const project = await BookmarkProjects.create({
     user: req.loggedUser.id,
+    bookmark: req.params.bookmarkId,
+    project: req.params.projectId,
   });
-  res.json({ message: 'success', data: post });
+
+  res.status(200).json({ message: 'success', data: project });
 };
 
-export const removeFromFavourite: RequestHandler<
-  { projectId: string },
+export const removeFromBookmark: RequestHandler<
+  { bookmarkId: string; projectId: string },
   SuccessResponse<{ data: any }>
 > = async (req, res, next) => {
-  const post = await Favourites.deleteOne({
-    project: req.params.projectId,
+  const project = await BookmarkProjects.deleteOne({
     user: req.loggedUser.id,
+    bookmark: req.params.bookmarkId,
+    project: req.params.projectId,
   });
-  res.json({ message: 'success', data: post });
+
+  res.status(200).json({ message: 'success', data: project });
 };
 
-export const getFavourites: RequestHandler<unknown, SuccessResponse<{ data: any }>> = async (
-  req,
-  res,
-) => {
+export const getBookmarkProjects: RequestHandler<
+  { bookmarkId: string },
+  SuccessResponse<{ data: any }>
+> = async (req, res, next) => {
   const pipelines: PipelineStage[] = [
-    { $match: { user: new mongoose.Types.ObjectId(req.loggedUser.id as string) } },
+    {
+      $match: {
+        user: new mongoose.Types.ObjectId(req.loggedUser.id as string),
+        bookmark: new mongoose.Types.ObjectId(req.params.bookmarkId),
+      },
+    },
     {
       $lookup: {
         from: 'allProjects',
@@ -133,6 +142,6 @@ export const getFavourites: RequestHandler<unknown, SuccessResponse<{ data: any 
       },
     },
   ];
-  const posts = await Favourites.aggregate(pipelines);
-  res.json({ message: 'success', data: posts });
+  const projects = await BookmarkProjects.aggregate(pipelines);
+  res.status(200).json({ message: 'success', data: projects });
 };

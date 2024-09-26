@@ -3,7 +3,6 @@ import { MODELS } from '../types/model-names';
 
 export interface Ifavourite {
   project: Types.ObjectId;
-  ref: string;
   user: Types.ObjectId;
 }
 

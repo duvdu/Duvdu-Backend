@@ -7,11 +7,12 @@ const bookmarksSchema = new Schema<Ibookmark>(
   {
     user: { type: Schema.Types.ObjectId, ref: MODELS.user },
     title: String,
-    projects: [{ type: Schema.Types.ObjectId, ref: MODELS.projects }],
+    image: String,
   },
   { collection: MODELS.bookmark, timestamps: true },
 );
 
 bookmarksSchema.index({ user: 1, title: 1 }, { unique: true });
+bookmarksSchema.index({ user: 1 });
 
 export const Bookmarks = model<Ibookmark>(MODELS.bookmark, bookmarksSchema);

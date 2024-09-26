@@ -7,11 +7,11 @@ import { CustomError } from '../errors/custom-error';
 // eslint-disable-next-line
 export const globalErrorHandlingMiddleware: ErrorRequestHandler = (err, req, res, next) => {
   if (process.env.NODE_ENV === 'development') console.log(err);
-  logger.error(err);
   // custom error
   if (err instanceof CustomError) {
     return res.status(err.statusCode).json({ errors: err.serializeError() });
   }
+  logger.error(err);
   // mongo dublicate error
   if (err.name === 'MongoServerError' && err.code == '11000')
     return res

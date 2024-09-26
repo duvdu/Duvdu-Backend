@@ -5,7 +5,7 @@ import { NotFound } from '@duvdu-v1/duvdu';
 import { Router } from 'express';
 
 import { authRoutes } from './auth.routes';
-import { bookmarkRoutes } from './bookmark.routes';
+// import { bookmarkRoutes } from './bookmark.routes';
 import { router as followRouter } from './follow.routes';
 import { planRoutes } from './plan.routes';
 import { router as reportRoutes } from './report.routes';
@@ -14,11 +14,13 @@ import { splashRoutes } from './splash.routes';
 import { termsRoutes } from './term.routes';
 import { ticketsRoutes } from './ticket.routes';
 import { favouriteRoutes } from './favourites.routes';
+import { bookmarksRoutes } from './bookmarks.routes';
 
 const router = Router();
 
 router.use('/auth', authRoutes);
-router.use('/saved-projects', bookmarkRoutes);
+// router.use('/saved-projects', bookmarkRoutes);
+router.use('/bookmarks', bookmarksRoutes);
 router.use('/terms', termsRoutes);
 router.use('/tickets', ticketsRoutes);
 router.use('/plans', planRoutes);
