@@ -7,7 +7,7 @@ import { hashPassword } from '../../utils/bcrypt';
 export const createUserHandler: RequestHandler<
   unknown,
   SuccessResponse,
-  Pick<Iuser, 'name' | 'username' | 'phoneNumber' | 'password' | 'role'>,
+  Pick<Iuser, 'name' | 'username' | 'phoneNumber' | 'password' | 'role' | 'email'>,
   unknown
 > = async (req, res, next) => {
   const role = await Roles.findById(req.body.role);

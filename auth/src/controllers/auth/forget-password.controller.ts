@@ -1,3 +1,4 @@
+import 'express-async-errors';
 import {
   BadRequestError,
   NotFound,
@@ -6,23 +7,48 @@ import {
   Irole,
   SuccessResponse,
   VerificationReason,
-  userSession,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
+import { createOrUpdateSessionAndGenerateTokens } from './../../utils/createOrUpdateSessionAndGenerateTokens';
 import { hashPassword } from '../../utils/bcrypt';
 import { hashVerificationCode } from '../../utils/crypto';
-import { generateBrowserFingerprint } from '../../utils/generateFingerPrint';
-import { generateAccessToken, generateRefreshToken } from '../../utils/generateToken';
 import { generateRandom6Digit } from '../../utils/gitRandom6Dugut';
 
 export const askForgetPasswordHandler: RequestHandler<
-  { username: string },
-  SuccessResponse
+  unknown,
+  SuccessResponse,
+  { username: string , email:string, phoneNumber:{number:string}  },
+  unknown
 > = async (req, res, next) => {
-  const user = await Users.findOne({ username: req.params.username });
-  if (!user) return next(new NotFound(undefined, req.lang));
+  const { username, email, phoneNumber } = req.body;
 
+  const query: { username?: string; email?: string; 'phoneNumber.number'?: string } = {};
+  let sendEmailOtp = false;
+
+  if (username) {
+    query.username = username;
+  } else if (email) {
+    query.email = email;
+    sendEmailOtp = true;
+  } else if (phoneNumber) {
+    query['phoneNumber.number'] = phoneNumber.number;
+  }
+
+  if (Object.keys(query).length === 0)
+    return next(
+      new BadRequestError(
+        {
+          en: 'Please provide either username, email, or phone number',
+          ar: 'يرجى تقديم اسم المستخدم أو البريد الإلكتروني أو رقم الهاتف',
+        },
+        req.lang,
+      ),
+    );
+
+  const user = await Users.findOne(query);
+  if (!user) return next(new NotFound(undefined, req.lang));
+  
   if (!user.isVerified)
     return next(
       new BadRequestError({ en: 'account not verified', ar: 'الحساب غير موثق' }, req.lang),
@@ -45,18 +71,49 @@ export const askForgetPasswordHandler: RequestHandler<
     reason: VerificationReason.forgetPassword,
   };
   await user.save();
-  // TODO: send OTP
+  // TODO: send OTP to email or phone 
+  if (sendEmailOtp) {
+    console.log('send otp to email');
+  }else{
+    console.log('send otp to phone');
+  }
+
   res.status(200).json(<any>{ message: 'success', code });
 };
 
 export const updateForgetenPasswordHandler: RequestHandler<
-  { username: string },
-  SuccessResponse,
-  {
-    newPassword: string;
-  }
+unknown,
+SuccessResponse,
+{ username: string , email:string, phoneNumber:{number:string} , newPassword: string;  },
+  unknown
 > = async (req, res, next) => {
-  const user = await Users.findOne({ username: req.params.username }).populate('role');
+
+
+  const { username, email, phoneNumber } = req.body;
+
+  const query: { username?: string; email?: string; 'phoneNumber.number'?: string } = {};
+
+  if (username) {
+    query.username = username;
+  } else if (email) {
+    query.email = email;
+  } else if (phoneNumber) {
+    query['phoneNumber.number'] = phoneNumber.number;
+  }
+
+  if (Object.keys(query).length === 0)
+    return next(
+      new BadRequestError(
+        {
+          en: 'Please provide either username, email, or phone number',
+          ar: 'يرجى تقديم اسم المستخدم أو البريد الإلكتروني أو رقم الهاتف',
+        },
+        req.lang,
+      ),
+    );
+
+
+  const user = await Users.findOne(query).populate('role');
   if (!user) return next(new NotFound());
 
   if (!user.isBlocked)
@@ -73,51 +130,10 @@ export const updateForgetenPasswordHandler: RequestHandler<
 
   const role = <Irole>user.role;
 
-  const fingerprint = await generateBrowserFingerprint();
   const userAgent = req.headers['user-agent'];
-  const clientType = userAgent && /mobile|android|touch|webos/i.test(userAgent) ? 'mobile' : 'web';
-  const refreshToken = generateRefreshToken({ id: user._id.toString() });
-  const accessToken = generateAccessToken({
-    id: user.id,
-    isVerified: user.isVerified,
-    isBlocked: user.isBlocked,
-    role: { key: role.key, permissions: role.permissions },
-  });
 
-  // Update or replace existing session and token
-  const sessionData = {
-    user: user._id,
-    fingerPrint: fingerprint,
-    clientType,
-    refreshToken,
-    userAgent,
-  };
-  await userSession.findOneAndUpdate(
-    { user: user._id, fingerPrint: fingerprint, clientType, userAgent },
-    sessionData,
-    { upsert: true },
-  );
-
-  // Update or add the new refresh token
-  const tokenIndex = user.refreshTokens?.findIndex(
-    (rt) => rt.clientType === clientType && rt.fingerprint === fingerprint,
-  );
-  if (tokenIndex !== -1) {
-    user.refreshTokens![tokenIndex!] = {
-      token: refreshToken,
-      clientType,
-      fingerprint: fingerprint,
-      userAgent: userAgent!,
-    };
-  } else {
-    user.refreshTokens?.push({
-      token: refreshToken,
-      clientType,
-      fingerprint: fingerprint,
-      userAgent: userAgent!,
-    });
-  }
-
+  const  {accessToken , refreshToken} = await createOrUpdateSessionAndGenerateTokens(userAgent! , user , role , null);
+  
   user.password = await hashPassword(req.body.newPassword);
   await user.save();
 

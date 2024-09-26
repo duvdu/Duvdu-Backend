@@ -6,7 +6,12 @@ import * as val from '../validators/role/role.validator';
 
 const router = Router();
 
-router.get('/permissions' , isauthenticated , isauthorized(PERMISSIONS.getAllPermissions) , controllers.getAllPermissions);
+router.get(
+  '/permissions',
+  isauthenticated,
+  isauthorized(PERMISSIONS.getAllPermissions),
+  controllers.getAllPermissions,
+);
 router
   .route('/')
   .get(isauthenticated, isauthorized(PERMISSIONS.getRolesHandler), controllers.getRolesHandler)

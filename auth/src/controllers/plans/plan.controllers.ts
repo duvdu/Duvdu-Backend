@@ -1,4 +1,4 @@
-import {  NotFound, Roles, Plans } from '@duvdu-v1/duvdu';
+import { NotFound, Roles, Plans } from '@duvdu-v1/duvdu';
 
 import {
   CreatePlanHandler,

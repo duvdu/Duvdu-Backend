@@ -81,5 +81,7 @@
   "messageLength": "Message must be between 20 and 80 characters",
   "ticketIdInvalid": "Invalid ticket ID",
   "stateRequired": "State is required",
-  "feedbackRequired": "Feedback is required"
+  "feedbackRequired": "Feedback is required",
+
+  "invalidEmail": "invalid email format"
 }
