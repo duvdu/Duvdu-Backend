@@ -28,7 +28,8 @@ export const updateProfileHandler: UpdateProfileHandler = async (req, res, next)
   if (coverImage?.length) {
     await s3.saveBucketFiles(FOLDERS.auth, ...coverImage);
     req.body.coverImage = `${FOLDERS.auth}/${coverImage[0].filename}`;
-    if (profile.coverImage && !profile.coverImage.startsWith('defaults')) await s3.removeBucketFiles(profile.coverImage);
+    if (profile.coverImage && !profile.coverImage.startsWith('defaults'))
+      await s3.removeBucketFiles(profile.coverImage);
     Files.removeFiles(req.body.coverImage);
   }
   if (profileImage?.length) {
@@ -38,6 +39,12 @@ export const updateProfileHandler: UpdateProfileHandler = async (req, res, next)
       await s3.removeBucketFiles(profile.profileImage);
     Files.removeFiles(req.body.profileImage);
   }
+
+  if (req.body.location)
+    req.body.location = {
+      type: 'Point',
+      coordinates: [(req as any).body.location.lng, (req as any).body.location.lat],
+    } as any;
 
   const user = await Users.findByIdAndUpdate(req.loggedUser?.id, req.body, { new: true })
     .populate([{ path: 'category', select: 'title' }])

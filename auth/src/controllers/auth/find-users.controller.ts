@@ -1,6 +1,6 @@
 import { Iuser, MODELS, PaginationResponse, Roles, SystemRoles, Users } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
-import mongoose from 'mongoose';
+import mongoose, { PipelineStage } from 'mongoose';
 
 export const filterUsers: RequestHandler<
   unknown,
@@ -16,6 +16,7 @@ export const filterUsers: RequestHandler<
     hasVerificationPadge?: boolean;
     isBlocked?: boolean;
     isAdmin?: boolean;
+    maxDistance?: number;
   }
 > = async (req, res, next) => {
   if (req.query.search) {
@@ -44,6 +45,8 @@ export const filterUsers: RequestHandler<
     };
   }
 
+  req.query.maxDistance = +(req.query.maxDistance || 1000);
+
   next();
 };
 
@@ -51,9 +54,22 @@ export const findUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser
   req,
   res,
 ) => {
-  const count = await Users.countDocuments(req.pagination.filter);
-
-  const aggregationPipeline = [
+  const currentUser = await Users.findById(req.loggedUser.id, { location: 1 });
+  const aggregationPipeline: PipelineStage[] = [
+    {
+      $geoNear: {
+        near: {
+          type: 'Point',
+          coordinates: [
+            (currentUser as any).location.coordinates[0],
+            (currentUser as any).location.coordinates[1],
+          ],
+        },
+        distanceField: 'string',
+        maxDistance: (req.query.maxDistance as unknown as number) * 1000,
+        spherical: true,
+      },
+    },
     {
       $match: req.pagination.filter,
     },
@@ -198,10 +214,17 @@ export const findUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser
       },
     },
     {
-      $skip: req.pagination.skip,
-    },
-    {
-      $limit: req.pagination.limit,
+      $facet: {
+        totalCount: [{ $count: 'totalCount' }],
+        users: [
+          {
+            $skip: req.pagination.skip,
+          },
+          {
+            $limit: req.pagination.limit,
+          },
+        ],
+      },
     },
   ];
   const users = await Users.aggregate(aggregationPipeline);
@@ -210,9 +233,9 @@ export const findUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser
     message: 'success',
     pagination: {
       currentPage: req.pagination.page,
-      resultCount: count,
-      totalPages: Math.ceil(count / req.pagination.limit),
+      resultCount: users[0].totalCount[0].totalCount,
+      totalPages: Math.ceil(users[0].totalCount[0].totalCount / req.pagination.limit),
     },
-    data: users,
+    data: users[0].users,
   });
 };
