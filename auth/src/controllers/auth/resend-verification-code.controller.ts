@@ -9,7 +9,20 @@ export const resendVerificationCodeHandler: ResendVerificationCodeHandler = asyn
   res,
   next,
 ) => {
-  const user = await Users.findOne({ username: req.body.username });
+
+  const { login } = req.body;
+  const query: { username?: string; email?: string; 'phoneNumber.number'?: string } = {};
+  if (login) {
+    if (login.includes('@')) {
+      query.email = login;
+    } else if (/^\d+$/.test(login)) {
+      query['phoneNumber.number'] = login;
+    } else {
+      query.username = login;
+    }
+  }
+
+  const user = await Users.findOne(query);
   if (!user)
     return next(new NotFound({ en: 'User not found', ar: 'المستخدم غير موجود' }, req.lang));
   if (!user.verificationCode?.reason) return next(new UnauthorizedError());
