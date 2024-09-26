@@ -13,6 +13,7 @@ import { roleRoutes } from './role.routes';
 import { splashRoutes } from './splash.routes';
 import { termsRoutes } from './term.routes';
 import { ticketsRoutes } from './ticket.routes';
+import { favouriteRoutes } from './favourites.routes';
 
 const router = Router();
 
@@ -25,6 +26,7 @@ router.use('/roles', roleRoutes);
 router.use('/report', reportRoutes);
 router.use('/follow', followRouter);
 router.use('/splash', splashRoutes);
+router.use('/favourites', favouriteRoutes);
 router.get('/logs', (req, res, next) => {
   const filename = req.query.filename?.toString();
 

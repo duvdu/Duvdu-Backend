@@ -8,6 +8,7 @@ const userSchema = new Schema<Iuser>(
   {
     googleId: { type: String, default: null },
     appleId: { type: String, default: null },
+    email: { type: String, unique: true, sparse: true },
     name: { type: String, default: null },
     phoneNumber: {
       key: { type: String, default: null },
@@ -17,11 +18,18 @@ const userSchema = new Schema<Iuser>(
     password: String,
     verificationCode: { code: String, expireAt: Date, reason: { type: String, default: null } },
     isVerified: { type: Boolean, default: false },
-    refreshTokens: [{token:{type:String , default:null} , fingerprint:{type:String , default:null} , clientType:{type:String , default:null} , userAgent:{type:String , default:null}}],
+    refreshTokens: [
+      {
+        token: { type: String, default: null },
+        fingerprint: { type: String, default: null },
+        clientType: { type: String, default: null },
+        userAgent: { type: String, default: null },
+      },
+    ],
     profileImage: { type: String, default: 'defaults/profile.jpg' },
     coverImage: { type: String, default: null },
     location: { lat: { type: Number, default: null }, lng: { type: Number, default: null } },
-    category: { type: Schema.Types.ObjectId, ref: MODELS.category  , default:null},
+    category: { type: Schema.Types.ObjectId, ref: MODELS.category, default: null },
     acceptedProjectsCounter: { type: Number, default: 0 },
     profileViews: { type: Number, default: 0 },
     about: { type: String, default: null },
@@ -44,16 +52,15 @@ const userSchema = new Schema<Iuser>(
       followers: { type: Number, default: 0 },
       following: { type: Number, default: 0 },
     },
-    favourites: [
-      {
-        project: { type: Schema.Types.ObjectId, refPath: 'favourites.cycle', required: true },
-        cycle: { type: String, required: true },
-      },
-    ],
-    address:{type:String , default:null},
-    likes:{type:Number , default:0},
-    rank:{title:{type:String , default:null} , nextRankPercentage:{type:Number, default:0} , nextRankTitle:{type:String , default:null} , color:{type:String , default:null}},
-    projectsView:{type:Number , default:0}
+    address: { type: String, default: null },
+    likes: { type: Number, default: 0 },
+    rank: {
+      title: { type: String, default: null },
+      nextRankPercentage: { type: Number, default: 0 },
+      nextRankTitle: { type: String, default: null },
+      color: { type: String, default: null },
+    },
+    projectsView: { type: Number, default: 0 },
   },
   {
     timestamps: true,
@@ -68,8 +75,7 @@ const userSchema = new Schema<Iuser>(
 ).index({ name: 'text' });
 
 userSchema.pre('save', async function (next) {
-  if (this.isModified('acceptedProjectsCounter')) 
-    await updateRankForUser(this as UserDocument);
+  if (this.isModified('acceptedProjectsCounter')) await updateRankForUser(this as UserDocument);
   next();
 });
 

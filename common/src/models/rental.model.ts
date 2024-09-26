@@ -1,5 +1,7 @@
-import { Icategory, Iuser, MODELS } from '@duvdu-v1/duvdu';
 import { model, Types, Schema } from 'mongoose';
+import { Icategory } from '../types/Category';
+import { Iuser } from '../types/User';
+import { MODELS } from '../types/model-names';
 
 export enum RentalUnits {
   minutes = 'minutes',

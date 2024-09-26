@@ -18,13 +18,14 @@ export interface Iuser {
   id: string;
   googleId?: string;
   appleId?: string;
+  email: string;
   name?: string;
   phoneNumber: { key: string; number: string };
   username: string;
   password?: string;
   verificationCode?: { code?: string; expireAt?: string; reason?: VerificationReason };
   isVerified: boolean;
-  refreshTokens?: {fingerprint:string , clientType:string , token:string , userAgent:string}[];
+  refreshTokens?: { fingerprint: string; clientType: string; token: string; userAgent: string }[];
   profileImage?: string;
   coverImage?: string;
   location?: { lat: number; lng: number };
@@ -45,8 +46,13 @@ export interface Iuser {
   notificationToken: string | null;
   isFollow?: boolean;
   favourites: { project: Types.ObjectId; cycle: string }[];
-  address:string,
-  likes:number,
-  rank:{title:string | null , nextRangPercentage:number , nextRankTitle:string | null , color:string|null},
-  projectsView:number
+  address: string;
+  likes: number;
+  rank: {
+    title: string | null;
+    nextRangPercentage: number;
+    nextRankTitle: string | null;
+    color: string | null;
+  };
+  projectsView: number;
 }
