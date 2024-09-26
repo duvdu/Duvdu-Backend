@@ -13,7 +13,7 @@ export const createOrUpdateSessionAndGenerateTokens = async (
   const deviceId = generateUniqueDeviceId(userAgent!);
   
   // Generate tokens
-  const refreshToken = generateRefreshToken({ id: user._id.toString() });
+  const refreshToken = generateRefreshToken({ id: user.id.toString() });
   const accessToken = generateAccessToken({
     id: user.id,
     isVerified: user.isVerified,
@@ -22,8 +22,8 @@ export const createOrUpdateSessionAndGenerateTokens = async (
   });
   
   // Create or update the session in the database
-  const sessionData = { user: user._id, refreshToken, deviceId };
-  await userSession.findOneAndUpdate({ user: user._id, deviceId }, sessionData, { upsert: true });
+  const sessionData = { user: user.id, refreshToken, deviceId };
+  await userSession.findOneAndUpdate({ user: user.id, deviceId }, sessionData, { upsert: true });
   
   // Update or add the new refresh token to the user
   const tokenIndex = user.refreshTokens?.findIndex((rt) => rt.deviceId === deviceId);
