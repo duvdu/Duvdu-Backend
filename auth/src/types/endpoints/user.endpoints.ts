@@ -38,11 +38,9 @@ export interface SigninHandler
     unknown,
     successResponse<unknown>,
     {
-      username: string;
+      login: string;
       password: string;
       notificationToken?: string;
-      phoneNumber: { number: string };
-      email: string;
     },
     unknown
   > {}

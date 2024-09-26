@@ -6,19 +6,11 @@ export const resetPasswordVal = [
     .exists()
     .isStrongPassword({ minLength: 8, minLowercase: 1, minUppercase: 1, minNumbers: 1 })
     .withMessage('passwordInvalid'),
-  body('username')
+  body('login')
     .optional()
     .exists()
+    .withMessage('usernameRequired')
     .isString()
-    .withMessage('invalidFormat')
-    .isLength({ min: 6, max: 32 })
-    .withMessage('lengthBetween'),
-  body('phoneNumber.number')
-    .optional()
-    .exists()
-    .isString()
-    .isMobilePhone('ar-EG')
-    .withMessage('phoneNumberInvalid'),
-  body('email').optional().isEmail().withMessage('invalidEmail'),
+    .withMessage('invalidFormat'),
   globalValidatorMiddleware,
 ];

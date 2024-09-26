@@ -18,21 +18,23 @@ import { generateRandom6Digit } from '../../utils/gitRandom6Dugut';
 export const askForgetPasswordHandler: RequestHandler<
   unknown,
   SuccessResponse,
-  { username: string , email:string, phoneNumber:{number:string}  },
+  { login:string  },
   unknown
 > = async (req, res, next) => {
-  const { username, email, phoneNumber } = req.body;
+  const { login } = req.body;
 
   const query: { username?: string; email?: string; 'phoneNumber.number'?: string } = {};
   let sendEmailOtp = false;
 
-  if (username) {
-    query.username = username;
-  } else if (email) {
-    query.email = email;
-    sendEmailOtp = true;
-  } else if (phoneNumber) {
-    query['phoneNumber.number'] = phoneNumber.number;
+  if (login) {
+    if (login.includes('@')) {
+      query.email = login;
+      sendEmailOtp = true;
+    } else if (/^\d+$/.test(login)) {
+      query['phoneNumber.number'] = login;
+    } else {
+      query.username = login;
+    }
   }
 
   if (Object.keys(query).length === 0)
@@ -84,21 +86,23 @@ export const askForgetPasswordHandler: RequestHandler<
 export const updateForgetenPasswordHandler: RequestHandler<
 unknown,
 SuccessResponse,
-{ username: string , email:string, phoneNumber:{number:string} , newPassword: string;  },
+{ login:string , newPassword: string;  },
   unknown
 > = async (req, res, next) => {
 
 
-  const { username, email, phoneNumber } = req.body;
+  const { login } = req.body;
 
   const query: { username?: string; email?: string; 'phoneNumber.number'?: string } = {};
 
-  if (username) {
-    query.username = username;
-  } else if (email) {
-    query.email = email;
-  } else if (phoneNumber) {
-    query['phoneNumber.number'] = phoneNumber.number;
+  if (login) {
+    if (login.includes('@')) {
+      query.email = login;
+    } else if (/^\d+$/.test(login)) {
+      query['phoneNumber.number'] = login;
+    } else {
+      query.username = login;
+    }
   }
 
   if (Object.keys(query).length === 0)
