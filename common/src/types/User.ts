@@ -28,7 +28,10 @@ export interface Iuser {
   refreshTokens?: { fingerprint: string; clientType: string; token: string; userAgent: string }[];
   profileImage?: string;
   coverImage?: string;
-  location?: { lat: number; lng: number };
+  location: {
+    type: 'Point';
+    coordinates: [number, number];
+  };
   category?: Types.ObjectId | Icategory;
   acceptedProjectsCounter: number;
   profileViews: number;

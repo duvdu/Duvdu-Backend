@@ -28,7 +28,10 @@ const userSchema = new Schema<Iuser>(
     ],
     profileImage: { type: String, default: 'defaults/profile.jpg' },
     coverImage: { type: String, default: null },
-    location: { lat: { type: Number, default: null }, lng: { type: Number, default: null } },
+    location: {
+      type: { type: String, default: 'Point' },
+      coordinates: { type: [Number], default: [31.2357, 30.0444] },
+    },
     category: { type: Schema.Types.ObjectId, ref: MODELS.category, default: null },
     acceptedProjectsCounter: { type: Number, default: 0 },
     profileViews: { type: Number, default: 0 },
@@ -72,7 +75,9 @@ const userSchema = new Schema<Iuser>(
       },
     },
   },
-).index({ name: 'text' });
+)
+  .index({ name: 'text' })
+  .index({ location: '2dsphere' });
 
 userSchema.pre('save', async function (next) {
   if (this.isModified('acceptedProjectsCounter')) await updateRankForUser(this as UserDocument);
