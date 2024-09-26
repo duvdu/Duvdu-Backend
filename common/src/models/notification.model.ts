@@ -21,7 +21,7 @@ export const Notification = model<Inotification>(
         type: Schema.Types.ObjectId,
         ref: MODELS.user,
         // required:true
-        default:null
+        default: null,
       },
       targetUser: {
         type: Schema.Types.ObjectId,

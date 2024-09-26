@@ -4,37 +4,47 @@ import { MODELS } from './../types/model-names';
 import { CYCLES } from '../types/cycles';
 import { Iuser } from '../types/User';
 export interface IContractReview {
-    sp:Types.ObjectId | Iuser;
-    customer: Types.ObjectId | Iuser;
-    contract: Types.ObjectId;
-    cycle :CYCLES,
-    rate:number;
-    comment:string;
+  sp: Types.ObjectId | Iuser;
+  customer: Types.ObjectId | Iuser;
+  contract: Types.ObjectId;
+  cycle: CYCLES;
+  rate: number;
+  comment: string;
 }
-
 
 export interface IProjectReview {
-  user:Types.ObjectId | Iuser;
+  user: Types.ObjectId | Iuser;
   project: Types.ObjectId;
-  cycle :CYCLES,
-  rate:number;
-  comment:string;
+  cycle: CYCLES;
+  rate: number;
+  comment: string;
 }
 
-export const ProjectReview = model<IProjectReview>(MODELS.projectReview , new Schema<IProjectReview>({
-  user:{type: Schema.Types.ObjectId , ref:MODELS.user},
-  project:{type:Schema.Types.ObjectId},
-  cycle:{type:String , enum:CYCLES},
-  rate:{type:Number , default:0},
-  comment:{type:String , default:null}
-},{timestamps:true , collection:MODELS.projectReview}));
+export const ProjectReview = model<IProjectReview>(
+  MODELS.projectReview,
+  new Schema<IProjectReview>(
+    {
+      user: { type: Schema.Types.ObjectId, ref: MODELS.user },
+      project: { type: Schema.Types.ObjectId },
+      cycle: { type: String, enum: CYCLES },
+      rate: { type: Number, default: 0 },
+      comment: { type: String, default: null },
+    },
+    { timestamps: true, collection: MODELS.projectReview },
+  ),
+);
 
-
-export const ContractReview = model<IContractReview>(MODELS.contractReview , new Schema<IContractReview>({
-  sp:{type: Schema.Types.ObjectId , ref:MODELS.user},
-  customer:{type: Schema.Types.ObjectId , ref:MODELS.user},
-  contract:{type:Schema.Types.ObjectId},
-  cycle:{type:String , enum:CYCLES},
-  rate:{type:Number , default:0},
-  comment:{type:String , default:null}
-},{timestamps:true , collection:MODELS.contractReview}));
+export const ContractReview = model<IContractReview>(
+  MODELS.contractReview,
+  new Schema<IContractReview>(
+    {
+      sp: { type: Schema.Types.ObjectId, ref: MODELS.user },
+      customer: { type: Schema.Types.ObjectId, ref: MODELS.user },
+      contract: { type: Schema.Types.ObjectId },
+      cycle: { type: String, enum: CYCLES },
+      rate: { type: Number, default: 0 },
+      comment: { type: String, default: null },
+    },
+    { timestamps: true, collection: MODELS.contractReview },
+  ),
+);

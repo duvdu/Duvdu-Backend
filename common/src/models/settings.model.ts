@@ -20,11 +20,13 @@ export const Setting = model<Isetting>(
       expirationTime: [{ time: { type: Number, unique: true } }],
       default_profile: String,
       default_cover: String,
-      splash: [{
-        cover: {type: String, default: null},
-        title: {type: String, default: null},
-        subTitle: {type: String, default: null}
-      }]
+      splash: [
+        {
+          cover: { type: String, default: null },
+          title: { type: String, default: null },
+          subTitle: { type: String, default: null },
+        },
+      ],
     },
     { timestamps: true, collection: MODELS.setting },
   ),

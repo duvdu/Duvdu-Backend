@@ -5,10 +5,13 @@ import { Iuser } from '../types/User';
 
 export type UserDocument = Document & Iuser;
 
-
 export const updateRankForUser = async (user: UserDocument) => {
-  const currentRank = await Rank.findOne({ actionCount: { $lte: user.acceptedProjectsCounter } }).sort({ actionCount: -1 }).exec();
-  const nextRank = await Rank.findOne({ actionCount: { $gt: user.acceptedProjectsCounter } }).sort({ actionCount: 1 }).exec();
+  const currentRank = await Rank.findOne({ actionCount: { $lte: user.acceptedProjectsCounter } })
+    .sort({ actionCount: -1 })
+    .exec();
+  const nextRank = await Rank.findOne({ actionCount: { $gt: user.acceptedProjectsCounter } })
+    .sort({ actionCount: 1 })
+    .exec();
 
   if (currentRank) {
     user.rank.title = currentRank.rank;
@@ -22,10 +25,9 @@ export const updateRankForUser = async (user: UserDocument) => {
     } else {
       user.rank.nextRangPercentage = 100;
     }
-
   } else {
     user.rank.title = null;
-    user.rank.nextRangPercentage = 0; 
+    user.rank.nextRangPercentage = 0;
     user.rank.nextRankTitle = null;
     user.rank.color = null;
   }
