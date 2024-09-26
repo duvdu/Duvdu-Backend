@@ -12,18 +12,19 @@ import { comparePassword } from '../../utils/bcrypt';
 import { createOrUpdateSessionAndGenerateTokens } from '../../utils/createOrUpdateSessionAndGenerateTokens';
 
 export const signinHandler: SigninHandler = async (req, res, next) => {
-  const { username, password, notificationToken, email, phoneNumber } = req.body;
+  const { login, password, notificationToken } = req.body;
 
   const query: { username?: string; email?: string; 'phoneNumber.number'?: string } = {};
 
-  if (username) {
-    query.username = username;
-  } else if (email) {
-    query.email = email;
-  } else if (phoneNumber) {
-    query['phoneNumber.number'] = phoneNumber.number;
+  if (login) {
+    if (login.includes('@')) {
+      query.email = login;
+    } else if (/^\d+$/.test(login)) {
+      query['phoneNumber.number'] = login;
+    } else {
+      query.username = login;
+    }
   }
-
   if (Object.keys(query).length === 0)
     return next(
       new BadRequestError(

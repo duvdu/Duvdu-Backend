@@ -15,17 +15,19 @@ import { hashVerificationCode } from '../../utils/crypto';
 export const verifyHandler: RequestHandler<
   unknown,
   SuccessResponse<{ reason: string; username: string }>,
-  { username: string; code: string ,  email:string, phoneNumber:{number:string} }
+  { login: string; code: string  }
 > = async (req, res, next) => {
 
-  const { username, email, phoneNumber } = req.body;
+  const { login } = req.body;
   const query: { username?: string; email?: string; 'phoneNumber.number'?: string } = {};
-  if (username) {
-    query.username = username;
-  } else if (email) {
-    query.email = email;
-  } else if (phoneNumber) {
-    query['phoneNumber.number'] = phoneNumber.number;
+  if (login) {
+    if (login.includes('@')) {
+      query.email = login;
+    } else if (/^\d+$/.test(login)) {
+      query['phoneNumber.number'] = login;
+    } else {
+      query.username = login;
+    }
   }
 
   if (Object.keys(query).length === 0)
@@ -70,6 +72,6 @@ export const verifyHandler: RequestHandler<
   res.status(200).json({
     message: 'success',
     reason: user.verificationCode.reason as string,
-    username: req.body.username,
+    username: user.username,
   });
 };

@@ -2,15 +2,7 @@ import { globalValidatorMiddleware } from '@duvdu-v1/duvdu';
 import { body } from 'express-validator';
 
 export const signinVal = [
-  body('phoneNumber').isObject().optional(),
-  body('phoneNumber.number')
-    .optional()
-    .exists()
-    .isString()
-    .isMobilePhone('ar-EG')
-    .withMessage('phoneNumberInvalid'),
-  body('email').optional().isEmail().withMessage('invalidEmail'),
-  body('username')
+  body('login')
     .optional()
     .exists()
     .withMessage('usernameRequired')
