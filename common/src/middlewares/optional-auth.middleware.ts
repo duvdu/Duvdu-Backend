@@ -12,10 +12,15 @@ export const optionalAuthenticated: RequestHandler = async (req, res, next) => {
     payload = <IjwtPayload>verify((req as any).session.access, process.env.JWT_KEY!);
     (req as any).loggedUser = payload;
     if ((req as any).loggedUser.isBlocked.value)
-      return next(new UnauthorizedError( {
-        en: `Forbidden: User is blocked ${(req as any).loggedUser.isBlocked.reason}`,
-        ar:` ممنوع: المستخدم محظور ${(req as any).loggedUser.isBlocked.reason}`,
-      } , (req as any).lang));
+      return next(
+        new UnauthorizedError(
+          {
+            en: `Forbidden: User is blocked ${(req as any).loggedUser.isBlocked.reason}`,
+            ar: ` ممنوع: المستخدم محظور ${(req as any).loggedUser.isBlocked.reason}`,
+          },
+          (req as any).lang,
+        ),
+      );
   } catch (error) {
     return next();
   }

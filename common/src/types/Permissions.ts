@@ -79,7 +79,7 @@ export enum PERMISSIONS {
   deleteSettingHandler = 'delete setting',
 
   // dashboard
-  accessDashboard = 'access dashboard'
+  accessDashboard = 'access dashboard',
 }
 
 export const permissions = {
@@ -119,7 +119,7 @@ export const permissions = {
     PERMISSIONS.updateRoleHandler,
     PERMISSIONS.updateRoleHandler,
     PERMISSIONS.removeRoleHandler,
-    PERMISSIONS.getAllPermissions
+    PERMISSIONS.getAllPermissions,
   ],
   Post: [
     PERMISSIONS.createProjectHandler,
@@ -143,7 +143,7 @@ export const permissions = {
     PERMISSIONS.getCrmRentalProject,
   ],
   booking: [PERMISSIONS.booking],
-  teamProject:[
+  teamProject: [
     PERMISSIONS.createTeamProjectHandler,
     PERMISSIONS.deleteTeamProjectCreativeHandler,
     PERMISSIONS.getTeamProjectAnalysisHandler,
@@ -152,20 +152,16 @@ export const permissions = {
     PERMISSIONS.deleteTeamProjectHandler,
     PERMISSIONS.updateTeamProjectHandler,
   ],
-  rank:[
+  rank: [
     PERMISSIONS.createRankHandler,
     PERMISSIONS.updateRankHandler,
-    PERMISSIONS.deleteRankHandler
+    PERMISSIONS.deleteRankHandler,
   ],
-  setting:[
+  setting: [
     PERMISSIONS.createSettingHandler,
     PERMISSIONS.updateSettingHandler,
-    PERMISSIONS.deleteSettingHandler
+    PERMISSIONS.deleteSettingHandler,
   ],
-  producer:[
-    PERMISSIONS.getProducerAnalysis,
-  ],
-  dashboard:[
-    PERMISSIONS.accessDashboard
-  ]
+  producer: [PERMISSIONS.getProducerAnalysis],
+  dashboard: [PERMISSIONS.accessDashboard],
 };

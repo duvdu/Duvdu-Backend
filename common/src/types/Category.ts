@@ -10,6 +10,6 @@ export interface Icategory {
   jobTitles?: string[];
   cycle: CYCLES;
   status: boolean;
-  trend:boolean;
-  media: 'image' | 'video' | 'audio'
+  trend: boolean;
+  media: 'image' | 'video' | 'audio';
 }

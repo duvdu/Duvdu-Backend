@@ -5,6 +5,7 @@ import { GetLoggedUserProfileHandler } from '../../types/endpoints/user.endpoint
 
 export const getLoggedUserProfileHandler: GetLoggedUserProfileHandler = async (req, res, next) => {
   await updateRankForUser(req.loggedUser.id, req.lang);
+  
   const user = await Users.findById(req.loggedUser?.id)
     .select(
       '-googleId -appleId -password -verificationCode.code -verificationCode.expireAt -refreshTokens -role -favourites',

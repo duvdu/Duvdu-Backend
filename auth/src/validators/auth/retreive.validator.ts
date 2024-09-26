@@ -3,10 +3,14 @@ import { body } from 'express-validator';
 
 export const retreiveUsernameVal = [
   body('username')
-    .exists()
+    .optional()
     .isString()
     .isLength({ min: 6, max: 32 })
-    .toLowerCase()
-    .withMessage('usernameInvalid'),
+    .withMessage('lengthBetween')
+    .custom((val) => {
+      if (val.match(/^[a-z0-9_]+$/)) return true;
+      throw new Error('usernameFormat');
+    }),
   globalValidatorMiddleware,
 ];
+

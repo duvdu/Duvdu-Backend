@@ -3,6 +3,7 @@ import { body, param } from 'express-validator';
 
 export const signupVal = [
   body('name').isString().trim().isLength({ min: 3, max: 32 }).withMessage('nameInvalid'),
+  body('email').isEmail().withMessage('invalidEmail'),
   body('phoneNumber').isObject(),
   body('phoneNumber.number')
     .exists()
@@ -31,6 +32,7 @@ export const signupVal = [
 
 export const createUser = [
   body('name').isString().trim().isLength({ min: 3, max: 32 }).withMessage('nameInvalid'),
+  body('email').isEmail().withMessage('invalidEmail'),
   body('phoneNumber').isObject(),
   body('phoneNumber.number')
     .exists()
@@ -104,6 +106,7 @@ export const blockUser = [
 export const unblockUser = [param('userId').isMongoId(), globalValidatorMiddleware];
 
 export const loginProvider = [
+  body('email').isEmail().withMessage('invalidEmail'),
   body('googleId')
     .optional()
     .isString()

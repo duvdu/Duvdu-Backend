@@ -64,12 +64,7 @@ router
 router.post('/logout', isauthenticated, handlers.logoutHandler);
 router.post('/signin', val.signinVal, handlers.signinHandler);
 router.post('/signup', val.signupVal, handlers.signupHandler);
-router.post(
-  '/complete-sginup',
-  isauthenticated,
-  val.completeSginUpVal,
-  handlers.completeSginupHandler,
-);
+
 router.post(
   '/retreive-username',
   // rateLimit({
@@ -93,7 +88,7 @@ router
   .patch(val.updatePhoneNumberVal, handlers.updatePhoneNumberHandler);
 
 router
-  .route('/reset-password/:username')
+  .route('/reset-password')
   .get(val.askResetPasswordVal, handlers.askForgetPasswordHandler)
   .post(val.resetPasswordVal, handlers.updateForgetenPasswordHandler);
 

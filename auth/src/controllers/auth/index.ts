@@ -9,7 +9,6 @@ export * from './get-user-profile.controller';
 export * from './update-phone-numbers.controller';
 export * from './forget-password.controller';
 export * from './verify.controller';
-export * from './completeSginUp.controller';
 export * from './find-users.controller';
 export * from './favourites.controller';
 export * from './update-default-profile-crm.controller';

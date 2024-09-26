@@ -3,5 +3,5 @@ export enum Channels {
   new_message = 'new_message',
   new_follower = 'new_follower',
   new_contract = 'new_contract',
-  update_contract = 'update_contract'
-} 
+  update_contract = 'update_contract',
+}

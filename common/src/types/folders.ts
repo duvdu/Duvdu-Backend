@@ -7,5 +7,5 @@ export enum FOLDERS {
   chat = 'chat',
   copyrights = 'copyrights',
   team_project = 'team_project',
-  producer = 'producer'
+  producer = 'producer',
 }

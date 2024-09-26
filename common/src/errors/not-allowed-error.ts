@@ -50,7 +50,8 @@ export class NotAllowedError extends CustomError {
   }
 
   serializeError(): { message: string; field?: string | undefined }[] {
-    const localizedMessage = this.messages[this.lang as keyof LocalizedMessages] || this.messages['en'];
+    const localizedMessage =
+      this.messages[this.lang as keyof LocalizedMessages] || this.messages['en'];
     return [{ message: localizedMessage }];
   }
 }

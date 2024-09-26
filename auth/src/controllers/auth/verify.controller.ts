@@ -15,9 +15,31 @@ import { hashVerificationCode } from '../../utils/crypto';
 export const verifyHandler: RequestHandler<
   unknown,
   SuccessResponse<{ reason: string; username: string }>,
-  { username: string; code: string }
+  { username: string; code: string ,  email:string, phoneNumber:{number:string} }
 > = async (req, res, next) => {
-  const user = await Users.findOne({ username: req.body.username });
+
+  const { username, email, phoneNumber } = req.body;
+  const query: { username?: string; email?: string; 'phoneNumber.number'?: string } = {};
+  if (username) {
+    query.username = username;
+  } else if (email) {
+    query.email = email;
+  } else if (phoneNumber) {
+    query['phoneNumber.number'] = phoneNumber.number;
+  }
+
+  if (Object.keys(query).length === 0)
+    return next(
+      new BadRequestError(
+        {
+          en: 'Please provide either username, email, or phone number',
+          ar: 'يرجى تقديم اسم المستخدم أو البريد الإلكتروني أو رقم الهاتف',
+        },
+        req.lang,
+      ),
+    );
+
+  const user = await Users.findOne(query);
   if (!user)
     return next(new NotFound({ en: 'User not found', ar: 'المستخدم غير موجود' }, req.lang));
   if (!user.verificationCode?.code) return next(new UnauthorizedError(undefined, req.lang));

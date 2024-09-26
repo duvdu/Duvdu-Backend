@@ -21,9 +21,7 @@ const userSchema = new Schema<Iuser>(
     refreshTokens: [
       {
         token: { type: String, default: null },
-        fingerprint: { type: String, default: null },
-        clientType: { type: String, default: null },
-        userAgent: { type: String, default: null },
+        deviceId: { type: String, default: null },
       },
     ],
     profileImage: { type: String, default: 'defaults/profile.jpg' },

@@ -56,7 +56,8 @@ export class DatabaseConnectionError extends CustomError {
   }
 
   serializeError() {
-    const localizedMessage = this.messages[this.lang as keyof LocalizedMessages] || this.messages['en'];
+    const localizedMessage =
+      this.messages[this.lang as keyof LocalizedMessages] || this.messages['en'];
     return [{ message: localizedMessage }];
   }
 }

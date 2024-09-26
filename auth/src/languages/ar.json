@@ -81,5 +81,7 @@
   "messageLength": "يجب أن تكون الرسالة بين 20 و 80 حرفًا",
   "ticketIdInvalid": "معرف التذكرة غير صالح",
   "stateRequired": "الحالة مطلوبة",
-  "feedbackRequired": "التغذية الراجعة مطلوبة"
+  "feedbackRequired": "التغذية الراجعة مطلوبة",
+
+  "invalidEmail": "تنسيق البريد الإلكتروني غير صالح"
 }

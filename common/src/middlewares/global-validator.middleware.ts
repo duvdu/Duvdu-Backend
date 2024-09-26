@@ -6,10 +6,9 @@ import { validationResult, matchedData } from 'express-validator';
 
 import { ValidationError } from '../errors/validation-error';
 
-
-const loadLanguageFile = (lang:string) => {
+const loadLanguageFile = (lang: string) => {
   console.log(lang);
-  
+
   try {
     const filePath = path.join(__dirname, `../../../../../src/languages/${lang}.json`);
     const data = fs.readFileSync(filePath, 'utf8');
@@ -18,7 +17,7 @@ const loadLanguageFile = (lang:string) => {
     console.error(`Error loading language file for ${lang}:`, error);
     // Default to English if there's an error loading the requested language
     const defaultPath = path.join(__dirname, '../languages/en.json');
-    const data = fs.readFileSync(defaultPath, 'utf8');    
+    const data = fs.readFileSync(defaultPath, 'utf8');
     return JSON.parse(data);
   }
 };
@@ -28,9 +27,9 @@ export const globalValidatorMiddleware: RequestHandler = (req, res, next) => {
   if (!errors.isEmpty()) {
     const lang = (req as any).lang;
     const language = loadLanguageFile(lang);
-    const translatedErrors = errors.array().map(error => ({
+    const translatedErrors = errors.array().map((error) => ({
       ...error,
-      msg: language[error.msg] || error.msg
+      msg: language[error.msg] || error.msg,
     }));
     return next(new ValidationError(translatedErrors));
   }

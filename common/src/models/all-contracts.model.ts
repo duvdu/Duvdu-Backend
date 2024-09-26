@@ -10,19 +10,22 @@ export interface Icontract {
   contract: Types.ObjectId;
   ref: string;
   cycle: string;
-  coupons: Types.ObjectId []
+  coupons: Types.ObjectId[];
 }
 
 export const Contracts = model<Icontract>(
   MODELS.allContracts,
-  new Schema<Icontract>({
-    customer: { type: Schema.Types.ObjectId, ref: MODELS.user },
-    sp: { type: Schema.Types.ObjectId, ref: MODELS.user },
-    contract: { type: Schema.Types.ObjectId, refPath: 'ref' },
-    ref: String,
-    cycle: { type: String, default: null },
-    coupons:[{type:Schema.Types.ObjectId , ref:MODELS.coupon}]
-  } , {timestamps:true , collection:MODELS.allContracts}),
+  new Schema<Icontract>(
+    {
+      customer: { type: Schema.Types.ObjectId, ref: MODELS.user },
+      sp: { type: Schema.Types.ObjectId, ref: MODELS.user },
+      contract: { type: Schema.Types.ObjectId, refPath: 'ref' },
+      ref: String,
+      cycle: { type: String, default: null },
+      coupons: [{ type: Schema.Types.ObjectId, ref: MODELS.coupon }],
+    },
+    { timestamps: true, collection: MODELS.allContracts },
+  ),
 );
 
 export interface IcontractReport {
