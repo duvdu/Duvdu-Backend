@@ -7,4 +7,5 @@ export interface Ibookmark {
   user: Types.ObjectId | Iuser;
   title: string;
   image: string;
+  color: string;
 }

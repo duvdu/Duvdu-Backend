@@ -43,7 +43,7 @@ export const getBookmarkProjects: RequestHandler<
       $lookup: {
         from: 'allProjects',
         localField: 'project',
-        foreignField: '_id',
+        foreignField: 'project.type',
         as: 'project',
       },
     },

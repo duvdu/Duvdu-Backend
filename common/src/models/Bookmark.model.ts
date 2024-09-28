@@ -8,6 +8,7 @@ const bookmarksSchema = new Schema<Ibookmark>(
     user: { type: Schema.Types.ObjectId, ref: MODELS.user },
     title: String,
     image: String,
+    color: String,
   },
   { collection: MODELS.bookmark, timestamps: true },
 );

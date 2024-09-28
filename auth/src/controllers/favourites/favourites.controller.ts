@@ -34,7 +34,7 @@ export const getFavourites: RequestHandler<unknown, SuccessResponse<{ data: any 
       $lookup: {
         from: 'allProjects',
         localField: 'project',
-        foreignField: '_id',
+        foreignField: 'project.type',
         as: 'project',
       },
     },

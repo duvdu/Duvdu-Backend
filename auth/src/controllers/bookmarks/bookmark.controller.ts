@@ -1,16 +1,30 @@
 import { SuccessResponse, Bookmarks, BookmarkProjects, Bucket, NotFound } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
-import mongoose from 'mongoose';
+
+export const bookmarkColors = [
+  '#F7F2EB',
+  '#E6F8CC',
+  '#006ADD',
+  '#1AC469',
+  '#EF5FA4',
+  '#F26A43',
+  '#30A9E0',
+  '#FDFD00',
+  '#FED386',
+  '#C5C1EA',
+];
 
 export const createBookmark: RequestHandler<
   unknown,
   SuccessResponse<{ data: any }>,
-  { title: string; image?: string }
+  { title: string; image?: string; color?: string }
 > = async (req, res) => {
   const bucket = new Bucket();
   if (req.file) {
     await bucket.saveBucketFiles('bookmark', req.file);
     req.body.image = `bookmark/${req.file.filename}`;
+  } else {
+    req.body.color = bookmarkColors[Math.floor(Math.random() * bookmarkColors.length)];
   }
 
   try {
@@ -70,33 +84,14 @@ export const findBookmarks: RequestHandler<unknown, SuccessResponse<{ data: any 
   req,
   res,
 ) => {
-  const bookmarks = await Bookmarks.aggregate([
+  const bookmarks = await Bookmarks.find(
+    { user: req.loggedUser.id },
     {
-      $match: {
-        user: new mongoose.Types.ObjectId(req.loggedUser.id as string),
-      },
+      title: 1,
+      image: { $concat: [process.env.BUCKET_HOST, '/', '$image'] },
+      createdAt: 1,
+      updatedAt: 1,
     },
-    {
-      $lookup: {
-        from: 'bookmark_projects',
-        localField: '_id',
-        foreignField: 'bookmark',
-        as: 'bookmarkProjects',
-      },
-    },
-    {
-      $addFields: {
-        bookmarkProjects: { $slice: ['$bookmarkProjects', 3] },
-      },
-    },
-    {
-      $project: {
-        _id: 1,
-        title: 1,
-        image: { $concat: [process.env.BUCKET_HOST, '/', '$image'] },
-        bookmarkProjects: 1,
-      },
-    },
-  ]);
+  );
   res.json({ message: 'success', data: bookmarks });
 };
