@@ -90,6 +90,7 @@ export const findBookmarks: RequestHandler<unknown, SuccessResponse<{ data: any 
     {
       title: 1,
       image: { $concat: [process.env.BUCKET_HOST, '/', '$image'] },
+      color: 1,
       createdAt: 1,
       updatedAt: 1,
     },
