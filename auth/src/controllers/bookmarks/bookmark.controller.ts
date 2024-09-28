@@ -32,6 +32,7 @@ export const createBookmark: RequestHandler<
       user: req.loggedUser.id,
       title: req.body.title,
       image: req.body.image,
+      color: req.body.color,
     });
     res.status(201).json({ message: 'success', data: bookmark });
   } catch (error) {
