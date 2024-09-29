@@ -12,6 +12,8 @@ export const createOrUpdateSessionAndGenerateTokens = async (
 ): Promise<{ refreshToken: string; accessToken: string }> => {
   const deviceId = generateUniqueDeviceId(userAgent!);
   
+  console.log(role);
+  
   // Generate tokens
   const refreshToken = generateRefreshToken({ id: user.id.toString() });
   const accessToken = generateAccessToken({

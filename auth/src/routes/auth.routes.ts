@@ -89,7 +89,7 @@ router
 
 router
   .route('/reset-password')
-  .get(val.askResetPasswordVal, handlers.askForgetPasswordHandler)
+  .patch(val.askResetPasswordVal, handlers.askForgetPasswordHandler)
   .post(val.resetPasswordVal, handlers.updateForgetenPasswordHandler);
 
 router.post('/resend-code', val.resendCodeVal, handlers.resendVerificationCodeHandler);
