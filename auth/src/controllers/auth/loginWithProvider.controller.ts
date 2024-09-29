@@ -1,7 +1,6 @@
 import 'express-async-errors';
 import {
   BadRequestError,
-  Irole,
   Iuser,
   NotFound,
   Roles,
@@ -88,7 +87,7 @@ export const loginWithProviderHandler: RequestHandler<
 
   const userAgent = req.headers['user-agent'];
 
-  const {accessToken , refreshToken} = await createOrUpdateSessionAndGenerateTokens(userAgent! , user , user.role as Irole , req.body.notificationToken? req.body.notificationToken : null);
+  const {accessToken , refreshToken} = await createOrUpdateSessionAndGenerateTokens(userAgent! , user , role , req.body.notificationToken? req.body.notificationToken : null);
 
   req.session.access = accessToken;
   req.session.refresh = refreshToken;
