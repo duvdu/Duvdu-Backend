@@ -2,15 +2,30 @@ import { SuccessResponse, Bookmarks, BookmarkProjects, Bucket, NotFound } from '
 import { RequestHandler } from 'express';
 import mongoose from 'mongoose';
 
+export const bookmarkColors = [
+  '#F7F2EB',
+  '#E6F8CC',
+  '#006ADD',
+  '#1AC469',
+  '#EF5FA4',
+  '#F26A43',
+  '#30A9E0',
+  '#FDFD00',
+  '#FED386',
+  '#C5C1EA',
+];
+
 export const createBookmark: RequestHandler<
   unknown,
   SuccessResponse<{ data: any }>,
-  { title: string; image?: string }
+  { title: string; image?: string; color?: string }
 > = async (req, res) => {
   const bucket = new Bucket();
   if (req.file) {
     await bucket.saveBucketFiles('bookmark', req.file);
     req.body.image = `bookmark/${req.file.filename}`;
+  } else {
+    req.body.color = bookmarkColors[Math.floor(Math.random() * bookmarkColors.length)];
   }
 
   try {
@@ -18,6 +33,7 @@ export const createBookmark: RequestHandler<
       user: req.loggedUser.id,
       title: req.body.title,
       image: req.body.image,
+      color: req.body.color,
     });
     res.status(201).json({ message: 'success', data: bookmark });
   } catch (error) {
@@ -73,7 +89,7 @@ export const findBookmarks: RequestHandler<unknown, SuccessResponse<{ data: any 
   const bookmarks = await Bookmarks.aggregate([
     {
       $match: {
-        user: new mongoose.Types.ObjectId(req.loggedUser.id as string),
+        user: new mongoose.Types.ObjectId(req.loggedUser.id),
       },
     },
     {
@@ -86,15 +102,19 @@ export const findBookmarks: RequestHandler<unknown, SuccessResponse<{ data: any 
     },
     {
       $addFields: {
-        bookmarkProjects: { $slice: ['$bookmarkProjects', 3] },
+        bookmarkProjectCount: { $size: '$bookmarkProjects' },
       },
     },
     {
       $project: {
-        _id: 1,
         title: 1,
-        image: { $concat: [process.env.BUCKET_HOST, '/', '$image'] },
-        bookmarkProjects: 1,
+        image: {
+          $concat: [process.env.BUCKET_HOST, '/', '$image'],
+        },
+        color: 1,
+        createdAt: 1,
+        updatedAt: 1,
+        bookmarkProjectCount: 1,
       },
     },
   ]);

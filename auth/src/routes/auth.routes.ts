@@ -116,20 +116,6 @@ router
 router.get('/profile/projects', isauthenticated, handlers.getLoggedUserProjects);
 router.get('/profile/projects/:username', handlers.getUserProjectsByUsername);
 
-router.get(
-  '/profile/favourites',
-  isauthenticated,
-  val.getFavourites,
-  globalPaginationMiddleware,
-  handlers.getFavouriteProjects,
-);
-router.patch(
-  '/profile/favourites/:projectId',
-  isauthenticated,
-  val.favouritesAction,
-  handlers.updateFavouriteList,
-);
-
 router.route('/profile/:username').get(optionalAuthenticated, handlers.getUserProfileHandler);
 
 router.route('/verify').post(val.verify, handlers.verifyHandler);

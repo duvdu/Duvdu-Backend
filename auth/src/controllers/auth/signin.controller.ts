@@ -69,6 +69,7 @@ export const signinHandler: SigninHandler = async (req, res, next) => {
 
   const {accessToken , refreshToken} = await createOrUpdateSessionAndGenerateTokens(userAgent! , user , role , notificationToken?notificationToken:null);
   
+
   req.session.access = accessToken;
   req.session.refresh = refreshToken;
 

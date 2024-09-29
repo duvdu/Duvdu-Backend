@@ -43,7 +43,7 @@ export const getBookmarkProjects: RequestHandler<
       $lookup: {
         from: 'allProjects',
         localField: 'project',
-        foreignField: '_id',
+        foreignField: 'project.type',
         as: 'project',
       },
     },
@@ -134,11 +134,26 @@ export const getBookmarkProjects: RequestHandler<
     },
     {
       $project: {
-        ref: 1,
-        rate: 1,
+        _id: 1,
+        cycle: {
+          $cond: {
+            if: { $eq: ['$ref', 'portfolio-post'] },
+            then: 'project',
+            else: '$ref',
+          },
+        },
         createdAt: 1,
         updatedAt: 1,
-        details: 1,
+        details: {
+          _id: 1,
+          category: {
+            _id: 1,
+            title: 1,
+          },
+          name: 1,
+          description: 1,
+          cover: 1,
+        },
       },
     },
   ];
