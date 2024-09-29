@@ -1,5 +1,6 @@
 import { SuccessResponse, Bookmarks, BookmarkProjects, Bucket, NotFound } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
+import mongoose from 'mongoose';
 
 export const bookmarkColors = [
   '#F7F2EB',
@@ -85,15 +86,37 @@ export const findBookmarks: RequestHandler<unknown, SuccessResponse<{ data: any 
   req,
   res,
 ) => {
-  const bookmarks = await Bookmarks.find(
-    { user: req.loggedUser.id },
+  const bookmarks = await Bookmarks.aggregate([
     {
-      title: 1,
-      image: { $concat: [process.env.BUCKET_HOST, '/', '$image'] },
-      color: 1,
-      createdAt: 1,
-      updatedAt: 1,
+      $match: {
+        user: new mongoose.Types.ObjectId(req.loggedUser.id),
+      },
     },
-  );
+    {
+      $lookup: {
+        from: 'bookmark_projects',
+        localField: '_id',
+        foreignField: 'bookmark',
+        as: 'bookmarkProjects',
+      },
+    },
+    {
+      $addFields: {
+        bookmarkProjectCount: { $size: '$bookmarkProjects' },
+      },
+    },
+    {
+      $project: {
+        title: 1,
+        image: {
+          $concat: [process.env.BUCKET_HOST, '/', '$image'],
+        },
+        color: 1,
+        createdAt: 1,
+        updatedAt: 1,
+        bookmarkProjectCount: 1,
+      },
+    },
+  ]);
   res.json({ message: 'success', data: bookmarks });
 };
