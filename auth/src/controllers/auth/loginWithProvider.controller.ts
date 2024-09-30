@@ -61,6 +61,7 @@ export const loginWithProviderHandler: RequestHandler<
       username: req.body.username,
       isVerified: true,
       role: role._id,
+      email:req.body.email
     });
   } else {
     role = await Roles.findById(user.role);
