@@ -6,11 +6,15 @@ export const addToFavourite: RequestHandler<
   { projectId: string },
   SuccessResponse<{ data: any }>
 > = async (req, res, next) => {
-  const post = await Favourites.create({
-    project: req.params.projectId,
-    user: req.loggedUser.id,
-  });
-  res.json({ message: 'success', data: post });
+  try {
+    const post = await Favourites.create({
+      project: req.params.projectId,
+      user: req.loggedUser.id,
+    });
+    res.json({ message: 'success', data: post });
+  } catch (error) {
+    res.status(200).json({ message: 'cannot add this project' as any, data: {} });
+  }
 };
 
 export const removeFromFavourite: RequestHandler<

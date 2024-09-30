@@ -1,18 +1,21 @@
 import { SuccessResponse, Bookmarks, BookmarkProjects, Bucket, NotFound } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
-import mongoose, { PipelineStage } from 'mongoose';
+import mongoose, { MongooseError, PipelineStage } from 'mongoose';
 
 export const addToBookmark: RequestHandler<
   { bookmarkId: string; projectId: string },
   SuccessResponse<{ data: any }>
 > = async (req, res, next) => {
-  const project = await BookmarkProjects.create({
-    user: req.loggedUser.id,
-    bookmark: req.params.bookmarkId,
-    project: req.params.projectId,
-  });
-
-  res.status(200).json({ message: 'success', data: project });
+  try {
+    const project = await BookmarkProjects.create({
+      user: req.loggedUser.id,
+      bookmark: req.params.bookmarkId,
+      project: req.params.projectId,
+    });
+    res.status(200).json({ message: 'success', data: project });
+  } catch (error) {
+    res.status(200).json({ message: 'cannot add this project' as any, data: {} });
+  }
 };
 
 export const removeFromBookmark: RequestHandler<
@@ -93,6 +96,15 @@ export const getBookmarkProjects: RequestHandler<
     },
     {
       $lookup: {
+        from: 'users',
+        localField: 'details.user',
+        foreignField: '_id',
+        as: 'details.user',
+      },
+    },
+    { $unwind: { path: '$details.user', preserveNullAndEmptyArrays: true } },
+    {
+      $lookup: {
         from: 'categories',
         localField: 'details.category',
         foreignField: '_id',
@@ -133,6 +145,17 @@ export const getBookmarkProjects: RequestHandler<
       },
     },
     {
+      $lookup: {
+        from: 'favourites',
+        localField: '_id',
+        foreignField: 'project',
+        as: 'favourite',
+      },
+    },
+    {
+      $unwind: { path: '$favourite', preserveNullAndEmptyArrays: true },
+    },
+    {
       $project: {
         _id: 1,
         cycle: {
@@ -144,18 +167,39 @@ export const getBookmarkProjects: RequestHandler<
         },
         createdAt: 1,
         updatedAt: 1,
-        details: {
-          _id: 1,
-          category: {
-            _id: 1,
-            title: 1,
+        details: 1,
+        isFavourite: {
+          $cond: {
+            if: {
+              $eq: ['$favourite.user', new mongoose.Types.ObjectId(req.loggedUser.id as string)],
+            },
+            then: true,
+            else: false,
           },
-          name: 1,
-          description: 1,
-          cover: 1,
         },
       },
     },
+    {
+      $set: {
+        user: {
+          _id: '$details.user._id',
+          name: '$details.user.name',
+          username: '$details.user.username',
+          profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$details.user.profileImage'] },
+        },
+      },
+    },
+    {
+      $project: {
+        'details.user': 0,
+      },
+    },
+    {
+      $addFields: {
+        'details.user': '$user',
+      },
+    },
+    { $unset: ['user'] },
   ];
   const projects = await BookmarkProjects.aggregate(pipelines);
   res.status(200).json({ message: 'success', data: projects });
