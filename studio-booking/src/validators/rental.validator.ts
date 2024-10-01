@@ -4,8 +4,16 @@ import mongoose from 'mongoose';
 
 export const create = [
   body('category').isMongoId(),
-  body('subCategory').isMongoId(),
-  body('tags').isArray(),
+  body('subCategory').optional().isMongoId(),
+  body('tags')
+    .optional()
+    .isArray()
+    .custom((val, { req }) => {
+      if (val?.length > 0) {
+        if (!req.body.subCategory) throw new Error('subCategory is required');
+      }
+      return true;
+    }),
   body('tags.*').isMongoId(),
   body('title').isString().bail().trim().isLength({ min: 5 }),
   body('phoneNumber').isMobilePhone(['ar-EG']),
