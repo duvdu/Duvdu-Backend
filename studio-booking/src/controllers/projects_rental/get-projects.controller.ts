@@ -3,10 +3,8 @@ import { RequestHandler } from 'express';
 import mongoose, { PipelineStage } from 'mongoose';
 
 export const getProjectsHandler: RequestHandler = async (req, res) => {
-
   let isInstant = undefined;
-  if (req.pagination.filter.instant != undefined) 
-    isInstant = req.pagination.filter.instant;
+  if (req.pagination.filter.instant != undefined) isInstant = req.pagination.filter.instant;
   delete req.pagination.filter.instant;
 
   const pipelines: PipelineStage[] = [
@@ -71,7 +69,7 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
     },
     { $unwind: '$userDetails' },
   ];
-  
+
   // Conditionally add the $match stage for isAvaliableToInstantProjects
   if (isInstant !== undefined) {
     pipelines.push({
@@ -80,7 +78,7 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
       },
     });
   }
-  
+
   pipelines.push(
     {
       $set: {
@@ -116,9 +114,8 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
     },
     {
       $unset: ['userDetails', 'categoryDetails'],
-    }
+    },
   );
-  
 
   const projects = await Rentals.aggregate([
     {
@@ -135,6 +132,33 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
       $limit: req.pagination.limit,
     },
     ...pipelines,
+    {
+      $lookup: {
+        from: 'favourites',
+        localField: '_id',
+        foreignField: 'project',
+        as: 'favourite',
+      },
+    },
+    {
+      $unwind: { path: '$favourite', preserveNullAndEmptyArrays: true },
+    },
+    {
+      $addFields: {
+        isFavourite: {
+          $cond: {
+            if: {
+              $eq: [
+                '$favourite.user',
+                req.loggedUser?.id ? new mongoose.Types.ObjectId(req.loggedUser.id as string) : '0',
+              ],
+            },
+            then: true,
+            else: false,
+          },
+        },
+      },
+    },
   ]);
 
   const count = await Rentals.aggregate([
@@ -149,15 +173,15 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
 
   const resultCount = count.length;
 
-  if (req.loggedUser?.id) {
-    const user = await Users.findById(req.loggedUser.id, { favourites: 1 });
+  // if (req.loggedUser?.id) {
+  //   const user = await Users.findById(req.loggedUser.id, { favourites: 1 });
 
-    projects.forEach((project) => {
-      project.isFavourite = user?.favourites.some(
-        (el: any) => el.project.toString() === project._id.toString(),
-      );
-    });
-  }
+  //   projects.forEach((project) => {
+  //     project.isFavourite = user?.favourites.some(
+  //       (el: any) => el.project.toString() === project._id.toString(),
+  //     );
+  //   });
+  // }
 
   res.status(200).json({
     message: 'success',
@@ -187,7 +211,7 @@ export const getProjectsPagination: RequestHandler<
     endDate?: Date;
     tags?: string;
     subCategory?: string[];
-    instant?:boolean;
+    instant?: boolean;
   }
 > = async (req, res, next) => {
   req.pagination.filter = {};
@@ -230,31 +254,29 @@ export const getProjectsPagination: RequestHandler<
   if (req.query.category) req.pagination.filter.category = { $in: req.query.category };
 
   if (req.query.subCategory) {
-    const subCategoryIds = req.query.subCategory.map(id => new mongoose.Types.ObjectId(id));  
+    const subCategoryIds = req.query.subCategory.map((id) => new mongoose.Types.ObjectId(id));
     // Step 1: Retrieve the subcategory titles from the Category model
     const subCategories = await Categories.aggregate([
       { $unwind: '$subCategories' },
       { $match: { 'subCategories._id': { $in: subCategoryIds } } },
-      { 
-        $project: { 
-          _id: 0, 
+      {
+        $project: {
+          _id: 0,
           'title.ar': '$subCategories.title.ar',
-          'title.en': '$subCategories.title.en'
-        }
-      }
+          'title.en': '$subCategories.title.en',
+        },
+      },
     ]);
-  
+
     // Construct the filter for the subCategory titles in both Arabic and English
-    const arabicTitles = subCategories.map(subCat => subCat.title.ar);
-    const englishTitles = subCategories.map(subCat => subCat.title.en);
-  
+    const arabicTitles = subCategories.map((subCat) => subCat.title.ar);
+    const englishTitles = subCategories.map((subCat) => subCat.title.en);
+
     // Ensure that at least one of the title arrays has content
     req.pagination.filter['$or'] = [
       { 'subCategory.ar': { $in: arabicTitles } },
-      { 'subCategory.en': { $in: englishTitles } }
+      { 'subCategory.en': { $in: englishTitles } },
     ];
-    
-  
   }
 
   if (req.query.tags) {

@@ -21,21 +21,22 @@ export const getProjectsPagination: RequestHandler<
     endDate?: Date;
     projectScaleMin?: number;
     projectScaleMax?: number;
-    instant?:boolean;
-    duration?:number;
+    instant?: boolean;
+    duration?: number;
   }
 > = async (req, res, next) => {
-  if (req.query.duration) req.pagination.filter.duration ={$eq: req.query.duration};
+  if (req.query.duration) req.pagination.filter.duration = { $eq: req.query.duration };
   if (req.query.instant != undefined) req.pagination.filter.instant = req.query.instant;
   if (req.query.search) {
-    req.pagination.filter = {$or: [
-      { name: { $regex: req.query.search, $options: 'i' } },
-      { description: { $regex: req.query.search, $options: 'i' } },
-      { 'tools.name': { $regex: req.query.search, $options: 'i' } },
-      { 'functions.name': { $regex: req.query.search, $options: 'i' } },
-      { address: { $regex: req.query.search, $options: 'i' } },
-    ]};
-    
+    req.pagination.filter = {
+      $or: [
+        { name: { $regex: req.query.search, $options: 'i' } },
+        { description: { $regex: req.query.search, $options: 'i' } },
+        { 'tools.name': { $regex: req.query.search, $options: 'i' } },
+        { 'functions.name': { $regex: req.query.search, $options: 'i' } },
+        { address: { $regex: req.query.search, $options: 'i' } },
+      ],
+    };
   }
 
   if (req.query.location) {
@@ -48,36 +49,33 @@ export const getProjectsPagination: RequestHandler<
   }
 
   if (req.query.subCategory) {
-    const subCategoryIds = req.query.subCategory.map(id => new mongoose.Types.ObjectId(id));  
+    const subCategoryIds = req.query.subCategory.map((id) => new mongoose.Types.ObjectId(id));
     // Step 1: Retrieve the subcategory titles from the Category model
     const subCategories = await Categories.aggregate([
       { $unwind: '$subCategories' },
       { $match: { 'subCategories._id': { $in: subCategoryIds } } },
-      { 
-        $project: { 
-          _id: 0, 
+      {
+        $project: {
+          _id: 0,
           'title.ar': '$subCategories.title.ar',
-          'title.en': '$subCategories.title.en'
-        }
-      }
+          'title.en': '$subCategories.title.en',
+        },
+      },
     ]);
-  
+
     // Construct the filter for the subCategory titles in both Arabic and English
-    const arabicTitles = subCategories.map(subCat => subCat.title.ar);
-    const englishTitles = subCategories.map(subCat => subCat.title.en);
-  
+    const arabicTitles = subCategories.map((subCat) => subCat.title.ar);
+    const englishTitles = subCategories.map((subCat) => subCat.title.en);
+
     req.pagination.filter['$or'] = [
       { 'subCategory.ar': { $in: arabicTitles } },
-      { 'subCategory.en': { $in: englishTitles } }
+      { 'subCategory.en': { $in: englishTitles } },
     ];
-    
-  
   }
-
 
   if (req.query.tags) {
     req.pagination.filter['tags'] = {
-      $elemMatch: { _id: { $in: req.query.tags.map(el => new mongoose.Types.ObjectId(el)) } }
+      $elemMatch: { _id: { $in: req.query.tags.map((el) => new mongoose.Types.ObjectId(el)) } },
     };
   }
 
@@ -109,14 +107,9 @@ export const getProjectsPagination: RequestHandler<
 };
 
 export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
-
-
   let isInstant = undefined;
-  if (req.pagination.filter.instant != undefined) 
-    isInstant = req.pagination.filter.instant;
+  if (req.pagination.filter.instant != undefined) isInstant = req.pagination.filter.instant;
   delete req.pagination.filter.instant;
-
-  
 
   const countPipeline = [
     {
@@ -134,19 +127,22 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
       },
     },
     { $unwind: '$user' },
-    ...(isInstant !== undefined ? [{
-      $match: {
-        'user.isAvaliableToInstantProjects': isInstant,
-      },
-    }] : []),
+    ...(isInstant !== undefined
+      ? [
+          {
+            $match: {
+              'user.isAvaliableToInstantProjects': isInstant,
+            },
+          },
+        ]
+      : []),
     {
-      $count: 'totalCount'
-    }
+      $count: 'totalCount',
+    },
   ];
-  
+
   const countResult = await ProjectCycle.aggregate(countPipeline);
   const resultCount = countResult.length > 0 ? countResult[0].totalCount : 0;
-
 
   const pipeline: PipelineStage[] = [
     {
@@ -168,14 +164,15 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
     },
     { $unwind: '$user' },
   ];
-  
-  if (isInstant !== undefined) {    pipeline.push({
-    $match: {
-      'user.isAvaliableToInstantProjects': isInstant,
-    },
-  });
+
+  if (isInstant !== undefined) {
+    pipeline.push({
+      $match: {
+        'user.isAvaliableToInstantProjects': isInstant,
+      },
+    });
   }
-  
+
   pipeline.push(
     {
       $lookup: {
@@ -193,6 +190,22 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
         foreignField: '_id',
         as: 'creatives',
       },
+    },
+    {
+      $lookup: {
+        from: 'favourites',
+        localField: '_id',
+        foreignField: 'project',
+        as: 'favourite',
+      },
+    },
+    {
+      $addFields: {
+        favouriteCount: { $size: '$favourite' },
+      },
+    },
+    {
+      $unwind: { path: '$favourite', preserveNullAndEmptyArrays: true },
     },
     // Project final fields
     {
@@ -286,21 +299,25 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
         rate: 1,
         updatedAt: 1,
         createdAt: 1,
+        isFavourite: {
+          $cond: {
+            if: {
+              $eq: [
+                '$favourite.user',
+                req.loggedUser?.id ? new mongoose.Types.ObjectId(req.loggedUser.id as string) : '0',
+              ],
+            },
+            then: true,
+            else: false,
+          },
+        },
+        favouriteCount: 1,
       },
-    }
+    },
   );
-  
+
   // Execute the aggregation pipeline
   const projects = await ProjectCycle.aggregate(pipeline);
-  
-  if (req.loggedUser?.id) {
-    const user = await Users.findById(req.loggedUser.id, { favourites: 1 });
-    projects.forEach((project) => {
-      project.isFavourite = user?.favourites.some(
-        (el: any) => el.project.toString() === project._id.toString(),
-      );
-    });
-  }
 
   res.status(200).json({
     message: 'success',

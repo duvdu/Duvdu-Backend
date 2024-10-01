@@ -1,6 +1,13 @@
 import 'express-async-errors';
 
-import { Contracts, incrementProjectsView, MODELS, NotFound, ProjectCycle, Users } from '@duvdu-v1/duvdu';
+import {
+  Contracts,
+  incrementProjectsView,
+  MODELS,
+  NotFound,
+  ProjectCycle,
+  Users,
+} from '@duvdu-v1/duvdu';
 import mongoose from 'mongoose';
 
 import { GetProjectHandler } from '../../types/project.endoints';
@@ -9,7 +16,10 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
   try {
     const projects = await ProjectCycle.aggregate([
       {
-        $match: { _id: new mongoose.Types.ObjectId(req.params.projectId), isDeleted: { $ne: true } },
+        $match: {
+          _id: new mongoose.Types.ObjectId(req.params.projectId),
+          isDeleted: { $ne: true },
+        },
       },
       {
         $lookup: {
@@ -42,10 +52,26 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
         },
       },
       {
+        $lookup: {
+          from: 'favourites',
+          localField: '_id',
+          foreignField: 'project',
+          as: 'favourite',
+        },
+      },
+      {
+        $addFields: {
+          favouriteCount: { $size: '$favourite' },
+        },
+      },
+      {
+        $unwind: { path: '$favourite', preserveNullAndEmptyArrays: true },
+      },
+      {
         $project: {
           _id: 1,
           user: {
-            _id:'$user._id',
+            _id: '$user._id',
             profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$user.profileImage'] },
             coverImage: { $concat: [process.env.BUCKET_HOST, '/', '$user.coverImage'] },
             category: {
@@ -65,8 +91,8 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
             pricePerHour: '$user.pricePerHour',
             hasVerificationBadge: '$user.hasVerificationBadge',
             likes: '$user.likes',
-            followCount:'$user.followCount',
-            address:'$user.address',
+            followCount: '$user.followCount',
+            address: '$user.address',
           },
           category: {
             title: '$category.title.' + req.lang,
@@ -106,8 +132,10 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
               input: { $ifNull: ['$creatives', []] },
               as: 'creative',
               in: {
-                _id:'$$creative._id',
-                profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$$creative.profileImage'] },
+                _id: '$$creative._id',
+                profileImage: {
+                  $concat: [process.env.BUCKET_HOST, '/', '$$creative.profileImage'],
+                },
                 isOnline: '$$creative.isOnline',
                 username: '$$creative.username',
                 name: '$$creative.name',
@@ -122,8 +150,8 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
                 pricePerHour: '$$creative.pricePerHour',
                 hasVerificationBadge: '$$creative.hasVerificationBadge',
                 likes: '$$creative.likes',
-                followCount:'$$creative.followCount',
-                address:'$$creative.address',
+                followCount: '$$creative.followCount',
+                address: '$$creative.address',
               },
             },
           },
@@ -133,9 +161,24 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
           duration: 1,
           showOnHome: 1,
           projectScale: 1,
+          isFavourite: {
+            $cond: {
+              if: {
+                $eq: [
+                  '$favourite.user',
+                  req.loggedUser?.id
+                    ? new mongoose.Types.ObjectId(req.loggedUser.id as string)
+                    : '0',
+                ],
+              },
+              then: true,
+              else: false,
+            },
+          },
           rate: 1,
-          updatedAt:1,
-          createdAt:1
+          favouriteCount: 1,
+          updatedAt: 1,
+          createdAt: 1,
         },
       },
     ]);
@@ -143,16 +186,19 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
     if (!projects[0])
       return next(new NotFound({ en: 'project not found', ar: 'المشروع غير موجود' }, req.lang));
 
-    if (req.loggedUser?.id) {
-      const user = await Users.findById(req.loggedUser.id, { favourites: 1 });
+    // if (req.loggedUser?.id) {
+    //   const user = await Users.findById(req.loggedUser.id, { favourites: 1 });
 
-      projects[0].isFavourite = user?.favourites.some(
-        (el: any) => el.project.toString() === projects[0]._id.toString(),
-      );
-    }
-    await incrementProjectsView(projects[0].user._id  , MODELS.portfolioPost, projects[0]._id , req.lang);
-
-
+    //   projects[0].isFavourite = user?.favourites.some(
+    //     (el: any) => el.project.toString() === projects[0]._id.toString(),
+    //   );
+    // }
+    await incrementProjectsView(
+      projects[0].user._id,
+      MODELS.portfolioPost,
+      projects[0]._id,
+      req.lang,
+    );
 
     const canChat = !!(await Contracts.findOne({
       $or: [
