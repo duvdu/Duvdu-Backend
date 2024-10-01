@@ -141,6 +141,11 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
       },
     },
     {
+      $addFields: {
+        favouriteCount: { $size: '$favourite' },
+      },
+    },
+    {
       $unwind: { path: '$favourite', preserveNullAndEmptyArrays: true },
     },
     {
@@ -159,6 +164,11 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
         },
       },
     },
+    {
+      $project: {
+        favourite: 0,
+      },
+    },
   ]);
 
   const count = await Rentals.aggregate([
@@ -169,6 +179,23 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
       },
     },
     ...pipelines,
+
+    {
+      $addFields: {
+        isFavourite: {
+          $cond: {
+            if: {
+              $eq: [
+                '$favourite.user',
+                req.loggedUser?.id ? new mongoose.Types.ObjectId(req.loggedUser.id as string) : '0',
+              ],
+            },
+            then: true,
+            else: false,
+          },
+        },
+      },
+    },
   ]);
 
   const resultCount = count.length;

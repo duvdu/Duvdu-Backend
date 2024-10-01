@@ -7,7 +7,7 @@ import {
   Contracts,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
-import { Types } from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 
 export const getProjectHandler: RequestHandler = async (req, res, next) => {
   const pipelines = [
@@ -92,8 +92,8 @@ export const getProjectHandler: RequestHandler = async (req, res, next) => {
           pricePerHour: '$userDetails.pricePerHour',
           hasVerificationBadge: '$userDetails.hasVerificationBadge',
           likes: '$userDetails.likes',
-          followCount:'$userDetails.followCount',
-          address:'$userDetails.address',
+          followCount: '$userDetails.followCount',
+          address: '$userDetails.address',
         },
         attachments: {
           $map: {
@@ -112,6 +112,43 @@ export const getProjectHandler: RequestHandler = async (req, res, next) => {
     {
       $unset: ['userDetails', 'categoryDetails'],
     },
+    {
+      $lookup: {
+        from: 'favourites',
+        localField: '_id',
+        foreignField: 'project',
+        as: 'favourite',
+      },
+    },
+    {
+      $addFields: {
+        favouriteCount: { $size: '$favourite' },
+      },
+    },
+    {
+      $unwind: { path: '$favourite', preserveNullAndEmptyArrays: true },
+    },
+    {
+      $addFields: {
+        isFavourite: {
+          $cond: {
+            if: {
+              $eq: [
+                '$favourite.user',
+                req.loggedUser?.id ? new mongoose.Types.ObjectId(req.loggedUser.id as string) : '0',
+              ],
+            },
+            then: true,
+            else: false,
+          },
+        },
+      },
+    },
+    {
+      $project: {
+        favourite: 0,
+      },
+    },
   ];
 
   const project = (
@@ -128,14 +165,7 @@ export const getProjectHandler: RequestHandler = async (req, res, next) => {
 
   if (!project) return next(new NotFound(undefined, req.lang));
 
-  if (req.loggedUser?.id) {
-    const user = await Users.findById(req.loggedUser.id, { favourites: 1 });
-
-    project.isFavourite = user?.favourites.some(
-      (el: any) => el.project.toString() === project._id.toString(),
-    );
-  }
-  await incrementProjectsView(project.user._id , 'rentals', project._id , req.lang);
+  await incrementProjectsView(project.user._id, 'rentals', project._id, req.lang);
   const canChat = !!(await Contracts.findOne({
     $or: [
       { sp: req.loggedUser?.id, customer: project.customer },
