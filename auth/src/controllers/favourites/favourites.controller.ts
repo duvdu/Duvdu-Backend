@@ -88,6 +88,15 @@ export const getFavourites: RequestHandler<unknown, SuccessResponse<{ data: any 
     },
     {
       $lookup: {
+        from: 'users',
+        localField: 'details.user',
+        foreignField: '_id',
+        as: 'details.user',
+      },
+    },
+    { $unwind: { path: '$details.user', preserveNullAndEmptyArrays: true } },
+    {
+      $lookup: {
         from: 'categories',
         localField: 'details.category',
         foreignField: '_id',
@@ -129,13 +138,40 @@ export const getFavourites: RequestHandler<unknown, SuccessResponse<{ data: any 
     },
     {
       $project: {
-        ref: 1,
+        cycle: {
+          $cond: {
+            if: { $eq: ['$ref', 'portfolio-post'] },
+            then: 'project',
+            else: '$ref',
+          },
+        },
         rate: 1,
         createdAt: 1,
         updatedAt: 1,
         details: 1,
       },
     },
+    {
+      $set: {
+        user: {
+          _id: '$details.user._id',
+          name: '$details.user.name',
+          username: '$details.user.username',
+          profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$details.user.profileImage'] },
+        },
+      },
+    },
+    {
+      $project: {
+        'details.user': 0,
+      },
+    },
+    {
+      $addFields: {
+        'details.user': '$user',
+      },
+    },
+    { $unset: ['user'] },
   ];
   const posts = await Favourites.aggregate(pipelines);
   res.json({ message: 'success', data: posts });
