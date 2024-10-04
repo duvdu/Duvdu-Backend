@@ -15,11 +15,15 @@ interface Ititle {
 
 export async function filterTagsForCategory(
   categoryId: string,
-  subcategoryId: string,
-  tagIds: string[],
+  subcategoryId: string | undefined,
+  tagIds: string[] | undefined,
   cycle: string,
   lang: string,
-): Promise<{ subCategoryTitle: Ititle; filteredTags: Itag[]; media: string | undefined }> {
+): Promise<{
+  subCategoryTitle: Ititle | undefined;
+  filteredTags: Itag[];
+  media: string | undefined;
+}> {
   const category = await Categories.findOne({ _id: categoryId });
   if (!category) throw new NotFound({ en: 'Category not found', ar: 'الفئة غير موجودة' }, lang);
   if (category.cycle !== cycle)
@@ -35,6 +39,13 @@ export async function filterTagsForCategory(
         lang,
       );
   }
+
+  if (!subcategoryId)
+    return {
+      subCategoryTitle: undefined,
+      filteredTags: [],
+      media: category.media ? category.media : undefined,
+    };
 
   const subcategoryFound = category.subCategories?.find(
     (subCategory: any) => subCategory._id.toString() === subcategoryId,
@@ -52,15 +63,16 @@ export async function filterTagsForCategory(
     );
   }
 
-  const filteredTags = subcategoryFound.tags.filter((tag: any) =>
-    tagIds.includes(tag._id.toString()),
-  );
-  if (filteredTags.length !== tagIds.length)
-    throw new BadRequestError({ en: 'Invalid tags', ar: 'العلامات غير صالحة' }, lang);
+  let filteredTags;
+  if (tagIds) {
+    filteredTags = subcategoryFound.tags.filter((tag: any) => tagIds.includes(tag._id.toString()));
+    if (filteredTags.length !== tagIds.length)
+      throw new BadRequestError({ en: 'Invalid tags', ar: 'العلامات غير صالحة' }, lang);
+  }
 
   return {
     subCategoryTitle: subcategoryFound.title,
-    filteredTags,
+    filteredTags: filteredTags || [],
     media: category.media ? category.media : undefined,
   };
 }

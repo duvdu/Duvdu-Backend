@@ -30,7 +30,7 @@ export const createProjectHandler: RequestHandler = async (req, res) => {
   Files.removeFiles(...req.body.attachments, req.body.cover);
 
   const project = await Rentals.create({ ...req.body, user: req.loggedUser.id });
-  
+
   await Project.create({
     project: { type: project.id, ref: 'rentals' },
     user: req.loggedUser.id,

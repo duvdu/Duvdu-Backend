@@ -8,7 +8,7 @@ import {
   optionalAuthenticated,
   PERMISSIONS,
 } from '@duvdu-v1/duvdu';
-import { Router } from 'express';
+import { RequestHandler, Router } from 'express';
 
 import { contractAction } from '../controllers/booking/contract-action.controller';
 import { createContractHandler } from '../controllers/booking/create-contract.controller';
@@ -35,14 +35,32 @@ router
     optionalAuthenticated,
     val.getAll,
     globalPaginationMiddleware,
-    handlers.getProjectsPagination,
+    handlers.getProjectsPagination as unknown as RequestHandler,
     handlers.getProjectsHandler,
   );
 
-router.get('/analysis', isauthenticated , isauthorized(PERMISSIONS.getRentalAnalysisHandler), handlers.getProjectAnalysis);
-router.get('/crm' , isauthenticated , isauthorized(PERMISSIONS.getCrmRentalProject) , val.getAll , globalPaginationMiddleware , handlers.getProjectsPagination , handlers.getProjectsCrmHandler);
-router.get('/crm/:projectId' , isauthenticated , isauthorized(PERMISSIONS.getCrmRentalProject), val.getOne , handlers.getProjectCrmHandler);
-
+router.get(
+  '/analysis',
+  isauthenticated,
+  isauthorized((PERMISSIONS as any).getRentalAnalysisHandler),
+  handlers.getProjectAnalysis,
+);
+router.get(
+  '/crm',
+  isauthenticated,
+  isauthorized((PERMISSIONS as any).getCrmRentalProject),
+  val.getAll,
+  globalPaginationMiddleware,
+  handlers.getProjectsPagination as unknown as RequestHandler,
+  handlers.getProjectsCrmHandler,
+);
+router.get(
+  '/crm/:projectId',
+  isauthenticated,
+  isauthorized((PERMISSIONS as any).getCrmRentalProject),
+  val.getOne,
+  handlers.getProjectCrmHandler,
+);
 
 router
   .route('/:projectId')
