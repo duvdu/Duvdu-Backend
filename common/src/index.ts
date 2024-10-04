@@ -49,7 +49,7 @@ export * from './types/cycles';
 export * from './types/booking-states';
 export * from './types/socket-channel';
 
-export * from './models/Bookmark.model';
+export * from './models/producerPlatform.model';
 export * from './models/Plan.model';
 export * from './models/Role.model';
 export * from './models/Term.model';

@@ -13,10 +13,12 @@ export const appendProducerVal = [
     }),
   body('searchKeywords').isArray({ min: 1 }).withMessage('searchKeywordsArray'),
   body('searchKeywords.*').isString().exists().withMessage('searchKeywordsString'),
-  body('subcategory').isArray({ min: 1 }).withMessage('subcategoryArray'),
-  body('subcategory.*.subcategory').isMongoId().withMessage('subcategoryMongoId'),
-  body('subcategory.*.tags').isArray({ min: 1 }).withMessage('tagsArray'),
+  body('subcategory').optional().isArray({ min: 1 }).withMessage('subcategoryArray'),
+  body('subcategory.*.subcategory').optional().isMongoId().withMessage('subcategoryMongoId'),
+  body('subcategory.*.tags').optional().isArray({ min: 1 }).withMessage('tagsArray'),
   body('subcategory.*.tags.*').isMongoId().withMessage('tagsMongoId'),
+  body('platforms').isArray({ min: 1 }),
+  body('platforms.*').isMongoId(),
   globalValidatorMiddleware,
 ];
 
@@ -28,6 +30,8 @@ export const updateProducerVal = [
       if (req.body.subcategory) return true;
       throw new Error('categoryOptional');
     }),
+  body('platforms').optional().isArray({ min: 1 }),
+  body('platforms.*').isMongoId(),
   body('maxBudget')
     .optional()
     .isInt()
@@ -58,10 +62,12 @@ export const updateProducerVal = [
 ];
 
 export const getProducersVal = [
+  query('platforms').optional().isArray({ min: 1 }),
+  query('platforms.*').isMongoId(),
   query('search').optional().isString().withMessage('searchKeywordsOptionalString'),
   query('category').optional().isMongoId().withMessage('categoryOptionalMongoId'),
-  query('maxBudget').optional().isInt({gt:0}).toInt().withMessage('maxBudgetOptionalNumeric'),
-  query('minBudget').optional().isInt({gt:0}).toInt().withMessage('minBudgetOptionalNumeric'),
+  query('maxBudget').optional().isInt({ gt: 0 }).toInt().withMessage('maxBudgetOptionalNumeric'),
+  query('minBudget').optional().isInt({ gt: 0 }).toInt().withMessage('minBudgetOptionalNumeric'),
   query('tags')
     .optional()
     .customSanitizer((val) => (typeof val === 'string' ? val.split(',') : val))
@@ -91,7 +97,6 @@ export const getProducerVal = [
   param('producerId').isMongoId().withMessage('producerIdMongoId'),
   globalValidatorMiddleware,
 ];
-
 
 export const getProducerAnalysis = [
   query('startDate').optional().isISO8601().toDate().withMessage('startDate'),

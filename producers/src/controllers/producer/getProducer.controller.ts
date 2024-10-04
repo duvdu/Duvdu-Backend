@@ -33,37 +33,74 @@ export const getProducerHandler: GetProducerHandler = async (req, res, next) => 
       $unwind: '$categoryData',
     },
     {
+      $lookup: {
+        from: MODELS.producerPlatforms,
+        localField: 'platforms',
+        foreignField: '_id',
+        as: 'platforms',
+      },
+    },
+    {
       $project: {
         _id: 1,
         subCategories: {
-          $map: {
-            input: '$subCategories',
-            as: 'subCat',
-            in: {
-              title: {
-                $cond: {
-                  if: { $eq: ['ar', req.lang] },
-                  then: '$$subCat.title.ar',
-                  else: '$$subCat.title.en',
-                },
-              },
-              tags: {
-                $map: {
-                  input: '$$subCat.tags',
-                  as: 'tag',
-                  in: {
-                    title: {
-                      $cond: {
-                        if: { $eq: ['ar', req.lang] },
-                        then: '$$tag.ar',
-                        else: '$$tag.en',
-                      },
+          $cond: {
+            if: { $isArray: '$subCategories' },
+            then: {
+              $map: {
+                input: '$subCategories',
+                as: 'subCat',
+                in: {
+                  title: {
+                    $cond: {
+                      if: { $eq: ['ar', req.lang] },
+                      then: '$$subCat.title.ar',
+                      else: '$$subCat.title.en',
                     },
-                    _id: '$$tag._id',
                   },
+                  tags: {
+                    $cond: {
+                      if: { $isArray: '$$subCat.tags' },
+                      then: {
+                        $map: {
+                          input: '$$subCat.tags',
+                          as: 'tag',
+                          in: {
+                            title: {
+                              $cond: {
+                                if: { $eq: ['ar', req.lang] },
+                                then: '$$tag.ar',
+                                else: '$$tag.en',
+                              },
+                            },
+                            _id: '$$tag._id',
+                          },
+                        },
+                      },
+                      else: [],
+                    },
+                  },
+                  _id: '$$subCat._id',
                 },
               },
-              _id: '$$subCat._id',
+            },
+            else: [],
+          },
+        },
+        platforms: {
+          $map: {
+            input: '$platforms',
+            as: 'platform',
+            in: {
+              _id: '$$platform._id',
+              name: {
+                $cond: {
+                  if: { $eq: [req.lang, 'ar'] },
+                  then: '$$platform.name.ar',
+                  else: '$$platform.name.en',
+                },
+              },
+              image: { $concat: [process.env.BUCKET_HOST, '/', '$$platform.image'] },
             },
           },
         },

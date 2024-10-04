@@ -1,5 +1,6 @@
 import { model, Schema, Types } from 'mongoose';
 
+import { IProducerPlatform } from './producerPlatform.model';
 import { Icategory } from '../types/Category';
 import { MODELS } from '../types/model-names';
 import { Iuser } from '../types/User';
@@ -11,6 +12,7 @@ export interface Iproducer {
   maxBudget: number;
   minBudget: number;
   searchKeywords: string[];
+  platforms: Types.ObjectId [] | IProducerPlatform[]
 }
 
 export const Producer = model<Iproducer>(
@@ -34,6 +36,7 @@ export const Producer = model<Iproducer>(
       minBudget: { type: Number, default: null },
       maxBudget: { type: Number, default: null },
       searchKeywords: [String],
+      platforms:[{type:Schema.Types.ObjectId , ref:MODELS.producerPlatforms}]
     },
     { timestamps: true, collection: MODELS.producer },
   ),
