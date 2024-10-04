@@ -80,6 +80,11 @@ export enum PERMISSIONS {
 
   // dashboard
   accessDashboard = 'access dashboard',
+
+  // producer platform
+  createPlatform = 'create producer platform',
+  updatePlatform = 'update producer platform',
+  getPlatform = 'get producer platform',
 }
 
 export const permissions = {
