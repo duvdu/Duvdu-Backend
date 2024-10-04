@@ -64,7 +64,7 @@ export const createContractHandler: CreateContractHandler = async (req, res, nex
     const contract = await ProducerContract.create({
       ...req.body,
       user: req.loggedUser.id,
-      sp:producer.user
+      sp: producer.user,
     });
 
     await sendNotification(

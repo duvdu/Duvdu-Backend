@@ -2,8 +2,6 @@ import { MODELS, Producer, ProducerContract, SuccessResponse } from '@duvdu-v1/d
 import { RequestHandler } from 'express';
 import { PipelineStage } from 'mongoose';
 
-
-
 // Define the request handler for getting producer analysis
 export const getProducerAnalysis: RequestHandler<
   unknown,
@@ -47,26 +45,25 @@ export const getProducerAnalysis: RequestHandler<
                 $map: {
                   input: '$$subCategory.tags',
                   as: 'tag',
-                  in: `$$tag.${req.lang}`
-                }
-              }
-            }
-          }
+                  in: `$$tag.${req.lang}`,
+                },
+              },
+            },
+          },
         },
         'categoryDetails.jobTitles': {
           $map: {
             input: '$categoryDetails.jobTitles',
             as: 'jobTitle',
-            in: `$$jobTitle.${req.lang}`
-          }
-        }
+            in: `$$jobTitle.${req.lang}`,
+          },
+        },
       },
     },
     { $sort: { totalProducers: -1 } },
   ];
   if (matchedPeriod.createdAt) topCategoriesPipeline.unshift({ $match: matchedPeriod });
   const categoryStats = await Producer.aggregate(topCategoriesPipeline);
-
 
   const budgetStatsPipeline: PipelineStage[] = [
     { $group: { _id: '$user', totalMaxBudget: { $sum: '$maxBudget' } } },
@@ -84,7 +81,9 @@ export const getProducerAnalysis: RequestHandler<
         _id: 1,
         totalMaxBudget: 1,
         'userDetails.username': 1,
-        'userDetails.profileImage': { $concat: [process.env.BUCKET_HOST ,'/', '$userDetails.profileImage'] },
+        'userDetails.profileImage': {
+          $concat: [process.env.BUCKET_HOST, '/', '$userDetails.profileImage'],
+        },
       },
     },
     { $sort: { totalMaxBudget: -1 } },
@@ -93,22 +92,25 @@ export const getProducerAnalysis: RequestHandler<
 
   const topMaxBudgetUsers = await Producer.aggregate([...budgetStatsPipeline, { $limit: 5 }]);
 
-  const bottomMaxBudgetUsers = await Producer.aggregate([...budgetStatsPipeline, { $sort: { totalMaxBudget: 1 } }, { $limit: 5 }]);
-
+  const bottomMaxBudgetUsers = await Producer.aggregate([
+    ...budgetStatsPipeline,
+    { $sort: { totalMaxBudget: 1 } },
+    { $limit: 5 },
+  ]);
 
   const keywordStatsPipeline: PipelineStage[] = [
     { $unwind: '$searchKeywords' },
     {
       $group: {
         _id: '$searchKeywords',
-        users: { $addToSet: '$user' } 
-      }
+        users: { $addToSet: '$user' },
+      },
     },
     {
       $project: {
         _id: 1,
-        userCount: { $size: '$users' }
-      }
+        userCount: { $size: '$users' },
+      },
     },
     { $sort: { userCount: -1 } },
     { $limit: 5 },
@@ -150,7 +152,9 @@ export const getProducerAnalysis: RequestHandler<
       $project: {
         _id: 1,
         totalContracts: 1,
-        'producerDetails.user.profileImage': { $concat: [process.env.BUCKET_HOST ,'/', 'producerDetails.user.profileImage'] },
+        'producerDetails.user.profileImage': {
+          $concat: [process.env.BUCKET_HOST, '/', 'producerDetails.user.profileImage'],
+        },
         'producerDetails.user.username': 1,
         'producerDetails.user.name': 1,
         'producerDetails.category.title': `$producerDetails.category.title.${req.lang}`,
@@ -164,11 +168,11 @@ export const getProducerAnalysis: RequestHandler<
                 $map: {
                   input: '$$subCategory.tags',
                   as: 'tag',
-                  in: `$$tag.${req.lang}`
-                }
-              }
-            }
-          }
+                  in: `$$tag.${req.lang}`,
+                },
+              },
+            },
+          },
         },
         'producerDetails.maxBudget': 1,
         'producerDetails.minBudget': 1,
@@ -203,10 +207,11 @@ export const getProducerAnalysis: RequestHandler<
   ];
 
   const combinedPipeline = [
-    { $facet: {
-      topProducers: topProducersPipeline,
-      statusCounts: statusCountsPipeline,
-    },
+    {
+      $facet: {
+        topProducers: topProducersPipeline,
+        statusCounts: statusCountsPipeline,
+      },
     },
   ] as PipelineStage[];
 

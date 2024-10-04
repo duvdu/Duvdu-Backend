@@ -11,21 +11,22 @@ export const getProducersPagination: RequestHandler<
   unknown,
   unknown,
   {
-    search: string;
+    search?: string;
     category?: string;
     maxBudget?: number;
     minBudget?: number;
     tags?: Types.ObjectId[];
     subCategory?: Types.ObjectId[];
     user?: string;
-    instant?:boolean;
+    instant?: boolean;
+    platforms?: Types.ObjectId[];
   }
 > = (req, res, next) => {
   req.pagination.filter = {};
 
   if (req.query.instant != undefined) req.pagination.filter.instant = req.query.instant;
   if (req.query.search) {
-    req.pagination.filter.$or =  { $regex: req.query.search, $options: 'i' };
+    req.pagination.filter.$or = { $regex: req.query.search, $options: 'i' };
   }
 
   if (req.query.category) {
@@ -42,23 +43,32 @@ export const getProducersPagination: RequestHandler<
 
   if (req.query.subCategory) {
     console.log(req.query.subCategory);
-    
+
     req.pagination.filter['subCategories'] = {
       $elemMatch: {
-        _id: { $in: req.query.subCategory.map(el => new mongoose.Types.ObjectId(el)) }
-      }
+        _id: { $in: req.query.subCategory.map((el) => new mongoose.Types.ObjectId(el)) },
+      },
     };
   }
 
   if (req.query.tags) {
     req.pagination.filter['subCategories'] = {
       $elemMatch: {
-        tags: { $elemMatch: { _id: { $in: req.query.tags.map(el => new mongoose.Types.ObjectId(el)) } } }
-      }
-    };  }
+        tags: {
+          $elemMatch: { _id: { $in: req.query.tags.map((el) => new mongoose.Types.ObjectId(el)) } },
+        },
+      },
+    };
+  }
 
   if (req.query.user) {
     req.pagination.filter.user = new mongoose.Types.ObjectId(req.query.user);
+  }
+
+  if (req.query.platforms) {
+    req.pagination.filter.platforms = {
+      $in: req.query.platforms.map((el) => new mongoose.Types.ObjectId(el)),
+    };
   }
 
   next();
@@ -66,14 +76,10 @@ export const getProducersPagination: RequestHandler<
 
 export const getProducersHandler: GetProducersHandler = async (req, res, next) => {
   try {
-
     let isInstant = undefined;
-    if (req.pagination.filter.instant != undefined) 
-      isInstant = req.pagination.filter.instant;
+    if (req.pagination.filter.instant != undefined) isInstant = req.pagination.filter.instant;
     delete req.pagination.filter.instant;
-    
-    
-  
+
     const countPipeline = [
       {
         $match: {
@@ -90,21 +96,25 @@ export const getProducersHandler: GetProducersHandler = async (req, res, next) =
         },
       },
       { $unwind: '$user' },
-      ...(isInstant !== undefined ? [{
-        $match: {
-          'user.isAvaliableToInstantProjects': isInstant,
-        },
-      }] : []),
+      ...(isInstant !== undefined
+        ? [
+            {
+              $match: {
+                'user.isAvaliableToInstantProjects': isInstant,
+              },
+            },
+          ]
+        : []),
       {
-        $count: 'totalCount'
-      }
+        $count: 'totalCount',
+      },
     ];
-    
+
     // Execute count aggregation
     const countResult = await Producer.aggregate(countPipeline);
     const resultCount = countResult.length > 0 ? countResult[0].totalCount : 0;
 
-    const pipeline : PipelineStage[] = [
+    const pipeline: PipelineStage[] = [
       {
         $match: {
           ...req.pagination.filter,
@@ -133,89 +143,127 @@ export const getProducersHandler: GetProducersHandler = async (req, res, next) =
       });
     }
 
-    pipeline.push( {
-      $lookup: {
-        from: MODELS.category,
-        localField: 'category',
-        foreignField: '_id',
-        as: 'categoryData',
+    pipeline.push(
+      {
+        $lookup: {
+          from: MODELS.category,
+          localField: 'category',
+          foreignField: '_id',
+          as: 'categoryData',
+        },
       },
-    },
-    {
-      $unwind: '$categoryData',
-    },
-    {
-      $project: {
-        _id: 1,
-        subCategories: {
-          $map: {
-            input: '$subCategories',
-            as: 'subCat',
-            in: {
-              title: {
-                $cond: {
-                  if: { $eq: ['ar', req.lang] },
-                  then: '$$subCat.title.ar',
-                  else: '$$subCat.title.en',
-                },
-              },
-              tags: {
+      {
+        $unwind: '$categoryData',
+      },
+      {
+        $lookup: {
+          from: MODELS.producerPlatforms,
+          localField: 'platforms',
+          foreignField: '_id',
+          as: 'platforms',
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          subCategories: {
+            $cond: {
+              if: { $isArray: '$subCategories' },
+              then: {
                 $map: {
-                  input: '$$subCat.tags',
-                  as: 'tag',
+                  input: '$subCategories',
+                  as: 'subCat',
                   in: {
                     title: {
                       $cond: {
                         if: { $eq: ['ar', req.lang] },
-                        then: '$$tag.ar',
-                        else: '$$tag.en',
+                        then: '$$subCat.title.ar',
+                        else: '$$subCat.title.en',
                       },
                     },
-                    _id: '$$tag._id',
+                    tags: {
+                      $cond: {
+                        if: { $isArray: '$$subCat.tags' },
+                        then: {
+                          $map: {
+                            input: '$$subCat.tags',
+                            as: 'tag',
+                            in: {
+                              title: {
+                                $cond: {
+                                  if: { $eq: ['ar', req.lang] },
+                                  then: '$$tag.ar',
+                                  else: '$$tag.en',
+                                },
+                              },
+                              _id: '$$tag._id',
+                            },
+                          },
+                        },
+                        else: [],
+                      },
+                    },
+                    _id: '$$subCat._id',
                   },
                 },
               },
-              _id: '$$subCat._id',
+              else: [],
             },
           },
-        },
-        minBudget: 1,
-        maxBudget: 1,
-        searchKeywords: 1,
-        createdAt: 1,
-        updatedAt: 1,
-        category: {
-          _id: '$categoryData._id',
-          image: {
-            $concat: [process.env.BUCKET_HOST, '/', '$categoryData.image'],
-          },
-          title: {
-            $cond: {
-              if: { $eq: ['ar', req.lang] },
-              then: '$categoryData.title.ar',
-              else: '$categoryData.title.en',
+          platforms: {
+            $map: {
+              input: '$platforms',
+              as: 'platform',
+              in: {
+                _id: '$$platform._id',
+                name: {
+                  $cond: {
+                    if: { $eq: [req.lang, 'ar'] },
+                    then: '$$platform.name.ar',
+                    else: '$$platform.name.en',
+                  },
+                },
+                image: { $concat: [process.env.BUCKET_HOST, '/', '$$platform.image'] },
+              },
             },
           },
-        },
-        user: {
-          profileImage: {
-            $cond: [
-              { $eq: ['$user.profileImage', null] },
-              null,
-              { $concat: [process.env.BUCKET_HOST, '/', '$user.profileImage'] },
-            ],
+          minBudget: 1,
+          maxBudget: 1,
+          searchKeywords: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          category: {
+            _id: '$categoryData._id',
+            image: {
+              $concat: [process.env.BUCKET_HOST, '/', '$categoryData.image'],
+            },
+            title: {
+              $cond: {
+                if: { $eq: ['ar', req.lang] },
+                then: '$categoryData.title.ar',
+                else: '$categoryData.title.en',
+              },
+            },
           },
-          username: '$user.username',
-          isOnline: '$user.isOnline',
-          acceptedProjectsCounter: '$user.acceptedProjectsCounter',
-          name: '$user.name',
-          rate: '$user.rate',
-          rank: '$user.rank',
-          projectsView: '$user.projectsView',
-          _id: '$user._id',
+          user: {
+            profileImage: {
+              $cond: [
+                { $eq: ['$user.profileImage', null] },
+                null,
+                { $concat: [process.env.BUCKET_HOST, '/', '$user.profileImage'] },
+              ],
+            },
+            username: '$user.username',
+            isOnline: '$user.isOnline',
+            acceptedProjectsCounter: '$user.acceptedProjectsCounter',
+            name: '$user.name',
+            rate: '$user.rate',
+            rank: '$user.rank',
+            projectsView: '$user.projectsView',
+            _id: '$user._id',
+          },
         },
       },
-    }
     );
     const producers = await Producer.aggregate(pipeline);
 

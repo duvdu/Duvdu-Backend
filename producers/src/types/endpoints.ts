@@ -30,7 +30,10 @@ export interface AppendProducerHandler
   extends RequestHandler<
     unknown,
     SuccessResponse<{ data: Iproducer }>,
-    Pick<Iproducer, 'category' | 'maxBudget' | 'minBudget' | 'searchKeywords' | 'subCategories'> & {
+    Pick<
+      Iproducer,
+      'category' | 'maxBudget' | 'minBudget' | 'searchKeywords' | 'subCategories' | 'platforms'
+    > & {
       subcategory: [{ subcategory: string; tags: [string] }];
     },
     unknown
@@ -40,7 +43,10 @@ export interface UpdateProducerHandler
   extends RequestHandler<
     { producerId: string },
     SuccessResponse<{ data: Iproducer }>,
-    Pick<Iproducer, 'category' | 'maxBudget' | 'minBudget' | 'searchKeywords' | 'subCategories'> & {
+    Pick<
+      Iproducer,
+      'category' | 'maxBudget' | 'minBudget' | 'searchKeywords' | 'subCategories' | 'platforms'
+    > & {
       subcategory: [{ subcategory: string; tags: [string] }];
     },
     unknown

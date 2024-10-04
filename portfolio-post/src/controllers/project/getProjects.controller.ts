@@ -1,6 +1,6 @@
 import 'express-async-errors';
 
-import { Categories, MODELS, ProjectCycle, Users } from '@duvdu-v1/duvdu';
+import { Categories, MODELS, ProjectCycle } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import mongoose, { PipelineStage, Types } from 'mongoose';
 
@@ -129,12 +129,12 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
     { $unwind: '$user' },
     ...(isInstant !== undefined
       ? [
-          {
-            $match: {
-              'user.isAvaliableToInstantProjects': isInstant,
-            },
+        {
+          $match: {
+            'user.isAvaliableToInstantProjects': isInstant,
           },
-        ]
+        },
+      ]
       : []),
     {
       $count: 'totalCount',

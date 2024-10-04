@@ -1,5 +1,12 @@
 import 'express-async-errors';
-import { BadRequestError, Categories, CYCLES, NotFound, Producer } from '@duvdu-v1/duvdu';
+import {
+  BadRequestError,
+  Categories,
+  CYCLES,
+  NotFound,
+  Producer,
+  ProducerPlatform,
+} from '@duvdu-v1/duvdu';
 
 import { AppendProducerHandler } from '../../types/endpoints';
 
@@ -23,42 +30,70 @@ export const appendProducerHandler: AppendProducerHandler = async (req, res, nex
       );
     }
 
-    const subcategories = req.body.subcategory;
-
-    const validSubcategories = category.subCategories!.filter((sub: any) =>
-      subcategories.some((inputSub) => sub._id.toString() === inputSub.subcategory),
-    );
-
-    if (validSubcategories.length !== subcategories.length) {
-      throw new BadRequestError({ en: 'invalid subcategory', ar: 'فئة فرعية غير صالحة' }, req.lang);
+    if (req.body.platforms) {
+      const platforms = await ProducerPlatform.countDocuments({
+        _id: req.body.platforms.map((el) => el),
+      });
+      if (platforms != req.body.platforms.length)
+        return next(
+          new BadRequestError({ en: 'invalid platform', ar: 'منصة غير صالحة' }, req.lang),
+        );
     }
 
-    const resultSubCategories = validSubcategories.map((validSub: any) => {
-      const inputSub = subcategories.find((input) => input.subcategory === validSub._id.toString());
+    const subcategories = req.body.subcategory;
 
-      const validTags = validSub.tags.filter((tag: any) =>
-        inputSub!.tags.includes(tag._id.toString()),
+    // Check if subcategories are provided
+    if (subcategories && subcategories.length > 0) {
+      const validSubcategories = category.subCategories!.filter((sub: any) =>
+        subcategories.some((inputSub) => sub._id.toString() === inputSub.subcategory),
       );
 
-      if (validTags.length !== inputSub!.tags.length) {
+      // Check if all provided subcategories are valid
+      if (validSubcategories.length !== subcategories.length) {
         throw new BadRequestError(
-          { en: 'invalid tags in subcategory', ar: 'علامات غير صالحة في الفئة الفرعية' },
+          { en: 'invalid subcategory', ar: 'فئة فرعية غير صالحة' },
           req.lang,
         );
       }
 
-      return {
-        title: validSub.title,
-        tags: validTags.map((tag: any) => ({
-          ar: tag.ar,
-          en: tag.en,
-          _id: tag._id
-        })),
-        _id: validSub._id
-      };
-    });
+      // Process each valid subcategory
+      const resultSubCategories = validSubcategories.map((validSub: any) => {
+        const inputSub = subcategories.find(
+          (input) => input.subcategory === validSub._id.toString(),
+        );
 
-    req.body.subCategories = resultSubCategories;
+        // If tags are provided, validate them
+        let validTags = [];
+        if (inputSub?.tags && inputSub.tags.length > 0) {
+          validTags = validSub.tags.filter((tag: any) =>
+            inputSub.tags.includes(tag._id.toString()),
+          );
+
+          // Check if all provided tags are valid
+          if (validTags.length !== inputSub.tags.length) {
+            throw new BadRequestError(
+              { en: 'invalid tags in subcategory', ar: 'علامات غير صالحة في الفئة الفرعية' },
+              req.lang,
+            );
+          }
+        }
+
+        // Return subcategory with optional tags
+        return {
+          title: validSub.title,
+          tags: validTags.map((tag: any) => ({
+            ar: tag.ar,
+            en: tag.en,
+            _id: tag._id,
+          })),
+          _id: validSub._id,
+        };
+      });
+
+      req.body.subCategories = resultSubCategories;
+    } else {
+      req.body.subCategories = [];
+    }
 
     const producer = await Producer.create({
       ...req.body,
