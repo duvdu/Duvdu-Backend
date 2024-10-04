@@ -1,10 +1,9 @@
-import { Channels, NotificationDetails, NotificationType } from '@duvdu-v1/duvdu';
+import { Channels, NotificationDetails, NotificationType, TeamContract, TeamContractStatus, UserStatus } from '@duvdu-v1/duvdu';
 import Queue from 'bull';
 
 import { env } from '../config/env';
 import { updateUserStatus } from '../controllers/contract/updateUserStatus';
 import { sendSystemNotification } from '../controllers/project/sendNotification';
-import { ContractStatus, TeamContract, UserStatus } from '../models/teamProject.model';
 
 interface IcontarctQueue {
   contractId: string;
@@ -21,8 +20,8 @@ export const PayMentQueue = new Queue<IcontarctQueue>(
 pendingQueue.process(async (job) => {
   try {
     const contract = await TeamContract.findOneAndUpdate(
-      { _id: job.data.contractId, status: ContractStatus.pending },
-      { status: ContractStatus.canceled, actionAt: new Date() },
+      { _id: job.data.contractId, status: TeamContractStatus.pending },
+      { status: TeamContractStatus.canceled, actionAt: new Date() },
       { new: true },
     );
     console.log(contract);
@@ -52,8 +51,8 @@ pendingQueue.process(async (job) => {
 PayMentQueue.process(async (job) => {
   try {
     const contract = await TeamContract.findOneAndUpdate(
-      { _id: job.data.contractId, status: ContractStatus.waitingForTotalPayment },
-      { status: ContractStatus.canceled, actionAt: new Date() },
+      { _id: job.data.contractId, status: TeamContractStatus.waitingForTotalPayment },
+      { status: TeamContractStatus.canceled, actionAt: new Date() },
       { new: true },
     );
 
