@@ -1,10 +1,6 @@
 import admin from './fireBaseConfig';
 
-export const sendFcmToMultipleUsers = async (
-  tokens: string[],
-  title: string,
-  message: string,
-) => {
+export const sendFcmToMultipleUsers = async (tokens: string[], title: string, message: string) => {
   const messagePayload = {
     notification: {
       title: title,
@@ -17,7 +13,7 @@ export const sendFcmToMultipleUsers = async (
           contentAvailable: true,
         },
       },
-    }
+    },
   };
 
   try {

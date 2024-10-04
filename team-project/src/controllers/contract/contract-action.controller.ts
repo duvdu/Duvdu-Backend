@@ -9,14 +9,15 @@ import {
   NotificationType,
   NotificationDetails,
   Channels,
+  TeamContractStatus,
+  TeamContract,
+  UserStatus,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 import { updateUserStatus } from './updateUserStatus';
-import { ContractStatus, TeamContract, UserStatus } from '../../models/teamProject.model';
 // import { PayMentQueue } from '../../utils/expirationQueue';
 import { sendNotification } from '../project/sendNotification';
-
 
 export const contractAction: RequestHandler<
   { contractId: string },
@@ -29,12 +30,12 @@ export const contractAction: RequestHandler<
       $or: [{ sp: req.loggedUser.id }, { customer: req.loggedUser.id }],
     });
     if (!contract) return next(new NotFound(undefined, req.lang));
-  
+
     const isSp = contract.sp.toString() === req.loggedUser.id;
-  
+
     if (isSp) {
       // throw if actionAt not undefiend or current state not pending
-      if (contract.actionAt || contract.status !== ContractStatus.pending)
+      if (contract.actionAt || contract.status !== TeamContractStatus.pending)
         return next(
           new BadRequestError(
             { en: 'action is already taken', ar: 'action is already taken' },
@@ -49,16 +50,22 @@ export const contractAction: RequestHandler<
         return next(
           new BadRequestError({ en: 'time limit exeeded', ar: 'time limit exeeded' }, req.lang),
         );
-  
+
       if (req.body.action === 'reject') {
         {
           await TeamContract.updateOne(
             { _id: req.params.contractId },
-            { status: ContractStatus.rejected, rejectedBy: 'sp', actionAt: new Date() },
+            { status: TeamContractStatus.rejected, rejectedBy: 'sp', actionAt: new Date() },
           );
-  
-          await updateUserStatus(contract.project.toString() , contract.category.toString() , contract.sp.toString() , UserStatus.rejected , req.lang);
-  
+
+          await updateUserStatus(
+            contract.project.toString(),
+            contract.category.toString(),
+            contract.sp.toString(),
+            UserStatus.rejected,
+            req.lang,
+          );
+
           await sendNotification(
             req.loggedUser.id,
             contract.sp.toString(),
@@ -78,7 +85,7 @@ export const contractAction: RequestHandler<
               req.lang,
             ),
           );
-  
+
         await Users.updateOne({ _id: req.loggedUser.id }, { $inc: { avaliableContracts: -1 } });
         // update project state to await payment
         // create payment link and send it to customer
@@ -89,14 +96,20 @@ export const contractAction: RequestHandler<
             _id: req.params.contractId,
           },
           {
-            status: ContractStatus.waitingForTotalPayment,
+            status: TeamContractStatus.waitingForTotalPayment,
             actionAt: new Date(),
             paymentLink: paymentSession,
           },
         );
-  
-        await updateUserStatus(contract.project.toString() , contract.category.toString() , contract.sp.toString() , UserStatus.accepted , req.lang);
-  
+
+        await updateUserStatus(
+          contract.project.toString(),
+          contract.category.toString(),
+          contract.sp.toString(),
+          UserStatus.accepted,
+          req.lang,
+        );
+
         await sendNotification(
           req.loggedUser.id,
           contract.customer.toString(),
@@ -106,7 +119,7 @@ export const contractAction: RequestHandler<
           NotificationDetails.updateTeamContract.message,
           Channels.update_contract,
         );
-  
+
         // TODO:
         // const delay =  contract.stageExpiration * 60 * 60 * 1000;
         // await PayMentQueue.add(
@@ -118,10 +131,12 @@ export const contractAction: RequestHandler<
       if (
         req.body.action !== 'reject' ||
         !contract.actionAt ||
-        ![ContractStatus.pending, ContractStatus.waitingForTotalPayment].includes(contract.status)
+        ![TeamContractStatus.pending, TeamContractStatus.waitingForTotalPayment].includes(
+          contract.status,
+        )
       )
         return next(new BadRequestError({ en: 'invalid action', ar: 'invalid action' }, req.lang));
-  
+
       // throw if actionAt + stageExpiration < Date.now()
       if (
         new Date(contract.actionAt).getTime() + contract.stageExpiration * 60 * 60 * 1000 <
@@ -130,15 +145,20 @@ export const contractAction: RequestHandler<
         return next(
           new BadRequestError({ en: 'time limit exceeded', ar: 'time limit exceeded' }, req.lang),
         );
-  
+
       await TeamContract.updateOne(
         { _id: req.params.contractId },
-        { status: ContractStatus.rejected, rejectedBy: 'customer', actionAt: new Date() },
+        { status: TeamContractStatus.rejected, rejectedBy: 'customer', actionAt: new Date() },
       );
-  
-      await updateUserStatus(contract.project.toString() , contract.category.toString() , contract.sp.toString() , UserStatus.canceled , req.lang);
-  
-  
+
+      await updateUserStatus(
+        contract.project.toString(),
+        contract.category.toString(),
+        contract.sp.toString(),
+        UserStatus.canceled,
+        req.lang,
+      );
+
       await sendNotification(
         req.loggedUser.id,
         contract.sp.toString(),
@@ -149,9 +169,8 @@ export const contractAction: RequestHandler<
         Channels.update_contract,
       );
     }
-  
+
     res.status(200).json({ message: 'success' });
-  
   } catch (error) {
     next(error);
   }

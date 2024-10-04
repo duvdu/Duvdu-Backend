@@ -11,11 +11,12 @@ import {
   FOLDERS,
   NotificationDetails,
   NotificationType,
+  TeamContract,
+  TeamProject,
   Users,
 } from '@duvdu-v1/duvdu';
 
 import { sendNotification } from './sendNotification';
-import { TeamContract, TeamProject } from '../../models/teamProject.model';
 import { getBestExpirationTime } from '../../services/getBestExpirationTime.service';
 import { CreateProjectHandler } from '../../types/project.endpoints';
 // import { pendingQueue } from '../../utils/expirationQueue';
@@ -24,13 +25,12 @@ export const createProjectHandler: CreateProjectHandler = async (req, res, next)
   const files = req.files as { [fieldName: string]: Express.Multer.File[] };
   const creatives = req.body.creatives;
 
-  
   const s3 = new Bucket();
   // handle cover
   await s3.saveBucketFiles(FOLDERS.team_project, ...files['cover']);
   req.body.cover = `${FOLDERS.team_project}/${files['cover'][0].filename}`;
   console.log(req.body.cover);
-  
+
   Files.removeFiles(req.body.cover);
 
   // validate user and upload attachments
@@ -46,7 +46,8 @@ export const createProjectHandler: CreateProjectHandler = async (req, res, next)
 
         user.attachments = [];
         const key = `creatives[${creatives.indexOf(creative)}][users][${creative.users.indexOf(user)}][attachments]`;
-        if (key?.length && Array.isArray(files[key])) await s3.saveBucketFiles(FOLDERS.team_project, ...files[key]);
+        if (key?.length && Array.isArray(files[key]))
+          await s3.saveBucketFiles(FOLDERS.team_project, ...files[key]);
 
         for (let i = 0; i < key.length; i++) {
           const fileArray = files[key];
@@ -85,7 +86,7 @@ export const createProjectHandler: CreateProjectHandler = async (req, res, next)
         ).toString(),
         req.lang,
       );
-      
+
       // create contract
       const contract = await TeamContract.create({
         sp: user.user,
@@ -98,13 +99,13 @@ export const createProjectHandler: CreateProjectHandler = async (req, res, next)
         deadline: user.deadLine,
         details: user.details,
         totalAmount: user.totalAmount,
-        attachments:user.attachments,
+        attachments: user.attachments,
         cycle: CYCLES.teamProject,
         stageExpiration,
-        category:creative.category
+        category: creative.category,
       });
 
-      // create contract an all contracts 
+      // create contract an all contracts
       await Contracts.create({
         contract: contract._id,
         customer: contract.customer,

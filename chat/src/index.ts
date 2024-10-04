@@ -32,7 +32,7 @@ const start = async () => {
   });
 
   await dbConnection(env.mongoDb.uri);
-  
+
   const server = app.listen(3000, () => {
     console.log('app listen on port 3000');
   });
@@ -53,6 +53,5 @@ export async function getSocketIOInstance(): Promise<Server> {
   }
   return ioReady;
 }
-
 
 start();

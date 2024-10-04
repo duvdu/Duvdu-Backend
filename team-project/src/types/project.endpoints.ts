@@ -1,8 +1,12 @@
 /* eslint-disable @typescript-eslint/no-namespace */
-import { PaginationResponse, SuccessResponse, IjwtPayload, Ipagination } from '@duvdu-v1/duvdu';
+import {
+  PaginationResponse,
+  SuccessResponse,
+  IjwtPayload,
+  Ipagination,
+  ITeamProject,
+} from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
-
-import { ITeamProject } from '../models/teamProject.model';
 
 declare module 'express-session' {
   interface SessionData {
@@ -45,7 +49,6 @@ export interface AddCreativeHandler
     },
     unknown
   > {}
-  
 
 export interface DeleteCreativeHandler
   extends RequestHandler<
@@ -73,7 +76,12 @@ export interface DeleteProjectHandler
   extends RequestHandler<{ teamId: string }, SuccessResponse, unknown, unknown> {}
 
 export interface GetTeamsCrmHandler
-extends RequestHandler<unknown , PaginationResponse<{data:ITeamProject[]}> , unknown , unknown>{}
+  extends RequestHandler<unknown, PaginationResponse<{ data: ITeamProject[] }>, unknown, unknown> {}
 
 export interface GetTeamCrmHandler
-extends RequestHandler<{teamId:string} , SuccessResponse<{data:ITeamProject}> , unknown , unknown>{}
+  extends RequestHandler<
+    { teamId: string },
+    SuccessResponse<{ data: ITeamProject }>,
+    unknown,
+    unknown
+  > {}

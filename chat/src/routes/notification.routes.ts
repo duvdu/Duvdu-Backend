@@ -8,8 +8,9 @@ export const router = express.Router();
 
 router.use(isauthenticated);
 
-
-router.route('/users').post(val.sendMultiNotificationVal , handler.sendNotificationToMultiUserHandler);
+router
+  .route('/users')
+  .post(val.sendMultiNotificationVal, handler.sendNotificationToMultiUserHandler);
 router
   .route('/')
   .get(
@@ -18,7 +19,7 @@ router
     handler.getLoggedUserNotificationHandler,
   )
   .patch(handler.updateWatchNotificationHandler)
-  .post(val.sendTopicNotificationVal , handler.sendTopicNotificationHandler);
+  .post(val.sendTopicNotificationVal, handler.sendTopicNotificationHandler);
 
 router.get(
   '/crm',

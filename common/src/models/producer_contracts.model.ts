@@ -1,7 +1,7 @@
 import { model, Schema, Types } from 'mongoose';
 
-import { Iuser } from '../types/User';
 import { MODELS } from '../types/model-names';
+import { Iuser } from '../types/User';
 
 export enum ContractStatus {
   canceled = 'canceled',

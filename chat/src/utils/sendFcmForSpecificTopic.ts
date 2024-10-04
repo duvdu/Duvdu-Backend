@@ -1,11 +1,6 @@
 import admin from './fireBaseConfig';
 
-
-export const sendFcmToSpecificTopic = async (
-  topic: string,
-  title: string,
-  message: string,
-) => {
+export const sendFcmToSpecificTopic = async (topic: string, title: string, message: string) => {
   const messagePayload = {
     notification: {
       title: title,
@@ -15,10 +10,10 @@ export const sendFcmToSpecificTopic = async (
     apns: {
       payload: {
         aps: {
-          contentAvailable: true, 
+          contentAvailable: true,
         },
       },
-    }
+    },
   };
 
   try {
