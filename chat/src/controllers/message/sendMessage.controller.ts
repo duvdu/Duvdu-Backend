@@ -32,8 +32,22 @@ export const sendMessageHandler: SendMessageHandler = async (req, res, next) => 
     );
 
   const contract = await Contracts.findOne({$or:[{sp:req.loggedUser.id , customer:req.body.receiver} , {sp:req.body.receiver , customer:req.loggedUser.id}]});
-  if (!contract && req.loggedUser.role.key != SystemRoles.admin) 
-    return next(new NotAllowedError(undefined , req.lang));
+  // if (!contract && req.loggedUser.role.key != SystemRoles.admin) 
+  //   return next(new NotAllowedError(undefined , req.lang));
+
+  const project = await TeamProject.findOne({
+    isDeleted: false,
+    creatives: {
+      $elemMatch: {
+        'users.user': { $all: [req.loggedUser.id, req.body.receiver] }, 
+      },
+    },
+  });
+
+  if (!contract && !project && req.loggedUser.role.key !== SystemRoles.admin) {
+    return next(new NotAllowedError(undefined, req.lang));
+  }
+
 
   const attachments = <Express.Multer.File[] | undefined>(req.files as any)?.attachments;
   if (attachments) {
