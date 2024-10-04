@@ -1,5 +1,9 @@
-import { CYCLES, Icategory, Iuser, MODELS } from '@duvdu-v1/duvdu';
 import { model, Schema, Types } from 'mongoose';
+
+import { Icategory } from '../types/Category';
+import { CYCLES } from '../types/cycles';
+import { MODELS } from '../types/model-names';
+import { Iuser } from '../types/User';
 
 export enum UserStatus {
   accepted = 'accepted',
