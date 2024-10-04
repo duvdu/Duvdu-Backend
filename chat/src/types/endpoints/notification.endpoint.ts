@@ -23,10 +23,18 @@ export interface GetNotificationsCrmHandler
     unknown
   > {}
 
-
 export interface SendNotificationForSpecificTopicHandler
-  extends RequestHandler<unknown , SuccessResponse , {topic:string , message:string , title:string} , unknown>{}
-  
+  extends RequestHandler<
+    unknown,
+    SuccessResponse,
+    { topic: string; message: string; title: string },
+    unknown
+  > {}
 
 export interface SendNotificationMultiUserHandler
-extends RequestHandler<unknown , SuccessResponse , {users:string[] , message:string , title:string} , unknown>{}
+  extends RequestHandler<
+    unknown,
+    SuccessResponse,
+    { users: string[]; message: string; title: string },
+    unknown
+  > {}

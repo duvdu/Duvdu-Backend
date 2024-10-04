@@ -16,10 +16,7 @@ export const create = [
   body('address').exists().isString().withMessage('address'),
   body('creatives').isArray({ min: 1 }).withMessage('creatives'),
   body('creatives.*.category').isMongoId().withMessage('creativesCategory'),
-  body('creatives.*.users')
-    .optional()
-    .isArray({ min: 1 })
-    .withMessage('creativesUsers'),
+  body('creatives.*.users').optional().isArray({ min: 1 }).withMessage('creativesUsers'),
   body('creatives.*.users.*.user').isMongoId().withMessage('creativesUsersUser'),
   body('creatives.*.users.*.duration').isInt({ min: 1 }).withMessage('creativesUsersDuration'),
   body('creatives.*.users.*.startDate').isISO8601().withMessage('creativesUsersStartDate'),
@@ -38,14 +35,14 @@ export const addCreative = [
   body('hourPrice').isInt({ min: 1 }).withMessage('hourPrice'),
   body('details').isString().withMessage('details'),
   body('category').isMongoId().withMessage('category'),
-  globalValidatorMiddleware
+  globalValidatorMiddleware,
 ];
 
 export const deleteCreative = [
   param('teamId').isMongoId().withMessage('teamId'),
   body('category').isMongoId().withMessage('category'),
   body('user').isMongoId().withMessage('user'),
-  globalValidatorMiddleware
+  globalValidatorMiddleware,
 ];
 
 export const getAll = [
@@ -58,14 +55,13 @@ export const getAll = [
   query('isDeleted').optional().isBoolean().toBoolean().withMessage('isDeleted'),
   query('limit').optional().isInt({ min: 1 }).withMessage('limit'),
   query('page').optional().isInt({ min: 1 }).withMessage('page'),
-  globalPaginationMiddleware
+  globalPaginationMiddleware,
 ];
 
 export const getOne = [
   param('teamId').isMongoId().withMessage('teamId'),
-  globalValidatorMiddleware
+  globalValidatorMiddleware,
 ];
-
 
 export const action = [
   body('action')

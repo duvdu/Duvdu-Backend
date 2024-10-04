@@ -10,6 +10,7 @@ import {
   Notification,
   NotificationType,
   SystemRoles,
+  TeamProject,
   Users,
 } from '@duvdu-v1/duvdu';
 
@@ -31,23 +32,37 @@ export const sendMessageHandler: SendMessageHandler = async (req, res, next) => 
       ),
     );
 
-  const contract = await Contracts.findOne({$or:[{sp:req.loggedUser.id , customer:req.body.receiver} , {sp:req.body.receiver , customer:req.loggedUser.id}]});
-  // if (!contract && req.loggedUser.role.key != SystemRoles.admin) 
-  //   return next(new NotAllowedError(undefined , req.lang));
-
+  const contract = await Contracts.findOne({
+    $or: [
+      { sp: req.loggedUser.id, customer: req.body.receiver },
+      { sp: req.body.receiver, customer: req.loggedUser.id },
+    ],
+  });
+    
   const project = await TeamProject.findOne({
     isDeleted: false,
     creatives: {
       $elemMatch: {
-        'users.user': { $all: [req.loggedUser.id, req.body.receiver] }, 
+        'users.user': { $all: [req.loggedUser.id, req.body.receiver] }, // Both should exist in users
       },
     },
   });
-
-  if (!contract && !project && req.loggedUser.role.key !== SystemRoles.admin) {
+    
+  const isMainUser =
+      project &&
+      (project.user.toString() === req.loggedUser.id.toString() ||
+       project.user.toString() === req.body.receiver!.toString());
+    
+  // Check if the sender and receiver are in the same creative users array
+  const isInCreatives = project?.creatives.some((creative) =>
+    creative.users.some((u) =>
+      [req.loggedUser.id.toString(), req.body.receiver?.toString()].includes(u.user.toString())
+    )
+  );
+    
+  if (!contract && !isMainUser && !isInCreatives && req.loggedUser.role.key !== SystemRoles.admin) {
     return next(new NotAllowedError(undefined, req.lang));
   }
-
 
   const attachments = <Express.Multer.File[] | undefined>(req.files as any)?.attachments;
   if (attachments) {

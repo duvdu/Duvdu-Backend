@@ -1,7 +1,12 @@
-import { BadRequestError, NotAllowedError, NotFound, SuccessResponse } from '@duvdu-v1/duvdu';
+import {
+  BadRequestError,
+  NotAllowedError,
+  NotFound,
+  SuccessResponse,
+  TeamContract,
+  TeamContractStatus,
+} from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
-
-import { ContractStatus, TeamContract } from '../../models/teamProject.model';
 
 export const payContract: RequestHandler<{ paymentSession: string }, SuccessResponse> = async (
   req,
@@ -24,11 +29,11 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
 
   // TODO: record the transaction from payment gateway webhook
 
-  if (contract.status === ContractStatus.waitingForTotalPayment)
+  if (contract.status === TeamContractStatus.waitingForTotalPayment)
     await TeamContract.updateOne(
       { paymentLink: req.params.paymentSession },
       {
-        status: ContractStatus.ongoing,
+        status: TeamContractStatus.ongoing,
         totalCheckoutAt: new Date(),
         paymentAmount: contract.totalAmount,
       },

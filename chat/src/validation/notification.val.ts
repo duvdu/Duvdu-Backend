@@ -28,13 +28,13 @@ export const sendTopicNotificationVal = [
   body('topic').isString().withMessage('topicInvalid').exists().withMessage('topicRequired'),
   body('title').isString().withMessage('titleInvalid').exists().withMessage('titleRequired'),
   body('message').isString().withMessage('messageInvalid').exists().withMessage('messageRequired'),
-  globalValidatorMiddleware
+  globalValidatorMiddleware,
 ];
 
 export const sendMultiNotificationVal = [
-  body('users').isArray({min:1}),
+  body('users').isArray({ min: 1 }),
   body('users.*').isMongoId().withMessage('invalidId'),
   body('title').isString().withMessage('titleInvalid').exists().withMessage('titleRequired'),
   body('message').isString().withMessage('messageInvalid').exists().withMessage('messageRequired'),
-  globalValidatorMiddleware
+  globalValidatorMiddleware,
 ];
