@@ -32,7 +32,7 @@ export interface Iuser {
     type: 'Point';
     coordinates: [number, number];
   };
-  category?: Types.ObjectId | Icategory;
+  categories?: (Types.ObjectId | Icategory)[];
   acceptedProjectsCounter: number;
   profileViews: number;
   about?: string;

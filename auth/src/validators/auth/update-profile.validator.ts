@@ -24,7 +24,9 @@ export const updateProfileVal = [
         .run(req);
     }),
   body('address').optional().exists().isString().withMessage('invalidAddress'),
-  body('category').optional().isMongoId().withMessage('categoryInvalid'),
+  body('categories').optional().isArray(),
+  body('categories.*').isMongoId(),
+  // body('category').optional().isMongoId().withMessage('categoryInvalid'),
   body('about').optional().isString().withMessage('aboutInvalid'),
   body('isAvaliableToInstantProjects')
     .optional()
