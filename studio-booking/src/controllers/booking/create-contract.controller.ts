@@ -9,6 +9,8 @@ import {
   CYCLES,
   Setting,
   Rentals,
+  Bucket,
+  FOLDERS,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
@@ -22,8 +24,18 @@ export const createContractHandler: RequestHandler<
     details: string;
     projectScale: { numberOfUnits: number };
     startDate: string;
+    attachments: string[];
   }
 > = async (req, res, next) => {
+  if (req.files) {
+    req.body.attachments = (req.files as Express.Multer.File[]).map(
+      (el: any) => 'studio-booking/' + el.filename,
+    );
+    await new Bucket().saveBucketFiles(
+      FOLDERS.studio_booking,
+      ...(req.files as Express.Multer.File[]),
+    );
+  }
   const project = await Rentals.findOne({ _id: req.params.projectId, isDeleted: { $ne: true } });
   if (!project)
     return next(new NotFound({ en: 'project not found', ar: 'المشروع غير موجود' }, req.lang));
@@ -45,7 +57,10 @@ export const createContractHandler: RequestHandler<
     project.projectScale.unit,
     req.body.projectScale.numberOfUnits,
   );
-  const stageExpiration = await getStageExpiration(new Date(req.body.startDate).toString(), req.lang);
+  const stageExpiration = await getStageExpiration(
+    new Date(req.body.startDate).toString(),
+    req.lang,
+  );
 
   const contract = await RentalContracts.create({
     ...req.body,
@@ -110,8 +125,6 @@ export const createContractHandler: RequestHandler<
 
 //   return minimumAvailableExpirationStage;
 // };
-
-
 
 async function getStageExpiration(isoDate: string, lang: string) {
   const givenDate = new Date(isoDate);

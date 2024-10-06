@@ -22,9 +22,9 @@ export const create = [
     .isLength({ min: 3 })
     .withMessage('searchKeywordLength'),
   body('showOnHome').isBoolean().toBoolean().withMessage('showOnHomeBoolean'),
-  body('tags').isArray().withMessage('tagsArray'),
+  body('tags').optional().isArray().withMessage('tagsArray'),
   body('tags.*').isMongoId().withMessage('tagLength'),
-  body('subCategory').isMongoId().withMessage('subCategoryInvalid'),
+  body('subCategory').optional().isMongoId().withMessage('subCategoryInvalid'),
   body('location.lat').isFloat({ min: -90, max: 90 }).withMessage('latInvalid'),
   body('location.lng').isFloat({ min: -180, max: 180 }).withMessage('lngInvalid'),
   globalValidatorMiddleware,
@@ -48,7 +48,6 @@ export const update = [
 ];
 
 export const findAll = [
-
   query('instant').optional().isBoolean().toBoolean(),
   query('search').optional().isLength({ min: 3 }).withMessage('searchLength'),
   query('address').optional().isLength({ min: 3 }).withMessage('addressLength'),

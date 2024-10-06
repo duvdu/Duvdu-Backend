@@ -16,6 +16,7 @@ export interface IrentalContract {
   customer: Types.ObjectId | Iuser;
   sp: Types.ObjectId | Iuser;
   project: Types.ObjectId | Irental;
+  attachments: string[];
   details: string;
   insurance: number;
   projectScale: { unit: string; numberOfUnits: number; unitPrice: number };
@@ -42,6 +43,7 @@ export const RentalContracts = model<IrentalContract>(
       sp: { type: Schema.Types.ObjectId, ref: MODELS.user },
       project: { type: Schema.Types.ObjectId, ref: 'rentals' },
       details: { type: String, default: null },
+      attachments: [String],
       insurance: { type: Number, default: null },
       projectScale: { unit: String, numberOfUnits: Number, unitPrice: Number },
       location: { lat: Number, lng: Number },

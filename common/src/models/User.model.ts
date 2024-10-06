@@ -30,7 +30,7 @@ const userSchema = new Schema<Iuser>(
       type: { type: String, default: 'Point' },
       coordinates: { type: [Number], default: [31.2357, 30.0444] },
     },
-    category: { type: Schema.Types.ObjectId, ref: MODELS.category, default: null },
+    categories: [{ type: Schema.Types.ObjectId, ref: MODELS.category, default: null }],
     acceptedProjectsCounter: { type: Number, default: 0 },
     profileViews: { type: Number, default: 0 },
     about: { type: String, default: null },

@@ -107,7 +107,7 @@ export interface ResetPasswordHandler
   > {}
 
 export interface ResendVerificationCodeHandler
-  extends RequestHandler<unknown, successResponse<unknown>, {login:string}> {}
+  extends RequestHandler<unknown, successResponse<unknown>, { login: string }> {}
 
 export interface UpdateProfileHandler
   extends RequestHandler<
@@ -120,7 +120,7 @@ export interface UpdateProfileHandler
         | 'profileImage'
         | 'coverImage'
         | 'location'
-        | 'category'
+        // | 'category'
         | 'about'
         | 'isAvaliableToInstantProjects'
         | 'pricePerHour'
@@ -142,7 +142,7 @@ export interface GetLoggedUserProfileHandler
         | 'profileImage'
         | 'coverImage'
         | 'location'
-        | 'category'
+        // | 'category'
         | 'acceptedProjectsCounter'
         | 'profileViews'
         | 'about'
@@ -170,7 +170,7 @@ export interface GetUserProfileHandler
         | 'profileImage'
         | 'coverImage'
         | 'location'
-        | 'category'
+        // | 'category'
         | 'acceptedProjectsCounter'
         | 'profileViews'
         | 'about'
