@@ -25,7 +25,7 @@ export const create = [
   body('address').isString().bail().trim(),
   body('searchKeywords').optional().isArray(),
   body('searchKeywords.*').isString().bail().trim().isLength({ min: 3 }),
-  body('insurance').isFloat({ min: 0 }).bail().toFloat(),
+  body('insurance').optional().isFloat({ min: 0 }).bail().toFloat(),
   body('showOnHome').optional().isBoolean().bail().toBoolean(),
   // body('projectScale').isObject(),
   body('projectScale.unit')

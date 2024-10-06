@@ -76,7 +76,13 @@ router
   )
   .delete(isauthenticated, val.getOne, handlers.removeProjectHandler);
 
-router.post('/:projectId/contract', isauthenticated, contractVal.create, createContractHandler);
+router.post(
+  '/:projectId/contract',
+  isauthenticated,
+  globalUploadMiddleware(FOLDERS.studio_booking).array('attachments'),
+  contractVal.create,
+  createContractHandler,
+);
 router.post('/contract/pay/:paymentSession', isauthenticated, contractVal.pay, payContract);
 router.post('/contract/:contractId/action', isauthenticated, contractVal.action, contractAction);
 

@@ -52,7 +52,7 @@ export const Rentals = model<Irental>(
       location: { lat: Number, lng: Number },
       address: String,
       searchKeywords: [String],
-      insurance: Number,
+      insurance: { type: Number, default: null },
       showOnHome: { type: Boolean, default: true },
       projectScale: {
         unit: { type: String, enum: RentalUnits },
