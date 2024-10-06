@@ -36,6 +36,20 @@ export const getUserProfileHandler: GetUserProfileHandler = async (req, res, nex
     },
     {
       $addFields: {
+        cycle: {
+          $cond: {
+            if: { $eq: ['$ref', 'portfolio-post'] },
+            then: 'project',
+            else: '$ref',
+          },
+        },
+        ref: {
+          $cond: {
+            if: { $eq: ['$ref', 'portfolio-post'] },
+            then: 'project',
+            else: '$ref',
+          },
+        },
         averageRate: {
           $cond: {
             if: { $gt: ['$rate.ratersCounter', 0] },
