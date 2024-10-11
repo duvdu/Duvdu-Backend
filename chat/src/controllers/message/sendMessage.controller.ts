@@ -4,6 +4,7 @@ import {
   Contracts,
   Files,
   FOLDERS,
+  Iuser,
   Message,
   NotAllowedError,
   NotFound,
@@ -114,7 +115,7 @@ export const sendMessageHandler: SendMessageHandler = async (req, res, next) => 
     io,
     Channels.new_message,
     notification.targetUser.toString(),
-    { title: notification.title, message: notification.message },
+    { title: `${(populatedNotification.sourceUser as Iuser).name}`, message: `${notification.message} from ${(populatedNotification.sourceUser as Iuser).name}` },
     populatedNotification,
     populatedMessage,
   );
