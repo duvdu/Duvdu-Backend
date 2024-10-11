@@ -96,7 +96,7 @@ export const sendMessageHandler: SendMessageHandler = async (req, res, next) => 
     sourceUser: req.loggedUser.id,
     targetUser: req.body.receiver,
     type: NotificationType.new_message,
-    target: message._id,
+    target: req.body.receiver,
     message: NotificationDetails.newMessage.message,
     title: NotificationDetails.newMessage.title,
   });
