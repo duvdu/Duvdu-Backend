@@ -38,7 +38,7 @@ export const sendMessageHandler: SendMessageHandler = async (req, res, next) => 
       { sp: req.body.receiver, customer: req.loggedUser.id },
     ],
   });
-    
+
   const project = await TeamProject.findOne({
     isDeleted: false,
     creatives: {
@@ -47,19 +47,19 @@ export const sendMessageHandler: SendMessageHandler = async (req, res, next) => 
       },
     },
   });
-    
+
   const isMainUser =
-      project &&
-      (project.user.toString() === req.loggedUser.id.toString() ||
-       project.user.toString() === req.body.receiver!.toString());
-    
+    project &&
+    (project.user.toString() === req.loggedUser.id.toString() ||
+      project.user.toString() === req.body.receiver!.toString());
+
   // Check if the sender and receiver are in the same creative users array
   const isInCreatives = project?.creatives.some((creative) =>
     creative.users.some((u) =>
-      [req.loggedUser.id.toString(), req.body.receiver?.toString()].includes(u.user.toString())
-    )
+      [req.loggedUser.id.toString(), req.body.receiver?.toString()].includes(u.user.toString()),
+    ),
   );
-    
+
   if (!contract && !isMainUser && !isInCreatives && req.loggedUser.role.key !== SystemRoles.admin) {
     return next(new NotAllowedError(undefined, req.lang));
   }
@@ -84,6 +84,10 @@ export const sendMessageHandler: SendMessageHandler = async (req, res, next) => 
   const message = await Message.create({
     ...req.body,
     sender: req.loggedUser.id,
+    watchers: [
+      { user: req.body.receiver, watched: false },
+      { user: req.loggedUser.id, watched: false },
+    ],
   });
 
   const populatedMessage = await message.populate([
@@ -96,7 +100,7 @@ export const sendMessageHandler: SendMessageHandler = async (req, res, next) => 
     sourceUser: req.loggedUser.id,
     targetUser: req.body.receiver,
     type: NotificationType.new_message,
-    target: req.body.receiver,
+    target: req.loggedUser.id,
     message: NotificationDetails.newMessage.message,
     title: NotificationDetails.newMessage.title,
   });
@@ -112,7 +116,7 @@ export const sendMessageHandler: SendMessageHandler = async (req, res, next) => 
     notification.targetUser.toString(),
     { title: notification.title, message: notification.message },
     populatedNotification,
-    populatedMessage
+    populatedMessage,
   );
   await Notification.findByIdAndDelete(notification._id);
   res.status(201).json({ message: 'success', data: populatedMessage });

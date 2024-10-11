@@ -1,6 +1,6 @@
 import 'express-async-errors';
 
-import { Message } from '@duvdu-v1/duvdu';
+import { Message, Users } from '@duvdu-v1/duvdu';
 import { Types } from 'mongoose';
 
 import { GetSpecificChatHandler } from '../../types/endpoints/mesage.endpoints';
@@ -165,11 +165,25 @@ export const getSpecificChatHandler: GetSpecificChatHandler = async (req, res) =
   });
 
   await Message.updateMany(
-    { sender: userOne, receiver: userTwo, watched: false },
-    { $set: { watched: true } },
+    {
+      sender: userOne,
+      receiver: userTwo,
+      'watchers.user': userTwo,
+      'watchers.watched': false,
+    },
+    {
+      $set: { 'watchers.$[watcher].watched': true },
+    },
+    {
+      arrayFilters: [{ 'watcher.user': userTwo, 'watcher.watched': false }],
+    },
   );
 
-  res.status(200).json({
+  const user = await Users.findById(userOne).select(
+    'name projectsView rank username isOnline profileImage',
+  );
+
+  res.status(200).json(<any>{
     message: 'success',
     pagination: {
       currentPage: req.pagination.page,
@@ -177,5 +191,6 @@ export const getSpecificChatHandler: GetSpecificChatHandler = async (req, res) =
       totalPages: Math.ceil(resultCount / req.pagination.limit),
     },
     data: chat,
+    user,
   });
 };

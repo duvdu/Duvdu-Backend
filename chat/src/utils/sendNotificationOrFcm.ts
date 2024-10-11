@@ -58,7 +58,7 @@ export async function sendNotificationOrFCM(
   targetUserId: string,
   notificationDetails: { title: string; message: string },
   populatedNotification: Inotification,
-  message?:ImessageDoc
+  message?: ImessageDoc,
 ) {
   const userSocket = io.sockets.sockets.get(targetUserId);
 
@@ -67,7 +67,7 @@ export async function sendNotificationOrFCM(
     userSocket.join(targetUserId);
     io.to(targetUserId).emit(socketChannel, {
       data: populatedNotification,
-      message
+      message,
     });
   }
   const user = await Users.findById(targetUserId);
