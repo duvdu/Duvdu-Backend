@@ -120,7 +120,7 @@ export const getLoggedUserChatsHandler: GetLoggedUserChatsHandler = async (req, 
               as: 'message',
               cond: {
                 $and: [
-                  { $eq: ['$$message.receiver', req.loggedUser.id] },
+                  { $eq: ['$$message.receiver._id', req.loggedUser.id] },
                   { $eq: ['$$message.watched', false] },
                 ],
               },
