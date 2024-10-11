@@ -165,12 +165,7 @@ export const getSpecificChatHandler: GetSpecificChatHandler = async (req, res) =
   });
 
   await Message.updateMany(
-    {
-      $or: [
-        { sender: userOne, receiver: userTwo, watched: false },
-        { sender: userTwo, receiver: userOne, watched: false },
-      ],
-    },
+    { sender: userOne, receiver: userTwo, watched: false },
     { $set: { watched: true } },
   );
 
