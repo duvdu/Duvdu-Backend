@@ -1,4 +1,4 @@
-import { Inotification, NotFound, Users } from '@duvdu-v1/duvdu';
+import { ImessageDoc, Inotification, NotFound, Users } from '@duvdu-v1/duvdu';
 import SocketIO from 'socket.io';
 
 import admin from './fireBaseConfig';
@@ -58,15 +58,16 @@ export async function sendNotificationOrFCM(
   targetUserId: string,
   notificationDetails: { title: string; message: string },
   populatedNotification: Inotification,
+  message?:ImessageDoc
 ) {
   const userSocket = io.sockets.sockets.get(targetUserId);
 
   if (userSocket) {
     console.log('user socket true');
-
     userSocket.join(targetUserId);
     io.to(targetUserId).emit(socketChannel, {
       data: populatedNotification,
+      message
     });
   }
   const user = await Users.findById(targetUserId);

@@ -112,6 +112,7 @@ export const sendMessageHandler: SendMessageHandler = async (req, res, next) => 
     notification.targetUser.toString(),
     { title: notification.title, message: notification.message },
     populatedNotification,
+    populatedMessage
   );
   await Notification.findByIdAndDelete(notification._id);
   res.status(201).json({ message: 'success', data: populatedMessage });
