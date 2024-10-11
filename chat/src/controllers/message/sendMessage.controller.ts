@@ -108,7 +108,7 @@ export const sendMessageHandler: SendMessageHandler = async (req, res, next) => 
 
   const populatedNotification = await (
     await notification.save()
-  ).populate('sourceUser', 'isOnline profileImage username');
+  ).populate('sourceUser', 'isOnline profileImage username name');
 
   const io = req.app.get('socketio');
   sendNotificationOrFCM(
