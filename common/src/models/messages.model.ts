@@ -8,6 +8,11 @@ interface Ireaction {
   user: Types.ObjectId | Iuser;
 }
 
+export interface IWatcher {
+  user: Types.ObjectId | Iuser;
+  watched: boolean;
+}
+
 export interface ImessageDoc {
   sender: Types.ObjectId | Iuser;
   receiver: Types.ObjectId | Iuser;
@@ -19,13 +24,18 @@ export interface ImessageDoc {
     },
   ];
   reactions: Ireaction[];
-  watched: boolean;
   updated: boolean;
+  watchers: IWatcher[];
 }
 
-const reactionSchema = new Schema({
+const reactionSchema = new Schema<Ireaction>({
   type: { type: String, required: true },
   user: { type: Schema.Types.ObjectId, ref: MODELS.user, required: true },
+});
+
+const watcherSchema = new Schema<IWatcher>({
+  user: { type: Schema.Types.ObjectId, ref: MODELS.user, required: true },
+  watched: { type: Boolean, default: false },
 });
 
 export const Message = model<ImessageDoc>(
@@ -47,6 +57,7 @@ export const Message = model<ImessageDoc>(
         default: null,
       },
       reactions: [reactionSchema],
+      watchers: [watcherSchema],
       media: [
         {
           type: {
@@ -59,10 +70,6 @@ export const Message = model<ImessageDoc>(
           },
         },
       ],
-      watched: {
-        type: Boolean,
-        default: false,
-      },
       updated: {
         type: Boolean,
         default: false,

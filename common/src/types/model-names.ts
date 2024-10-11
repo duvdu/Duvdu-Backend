@@ -31,5 +31,5 @@ export enum MODELS {
   contractReview = 'contract_review',
   projectsViews = 'projects_views',
   coupon = 'coupons',
-  producerPlatforms='producers-platforms'
+  producerPlatforms = 'producers-platforms',
 }

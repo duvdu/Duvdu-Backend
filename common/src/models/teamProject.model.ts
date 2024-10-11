@@ -9,7 +9,7 @@ export enum UserStatus {
   accepted = 'accepted',
   rejected = 'rejected',
   pending = 'pending',
-  canceled = 'canceled'
+  canceled = 'canceled',
 }
 
 export interface ITeamProject {
@@ -124,7 +124,7 @@ export interface ITeamContract {
   hourPrice: number;
   deadline: Date;
   details: string;
-  attachments:string [];
+  attachments: string[];
   totalAmount: number;
   actionAt: Date;
   rejectedBy?: 'customer' | 'sp';
@@ -132,9 +132,9 @@ export interface ITeamContract {
   stageExpiration: number;
   status: TeamContractStatus;
   cycle: CYCLES;
-  createdAt:Date;
-  paymentAmount:number;
-  totalCheckoutAt:Date
+  createdAt: Date;
+  paymentAmount: number;
+  totalCheckoutAt: Date;
 }
 
 export const TeamContract = model<ITeamContract>(
@@ -144,7 +144,7 @@ export const TeamContract = model<ITeamContract>(
       sp: { type: Schema.Types.ObjectId, ref: MODELS.user },
       customer: { type: Schema.Types.ObjectId, ref: MODELS.user },
       project: { type: Schema.Types.ObjectId, ref: MODELS.teamProject },
-      category:{type:Schema.Types.ObjectId , ref:MODELS.category},
+      category: { type: Schema.Types.ObjectId, ref: MODELS.category },
       startDate: Date,
       duration: Date,
       workHours: { type: Number, default: 0 },
@@ -158,9 +158,9 @@ export const TeamContract = model<ITeamContract>(
       stageExpiration: { type: Number, default: 0 },
       status: { type: String, enum: TeamContractStatus, default: TeamContractStatus.pending },
       cycle: { type: String, default: CYCLES.teamProject },
-      paymentAmount:{type:Number , default:0},
-      attachments:[String],
-      totalCheckoutAt:Date
+      paymentAmount: { type: Number, default: 0 },
+      attachments: [String],
+      totalCheckoutAt: Date,
     },
     { timestamps: true, collection: 'team_contracts' },
   ),

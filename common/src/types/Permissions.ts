@@ -169,9 +169,9 @@ export const permissions = {
   ],
   producer: [PERMISSIONS.getProducerAnalysis],
   dashboard: [PERMISSIONS.accessDashboard],
-  producerPlatform:[
+  producerPlatform: [
     PERMISSIONS.getProducerAnalysis,
     PERMISSIONS.createPlatform,
     PERMISSIONS.updatePlatform,
-  ]
+  ],
 };

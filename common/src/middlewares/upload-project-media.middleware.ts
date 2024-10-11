@@ -23,7 +23,7 @@ export const uploadProjectMedia = (folder: string) =>
         file.mimetype.startsWith('video') ||
         file.mimetype === 'application/pdf' ||
         file.mimetype === 'audio/mpeg' ||
-        file.mimetype === 'audio/wav'||
+        file.mimetype === 'audio/wav' ||
         file.mimetype === 'audio/x-wav'
       )
         return callback(null, true);

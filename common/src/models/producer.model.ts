@@ -12,7 +12,7 @@ export interface Iproducer {
   maxBudget: number;
   minBudget: number;
   searchKeywords: string[];
-  platforms: Types.ObjectId [] | IProducerPlatform[]
+  platforms: Types.ObjectId[] | IProducerPlatform[];
 }
 
 export const Producer = model<Iproducer>(
@@ -36,7 +36,7 @@ export const Producer = model<Iproducer>(
       minBudget: { type: Number, default: null },
       maxBudget: { type: Number, default: null },
       searchKeywords: [String],
-      platforms:[{type:Schema.Types.ObjectId , ref:MODELS.producerPlatforms}]
+      platforms: [{ type: Schema.Types.ObjectId, ref: MODELS.producerPlatforms }],
     },
     { timestamps: true, collection: MODELS.producer },
   ),
