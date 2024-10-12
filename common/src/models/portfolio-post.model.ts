@@ -22,7 +22,7 @@ export interface IprojectCycle {
   description: string;
   tools: { name: string; unitPrice: number }[];
   functions: { name: string; unitPrice: number }[];
-  creatives: {creative:Types.ObjectId[] | Iuser[] , inviteStatus:InviteStatus};
+  creatives: {creative:Types.ObjectId[] | Iuser[] , inviteStatus:InviteStatus}[];
   location: { lat: number; lng: number };
   address: string;
   searchKeyWords: string[];
