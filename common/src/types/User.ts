@@ -58,4 +58,5 @@ export interface Iuser {
     color: string | null;
   };
   projectsView: number;
+  haveInvitation:boolean;
 }
