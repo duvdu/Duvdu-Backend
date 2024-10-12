@@ -1,6 +1,14 @@
 import { model, Schema, Types } from 'mongoose';
-import { Iuser } from '../types/User';
+
 import { MODELS } from '../types/model-names';
+import { Iuser } from '../types/User';
+
+
+export enum InviteStatus{
+  accepted = 'accepted',
+  rejected = 'rejected',
+  pending = 'pending'
+}
 
 export interface IprojectCycle {
   user: Types.ObjectId | Iuser;
@@ -8,12 +16,13 @@ export interface IprojectCycle {
   subCategory: { ar: string; en: string };
   tags: { ar: string; en: string }[];
   cover: string;
+  audioCover:string;
   attachments: string[];
   name: string;
   description: string;
   tools: { name: string; unitPrice: number }[];
   functions: { name: string; unitPrice: number }[];
-  creatives: Types.ObjectId[] | Iuser[];
+  creatives: {creative:Types.ObjectId[] | Iuser[] , inviteStatus:InviteStatus};
   location: { lat: number; lng: number };
   address: string;
   searchKeyWords: string[];
@@ -40,6 +49,7 @@ export const ProjectCycle = model<IprojectCycle>(
       subCategory: { ar: { type: String, default: null }, en: { type: String, default: null } },
       tags: [{ ar: { type: String, default: null }, en: { type: String, default: null } }],
       cover: { type: String, default: null },
+      audioCover: { type: String, default: null },
       attachments: [{ type: String, default: null }],
       name: { type: String, default: null },
       description: { type: String, default: null },
@@ -47,7 +57,7 @@ export const ProjectCycle = model<IprojectCycle>(
       functions: [
         { name: { type: String, default: null }, unitPrice: { type: Number, default: 0 } },
       ],
-      creatives: [{ type: Schema.Types.ObjectId, ref: MODELS.user }],
+      creatives: [{creative:{ type: Schema.Types.ObjectId, ref: MODELS.user } , inviteStatus:{type:String , enum:InviteStatus , default:InviteStatus.pending}}],
       location: { lat: { type: Number, default: 0 }, lng: { type: Number, default: 0 } },
       address: { type: String, default: null },
       searchKeyWords: [String],
