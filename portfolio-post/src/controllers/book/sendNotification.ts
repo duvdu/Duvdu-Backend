@@ -33,9 +33,14 @@ export const sendNotification = async (
   });
 };
 
-
-export const sendSystemNotification = async (users:string[] , target:string , type:string , message:string , title:string , channel:string)=>{
-  
+export const sendSystemNotification = async (
+  users: string[],
+  target: string,
+  type: string,
+  message: string,
+  title: string,
+  channel: string,
+) => {
   for (let i = 0; i < users.length; i++) {
     const notification = await Notification.create({
       targetUser: users[i],
@@ -44,17 +49,16 @@ export const sendSystemNotification = async (users:string[] , target:string , ty
       message: message,
       title: title,
     });
-      
+
     const populatedNotification = await (
       await notification.save()
     ).populate('sourceUser', 'isOnline profileImage username');
-      
+
     await new NewNotificationPublisher(natsWrapper.client).publish({
       notificationDetails: { message: notification.message, title: notification.title },
       populatedNotification,
       socketChannel: channel,
       targetUser: notification.targetUser.toString(),
     });
-    
   }
 };

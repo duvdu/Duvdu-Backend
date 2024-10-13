@@ -3,6 +3,16 @@ import mongoose from 'mongoose';
 import { Icategory } from '../types/Category';
 import { CYCLES } from '../types/cycles';
 import { MODELS } from '../types/model-names';
+
+
+
+export enum CategoryMedia {
+  image = 'image',
+  video = 'video',
+  audio = 'audio'
+}
+
+
 const categorySchema = new mongoose.Schema<Icategory>(
   {
     creativesCounter: {
@@ -36,7 +46,7 @@ const categorySchema = new mongoose.Schema<Icategory>(
       default: true,
     },
     trend: { type: Boolean, default: false },
-    media: { type: String, enum: ['image', 'video', 'audio'] },
+    media: { type: String, enum: CategoryMedia },
   },
   {
     timestamps: true,

@@ -35,22 +35,83 @@ export const getProjetcsCrm: GetProjectsForCrmHandler = async (req, res) => {
         as: 'category',
       },
     },
-    {
-      $unwind: '$category',
-    },
+    { $unwind: '$category' },
+    
+    // Unwind creatives array to handle each creative individually
+    { $unwind: { path: '$creatives', preserveNullAndEmptyArrays: true } },
+    
+    // Populate the creative field within each creative object in the array
     {
       $lookup: {
         from: MODELS.user,
-        localField: 'creatives',
+        localField: 'creatives.creative',
         foreignField: '_id',
-        as: 'creatives',
+        as: 'creativeDetails',
       },
+    },
+    { $unwind: { path: '$creativeDetails', preserveNullAndEmptyArrays: true } },
+  
+    // Reassemble the creatives array
+    {
+      $group: {
+        _id: '$_id',
+        creatives: {
+          $push: {
+            _id: '$creativeDetails._id',
+            profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$creativeDetails.profileImage'] },
+            isOnline: '$creativeDetails.isOnline',
+            username: '$creativeDetails.username',
+            name: '$creativeDetails.name',
+            rank: '$creativeDetails.rank',
+            projectsView: '$creativeDetails.projectsView',
+            coverImage: { $concat: [process.env.BUCKET_HOST, '/', '$creativeDetails.coverImage'] },
+            acceptedProjectsCounter: '$creativeDetails.acceptedProjectsCounter',
+            rate: '$creativeDetails.rate',
+            profileViews: '$creativeDetails.profileViews',
+            about: '$creativeDetails.about',
+            isAvaliableToInstantProjects: '$creativeDetails.isAvaliableToInstantProjects',
+            pricePerHour: '$creativeDetails.pricePerHour',
+            hasVerificationBadge: '$creativeDetails.hasVerificationBadge',
+            likes: '$creativeDetails.likes',
+            followCount: '$creativeDetails.followCount',
+            address: '$creativeDetails.address',
+            inviteStatus: '$creatives.inviteStatus', // Include original inviteStatus field
+          },
+        },
+        // Retain other fields
+        doc: { $first: '$$ROOT' },
+      },
+    },
+    
+    // Restore root document structure
+    {
+      $replaceRoot: {
+        newRoot: { $mergeObjects: ['$doc', { creatives: '$creatives' }] },
+      },
+    },
+  
+    // Continue with the favourite lookup and project stages
+    {
+      $lookup: {
+        from: 'favourites',
+        localField: '_id',
+        foreignField: 'project',
+        as: 'favourite',
+      },
+    },
+    {
+      $addFields: {
+        favouriteCount: { $size: '$favourite' },
+      },
+    },
+    {
+      $unwind: { path: '$favourite', preserveNullAndEmptyArrays: true },
     },
     {
       $project: {
         _id: 1,
         user: {
-          _id:'$user._id',
+          _id: '$user._id',
           profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$user.profileImage'] },
           isOnline: '$user.isOnline',
           username: '$user.username',
@@ -66,8 +127,8 @@ export const getProjetcsCrm: GetProjectsForCrmHandler = async (req, res) => {
           pricePerHour: '$user.pricePerHour',
           hasVerificationBadge: '$user.hasVerificationBadge',
           likes: '$user.likes',
-          followCount:'$user.followCount',
-          address:'$user.address',  
+          followCount: '$user.followCount',
+          address: '$user.address',
         },
         category: {
           title: '$category.title.' + req.lang,
@@ -78,7 +139,15 @@ export const getProjetcsCrm: GetProjectsForCrmHandler = async (req, res) => {
           $map: {
             input: '$tags',
             as: 'tag',
-            in: '$$tag.' + req.lang,
+            in: {
+              title: {
+                $cond: {
+                  if: { $eq: [req.lang, 'en'] },
+                  then: '$$tag.en',
+                  else: '$$tag.ar',
+                },
+              },
+            },
           },
         },
         cover: { $concat: [process.env.BUCKET_HOST, '/', '$cover'] },
@@ -93,32 +162,7 @@ export const getProjetcsCrm: GetProjectsForCrmHandler = async (req, res) => {
         description: 1,
         tools: 1,
         functions: 1,
-        creatives: {
-          $map: {
-            input: { $ifNull: ['$creatives', []] },
-            as: 'creative',
-            in: {
-              profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$$creative.profileImage'] },
-              isOnline: '$$creative.isOnline',
-              username: '$$creative.username',
-              name: '$$creative.name',
-              rank: '$$creative.rank',
-              projectsView: '$$creative.projectsView',
-              coverImage: { $concat: [process.env.BUCKET_HOST, '/', '$$creative.coverImage'] },
-              acceptedProjectsCounter: '$$creative.acceptedProjectsCounter',
-              rate: '$$creative.rate',
-              profileViews: '$$creative.profileViews',
-              about: '$$creative.about',
-              isAvaliableToInstantProjects: '$$creative.isAvaliableToInstantProjects',
-              pricePerHour: '$$creative.pricePerHour',
-              hasVerificationBadge: '$$creative.hasVerificationBadge',
-              likes: '$$creative.likes',
-              followCount:'$$creative.followCount',
-              address:'$$creative.address',
-              _id:'$$creative._id',
-            },
-          },
-        },
+        creatives: 1, // Include the populated creatives array
         location: 1,
         address: 1,
         searchKeyWords: 1,
@@ -126,10 +170,11 @@ export const getProjetcsCrm: GetProjectsForCrmHandler = async (req, res) => {
         showOnHome: 1,
         projectScale: 1,
         rate: 1,
-        updatedAt:1,
-        createdAt:1
+        updatedAt: 1,
+        createdAt: 1,
+        favouriteCount: 1,
       },
-    },
+    }
   ]);
   const resultCount = await ProjectCycle.countDocuments(req.pagination.filter);
 

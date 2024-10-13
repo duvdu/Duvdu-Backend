@@ -62,6 +62,7 @@ const userSchema = new Schema<Iuser>(
       color: { type: String, default: null },
     },
     projectsView: { type: Number, default: 0 },
+    haveInvitation:{type:Boolean , default:false}
   },
   {
     timestamps: true,

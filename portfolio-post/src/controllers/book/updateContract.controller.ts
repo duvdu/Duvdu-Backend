@@ -20,14 +20,14 @@ export const updateContractHandler: UpdateContractHandler = async (req, res, nex
     );
 
   // update equipment
-  
+
   if (req.body.equipment) {
     const { functions, tools, totalPrice } = await calculateTotalPrice(
       contract.project.toString(),
       req.body.equipment,
       req.lang,
     );
-    
+
     contract.tools = tools;
     contract.functions = functions;
     contract.equipmentPrice = +totalPrice;
@@ -37,15 +37,13 @@ export const updateContractHandler: UpdateContractHandler = async (req, res, nex
   if (req.body.duration) {
     contract.deadline = new Date(
       new Date(contract.startDate).setDate(
-        new Date(contract.startDate).getDate() + req.body.duration
-      )
+        new Date(contract.startDate).getDate() + req.body.duration,
+      ),
     );
-    
   }
 
   // update number of units
-  if (req.body.numberOfUnits) 
-    contract.projectScale.numberOfUnits = req.body.numberOfUnits;
+  if (req.body.numberOfUnits) contract.projectScale.numberOfUnits = req.body.numberOfUnits;
 
   // update unit price
   if (req.body.unitPrice) contract.projectScale.unitPrice = req.body.unitPrice;
@@ -54,6 +52,6 @@ export const updateContractHandler: UpdateContractHandler = async (req, res, nex
     contract.equipmentPrice + contract.projectScale.unitPrice * contract.projectScale.numberOfUnits;
   contract.secondPaymentAmount = contract.totalPrice - contract.firstPaymentAmount;
   await contract.save();
-  
+
   res.status(200).json({ message: 'success', data: contract });
 };

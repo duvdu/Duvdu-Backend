@@ -31,16 +31,17 @@ pendingQueue.process(async (job) => {
     const contract = await ProjectContract.findOneAndUpdate(
       { _id: job.data.contractId, status: ContractStatus.pending },
       { status: ContractStatus.canceled, actionAt: new Date() },
-      {new:true}
+      { new: true },
     );
 
     if (contract) {
-      await sendSystemNotification([contract.sp.toString() || '' , contract.customer.toString() || ''],
-        contract._id.toString() || '' ,
-        NotificationType.update_project_contract ,
+      await sendSystemNotification(
+        [contract.sp.toString() || '', contract.customer.toString() || ''],
+        contract._id.toString() || '',
+        NotificationType.update_project_contract,
         NotificationDetails.updateProjectContract.title,
         NotificationDetails.updateProjectContract.message,
-        Channels.update_contract
+        Channels.update_contract,
       );
     }
   } catch (error) {
@@ -53,16 +54,17 @@ firstPayMentQueue.process(async (job) => {
     const contract = await ProjectContract.findOneAndUpdate(
       { _id: job.data.contractId, status: ContractStatus.waitingForFirstPayment },
       { status: ContractStatus.canceled, actionAt: new Date() },
-      {new:true}
+      { new: true },
     );
 
     if (contract) {
-      await sendSystemNotification([contract?.sp!.toString() || '' , contract?.customer!.toString() || ''],
-        contract?._id.toString() || '' ,
-        NotificationType.update_project_contract ,
+      await sendSystemNotification(
+        [contract?.sp!.toString() || '', contract?.customer!.toString() || ''],
+        contract?._id.toString() || '',
+        NotificationType.update_project_contract,
         NotificationDetails.updateProjectContract.title,
         NotificationDetails.updateProjectContract.message,
-        Channels.update_contract
+        Channels.update_contract,
       );
     }
   } catch (error) {
@@ -77,12 +79,13 @@ secondPayMentQueue.process(async (job) => {
       { status: ContractStatus.canceled, actionAt: new Date() },
     );
 
-    await sendSystemNotification([contract?.sp!.toString() || '' , contract?.customer!.toString() || ''],
-      contract?._id.toString() || '' ,
-      NotificationType.update_project_contract ,
+    await sendSystemNotification(
+      [contract?.sp!.toString() || '', contract?.customer!.toString() || ''],
+      contract?._id.toString() || '',
+      NotificationType.update_project_contract,
       NotificationDetails.updateProjectContract.title,
       NotificationDetails.updateProjectContract.message,
-      Channels.update_contract
+      Channels.update_contract,
     );
   } catch (error) {
     return new Error('Failed to cancelled project contract');
@@ -96,12 +99,13 @@ updateAfterFirstPaymentQueeu.process(async (job) => {
       { status: ContractStatus.canceled, actionAt: new Date() },
     );
 
-    await sendSystemNotification([contract?.sp!.toString() || '' , contract?.customer!.toString() || ''],
-      contract?._id.toString() || '' ,
-      NotificationType.update_project_contract ,
+    await sendSystemNotification(
+      [contract?.sp!.toString() || '', contract?.customer!.toString() || ''],
+      contract?._id.toString() || '',
+      NotificationType.update_project_contract,
       NotificationDetails.updateProjectContract.title,
       NotificationDetails.updateProjectContract.message,
-      Channels.update_contract
+      Channels.update_contract,
     );
   } catch (error) {
     return new Error('Failed to cancelled project contract');

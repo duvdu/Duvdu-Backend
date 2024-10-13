@@ -4,16 +4,38 @@ import {
   BadRequestError,
   Bucket,
   Categories,
+  CategoryMedia,
   Files,
   FOLDERS,
+  IprojectCycle,
   NotAllowedError,
   NotFound,
   ProjectCycle,
+  SuccessResponse,
 } from '@duvdu-v1/duvdu';
+import { RequestHandler } from 'express';
 
-import { UpdateProjectHandler } from '../../types/project.endoints';
+import { filterFilesByType } from './createProject.controller';
 
-export const updateProjectHandler: UpdateProjectHandler = async (req, res, next) => {
+export const updateProjectHandler: RequestHandler<
+{ projectId: string },
+SuccessResponse<{ data: IprojectCycle }>,
+Pick<
+  IprojectCycle,
+  | 'address'
+  | 'attachments'
+  | 'cover'
+  | 'description'
+  | 'duration'
+  | 'location'
+  | 'name'
+  | 'projectScale'
+  | 'searchKeyWords'
+  | 'showOnHome'
+  | 'audioCover'
+>,
+unknown
+> = async (req, res, next) => {
   const project = await ProjectCycle.findOne({
     user: req.loggedUser.id,
     _id: req.params.projectId,
@@ -28,19 +50,50 @@ export const updateProjectHandler: UpdateProjectHandler = async (req, res, next)
 
   const attachments = <Express.Multer.File[] | undefined>(req.files as any)?.attachments;
   const cover = <Express.Multer.File[] | undefined>(req.files as any)?.cover;
+  const audioCover = <Express.Multer.File[]>(req.files as any).audioCover;
 
   const s3 = new Bucket();
   if (attachments) {
+    if (media === CategoryMedia.image) {
+      const imageFiles = filterFilesByType(attachments, 'image/');
+      if (imageFiles.length !== 1) {
+        return next(
+          new BadRequestError(
+            { en: 'There must be exactly one image file as an attachment', ar: 'يجب أن يكون هناك ملف صورة واحد كمرفق' },
+            req.lang,
+          ),
+        );
+      }
+    } else if (media === CategoryMedia.audio) {
+      const audioFiles = filterFilesByType(attachments, 'audio/');
+      if (audioFiles.length !== 1) {
+        return next(
+          new BadRequestError(
+            { en: 'There must be exactly one audio file as an attachment', ar: 'يجب أن يكون هناك ملف صوتي واحد كمرفق' },
+            req.lang,
+          ),
+        );
+      }
+    } else if (media === CategoryMedia.video) {
+      const videoFiles = filterFilesByType(attachments, 'video/');
+      if (videoFiles.length !== 1) {
+        return next(
+          new BadRequestError(
+            { en: 'There must be exactly one video file as an attachment', ar: 'يجب أن يكون هناك ملف فيديو واحد كمرفق' },
+            req.lang,
+          ),
+        );
+      }
+    }
+
     await s3.saveBucketFiles(FOLDERS.portfolio_post, ...attachments);
     req.body.attachments = attachments.map((el) => `${FOLDERS.portfolio_post}/${el.filename}`);
-    Files.removeFiles(...(req.body as any).attachments);
+    Files.removeFiles(...req.body.attachments);
   }
+  
   if (cover) {
-    await s3.saveBucketFiles(FOLDERS.portfolio_post, ...cover);
-    req.body.cover = `${FOLDERS.portfolio_post}/${cover[0].filename}`;
     if (media === 'image' || media === 'audio') {
       if (!cover[0].mimetype.startsWith('image/')) {
-        Files.removeFiles(...req.body.attachments, req.body.cover);
         return next(
           new BadRequestError(
             { en: 'Cover must be an image ', ar: 'يجب أن يكون الغلاف صورة' },
@@ -48,9 +101,10 @@ export const updateProjectHandler: UpdateProjectHandler = async (req, res, next)
           ),
         );
       }
+      await s3.saveBucketFiles(FOLDERS.portfolio_post, ...cover);
+      req.body.cover = `${FOLDERS.portfolio_post}/${cover[0].filename}`;
     } else if (media === 'video') {
       if (!cover[0].mimetype.startsWith('video/')) {
-        Files.removeFiles(...req.body.attachments, req.body.cover);
         return next(
           new BadRequestError(
             { en: 'Cover must be a video for video media type', ar: 'يجب أن يكون الغلاف فيديو ' },
@@ -60,6 +114,20 @@ export const updateProjectHandler: UpdateProjectHandler = async (req, res, next)
       }
     }
     Files.removeFiles(req.body.cover);
+  }
+
+  if (audioCover && category.media === CategoryMedia.audio) {
+    if (!audioCover[0].mimetype.startsWith('audio/')) {
+      return next(
+        new BadRequestError(
+          { en: 'Audio cover must be an audio file', ar: 'يجب أن يكون الغلاف الصوتي صوتيًا' },
+          req.lang,
+        ),
+      );
+    }
+    await s3.saveBucketFiles(FOLDERS.portfolio_post, ...audioCover);
+    req.body.audioCover = `${FOLDERS.portfolio_post}/${audioCover[0].filename}`;
+    Files.removeFiles(req.body.audioCover);
   }
 
   const updatedProject = await ProjectCycle.findOneAndUpdate(
@@ -74,6 +142,8 @@ export const updateProjectHandler: UpdateProjectHandler = async (req, res, next)
 
   attachments && (await s3.removeBucketFiles(...project.attachments));
   cover && (await s3.removeBucketFiles(project.cover));
+  audioCover && (await s3.removeBucketFiles(project.audioCover));
 
   res.status(200).json({ message: 'success', data: updatedProject });
 };
+

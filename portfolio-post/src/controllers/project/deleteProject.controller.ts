@@ -18,6 +18,6 @@ export const deleteProjectHandler: DeleteProjectHandler = async (req, res, next)
     user: req.loggedUser.id,
     ref: MODELS.portfolioPost,
   });
-  
+
   res.status(204).json({ message: 'success' });
 };

@@ -37,14 +37,15 @@ router
 router
   .route('/')
   .post(
-    isauthenticated,
-    isauthorized(PERMISSIONS.createProjectHandler),
+    // isauthenticated,
+    // isauthorized(PERMISSIONS.createProjectHandler),
     globalUploadMiddleware(FOLDERS.portfolio_post, {
       maxSize: 400 * 1024 * 1024,
       fileTypes: ['video', 'image', 'audio/wav', 'audio/mpeg', 'application/pdf'],
     }).fields([
       { name: 'attachments', maxCount: 10 },
       { name: 'cover', maxCount: 1 },
+      { name: 'audioCover', maxCount: 1 },
     ]),
     val.create,
     checkRequiredFields({ fields: ['cover', 'attachments'] }),
@@ -69,6 +70,7 @@ router
     }).fields([
       { name: 'attachments', maxCount: 10 },
       { name: 'cover', maxCount: 1 },
+      { name: 'audioCover', maxCount: 1 },
     ]),
     val.update,
     handler.updateProjectHandler,
