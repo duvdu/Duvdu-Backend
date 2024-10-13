@@ -3,6 +3,7 @@ import 'express-async-errors';
 import {
   Contracts,
   incrementProjectsView,
+  InviteStatus,
   MODELS,
   NotFound,
   ProjectCycle,
@@ -55,32 +56,39 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
       },
       { $unwind: { path: '$creativeDetails', preserveNullAndEmptyArrays: true } },
     
-      // Reassemble the creatives array
+
+
       {
         $group: {
           _id: '$_id',
           creatives: {
             $push: {
-              _id: '$creativeDetails._id',
-              profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$creativeDetails.profileImage'] },
-              isOnline: '$creativeDetails.isOnline',
-              username: '$creativeDetails.username',
-              name: '$creativeDetails.name',
-              rank: '$creativeDetails.rank',
-              projectsView: '$creativeDetails.projectsView',
-              coverImage: { $concat: [process.env.BUCKET_HOST, '/', '$creativeDetails.coverImage'] },
-              acceptedProjectsCounter: '$creativeDetails.acceptedProjectsCounter',
-              rate: '$creativeDetails.rate',
-              profileViews: '$creativeDetails.profileViews',
-              about: '$creativeDetails.about',
-              isAvaliableToInstantProjects: '$creativeDetails.isAvaliableToInstantProjects',
-              pricePerHour: '$creativeDetails.pricePerHour',
-              hasVerificationBadge: '$creativeDetails.hasVerificationBadge',
-              likes: '$creativeDetails.likes',
-              followCount: '$creativeDetails.followCount',
-              address: '$creativeDetails.address',
-              inviteStatus: '$creatives.inviteStatus', // Include original inviteStatus field
-            },
+              $cond: [
+                { $eq: ['$creatives.inviteStatus', InviteStatus.accepted] }, // Condition to check if inviteStatus is 'accepted'
+                {
+                  _id: '$creativeDetails._id',
+                  profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$creativeDetails.profileImage'] },
+                  isOnline: '$creativeDetails.isOnline',
+                  username: '$creativeDetails.username',
+                  name: '$creativeDetails.name',
+                  rank: '$creativeDetails.rank',
+                  projectsView: '$creativeDetails.projectsView',
+                  coverImage: { $concat: [process.env.BUCKET_HOST, '/', '$creativeDetails.coverImage'] },
+                  acceptedProjectsCounter: '$creativeDetails.acceptedProjectsCounter',
+                  rate: '$creativeDetails.rate',
+                  profileViews: '$creativeDetails.profileViews',
+                  about: '$creativeDetails.about',
+                  isAvaliableToInstantProjects: '$creativeDetails.isAvaliableToInstantProjects',
+                  pricePerHour: '$creativeDetails.pricePerHour',
+                  hasVerificationBadge: '$creativeDetails.hasVerificationBadge',
+                  likes: '$creativeDetails.likes',
+                  followCount: '$creativeDetails.followCount',
+                  address: '$creativeDetails.address',
+                  inviteStatus: '$creatives.inviteStatus', // Include original inviteStatus field
+                },
+                null // If the condition is not met, push null
+              ]
+            }
           },
           // Retain other fields
           doc: { $first: '$$ROOT' },
@@ -166,7 +174,13 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
           description: 1,
           tools: 1,
           functions: 1,
-          creatives: 1, // Include the populated creatives array
+          creatives: {
+            $filter: {
+              input: '$creatives',
+              as: 'creative',
+              cond: { $ne: ['$$creative', null] } // Filter out null values
+            }
+          }, // Include the populated creatives array
           location: 1,
           address: 1,
           searchKeyWords: 1,
