@@ -14,7 +14,7 @@ const userSchema = new Schema<Iuser>(
       key: { type: String, default: null },
       number: { type: String, unique: true, sparse: true },
     },
-    username: { type: String, unique: true, sparse: true },
+    username: { type: String, unique: true, sparse: true , default:null },
     password: String,
     verificationCode: { code: String, expireAt: Date, reason: { type: String, default: null } },
     isVerified: { type: Boolean, default: false },

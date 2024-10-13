@@ -51,7 +51,6 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
         NotificationDetails.updateProjectContract.message,
         Channels.update_contract,
       );
-
     } else if (req.body.action === 'accept' && contract.status === ContractStatus.pending) {
       const spUser = await Users.findOne({ _id: req.loggedUser.id }, { avaliableContracts: 1 });
 
@@ -108,7 +107,6 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
         NotificationDetails.updateProjectContract.message,
         Channels.update_contract,
       );
-
     } else if (
       req.body.action === 'accept' &&
       contract.status === ContractStatus.updateAfterFirstPayment
@@ -173,7 +171,6 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
         Channels.update_contract,
       );
 
-
       // add update after payment expiration
 
       // const delay = contract.stageExpiration * 3600 * 1000;
@@ -196,7 +193,6 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
         NotificationDetails.updateProjectContract.message,
         Channels.update_contract,
       );
-      
     } else
       return next(
         new NotAllowedError(

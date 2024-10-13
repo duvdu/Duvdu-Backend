@@ -50,7 +50,7 @@ export const getProjetcsCrm: GetProjectsForCrmHandler = async (req, res) => {
       $project: {
         _id: 1,
         user: {
-          _id:'$user._id',
+          _id: '$user._id',
           profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$user.profileImage'] },
           isOnline: '$user.isOnline',
           username: '$user.username',
@@ -66,8 +66,8 @@ export const getProjetcsCrm: GetProjectsForCrmHandler = async (req, res) => {
           pricePerHour: '$user.pricePerHour',
           hasVerificationBadge: '$user.hasVerificationBadge',
           likes: '$user.likes',
-          followCount:'$user.followCount',
-          address:'$user.address',  
+          followCount: '$user.followCount',
+          address: '$user.address',
         },
         category: {
           title: '$category.title.' + req.lang,
@@ -113,9 +113,9 @@ export const getProjetcsCrm: GetProjectsForCrmHandler = async (req, res) => {
               pricePerHour: '$$creative.pricePerHour',
               hasVerificationBadge: '$$creative.hasVerificationBadge',
               likes: '$$creative.likes',
-              followCount:'$$creative.followCount',
-              address:'$$creative.address',
-              _id:'$$creative._id',
+              followCount: '$$creative.followCount',
+              address: '$$creative.address',
+              _id: '$$creative._id',
             },
           },
         },
@@ -126,8 +126,8 @@ export const getProjetcsCrm: GetProjectsForCrmHandler = async (req, res) => {
         showOnHome: 1,
         projectScale: 1,
         rate: 1,
-        updatedAt:1,
-        createdAt:1
+        updatedAt: 1,
+        createdAt: 1,
       },
     },
   ]);

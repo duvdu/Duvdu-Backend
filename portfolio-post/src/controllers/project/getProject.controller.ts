@@ -6,7 +6,6 @@ import {
   MODELS,
   NotFound,
   ProjectCycle,
-  Users,
 } from '@duvdu-v1/duvdu';
 import mongoose from 'mongoose';
 

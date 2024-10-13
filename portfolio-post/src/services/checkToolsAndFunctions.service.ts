@@ -179,4 +179,3 @@ export async function calculateTotalPrice(
   result.totalPrice = totalPrice;
   return result;
 }
-

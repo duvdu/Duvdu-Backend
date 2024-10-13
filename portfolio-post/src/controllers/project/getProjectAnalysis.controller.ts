@@ -43,7 +43,7 @@ export const getProjectAnalysis: RequestHandler<
         _id: 1,
         totalProjects: 1,
         username: '$userDetails.username',
-        name:'$userDetails.name',
+        name: '$userDetails.name',
         profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$userDetails.profileImage'] },
       },
     },
@@ -56,14 +56,14 @@ export const getProjectAnalysis: RequestHandler<
   const topAddressesPipeline: PipelineStage[] = [
     { $group: { _id: { location: '$location', address: '$address' }, totalProjects: { $sum: 1 } } },
     { $sort: { totalProjects: -1 } },
-    { 
-      $project: { 
-        _id: 0, 
-        location: '$_id.location', 
-        address: '$_id.address', 
-        totalProjects: 1 
-      } 
-    }
+    {
+      $project: {
+        _id: 0,
+        location: '$_id.location',
+        address: '$_id.address',
+        totalProjects: 1,
+      },
+    },
   ];
   if (matchedPeriod.createdAt) topAddressesPipeline.unshift({ $match: matchedPeriod });
   const addressStats = await ProjectCycle.aggregate(topAddressesPipeline);
