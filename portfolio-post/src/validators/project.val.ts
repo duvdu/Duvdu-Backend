@@ -1,4 +1,4 @@
-import { globalValidatorMiddleware } from '@duvdu-v1/duvdu';
+import { globalValidatorMiddleware, InviteStatus } from '@duvdu-v1/duvdu';
 import { body, param, query } from 'express-validator';
 import mongoose from 'mongoose';
 
@@ -9,7 +9,7 @@ export const create = [
   body('category').isMongoId().withMessage('category'),
   body('creatives').optional().isArray({ min: 1 }).withMessage('creatives'),
   body('creatives.*.creative').isMongoId().withMessage('creatives'),
-  body('invitedCreatives').optional().isArray({min:1}),
+  body('invitedCreatives').optional().isArray({ min: 1 }),
   body('invitedCreatives.*.number').exists().isString().isMobilePhone('ar-EG'),
   body('functions').optional().isArray({ min: 1 }).withMessage('functions'),
   body('functions.*').isObject().withMessage('functions'),
@@ -161,4 +161,9 @@ export const getProjectAnalysis = [
   query('startDate').optional().isISO8601().toDate().withMessage('startDate'),
   query('endDate').optional().isISO8601().toDate().withMessage('endDate'),
   globalValidatorMiddleware,
+];
+
+export const invitationAction = [
+  body('status').isIn([InviteStatus.accepted , InviteStatus.rejected]),
+  globalValidatorMiddleware
 ];

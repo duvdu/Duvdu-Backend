@@ -18,23 +18,23 @@ import { RequestHandler } from 'express';
 import { filterFilesByType } from './createProject.controller';
 
 export const updateProjectHandler: RequestHandler<
-{ projectId: string },
-SuccessResponse<{ data: IprojectCycle }>,
-Pick<
-  IprojectCycle,
-  | 'address'
-  | 'attachments'
-  | 'cover'
-  | 'description'
-  | 'duration'
-  | 'location'
-  | 'name'
-  | 'projectScale'
-  | 'searchKeyWords'
-  | 'showOnHome'
-  | 'audioCover'
->,
-unknown
+  { projectId: string },
+  SuccessResponse<{ data: IprojectCycle }>,
+  Pick<
+    IprojectCycle,
+    | 'address'
+    | 'attachments'
+    | 'cover'
+    | 'description'
+    | 'duration'
+    | 'location'
+    | 'name'
+    | 'projectScale'
+    | 'searchKeyWords'
+    | 'showOnHome'
+    | 'audioCover'
+  >,
+  unknown
 > = async (req, res, next) => {
   const project = await ProjectCycle.findOne({
     user: req.loggedUser.id,
@@ -59,7 +59,10 @@ unknown
       if (imageFiles.length !== 1) {
         return next(
           new BadRequestError(
-            { en: 'There must be exactly one image file as an attachment', ar: 'يجب أن يكون هناك ملف صورة واحد كمرفق' },
+            {
+              en: 'There must be exactly one image file as an attachment',
+              ar: 'يجب أن يكون هناك ملف صورة واحد كمرفق',
+            },
             req.lang,
           ),
         );
@@ -69,7 +72,10 @@ unknown
       if (audioFiles.length !== 1) {
         return next(
           new BadRequestError(
-            { en: 'There must be exactly one audio file as an attachment', ar: 'يجب أن يكون هناك ملف صوتي واحد كمرفق' },
+            {
+              en: 'There must be exactly one audio file as an attachment',
+              ar: 'يجب أن يكون هناك ملف صوتي واحد كمرفق',
+            },
             req.lang,
           ),
         );
@@ -79,7 +85,10 @@ unknown
       if (videoFiles.length !== 1) {
         return next(
           new BadRequestError(
-            { en: 'There must be exactly one video file as an attachment', ar: 'يجب أن يكون هناك ملف فيديو واحد كمرفق' },
+            {
+              en: 'There must be exactly one video file as an attachment',
+              ar: 'يجب أن يكون هناك ملف فيديو واحد كمرفق',
+            },
             req.lang,
           ),
         );
@@ -90,7 +99,7 @@ unknown
     req.body.attachments = attachments.map((el) => `${FOLDERS.portfolio_post}/${el.filename}`);
     Files.removeFiles(...req.body.attachments);
   }
-  
+
   if (cover) {
     if (media === 'image' || media === 'audio') {
       if (!cover[0].mimetype.startsWith('image/')) {
@@ -146,4 +155,3 @@ unknown
 
   res.status(200).json({ message: 'success', data: updatedProject });
 };
-

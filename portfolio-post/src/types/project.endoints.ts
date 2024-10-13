@@ -1,7 +1,6 @@
 import { IprojectCycle, PaginationResponse, SuccessResponse } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-
 export interface GetProjectHandler
   extends RequestHandler<
     { projectId: string },
