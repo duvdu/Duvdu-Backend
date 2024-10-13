@@ -288,15 +288,14 @@ export const createProjectHandler: RequestHandler<
     // Create project cycle and project records
     const projectCycle = await ProjectCycle.create({
       ...req.body,
-      // user: req.loggedUser.id,
-      user: '662b93104566c8d2f8ed6aea',
+      user: req.loggedUser.id,
       creatives:[...(req.body.creatives? req.body.creatives:[]) , ...(invitedCreative? invitedCreative:[])]
     });
 
     await Project.create({
+      _id:projectCycle._id,
       project: { type: projectCycle.id, ref: MODELS.portfolioPost },
-      user: '662b93104566c8d2f8ed6aea',
-      // user: req.loggedUser.id,
+      user: req.loggedUser.id,
       ref: MODELS.portfolioPost,
     });
 

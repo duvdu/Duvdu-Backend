@@ -39,17 +39,62 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
           as: 'category',
         },
       },
-      {
-        $unwind: '$category',
-      },
+      { $unwind: '$category' },
+      
+      // Unwind creatives array to handle each creative individually
+      { $unwind: { path: '$creatives', preserveNullAndEmptyArrays: true } },
+      
+      // Populate the creative field within each creative object in the array
       {
         $lookup: {
           from: MODELS.user,
-          localField: 'creatives',
+          localField: 'creatives.creative',
           foreignField: '_id',
-          as: 'creatives',
+          as: 'creativeDetails',
         },
       },
+      { $unwind: { path: '$creativeDetails', preserveNullAndEmptyArrays: true } },
+    
+      // Reassemble the creatives array
+      {
+        $group: {
+          _id: '$_id',
+          creatives: {
+            $push: {
+              _id: '$creativeDetails._id',
+              profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$creativeDetails.profileImage'] },
+              isOnline: '$creativeDetails.isOnline',
+              username: '$creativeDetails.username',
+              name: '$creativeDetails.name',
+              rank: '$creativeDetails.rank',
+              projectsView: '$creativeDetails.projectsView',
+              coverImage: { $concat: [process.env.BUCKET_HOST, '/', '$creativeDetails.coverImage'] },
+              acceptedProjectsCounter: '$creativeDetails.acceptedProjectsCounter',
+              rate: '$creativeDetails.rate',
+              profileViews: '$creativeDetails.profileViews',
+              about: '$creativeDetails.about',
+              isAvaliableToInstantProjects: '$creativeDetails.isAvaliableToInstantProjects',
+              pricePerHour: '$creativeDetails.pricePerHour',
+              hasVerificationBadge: '$creativeDetails.hasVerificationBadge',
+              likes: '$creativeDetails.likes',
+              followCount: '$creativeDetails.followCount',
+              address: '$creativeDetails.address',
+              inviteStatus: '$creatives.inviteStatus', // Include original inviteStatus field
+            },
+          },
+          // Retain other fields
+          doc: { $first: '$$ROOT' },
+        },
+      },
+      
+      // Restore root document structure
+      {
+        $replaceRoot: {
+          newRoot: { $mergeObjects: ['$doc', { creatives: '$creatives' }] },
+        },
+      },
+    
+      // Continue with the favourite lookup and project stages
       {
         $lookup: {
           from: 'favourites',
@@ -72,16 +117,12 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
           user: {
             _id: '$user._id',
             profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$user.profileImage'] },
-            coverImage: { $concat: [process.env.BUCKET_HOST, '/', '$user.coverImage'] },
-            category: {
-              _id: 1,
-              title: req.lang === 'en' ? '$user.category.title.en' : '$user.category.title.ar',
-            },
             isOnline: '$user.isOnline',
             username: '$user.username',
             name: '$user.name',
             rank: '$user.rank',
             projectsView: '$user.projectsView',
+            coverImage: { $concat: [process.env.BUCKET_HOST, '/', '$user.coverImage'] },
             acceptedProjectsCounter: '$user.acceptedProjectsCounter',
             rate: '$user.rate',
             profileViews: '$user.profileViews',
@@ -103,7 +144,6 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
               input: '$tags',
               as: 'tag',
               in: {
-                _id: '$$tag._id',
                 title: {
                   $cond: {
                     if: { $eq: [req.lang, 'en'] },
@@ -126,60 +166,31 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
           description: 1,
           tools: 1,
           functions: 1,
-          creatives: {
-            $map: {
-              input: { $ifNull: ['$creatives', []] },
-              as: 'creative',
-              in: {
-                _id: '$$creative._id',
-                profileImage: {
-                  $concat: [process.env.BUCKET_HOST, '/', '$$creative.profileImage'],
-                },
-                isOnline: '$$creative.isOnline',
-                username: '$$creative.username',
-                name: '$$creative.name',
-                rank: '$$creative.rank',
-                projectsView: '$$creative.projectsView',
-                coverImage: { $concat: [process.env.BUCKET_HOST, '/', '$$creative.coverImage'] },
-                acceptedProjectsCounter: '$$creative.acceptedProjectsCounter',
-                rate: '$$creative.rate',
-                profileViews: '$$creative.profileViews',
-                about: '$$creative.about',
-                isAvaliableToInstantProjects: '$$creative.isAvaliableToInstantProjects',
-                pricePerHour: '$$creative.pricePerHour',
-                hasVerificationBadge: '$$creative.hasVerificationBadge',
-                likes: '$$creative.likes',
-                followCount: '$$creative.followCount',
-                address: '$$creative.address',
-              },
-            },
-          },
+          creatives: 1, // Include the populated creatives array
           location: 1,
           address: 1,
           searchKeyWords: 1,
           duration: 1,
           showOnHome: 1,
           projectScale: 1,
+          rate: 1,
+          updatedAt: 1,
+          createdAt: 1,
           isFavourite: {
             $cond: {
               if: {
                 $eq: [
                   '$favourite.user',
-                  req.loggedUser?.id
-                    ? new mongoose.Types.ObjectId(req.loggedUser.id as string)
-                    : '0',
+                  req.loggedUser?.id ? new mongoose.Types.ObjectId(req.loggedUser.id) : '0',
                 ],
               },
               then: true,
               else: false,
             },
           },
-          rate: 1,
           favouriteCount: 1,
-          updatedAt: 1,
-          createdAt: 1,
         },
-      },
+      }
     ]);
 
     if (!projects[0])
