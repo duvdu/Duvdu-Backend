@@ -56,7 +56,7 @@ export const updateProducerVal = [
       throw new Error('subcategoryOptional');
     }),
   body('subcategory.*.subcategory').isMongoId().withMessage('subcategoryOptionalMongoId'),
-  body('subcategory.*.tags').isArray({ min: 1 }).withMessage('tagsOptionalArray'),
+  body('subcategory.*.tags').optional().isArray({ min: 1 }).withMessage('tagsOptionalArray'),
   body('subcategory.*.tags.*').isMongoId().withMessage('tagsOptionalMongoId'),
   globalValidatorMiddleware,
 ];

@@ -41,10 +41,10 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
         },
       },
       { $unwind: '$category' },
-      
+
       // Unwind creatives array to handle each creative individually
       { $unwind: { path: '$creatives', preserveNullAndEmptyArrays: true } },
-      
+
       // Populate the creative field within each creative object in the array
       {
         $lookup: {
@@ -55,8 +55,6 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
         },
       },
       { $unwind: { path: '$creativeDetails', preserveNullAndEmptyArrays: true } },
-    
-
 
       {
         $group: {
@@ -67,13 +65,17 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
                 { $eq: ['$creatives.inviteStatus', InviteStatus.accepted] }, // Condition to check if inviteStatus is 'accepted'
                 {
                   _id: '$creativeDetails._id',
-                  profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$creativeDetails.profileImage'] },
+                  profileImage: {
+                    $concat: [process.env.BUCKET_HOST, '/', '$creativeDetails.profileImage'],
+                  },
                   isOnline: '$creativeDetails.isOnline',
                   username: '$creativeDetails.username',
                   name: '$creativeDetails.name',
                   rank: '$creativeDetails.rank',
                   projectsView: '$creativeDetails.projectsView',
-                  coverImage: { $concat: [process.env.BUCKET_HOST, '/', '$creativeDetails.coverImage'] },
+                  coverImage: {
+                    $concat: [process.env.BUCKET_HOST, '/', '$creativeDetails.coverImage'],
+                  },
                   acceptedProjectsCounter: '$creativeDetails.acceptedProjectsCounter',
                   rate: '$creativeDetails.rate',
                   profileViews: '$creativeDetails.profileViews',
@@ -86,22 +88,22 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
                   address: '$creativeDetails.address',
                   inviteStatus: '$creatives.inviteStatus', // Include original inviteStatus field
                 },
-                null // If the condition is not met, push null
-              ]
-            }
+                null, // If the condition is not met, push null
+              ],
+            },
           },
           // Retain other fields
           doc: { $first: '$$ROOT' },
         },
       },
-      
+
       // Restore root document structure
       {
         $replaceRoot: {
           newRoot: { $mergeObjects: ['$doc', { creatives: '$creatives' }] },
         },
       },
-    
+
       // Continue with the favourite lookup and project stages
       {
         $lookup: {
@@ -178,8 +180,8 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
             $filter: {
               input: '$creatives',
               as: 'creative',
-              cond: { $ne: ['$$creative', null] } // Filter out null values
-            }
+              cond: { $ne: ['$$creative', null] }, // Filter out null values
+            },
           }, // Include the populated creatives array
           location: 1,
           address: 1,
@@ -204,7 +206,7 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
           },
           favouriteCount: 1,
         },
-      }
+      },
     ]);
 
     if (!projects[0])

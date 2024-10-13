@@ -17,7 +17,6 @@
 // } from '@duvdu-v1/duvdu';
 // import { RequestHandler } from 'express';
 
-
 // export const createProjectHandler:  RequestHandler<
 // unknown,
 // SuccessResponse<{ data: IprojectCycle }>,
@@ -93,7 +92,7 @@
 //           await s3.saveBucketFiles(FOLDERS.portfolio_post , ...audioCover);
 //           req.body.audioCover = `${FOLDERS.portfolio_post}/${audioCover[0].filename}`;
 //         }
-//         else 
+//         else
 //           return next(new BadRequestError({en:'audio cover required and must be an audio' , ar:'يجب أن يكون الغلاف الصوتي صوتيًا'} , req.lang));
 //       }
 //     } else if (media === CategoryMedia.video) {
@@ -126,9 +125,6 @@
 //   }
 // };
 
-
-
-
 import 'express-async-errors';
 import {
   BadRequestError,
@@ -147,6 +143,7 @@ import {
 import { RequestHandler } from 'express';
 
 import { inviteCreatives } from '../../services/inviteCreative.service';
+import { sendNotification } from '../book/sendNotification';
 
 export const createProjectHandler: RequestHandler<
   unknown,
@@ -170,7 +167,7 @@ export const createProjectHandler: RequestHandler<
     | 'tags'
     | 'audioCover'
     | 'creatives'
-  > & { subCategoryId: string; tagsId: string[]; invitedCreatives:{ number: string }[] },
+  > & { subCategoryId: string; tagsId: string[]; invitedCreatives: { number: string }[] },
   unknown
 > = async (req, res, next) => {
   try {
@@ -191,10 +188,10 @@ export const createProjectHandler: RequestHandler<
     req.body.tags = filteredTags;
 
     // Validate creatives if present
-    
+
     if (req.body.creatives) {
       const creativeCount = await Users.countDocuments({
-        _id: { $in: req.body.creatives.map(el => el.creative) },
+        _id: { $in: req.body.creatives.map((el) => el.creative) },
       });
       if (creativeCount !== req.body.creatives.length) {
         return next(
@@ -207,18 +204,20 @@ export const createProjectHandler: RequestHandler<
     }
 
     let invitedCreative;
-    if (req.body.invitedCreatives) 
-      invitedCreative = await inviteCreatives(req.body.invitedCreatives) || [];
-
+    if (req.body.invitedCreatives)
+      invitedCreative = (await inviteCreatives(req.body.invitedCreatives)) || [];
 
     const s3 = new Bucket();
-    
+
     if (media === CategoryMedia.image) {
       const imageFiles = filterFilesByType(attachments, 'image/');
       if (imageFiles.length !== 1) {
         return next(
           new BadRequestError(
-            { en: 'There must be exactly one image file as an attachment', ar: 'يجب أن يكون هناك ملف صورة واحد كمرفق' },
+            {
+              en: 'There must be exactly one image file as an attachment',
+              ar: 'يجب أن يكون هناك ملف صورة واحد كمرفق',
+            },
             req.lang,
           ),
         );
@@ -228,7 +227,10 @@ export const createProjectHandler: RequestHandler<
       if (audioFiles.length !== 1) {
         return next(
           new BadRequestError(
-            { en: 'There must be exactly one audio file as an attachment', ar: 'يجب أن يكون هناك ملف صوتي واحد كمرفق' },
+            {
+              en: 'There must be exactly one audio file as an attachment',
+              ar: 'يجب أن يكون هناك ملف صوتي واحد كمرفق',
+            },
             req.lang,
           ),
         );
@@ -238,7 +240,10 @@ export const createProjectHandler: RequestHandler<
       if (videoFiles.length !== 1) {
         return next(
           new BadRequestError(
-            { en: 'There must be exactly one video file as an attachment', ar: 'يجب أن يكون هناك ملف فيديو واحد كمرفق' },
+            {
+              en: 'There must be exactly one video file as an attachment',
+              ar: 'يجب أن يكون هناك ملف فيديو واحد كمرفق',
+            },
             req.lang,
           ),
         );
@@ -258,10 +263,17 @@ export const createProjectHandler: RequestHandler<
 
       // Additional validation for audio media
       if (media === CategoryMedia.audio) {
-        if (!audioCover || audioCover.length === 0 || !audioCover[0].mimetype.startsWith('audio/')) {
+        if (
+          !audioCover ||
+          audioCover.length === 0 ||
+          !audioCover[0].mimetype.startsWith('audio/')
+        ) {
           return next(
             new BadRequestError(
-              { en: 'Audio cover is required and must be an audio file', ar: 'يجب أن يكون الغلاف الصوتي صوتيًا' },
+              {
+                en: 'Audio cover is required and must be an audio file',
+                ar: 'يجب أن يكون الغلاف الصوتي صوتيًا',
+              },
               req.lang,
             ),
           );
@@ -283,21 +295,40 @@ export const createProjectHandler: RequestHandler<
     // Save cover and attachments to bucket
     await s3.saveBucketFiles(FOLDERS.portfolio_post, ...attachments, ...cover);
     req.body.cover = `${FOLDERS.portfolio_post}/${cover[0].filename}`;
-    req.body.attachments = attachments.map(f => `${FOLDERS.portfolio_post}/${f.filename}`);
+    req.body.attachments = attachments.map((f) => `${FOLDERS.portfolio_post}/${f.filename}`);
 
     // Create project cycle and project records
     const projectCycle = await ProjectCycle.create({
       ...req.body,
       user: req.loggedUser.id,
-      creatives:[...(req.body.creatives? req.body.creatives:[]) , ...(invitedCreative? invitedCreative:[])]
+      creatives: [
+        ...(req.body.creatives ? req.body.creatives : []),
+        ...(invitedCreative ? invitedCreative : []),
+      ],
     });
 
     await Project.create({
-      _id:projectCycle._id,
+      _id: projectCycle._id,
       project: { type: projectCycle.id, ref: MODELS.portfolioPost },
       user: req.loggedUser.id,
       ref: MODELS.portfolioPost,
     });
+
+    const loggedUser = await Users.findById(req.loggedUser.id);
+
+    if (projectCycle.creatives.length > 0) {
+      for (const creative of projectCycle.creatives) {
+        await sendNotification(
+          req.loggedUser.id,
+          creative.creative.toString(),
+          projectCycle._id.toString(),
+          'new tag',
+          'You were mentioned in the project.',
+          `${loggedUser?.name} has tagged you in his project. Accept or decline.`,
+          'new-tag',
+        );
+      }
+    }
 
     // Respond with success message
     res.status(201).json({ message: 'success', data: projectCycle });
@@ -307,11 +338,9 @@ export const createProjectHandler: RequestHandler<
   }
 };
 
-
-
 export const filterFilesByType = (
-  attachments: Express.Multer.File[], 
-  mimeType: string
+  attachments: Express.Multer.File[],
+  mimeType: string,
 ): Express.Multer.File[] => {
-  return attachments.filter(file => file.mimetype.startsWith(mimeType));
+  return attachments.filter((file) => file.mimetype.startsWith(mimeType));
 };

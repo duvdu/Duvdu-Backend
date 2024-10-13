@@ -5,3 +5,4 @@ export * from './getProjects.controller';
 export * from './deleteProject.controller';
 export * from './getProjectAnalysis.controller';
 export * from './getProjectsForCrm.controllers';
+export * from './invitationAction.controller';

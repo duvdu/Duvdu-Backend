@@ -129,12 +129,12 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
     { $unwind: '$user' },
     ...(isInstant !== undefined
       ? [
-        {
-          $match: {
-            'user.isAvaliableToInstantProjects': isInstant,
+          {
+            $match: {
+              'user.isAvaliableToInstantProjects': isInstant,
+            },
           },
-        },
-      ]
+        ]
       : []),
     {
       $count: 'totalCount',
@@ -184,10 +184,10 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
       },
     },
     { $unwind: '$category' },
-    
+
     // Unwind creatives array to handle each creative individually
     { $unwind: { path: '$creatives', preserveNullAndEmptyArrays: true } },
-    
+
     // Populate the creative field within each creative object in the array
     {
       $lookup: {
@@ -198,7 +198,7 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
       },
     },
     { $unwind: { path: '$creativeDetails', preserveNullAndEmptyArrays: true } },
-  
+
     // Reassemble the creatives array
     {
       $group: {
@@ -209,13 +209,17 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
               { $eq: ['$creatives.inviteStatus', InviteStatus.accepted] }, // Condition to check if inviteStatus is 'accepted'
               {
                 _id: '$creativeDetails._id',
-                profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$creativeDetails.profileImage'] },
+                profileImage: {
+                  $concat: [process.env.BUCKET_HOST, '/', '$creativeDetails.profileImage'],
+                },
                 isOnline: '$creativeDetails.isOnline',
                 username: '$creativeDetails.username',
                 name: '$creativeDetails.name',
                 rank: '$creativeDetails.rank',
                 projectsView: '$creativeDetails.projectsView',
-                coverImage: { $concat: [process.env.BUCKET_HOST, '/', '$creativeDetails.coverImage'] },
+                coverImage: {
+                  $concat: [process.env.BUCKET_HOST, '/', '$creativeDetails.coverImage'],
+                },
                 acceptedProjectsCounter: '$creativeDetails.acceptedProjectsCounter',
                 rate: '$creativeDetails.rate',
                 profileViews: '$creativeDetails.profileViews',
@@ -228,22 +232,22 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
                 address: '$creativeDetails.address',
                 inviteStatus: '$creatives.inviteStatus', // Include original inviteStatus field
               },
-              null // If the condition is not met, push null
-            ]
-          }
+              null, // If the condition is not met, push null
+            ],
+          },
         },
         // Retain other fields
         doc: { $first: '$$ROOT' },
       },
     },
-    
+
     // Restore root document structure
     {
       $replaceRoot: {
         newRoot: { $mergeObjects: ['$doc', { creatives: '$creatives' }] },
       },
     },
-  
+
     // Continue with the favourite lookup and project stages
     {
       $lookup: {
@@ -320,8 +324,8 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
           $filter: {
             input: '$creatives',
             as: 'creative',
-            cond: { $ne: ['$$creative', null] } // Filter out null values
-          }
+            cond: { $ne: ['$$creative', null] }, // Filter out null values
+          },
         },
         location: 1,
         address: 1,
@@ -346,10 +350,9 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
         },
         favouriteCount: 1,
       },
-    }
+    },
   );
 
- 
   // Execute the aggregation pipeline
   const projects = await ProjectCycle.aggregate(pipeline);
 
