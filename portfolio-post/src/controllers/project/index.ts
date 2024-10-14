@@ -6,3 +6,4 @@ export * from './deleteProject.controller';
 export * from './getProjectAnalysis.controller';
 export * from './getProjectsForCrm.controllers';
 export * from './invitationAction.controller';
+export * from './getUserInvitation.controller';

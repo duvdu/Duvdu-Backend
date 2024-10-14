@@ -15,6 +15,8 @@ import * as val from '../validators/project.val';
 
 export const router = express.Router();
 
+
+router.route('/invitation').get(isauthenticated , handler.getUserInvitationHandler);
 router
   .route('/analysis')
   .get(
