@@ -15,9 +15,8 @@ import { hashVerificationCode } from '../../utils/crypto';
 export const verifyHandler: RequestHandler<
   unknown,
   SuccessResponse<{ reason: string; username: string }>,
-  { login: string; code: string  }
+  { login: string; code: string }
 > = async (req, res, next) => {
-
   const { login } = req.body;
   const query: { username?: string; email?: string; 'phoneNumber.number'?: string } = {};
   if (login) {

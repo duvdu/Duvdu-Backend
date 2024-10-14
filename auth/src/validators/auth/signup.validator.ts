@@ -68,6 +68,8 @@ export const updateUser = [
     .isLength({ min: 3, max: 32 })
     .withMessage('nameInvalid'),
   body('phoneNumber').isObject().optional(),
+  body('categories').optional().isArray(),
+  body('categories.*').isMongoId(),
   body('phoneNumber.number')
     .optional()
     .exists()

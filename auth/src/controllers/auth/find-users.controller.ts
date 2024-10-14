@@ -71,7 +71,7 @@ export const findUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser
       },
     },
     {
-      $match: {...req.pagination.filter , _id:new mongoose.Types.ObjectId(req.loggedUser.id)},
+      $match: { ...req.pagination.filter, _id: new mongoose.Types.ObjectId(req.loggedUser.id) },
     },
     {
       $project: {
