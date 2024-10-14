@@ -9,7 +9,6 @@ export const resendVerificationCodeHandler: ResendVerificationCodeHandler = asyn
   res,
   next,
 ) => {
-
   const { login } = req.body;
   const query: { username?: string; email?: string; 'phoneNumber.number'?: string } = {};
   if (login) {

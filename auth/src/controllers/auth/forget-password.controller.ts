@@ -18,7 +18,7 @@ import { generateRandom6Digit } from '../../utils/gitRandom6Dugut';
 export const askForgetPasswordHandler: RequestHandler<
   unknown,
   SuccessResponse,
-  { login:string  },
+  { login: string },
   unknown
 > = async (req, res, next) => {
   const { login } = req.body;
@@ -50,7 +50,7 @@ export const askForgetPasswordHandler: RequestHandler<
 
   const user = await Users.findOne(query);
   if (!user) return next(new NotFound(undefined, req.lang));
-  
+
   if (!user.isVerified)
     return next(
       new BadRequestError({ en: 'account not verified', ar: 'الحساب غير موثق' }, req.lang),
@@ -73,10 +73,10 @@ export const askForgetPasswordHandler: RequestHandler<
     reason: VerificationReason.forgetPassword,
   };
   await user.save();
-  // TODO: send OTP to email or phone 
+  // TODO: send OTP to email or phone
   if (sendEmailOtp) {
     console.log('send otp to email');
-  }else{
+  } else {
     console.log('send otp to phone');
   }
 
@@ -84,13 +84,11 @@ export const askForgetPasswordHandler: RequestHandler<
 };
 
 export const updateForgetenPasswordHandler: RequestHandler<
-unknown,
-SuccessResponse,
-{ login:string , newPassword: string;  },
+  unknown,
+  SuccessResponse,
+  { login: string; newPassword: string },
   unknown
 > = async (req, res, next) => {
-
-
   const { login } = req.body;
 
   const query: { username?: string; email?: string; 'phoneNumber.number'?: string } = {};
@@ -116,7 +114,6 @@ SuccessResponse,
       ),
     );
 
-
   const user = await Users.findOne(query).populate('role');
   if (!user) return next(new NotFound());
 
@@ -136,8 +133,13 @@ SuccessResponse,
 
   const userAgent = req.headers['user-agent'];
 
-  const  {accessToken , refreshToken} = await createOrUpdateSessionAndGenerateTokens(userAgent! , user , role , null);
-  
+  const { accessToken, refreshToken } = await createOrUpdateSessionAndGenerateTokens(
+    userAgent!,
+    user,
+    role,
+    null,
+  );
+
   user.password = await hashPassword(req.body.newPassword);
   await user.save();
 

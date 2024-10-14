@@ -1,6 +1,7 @@
 import {
   BadRequestError,
   Bucket,
+  Categories,
   Files,
   FOLDERS,
   Iuser,
@@ -27,6 +28,7 @@ export const updateUserHandler: RequestHandler<
     | 'address'
     | 'phoneNumber'
     | 'role'
+    | 'categories'
   >,
   unknown
 > = async (req, res, next) => {
@@ -64,6 +66,13 @@ export const updateUserHandler: RequestHandler<
     if (!role)
       return next(new NotFound({ en: 'role not found', ar: 'لم يتم العثور على الدور' }, req.lang));
   }
+
+  if (req.body.categories) {
+    const categoriesLength = await Categories.countDocuments({_id:req.body.categories.map(el => el)});
+    if (req.body.categories.length != categoriesLength) 
+      return next(new BadRequestError({en:'invalid categories ids' , ar:'معرفات الفئات غير صالحة'} , req.lang));
+  }
+
 
   if (req.body.password) req.body.password = await hashPassword(req.body.password);
 

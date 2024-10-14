@@ -61,8 +61,8 @@ export const loginWithProviderHandler: RequestHandler<
       username: req.body.username,
       isVerified: true,
       role: role._id,
-      email:req.body.email,
-      name:req.body.name
+      email: req.body.email,
+      name: req.body.name,
     });
   } else {
     role = await Roles.findById(user.role);
@@ -89,7 +89,12 @@ export const loginWithProviderHandler: RequestHandler<
 
   const userAgent = req.headers['user-agent'];
 
-  const {accessToken , refreshToken} = await createOrUpdateSessionAndGenerateTokens(userAgent! , user , role , req.body.notificationToken? req.body.notificationToken : null);
+  const { accessToken, refreshToken } = await createOrUpdateSessionAndGenerateTokens(
+    userAgent!,
+    user,
+    role,
+    req.body.notificationToken ? req.body.notificationToken : null,
+  );
 
   req.session.access = accessToken;
   req.session.refresh = refreshToken;

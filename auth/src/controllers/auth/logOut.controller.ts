@@ -20,7 +20,6 @@ export const logoutHandler: LogoutHandler = async (req, res) => {
     { $pull: { refreshTokens: { token: req.session.refresh } } },
   );
 
-
   req.session.access = '';
   req.session.refresh = '';
 

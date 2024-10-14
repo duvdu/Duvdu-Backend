@@ -8,7 +8,7 @@ import { GetLoggedProducerHandler } from '../../types/endpoints';
 export const getLoggedProducerHandler: GetLoggedProducerHandler = async (req, res, next) => {
   const producers = await Producer.aggregate([
     {
-      $match: { user: new mongoose.Types.ObjectId('662b93104566c8d2f8ed6aea') },
+      $match: { user: new mongoose.Types.ObjectId(req.loggedUser.id) },
     },
     {
       $lookup: {

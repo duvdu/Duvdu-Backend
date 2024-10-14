@@ -1,17 +1,36 @@
+import 'express-async-errors';
 import {
   BadRequestError,
   NotFound,
-  Categories,
   Users,
   Bucket,
   Files,
   FOLDERS,
+  SuccessResponse,
+  Iuser,
+  Categories,
 } from '@duvdu-v1/duvdu';
-
-import 'express-async-errors';
 import { RequestHandler } from 'express';
 
-export const updateProfileHandler: RequestHandler = async (req, res, next) => {
+export const updateProfileHandler: RequestHandler<
+  unknown,
+  SuccessResponse<{ data: Iuser }>,
+  Partial<
+    Pick<
+      Iuser,
+      | 'pricePerHour'
+      | 'isAvaliableToInstantProjects'
+      | 'about'
+      | 'categories'
+      | 'address'
+      | 'location'
+      | 'name'
+      | 'coverImage'
+      | 'profileImage'
+    >
+  >,
+  unknown
+> = async (req, res, next) => {
   const profile = await Users.findById(req.loggedUser.id);
   if (!profile)
     return next(new NotFound({ en: 'no user found', ar: 'المستخدم غير موجود' }, req.lang));
@@ -40,6 +59,12 @@ export const updateProfileHandler: RequestHandler = async (req, res, next) => {
       type: 'Point',
       coordinates: [(req as any).body.location.lng, (req as any).body.location.lat],
     } as any;
+
+  if (req.body.categories) {
+    const categoriesLength = await Categories.countDocuments({_id:req.body.categories.map(el => el)});
+    if (req.body.categories.length != categoriesLength) 
+      return next(new BadRequestError({en:'invalid categories ids' , ar:'معرفات الفئات غير صالحة'} , req.lang));
+  }
 
   const user = await Users.findByIdAndUpdate(req.loggedUser?.id, req.body, { new: true })
     .populate([{ path: 'categories', select: 'title' }])
