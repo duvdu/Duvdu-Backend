@@ -2,7 +2,6 @@ import {
   BadRequestError,
   Contracts,
   Follow,
-  Icategory,
   MODELS,
   NotFound,
   Users,

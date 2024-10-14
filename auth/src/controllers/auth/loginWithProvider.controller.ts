@@ -39,7 +39,6 @@ export const loginWithProviderHandler: RequestHandler<
 
     req.body.username = username.toLowerCase();
   }
-  console.log(req.body.username);
 
   let role;
   let user = await Users.findOne({
