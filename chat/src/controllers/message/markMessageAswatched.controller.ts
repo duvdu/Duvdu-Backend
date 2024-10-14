@@ -12,6 +12,7 @@ export const markMessageAsWatchedHandler: MarkMessageAsWatchedHandler = async (r
   if (messageCount != req.body.messages.length)
     return next(new BadRequestError({ en: 'invalid messages', ar: 'رسائل غير صالحة' }, req.lang));
 
+  
   await Message.updateMany(
     {
       _id: { $in: req.body.messages },
