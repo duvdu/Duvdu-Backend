@@ -32,6 +32,7 @@ export const createProjectHandler: RequestHandler = async (req, res) => {
   const project = await Rentals.create({ ...req.body, user: req.loggedUser.id });
 
   await Project.create({
+    _id:project._id,
     project: { type: project.id, ref: 'rentals' },
     user: req.loggedUser.id,
     ref: 'rentals',

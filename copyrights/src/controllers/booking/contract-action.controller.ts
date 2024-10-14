@@ -6,17 +6,18 @@ import {
   BadRequestError,
   Users,
   NotAllowedError,
+  Channels,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-// import { contractNotification } from './contract-notification.controller';
 // import { firstPaymentExpiration, totalPaymentExpiration } from '../../config/expiration-queue';
+import { sendNotification } from './contract-notification.controller';
 import { CopyrightContracts, ContractStatus } from '../../models/copyright-contract.model';
 
 export const contractAction: RequestHandler<
   { contractId: string },
   SuccessResponse,
-  { action: 'accept' | 'reject' }
+  { action: 'accept' | 'reject' | 'cancel' }
 > = async (req, res, next) => {
   const contract = await CopyrightContracts.findOne({
     _id: req.params.contractId,
@@ -34,7 +35,8 @@ export const contractAction: RequestHandler<
     );
 
   const isSp = contract.sp.toString() === req.loggedUser.id;
-
+  const sp = await Users.findById(contract.sp);
+  const customer = await Users.findById(contract.customer);
   // take action
   if (isSp) {
     /*
@@ -48,11 +50,16 @@ export const contractAction: RequestHandler<
         { _id: req.params.contractId },
         { status: ContractStatus.rejected, rejectedBy: 'sp', actionAt: new Date() },
       );
-      // await contractNotification(
-      //   contract.id,
-      //   contract.customer.toString(),
-      //   'copyright contract rejected by the SP',
-      // );
+
+      await sendNotification(
+        req.loggedUser.id,
+        contract.customer.toString(),
+        contract._id.toString(),
+        'contract',
+        'copyright contract updates',
+        `${sp?.name} reject this contract`,
+        Channels.update_contract,
+      );
     } else if (req.body.action === 'accept' && contract.status === ContractStatus.pending) {
       const spUser = await Users.findOne({ _id: req.loggedUser.id }, { avaliableContracts: 1 });
 
@@ -74,11 +81,16 @@ export const contractAction: RequestHandler<
           paymentLink: paymentSession,
         },
       );
-      // await contractNotification(
-      //   contract.id,
-      //   contract.customer.toString(),
-      //   `copyright contract accpted by the SP, please pay to complete this contract within ${contract.stageExpiration}h`,
-      // );
+
+      await sendNotification(
+        req.loggedUser.id,
+        contract.customer.toString(),
+        contract._id.toString(),
+        'contract',
+        'copyright contract updates',
+        `${sp?.name} accept this contract , please pay to complete this contract`,
+        Channels.update_contract,
+      );
 
       // await firstPaymentExpiration.add(
       //   { contractId: contract.id },
@@ -92,11 +104,16 @@ export const contractAction: RequestHandler<
         { _id: req.params.contractId },
         { status: ContractStatus.rejected, rejectedBy: 'sp', actionAt: new Date() },
       );
-      // await contractNotification(
-      //   contract.id,
-      //   contract.customer.toString(),
-      //   'copyright contract rejected by the SP',
-      // );
+
+      await sendNotification(
+        req.loggedUser.id,
+        contract.customer.toString(),
+        contract._id.toString(),
+        'contract',
+        'copyright contract updates',
+        `${sp?.name} reject this contract`,
+        Channels.update_contract,
+      );
     } else if (
       req.body.action === 'accept' &&
       contract.status === ContractStatus.updateAfterFirstPayment
@@ -110,11 +127,17 @@ export const contractAction: RequestHandler<
           paymentLink: paymentSession,
         },
       );
-      // await contractNotification(
-      //   contract.id,
-      //   contract.customer.toString(),
-      //   `copyright contract accpted by the SP, please pay to complete this contract within ${contract.stageExpiration}h`,
-      // );
+
+      await sendNotification(
+        req.loggedUser.id,
+        contract.customer.toString(),
+        contract._id.toString(),
+        'contract',
+        'copyright contract updates',
+        `${sp?.name} accept contract, please pay to complete this contract`,
+        Channels.update_contract,
+      );
+
       // await totalPaymentExpiration.add(
       //   { contractId: contract.id },
       //   { delay: (contract.stageExpiration || 0) * 60 * 60 * 1000 },
@@ -143,16 +166,37 @@ export const contractAction: RequestHandler<
       if action = accept && contract.status = update after first pay
         - project status = waiting for totol payment
     */
-    if (req.body.action === 'reject' && contract.status === ContractStatus.waitingForFirstPayment) {
+
+    if (req.body.action === 'cancel' && contract.status === ContractStatus.pending) {
+      await CopyrightContracts.updateOne(
+        { _id: req.params.contractId },
+        { status: ContractStatus.canceled, rejectedBy: 'customer', actionAt: new Date() },
+      );
+
+      await sendNotification(
+        req.loggedUser.id,
+        contract.sp.toString(),
+        contract._id.toString(),
+        'contract',
+        'copyright contract updates',
+        `${customer?.name} canceled this contract`,
+        Channels.update_contract,
+      );
+    } else if (req.body.action === 'reject' && contract.status === ContractStatus.waitingForFirstPayment) {
       await CopyrightContracts.updateOne(
         { _id: req.params.contractId },
         { status: ContractStatus.rejected, rejectedBy: 'customer', actionAt: new Date() },
       );
-      // await contractNotification(
-      //   contract.id,
-      //   contract.sp.toString(),
-      //   'copyright contract rejected by the customer',
-      // );
+
+      await sendNotification(
+        req.loggedUser.id,
+        contract.sp.toString(),
+        contract._id.toString(),
+        'contract',
+        'copyright contract updates',
+        `${customer?.name} reject this contract`,
+        Channels.update_contract,
+      );
     } else if (
       req.body.action === 'reject' &&
       contract.status === ContractStatus.waitingForTotalPayment
@@ -161,11 +205,16 @@ export const contractAction: RequestHandler<
         { _id: req.params.contractId },
         { status: ContractStatus.rejected, rejectedBy: 'customer', actionAt: new Date() },
       );
-      // await contractNotification(
-      //   contract.id,
-      //   contract.sp.toString(),
-      //   'copyright contract rejected by the customer',
-      // );
+
+      await sendNotification(
+        req.loggedUser.id,
+        contract.sp.toString(),
+        contract._id.toString(),
+        'contract',
+        'copyright contract updates',
+        `${customer?.name} reject this contract`,
+        Channels.update_contract,
+      );
     } else
       return next(
         new NotAllowedError(

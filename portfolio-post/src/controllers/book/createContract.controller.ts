@@ -104,6 +104,7 @@ export const createContractHandler: CreateContractHandler = async (req, res, nex
     });
 
     await Contracts.create({
+      _id: contract._id,
       customer: contract.customer,
       sp: contract.sp,
       contract: contract._id,

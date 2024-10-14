@@ -1,7 +1,8 @@
-import { ContractReports } from '@duvdu-v1/duvdu';
+import { Channels, ContractReports } from '@duvdu-v1/duvdu';
 import Queue from 'bull';
 
 import { env } from './env';
+import { sendSystemNotification } from '../controllers/booking/contract-notification.controller';
 import { ContractStatus, CopyrightContracts } from '../models/copyright-contract.model';
 
 export const pendingExpiration = new Queue<{ contractId: string }>(
@@ -30,33 +31,75 @@ export const onGoingExpiration = new Queue<{ contractId: string }>(
 );
 
 pendingExpiration.process(async (job) => {
-  await CopyrightContracts.findOneAndUpdate(
+  const contract = await CopyrightContracts.findOneAndUpdate(
     { _id: job.data.contractId, status: ContractStatus.pending },
     { status: ContractStatus.canceled, actionAt: new Date() },
   );
+
+  if (contract)
+    await sendSystemNotification(
+      [contract.sp.toString(), contract.customer.toString()],
+      contract._id.toString(),
+      'contract',
+      'copyright contract updates',
+      'contract canceled by system',
+      Channels.update_contract,
+    );
 });
 
 firstPaymentExpiration.process(async (job) => {
-  await CopyrightContracts.findOneAndUpdate(
+  const contract = await CopyrightContracts.findOneAndUpdate(
     { _id: job.data.contractId, status: ContractStatus.waitingForFirstPayment },
     { status: ContractStatus.canceled, actionAt: new Date() },
   );
+
+  if (contract)
+    await sendSystemNotification(
+      [contract.sp.toString(), contract.customer.toString()],
+      contract._id.toString(),
+      'contract',
+      'copyright contract updates',
+      'contract canceled by system',
+      Channels.update_contract,
+    );
+
 });
 
 updateAfterFirstPaymentExpiration.process(async (job) => {
   // if there are no update status will be wait for the total payment (act as sp reject)
-  await CopyrightContracts.findOneAndUpdate(
+  const contract = await CopyrightContracts.findOneAndUpdate(
     { _id: job.data.contractId, status: ContractStatus.updateAfterFirstPayment },
     { status: ContractStatus.canceled, actionAt: new Date() },
   );
+
+  if (contract)
+    await sendSystemNotification(
+      [contract.sp.toString(), contract.customer.toString()],
+      contract._id.toString(),
+      'contract',
+      'copyright contract updates',
+      'contract canceled by system',
+      Channels.update_contract,
+    );
+
 });
 
 totalPaymentExpiration.process(async (job) => {
   // if there are no update status will be wait for the total payment (act as sp accept)
-  await CopyrightContracts.findOneAndUpdate(
+  const contract = await CopyrightContracts.findOneAndUpdate(
     { _id: job.data.contractId, status: ContractStatus.waitingForTotalPayment },
     { status: ContractStatus.canceled, actionAt: new Date() },
   );
+
+  if (contract)
+    await sendSystemNotification(
+      [contract.sp.toString(), contract.customer.toString()],
+      contract._id.toString(),
+      'contract',
+      'copyright contract updates',
+      'contract canceled by system',
+      Channels.update_contract,
+    );
 });
 
 onGoingExpiration.process(async (job) => {

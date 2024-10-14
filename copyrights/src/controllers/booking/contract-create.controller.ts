@@ -13,11 +13,13 @@ import {
   CYCLES,
   addToDate,
   BadRequestError,
+  Users,
+  Channels,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-// import { contractNotification } from './contract-notification.controller';
 // import { pendingExpiration } from '../../config/expiration-queue';
+import { sendNotification } from './contract-notification.controller';
 import { ContractStatus, CopyrightContracts } from '../../models/copyright-contract.model';
 
 export const createContractHandler: RequestHandler<
@@ -72,13 +74,25 @@ export const createContractHandler: RequestHandler<
   });
 
   await Contracts.create({
+    _id: contract._id,
     customer: contract.customer,
     sp: contract.sp,
     contract: contract.id,
     ref: 'copyright_contracts',
     cycle: CYCLES.copyRights,
   });
-  // await contractNotification(contract.id, contract.sp.toString(), 'copyright contract created');
+
+  const user = await Users.findById(req.loggedUser.id);
+
+  await sendNotification(
+    req.loggedUser.id,
+    contract.sp.toString(),
+    contract._id.toString(),
+    'contract',
+    'new contract',
+    `new contract created from ${user?.name}`,
+    Channels.new_contract,
+  );
 
   // await pendingExpiration.add(
   //   { contractId: contract.id },
@@ -89,30 +103,6 @@ export const createContractHandler: RequestHandler<
   res.status(201).json({ message: 'success', data: { contractId: contract.id } });
 };
 
-// const getStageExpiration = async (date: Date, lang: string) => {
-//   const setting = await Setting.findOne({});
-//   const storedExpirations = setting?.expirationTime.map((el) => el.time);
-//   if (!storedExpirations || storedExpirations.length === 0)
-//     throw new Error('stored expiry times not exists');
-
-//   const contractTimeToBookingDate = +((date.getTime() - new Date().getTime()) / (1000 * 60 * 60));
-//   if (contractTimeToBookingDate < storedExpirations[0] * 3)
-//     throw new NotAllowedError(
-//       {
-//         en: `invalid booking date, minimum allowed booking date must be after ${storedExpirations[0] * 2} hours`,
-//         ar: `invalid booking date, minimum allowed booking date must be after ${storedExpirations[0] * 2} hours`,
-//       },
-//       lang,
-//     );
-//   else if (contractTimeToBookingDate > storedExpirations.at(-1)! * 3)
-//     return storedExpirations.at(-1);
-
-//   const minimumAvailableExpirationStage =
-//     storedExpirations[storedExpirations.findIndex((el) => el * 3 > contractTimeToBookingDate) - 1];
-
-//   return minimumAvailableExpirationStage;
-// };
-
 async function getStageExpiration(isoDate: string, lang: string) {
   const givenDate = new Date(isoDate);
   const currentDate = new Date();
@@ -120,7 +110,6 @@ async function getStageExpiration(isoDate: string, lang: string) {
   const timeDifferenceInHours = Math.abs(
     (givenDate.getTime() - currentDate.getTime()) / (1000 * 60 * 60),
   );
-  console.log(timeDifferenceInHours);
 
   const settings = await Setting.findOne().exec();
 

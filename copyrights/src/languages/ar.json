@@ -28,5 +28,4 @@
   "bookingIdInvalid": "يجب أن يكون معرف الحجز MongoDB صالحًا",
   "statusString": "يجب أن يكون الحالة سلسلة نصية",
   "statusInvalid": ""
-  
 }

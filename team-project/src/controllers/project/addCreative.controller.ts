@@ -110,6 +110,7 @@ export const addCreativeHandler: AddCreativeHandler = async (req, res, next) => 
 
   // create contract an all contracts
   await Contracts.create({
+    _id:contract._id,
     contract: contract._id,
     customer: contract.customer,
     sp: contract.sp,

@@ -3,7 +3,8 @@ import {
   NotFound,
   BadRequestError,
   NotAllowedError,
-  Notification,
+  Users,
+  Channels,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
@@ -12,9 +13,8 @@ import { RequestHandler } from 'express';
 //   onGoingExpiration,
 //   updateAfterFirstPaymentExpiration,
 // } from '../../config/expiration-queue';
-import { NotificationPublisher } from '../../event/publisher/notification.publisher';
+import { sendNotification } from './contract-notification.controller';
 import { CopyrightContracts, ContractStatus } from '../../models/copyright-contract.model';
-import { natsWrapper } from '../../nats-wrapper';
 
 export const payContract: RequestHandler<{ paymentSession: string }, SuccessResponse> = async (
   req,
@@ -23,6 +23,9 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
 ) => {
   const contract = await CopyrightContracts.findOne({ paymentLink: req.params.paymentSession });
   if (!contract) return next(new NotFound(undefined, req.lang));
+
+  const user = await Users.findById(req.loggedUser.id);
+  if (!user) return next(new NotFound(undefined, req.lang));
 
   if (
     new Date(contract.actionAt).getTime() + contract.stageExpiration * 60 * 60 * 1000 <
@@ -56,20 +59,15 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
     //   },
     // );
 
-    await Notification.create({
-      targetUser: contract.sp,
-      target: contract.id,
-      type: 'contract',
-      title: 'contract',
-      message: 'copyright contract, customer paied 10% of the amount',
-    });
-    await new NotificationPublisher(natsWrapper.client).publish({
-      targetUsers: [contract.customer.toString()],
-      notificationDetails: {
-        title: 'contract',
-        message: 'copyright contract, customer paied 10% of the amount',
-      },
-    });
+    await sendNotification(
+      req.loggedUser.id,
+      contract.sp.toString(),
+      contract._id.toString(),
+      'contract',
+      'copyright contract updates',
+      `${user?.name} paid 10% of the amount`,
+      Channels.update_contract,
+    );
   } else if (contract.status === ContractStatus.waitingForTotalPayment) {
     await CopyrightContracts.updateOne(
       { paymentLink: req.params.paymentSession },
@@ -79,11 +77,16 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
         secondPaymentAmount: contract.totalPrice - contract.firstPaymentAmount,
       },
     );
-    // await contractNotification(
-    //   contract.id,
-    //   contract.sp.toString(),
-    //   'copyright contract, customer paied the total amount',
-    // );
+
+    await sendNotification(
+      req.loggedUser.id,
+      contract.sp.toString(),
+      contract._id.toString(),
+      'contract',
+      'copyright contract updates',
+      `${user?.name} paid the total amount`,
+      Channels.update_contract,
+    );
 
     // check after expiration date by 24 hour
     // await onGoingExpiration.add(

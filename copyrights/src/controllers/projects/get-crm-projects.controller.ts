@@ -6,7 +6,6 @@ export const getCrmProjectsHandler: RequestHandler<
   PaginationResponse<{ data: IcopyRights[] }>
 > = async (req, res) => {
   const resultCount = await CopyRights.countDocuments(req.pagination.filter);
-  
 
   const projects = await CopyRights.aggregate([
     { $match: req.pagination.filter },
@@ -25,28 +24,28 @@ export const getCrmProjectsHandler: RequestHandler<
                 $cond: {
                   if: { $eq: ['ar', req.lang] },
                   then: '$$tag.ar',
-                  else: '$$tag.en'
-                }
-              }
-            }
-          }
+                  else: '$$tag.en',
+                },
+              },
+            },
+          },
         },
         subCategory: {
           $cond: {
             if: { $eq: ['ar', req.lang] },
             then: '$subCategory.ar',
-            else: '$subCategory.en'
-          }
-        }
-      }
+            else: '$subCategory.en',
+          },
+        },
+      },
     },
     {
       $lookup: {
         from: MODELS.user, // Assuming your user collection is named 'users'
         localField: 'user',
         foreignField: '_id',
-        as: 'userDetails'
-      }
+        as: 'userDetails',
+      },
     },
     {
       $addFields: {
@@ -55,18 +54,15 @@ export const getCrmProjectsHandler: RequestHandler<
             if: { $eq: [{ $size: '$userDetails' }, 0] }, // Check if user not found
             then: null,
             else: {
-              $arrayElemAt: [
-                '$userDetails',
-                0
-              ]
-            }
-          }
+              $arrayElemAt: ['$userDetails', 0],
+            },
+          },
         },
         // Add process.env.BUCKET_HOST before profileImage
         profileImage: {
-          $concat: [process.env.BUCKET_HOST, '$user.profileImage']
-        }
-      }
+          $concat: [process.env.BUCKET_HOST, '$user.profileImage'],
+        },
+      },
     },
     {
       $project: {
@@ -79,7 +75,7 @@ export const getCrmProjectsHandler: RequestHandler<
           isOnline: '$user.isOnline',
           rank: '$user.rank',
           projectsView: '$user.projectsView',
-          rate: '$user.rate'
+          rate: '$user.rate',
         },
         category: 1,
         price: 1,
@@ -91,13 +87,10 @@ export const getCrmProjectsHandler: RequestHandler<
         cycle: 1,
         rate: 1,
         tags: 1,
-        subCategory: 1
-      }
-    }
+        subCategory: 1,
+      },
+    },
   ]);
-  
-  
-
 
   res.status(200).json({
     message: 'success',
@@ -109,4 +102,3 @@ export const getCrmProjectsHandler: RequestHandler<
     data: projects,
   });
 };
-

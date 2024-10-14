@@ -32,6 +32,7 @@ export const createProjectHandler: RequestHandler<
     });
 
     await Project.create({
+      _id: project._id,
       project: {
         type: project.id,
         ref: MODELS.copyrights,

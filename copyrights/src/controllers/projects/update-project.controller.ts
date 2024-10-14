@@ -18,10 +18,11 @@ export const updateProjectHandler: RequestHandler<
   >
 > = async (req, res, next) => {
   const project = await CopyRights.findOne({ _id: req.params.projectId, isDeleted: { $ne: true } });
-  if (!project) return next(new NotFound({en:'project not found' , ar:'المشروع غير موجود'} , req.lang));
+  if (!project)
+    return next(new NotFound({ en: 'project not found', ar: 'المشروع غير موجود' }, req.lang));
 
   if (project.user.toString() !== req.loggedUser.id)
-    return next(new NotAllowedError(undefined , req.lang));
+    return next(new NotAllowedError(undefined, req.lang));
 
   const newProject = <IcopyRights>await CopyRights.findByIdAndUpdate(
     req.params.projectId,

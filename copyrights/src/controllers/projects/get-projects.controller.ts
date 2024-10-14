@@ -1,13 +1,13 @@
 import { PaginationResponse, CopyRights, IcopyRights, MODELS, Categories } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
-import mongoose  , {PipelineStage} from 'mongoose';
+import mongoose, { PipelineStage } from 'mongoose';
 
 export const getProjectsPagination: RequestHandler<
   unknown,
   unknown,
   unknown,
   {
-    instant?:boolean;
+    instant?: boolean;
     search?: string;
     user?: string;
     address?: string;
@@ -19,10 +19,10 @@ export const getProjectsPagination: RequestHandler<
     endDate?: Date;
     tags?: mongoose.Types.ObjectId[];
     subCategory?: mongoose.Types.ObjectId[];
-    duration?:number;
+    duration?: number;
   }
 > = async (req, res, next) => {
-  if (req.query.duration) req.pagination.filter['duration.value'] ={$eq: req.query.duration};
+  if (req.query.duration) req.pagination.filter['duration.value'] = { $eq: req.query.duration };
   if (req.query.instant != undefined) req.pagination.filter.instant = req.query.instant;
   if (req.query.search) req.pagination.filter.$text = { $search: req.query.search };
   if (req.query.user) req.pagination.filter.user = req.query.user;
@@ -44,33 +44,30 @@ export const getProjectsPagination: RequestHandler<
     req.pagination.filter.isDeleted = req.query.isDeleted ? true : { $ne: true };
   }
 
-
-
   if (req.query.subCategory) {
-    const subCategoryIds = req.query.subCategory.map(id => new mongoose.Types.ObjectId(id));  
+    const subCategoryIds = req.query.subCategory.map((id) => new mongoose.Types.ObjectId(id));
     // Step 1: Retrieve the subcategory titles from the Category model
     const subCategories = await Categories.aggregate([
       { $unwind: '$subCategories' },
       { $match: { 'subCategories._id': { $in: subCategoryIds } } },
-      { 
-        $project: { 
-          _id: 0, 
+      {
+        $project: {
+          _id: 0,
           'title.ar': '$subCategories.title.ar',
-          'title.en': '$subCategories.title.en'
-        }
-      }
+          'title.en': '$subCategories.title.en',
+        },
+      },
     ]);
-  
+
     // Construct the filter for the subCategory titles in both Arabic and English
-    const arabicTitles = subCategories.map(subCat => subCat.title.ar);
-    const englishTitles = subCategories.map(subCat => subCat.title.en);
-  
+    const arabicTitles = subCategories.map((subCat) => subCat.title.ar);
+    const englishTitles = subCategories.map((subCat) => subCat.title.en);
+
     // Ensure that at least one of the title arrays has content
     req.pagination.filter['$or'] = [
       { 'subCategory.ar': { $in: arabicTitles } },
-      { 'subCategory.en': { $in: englishTitles } }
+      { 'subCategory.en': { $in: englishTitles } },
     ];
-    
   }
 
   if (req.query.tags) {
@@ -83,14 +80,11 @@ export const getProjectsHandler: RequestHandler<
   unknown,
   PaginationResponse<{ data: IcopyRights[] }>
 > = async (req, res) => {
-
   let isInstant = undefined;
-  if (req.pagination.filter.instant != undefined) 
-    isInstant = req.pagination.filter.instant;
+  if (req.pagination.filter.instant != undefined) isInstant = req.pagination.filter.instant;
   delete req.pagination.filter.instant;
-  
 
-  const countPipeline : PipelineStage[] = [
+  const countPipeline: PipelineStage[] = [
     {
       $match: {
         ...req.pagination.filter,
@@ -98,7 +92,7 @@ export const getProjectsHandler: RequestHandler<
       },
     },
   ];
-  
+
   countPipeline.push({
     $lookup: {
       from: MODELS.user,
@@ -117,16 +111,15 @@ export const getProjectsHandler: RequestHandler<
   }
 
   countPipeline.push({ $unwind: '$userDetails' });
-  
+
   countPipeline.push({
-    $count: 'totalCount'
+    $count: 'totalCount',
   });
-  
+
   const countResult = await CopyRights.aggregate(countPipeline);
   const resultCount = countResult.length > 0 ? countResult[0].totalCount : 0;
 
-
-  const pipeline : PipelineStage[] = [
+  const pipeline: PipelineStage[] = [
     {
       $match: {
         ...req.pagination.filter,
@@ -146,7 +139,7 @@ export const getProjectsHandler: RequestHandler<
     },
     { $unwind: '$userDetails' },
   ];
-  
+
   // Conditionally add the $match stage for isInstant
   if (isInstant !== undefined) {
     pipeline.push({
@@ -155,7 +148,7 @@ export const getProjectsHandler: RequestHandler<
       },
     });
   }
-  
+
   pipeline.push(
     {
       $lookup: {
@@ -232,9 +225,9 @@ export const getProjectsHandler: RequestHandler<
         tags: 1,
         subCategory: 1,
       },
-    }
+    },
   );
-  
+
   // Run the aggregation pipeline
   const projects = await CopyRights.aggregate(pipeline);
 

@@ -90,6 +90,7 @@ export const createContractHandler: RequestHandler<
   // );
 
   await Contracts.create({
+    _id:contract._id,
     customer: contract.customer,
     sp: contract.sp,
     contract: contract.id,
@@ -101,30 +102,6 @@ export const createContractHandler: RequestHandler<
 
   res.status(201).json({ message: 'success' });
 };
-
-// const getStageExpiration = async (date: Date, lang: string) => {
-//   const setting = await Setting.findOne({});
-//   const storedExpirations = setting?.expirationTime.map((el) => el.time);
-//   if (!storedExpirations || storedExpirations.length === 0)
-//     throw new Error('stored expiry times not exists');
-
-//   const contractTimeToBookingDate = +((date.getTime() - new Date().getTime()) / (1000 * 60 * 60));
-//   if (contractTimeToBookingDate < storedExpirations[0] * 2)
-//     throw new NotAllowedError(
-//       {
-//         en: `invalid booking date, minimum allowed booking date must be after ${storedExpirations[0] * 2} hours`,
-//         ar: `invalid booking date, minimum allowed booking date must be after ${storedExpirations[0] * 2} hours`,
-//       },
-//       lang,
-//     );
-//   else if (contractTimeToBookingDate > storedExpirations.at(-1)! * 2)
-//     return storedExpirations.at(-1);
-
-//   const minimumAvailableExpirationStage =
-//     storedExpirations[storedExpirations.findIndex((el) => el * 2 > contractTimeToBookingDate) - 1];
-
-//   return minimumAvailableExpirationStage;
-// };
 
 async function getStageExpiration(isoDate: string, lang: string) {
   const givenDate = new Date(isoDate);

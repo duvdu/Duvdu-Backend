@@ -1,5 +1,5 @@
-import { Publisher, InotificationEvent, Subject } from '@duvdu-v1/duvdu';
+import { Publisher, Subject, NewNotificationEvent } from '@duvdu-v1/duvdu';
 
-export class NotificationPublisher extends Publisher<InotificationEvent> {
-  subject: Subject.notification = Subject.notification;
+export class NotificationPublisher extends Publisher<NewNotificationEvent> {
+  subject: Subject.newNotification = Subject.newNotification;
 }
