@@ -20,14 +20,22 @@ export const updateProviderPhoneNumberHandler: RequestHandler<
   const currentUser = await Users.findById(req.loggedUser?.id);
   if (!currentUser) return next(new NotFound(undefined, req.lang));
 
-  const user = await Users.findOne({ 'phoneNumber.number': req.body.phoneNumber });
-  if (user)
+  const user = await Users.findOne({ 'phoneNumber.number': req.body.phoneNumber , haveInvitation:false });
+  if (user) 
     return next(
       new BadRequestError(
         { en: 'phone number already exist', ar: 'رقم الهاتف موجود بالفعل' },
         req.lang,
       ),
     );
+
+  // handle invitedUser
+  const invitedUser = await Users.findOne({ 'phoneNumber.number': req.body.phoneNumber , haveInvitation:true });
+
+  if (invitedUser) {
+    await Users.findByIdAndDelete(invitedUser._id);
+    currentUser._id = invitedUser._id;
+  }
 
   const verificationCode: string = generateRandom6Digit();
   const hashedVerificationCode: string = hashVerificationCode(verificationCode);
