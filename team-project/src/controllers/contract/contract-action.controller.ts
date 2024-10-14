@@ -6,8 +6,6 @@ import {
   BadRequestError,
   Users,
   NotAllowedError,
-  NotificationType,
-  NotificationDetails,
   Channels,
   TeamContractStatus,
   TeamContract,
@@ -32,6 +30,9 @@ export const contractAction: RequestHandler<
     if (!contract) return next(new NotFound(undefined, req.lang));
 
     const isSp = contract.sp.toString() === req.loggedUser.id;
+
+    const sp = await Users.findById(contract.sp);
+    const customer = await Users.findById(contract.customer);
 
     if (isSp) {
       // throw if actionAt not undefiend or current state not pending
@@ -68,11 +69,11 @@ export const contractAction: RequestHandler<
 
           await sendNotification(
             req.loggedUser.id,
-            contract.sp.toString(),
+            contract.customer.toString(),
             contract._id.toString(),
-            NotificationType.update_team_contract,
-            NotificationDetails.updateTeamContract.title,
-            NotificationDetails.updateTeamContract.message,
+            'contract',
+            'team project contract update',
+            `${sp?.name} reject contract`,
             Channels.update_contract,
           );
         }
@@ -114,9 +115,9 @@ export const contractAction: RequestHandler<
           req.loggedUser.id,
           contract.customer.toString(),
           contract._id.toString(),
-          NotificationType.update_team_contract,
-          NotificationDetails.updateTeamContract.title,
-          NotificationDetails.updateTeamContract.message,
+          'contract',
+          'team project contract update',
+          `${sp?.name} accept contract`,
           Channels.update_contract,
         );
 
@@ -163,9 +164,9 @@ export const contractAction: RequestHandler<
         req.loggedUser.id,
         contract.sp.toString(),
         contract._id.toString(),
-        NotificationType.update_team_contract,
-        NotificationDetails.updateTeamContract.title,
-        NotificationDetails.updateTeamContract.message,
+        'contract',
+        'team project contract update',
+        `${customer?.name} reject contract`,
         Channels.update_contract,
       );
     }

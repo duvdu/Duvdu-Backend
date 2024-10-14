@@ -11,10 +11,12 @@ import {
   Rentals,
   Bucket,
   FOLDERS,
+  Users,
+  Channels,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-import { contractNotification } from './contract-notification.controller';
+import { sendNotification } from './contract-notification.controller';
 import { RentalContracts } from '../../models/rental-contracts.model';
 
 export const createContractHandler: RequestHandler<
@@ -98,7 +100,18 @@ export const createContractHandler: RequestHandler<
     cycle: CYCLES.studioBooking,
   });
 
-  await contractNotification(contract.id, contract.sp.toString(), 'new rental contract created');
+  const user = await Users.findById(req.loggedUser.id);
+
+  await sendNotification(
+    req.loggedUser.id,
+    contract.sp.toString(),
+    contract._id.toString(),
+    'contract',
+    'new rental contract',
+    `new contract created by ${user?.name}`,
+    Channels.new_contract,
+  );
+
 
   res.status(201).json({ message: 'success' });
 };

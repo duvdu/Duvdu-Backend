@@ -1,25 +1,64 @@
 import { Notification } from '@duvdu-v1/duvdu';
 
-import { NotificationPublisher } from '../../event/publisher/notification.publisher';
+import { NewNotificationPublisher } from '../../event/publisher/newNotification.publisher';
 import { natsWrapper } from '../../nats-wrapper';
 
-export const contractNotification = async (
-  contractId: string,
+export const sendNotification = async (
+  sourceUser: string,
   targetUser: string,
+  target: string,
+  type: string,
+  title: string,
   message: string,
+  channel: string,
 ) => {
-  await Notification.create({
-    targetUser,
-    target: contractId,
-    type: 'contract',
-    title: 'contract',
-    message,
+  const notification = await Notification.create({
+    sourceUser: sourceUser,
+    targetUser: targetUser,
+    type: type,
+    target: target,
+    message: message,
+    title: title,
   });
-  await new NotificationPublisher(natsWrapper.client).publish({
-    targetUsers: [targetUser],
-    notificationDetails: {
-      title: 'contract',
-      message,
-    },
+
+  const populatedNotification = await (
+    await notification.save()
+  ).populate('sourceUser', 'isOnline profileImage username');
+
+  await new NewNotificationPublisher(natsWrapper.client).publish({
+    notificationDetails: { message: notification.message, title: notification.title },
+    populatedNotification,
+    socketChannel: channel,
+    targetUser: notification.targetUser.toString(),
   });
+};
+
+export const sendSystemNotification = async (
+  users: string[],
+  target: string,
+  type: string,
+  message: string,
+  title: string,
+  channel: string,
+) => {
+  for (let i = 0; i < users.length; i++) {
+    const notification = await Notification.create({
+      targetUser: users[i],
+      type: type,
+      target: target,
+      message: message,
+      title: title,
+    });
+
+    const populatedNotification = await (
+      await notification.save()
+    ).populate('sourceUser', 'isOnline profileImage username');
+
+    await new NewNotificationPublisher(natsWrapper.client).publish({
+      notificationDetails: { message: notification.message, title: notification.title },
+      populatedNotification,
+      socketChannel: channel,
+      targetUser: notification.targetUser.toString(),
+    });
+  }
 };

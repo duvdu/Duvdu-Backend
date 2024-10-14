@@ -10,9 +10,8 @@ import {
   FOLDERS,
   NotAllowedError,
   NotFound,
-  NotificationDetails,
-  NotificationType,
   ProjectCycle,
+  Users,
 } from '@duvdu-v1/duvdu';
 
 import { sendNotification } from './sendNotification';
@@ -113,14 +112,14 @@ export const createContractHandler: CreateContractHandler = async (req, res, nex
     });
 
     // send notification to sp
-
+    const user = await Users.findById(req.loggedUser.id);
     await sendNotification(
       req.loggedUser.id,
       contract.sp.toString(),
       contract._id.toString(),
-      NotificationType.new_project_contract,
-      NotificationDetails.newProjectContract.title,
-      NotificationDetails.newProjectContract.message,
+      'contract',
+      'project new contract',
+      `new contract created by ${user?.name}`,
       Channels.new_contract,
     );
 

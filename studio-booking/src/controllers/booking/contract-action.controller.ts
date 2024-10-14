@@ -6,16 +6,17 @@ import {
   BadRequestError,
   Users,
   NotAllowedError,
+  Channels,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-import { contractNotification } from './contract-notification.controller';
+import { sendNotification } from './contract-notification.controller';
 import { ContractStatus, RentalContracts } from '../../models/rental-contracts.model';
 
 export const contractAction: RequestHandler<
   { contractId: string },
   SuccessResponse,
-  { action: string }
+  { action: 'reject'| 'accept' | 'cancel' }
 > = async (req, res, next) => {
   const contract = await RentalContracts.findOne({
     _id: req.params.contractId,
@@ -24,6 +25,9 @@ export const contractAction: RequestHandler<
   if (!contract) return next(new NotFound(undefined, req.lang));
 
   const isSp = contract.sp.toString() === req.loggedUser.id;
+
+  const sp = await Users.findById(contract.sp);
+  const customer = await Users.findById(contract.customer);
 
   if (isSp) {
     // throw if actionAt not undefiend or current state not pending
@@ -49,11 +53,17 @@ export const contractAction: RequestHandler<
           { _id: req.params.contractId },
           { status: ContractStatus.rejected, rejectedBy: 'sp', actionAt: new Date() },
         );
-        await contractNotification(
-          contract.id,
+
+        await sendNotification(
+          req.loggedUser.id,
           contract.customer.toString(),
-          'the sp refused your rental contract',
+          contract._id.toString(),
+          'contract',
+          'rental contract updates',
+          `${sp?.name} reject this contract`,
+          Channels.update_contract,
         );
+
       }
     } else if (req.body.action === 'accept') {
       const spUser = await Users.findOne({ _id: req.loggedUser.id }, { avaliableContracts: 1 });
@@ -81,10 +91,14 @@ export const contractAction: RequestHandler<
         },
       );
 
-      await contractNotification(
-        contract.id,
+      await sendNotification(
+        req.loggedUser.id,
         contract.customer.toString(),
-        'the sp accepted your rental contract',
+        contract._id.toString(),
+        'contract',
+        'rental contract updates',
+        `${sp?.name} accept this contract`,
+        Channels.update_contract,
       );
 
       // await paymentExpiration.add(
@@ -93,7 +107,24 @@ export const contractAction: RequestHandler<
       // );
     }
   } else {
-    if (
+
+    if (req.body.action === 'cancel' && contract.status === ContractStatus.pending) {
+      await RentalContracts.updateOne(
+        { _id: req.params.contractId },
+        { status: ContractStatus.canceled, rejectedBy: 'customer', actionAt: new Date() },
+      );
+  
+      await sendNotification(
+        req.loggedUser.id,
+        contract.sp.toString(),
+        contract._id.toString(),
+        'contract',
+        'rental contract updates',
+        `${customer?.name} cancel this contract`,
+        Channels.update_contract,
+      );
+    }
+    else if (
       req.body.action !== 'reject' ||
       !contract.actionAt ||
       ![ContractStatus.pending, ContractStatus.waitingForPayment].includes(contract.status)
@@ -109,16 +140,22 @@ export const contractAction: RequestHandler<
         new BadRequestError({ en: 'time limit exeeded', ar: 'time limit exeeded' }, req.lang),
       );
 
-    await RentalContracts.updateOne(
-      { _id: req.params.contractId },
-      { status: ContractStatus.rejected, rejectedBy: 'customer', actionAt: new Date() },
-    );
-
-    await contractNotification(
-      contract.id,
-      contract.sp.toString(),
-      'the customer reject your rental contract',
-    );
+    if (req.body.action === 'reject') {
+      await RentalContracts.updateOne(
+        { _id: req.params.contractId },
+        { status: ContractStatus.rejected, rejectedBy: 'customer', actionAt: new Date() },
+      );
+  
+      await sendNotification(
+        req.loggedUser.id,
+        contract.sp.toString(),
+        contract._id.toString(),
+        'contract',
+        'rental contract updates',
+        `${customer?.name} reject this contract`,
+        Channels.update_contract,
+      );
+    } 
   }
 
   res.status(200).json({ message: 'success' });

@@ -11,10 +11,9 @@ import {
   MODELS,
   NotAllowedError,
   NotFound,
-  NotificationDetails,
-  NotificationType,
   Producer,
   ProducerContract,
+  Users,
 } from '@duvdu-v1/duvdu';
 
 import { sendNotification } from './sendNotification';
@@ -67,13 +66,14 @@ export const createContractHandler: CreateContractHandler = async (req, res, nex
       sp: producer.user,
     });
 
+    const user = await Users.findById(req.loggedUser.id);
     await sendNotification(
       req.loggedUser.id,
       producer.user.toString(),
       contract._id.toString(),
-      NotificationType.new_producer_contract,
-      NotificationDetails.newProducerContract.title,
-      NotificationDetails.newProducerContract.message,
+      'contract',
+      'new producer contract',
+      `new contract created by ${user?.name}`,
       Channels.new_contract,
     );
 

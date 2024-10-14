@@ -1,7 +1,8 @@
-import { ContractReports } from '@duvdu-v1/duvdu';
+import { Channels, ContractReports } from '@duvdu-v1/duvdu';
 import Queue from 'bull';
 
 import { env } from './env';
+import { sendSystemNotification } from '../controllers/booking/contract-notification.controller';
 import { ContractStatus, RentalContracts } from '../models/rental-contracts.model';
 
 export const pendingExpiration = new Queue<{ contractId: string }>(
@@ -20,17 +21,39 @@ export const onGoingExpiration = new Queue<{ contractId: string }>(
 );
 
 pendingExpiration.process(async (job) => {
-  await RentalContracts.findOneAndUpdate(
+  const contract =await RentalContracts.findOneAndUpdate(
     { _id: job.data.contractId, status: ContractStatus.pending },
     { status: ContractStatus.canceled, actionAt: new Date() },
   );
+
+  if (contract)
+    await sendSystemNotification(
+      [contract.sp.toString(), contract.customer.toString()],
+      contract._id.toString(),
+      'contract',
+      'rental contract updates',
+      'contract canceled by system',
+      Channels.update_contract,
+    );
+
 });
 
 paymentExpiration.process(async (job) => {
-  await RentalContracts.findOneAndUpdate(
+  const contract = await RentalContracts.findOneAndUpdate(
     { _id: job.data.contractId, status: ContractStatus.waitingForPayment },
     { status: ContractStatus.canceled, actionAt: new Date() },
   );
+
+  if (contract)
+    await sendSystemNotification(
+      [contract.sp.toString(), contract.customer.toString()],
+      contract._id.toString(),
+      'contract',
+      'rental contract updates',
+      'contract canceled by system',
+      Channels.update_contract,
+    );
+
 });
 
 onGoingExpiration.process(async (job) => {

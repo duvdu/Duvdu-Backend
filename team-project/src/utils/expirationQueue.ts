@@ -1,4 +1,4 @@
-import { Channels, NotificationDetails, NotificationType, TeamContract, TeamContractStatus, UserStatus } from '@duvdu-v1/duvdu';
+import { Channels, TeamContract, TeamContractStatus, UserStatus } from '@duvdu-v1/duvdu';
 import Queue from 'bull';
 
 import { env } from '../config/env';
@@ -24,7 +24,6 @@ pendingQueue.process(async (job) => {
       { status: TeamContractStatus.canceled, actionAt: new Date() },
       { new: true },
     );
-    console.log(contract);
 
     if (contract) {
       await updateUserStatus(
@@ -35,11 +34,11 @@ pendingQueue.process(async (job) => {
         job.data.lang,
       );
       await sendSystemNotification(
-        [contract?.sp!.toString() || '', contract?.customer!.toString() || ''],
-        contract?._id.toString() || '',
-        NotificationType.update_team_contract,
-        NotificationDetails.updateTeamContract.title,
-        NotificationDetails.updateTeamContract.message,
+        [contract?.sp!.toString(), contract?.customer!.toString()],
+        contract?._id.toString(),
+        'contract',
+        'rental contract updates ',
+        'contract canceled by system',
         Channels.update_contract,
       );
     }
@@ -65,11 +64,11 @@ PayMentQueue.process(async (job) => {
         job.data.lang,
       );
       await sendSystemNotification(
-        [contract?.sp!.toString() || '', contract?.customer!.toString() || ''],
-        contract?._id.toString() || '',
-        NotificationType.update_team_contract,
-        NotificationDetails.updateTeamContract.title,
-        NotificationDetails.updateTeamContract.message,
+        [contract?.sp!.toString(), contract?.customer!.toString()],
+        contract?._id.toString(),
+        'contract',
+        'rental contract updates ',
+        'contract canceled by system',
         Channels.update_contract,
       );
     }

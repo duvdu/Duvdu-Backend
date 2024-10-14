@@ -9,8 +9,6 @@ import {
   CYCLES,
   Files,
   FOLDERS,
-  NotificationDetails,
-  NotificationType,
   TeamContract,
   TeamProject,
   Users,
@@ -114,15 +112,16 @@ export const createProjectHandler: CreateProjectHandler = async (req, res, next)
         cycle: CYCLES.teamProject,
         ref: 'team_contracts',
       });
-
+   
+      const customer = await Users.findById(req.loggedUser.id);
       // send notification to user
       await sendNotification(
         contract.customer.toString(),
         contract.sp.toString(),
         contract._id.toString(),
-        NotificationType.new_team_contract,
-        NotificationDetails.newTeamContract.title,
-        NotificationDetails.newTeamContract.message,
+        'contract',
+        'team project new contract',
+        `new team project contract from ${customer?.name}`,
         Channels.new_contract,
       );
 
