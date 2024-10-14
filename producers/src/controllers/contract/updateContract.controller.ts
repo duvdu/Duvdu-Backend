@@ -6,11 +6,10 @@ import {
   ContractStatus,
   NotAllowedError,
   NotFound,
-  NotificationDetails,
-  NotificationType,
   Producer,
   ProducerContract,
   UnauthorizedError,
+  Users,
 } from '@duvdu-v1/duvdu';
 
 import { sendNotification } from './sendNotification';
@@ -21,6 +20,7 @@ export const updateContractHandler: UpdateContractHandler = async (req, res, nex
   const contract = await ProducerContract.findById(req.params.contractId);
   if (!contract)
     return next(new NotFound({ en: 'contract not found', ar: 'العقد غير موجود' }, req.lang));
+
 
   if (
     contract.user.toString() === req.loggedUser.id &&
@@ -42,6 +42,10 @@ export const updateContractHandler: UpdateContractHandler = async (req, res, nex
     return next(
       new NotFound({ en: 'producer not found', ar: 'لم يتم العثور على المنتج' }, req.lang),
     );
+
+  const sp = await Users.findById(producer.user);
+  const user = await Users.findById(contract.user);
+
 
   if (req.body.appointmentDate) {
     if (producer.user.toString() != req.loggedUser.id)
@@ -102,9 +106,9 @@ export const updateContractHandler: UpdateContractHandler = async (req, res, nex
       req.loggedUser.id,
       contract.user.toString(),
       contract._id.toString(),
-      NotificationType.updated_producer_contract,
-      NotificationDetails.updatedProducerContract.title,
-      NotificationDetails.updatedProducerContract.message,
+      'contract',
+      'producer contract update',
+      `${sp?.name} accept this contract` ,
       Channels.update_contract,
     );
     // const delay = updatedContract.stageExpiration * 3600 * 1000;
@@ -127,9 +131,9 @@ export const updateContractHandler: UpdateContractHandler = async (req, res, nex
       req.loggedUser.id,
       contract.user.toString(),
       contract._id.toString(),
-      NotificationType.updated_producer_contract,
-      NotificationDetails.updatedProducerContract.title,
-      NotificationDetails.updatedProducerContract.message,
+      'contract',
+      'producer contract updated',
+      `${sp?.name} ${updatedContract.status} this contract`,
       Channels.update_contract,
     );
 
@@ -142,9 +146,9 @@ export const updateContractHandler: UpdateContractHandler = async (req, res, nex
       req.loggedUser.id,
       producer.user.toString(),
       contract._id.toString(),
-      NotificationType.updated_producer_contract,
-      NotificationDetails.updatedProducerContract.title,
-      NotificationDetails.updatedProducerContract.message,
+      'contract',
+      'producer contract updated',
+      `${user?.name} ${updatedContract.status} this contract`,
       Channels.update_contract,
     );
 

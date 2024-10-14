@@ -1,8 +1,6 @@
 import {
   Channels,
   ContractStatus,
-  NotificationDetails,
-  NotificationType,
   Producer,
   ProducerContract,
 } from '@duvdu-v1/duvdu';
@@ -26,25 +24,27 @@ createContractQueue.process(async (job) => {
 
     const contract = await ProducerContract.findById(job.data.contractId);
     const producer = await Producer.findById(contract?.producer);
-    if (contract?.status == ContractStatus.pending) {
-      await ProducerContract.findByIdAndUpdate(
-        job.data.contractId,
-        {
-          status: ContractStatus.canceled,
-          rejectedBy: 'system',
-          actionAt: new Date(),
-        },
-        { new: true },
-      );
-      await sendSystemNotification(
-        [contract.user.toString() || '', producer?.user.toString() || ''],
-        contract._id.toString(),
-        NotificationType.updated_producer_contract,
-        NotificationDetails.updatedProducerContract.title,
-        NotificationDetails.updatedProducerContract.message,
-        Channels.update_contract,
-      );
-    }
+
+    if(contract)
+      if (contract.status == ContractStatus.pending) {
+        await ProducerContract.findByIdAndUpdate(
+          job.data.contractId,
+          {
+            status: ContractStatus.canceled,
+            rejectedBy: 'system',
+            actionAt: new Date(),
+          },
+          { new: true },
+        );
+        await sendSystemNotification(
+          [contract.user.toString(), producer? producer.user.toString() : ''],
+          contract._id.toString(),
+          'contract',
+          'producer contract update',
+          'producer contract canceled by system',
+          Channels.update_contract,
+        );
+      }
   } catch (error) {
     return new Error('Failed to cancelled producer contract');
   }
@@ -60,26 +60,27 @@ UpdateContractQueue.process(async (job) => {
     const contract = await ProducerContract.findById(job.data.contractId);
     const producer = await Producer.findById(contract?.producer);
 
-    if (contract?.status == ContractStatus.acceptedWithUpdate) {
-      await ProducerContract.findByIdAndUpdate(
-        job.data.contractId,
-        {
-          status: ContractStatus.canceled,
-          rejectedBy: 'system',
-          actionAt: new Date(),
-        },
-        { new: true },
-      );
+    if(contract)
+      if (contract.status == ContractStatus.acceptedWithUpdate) {
+        await ProducerContract.findByIdAndUpdate(
+          job.data.contractId,
+          {
+            status: ContractStatus.canceled,
+            rejectedBy: 'system',
+            actionAt: new Date(),
+          },
+          { new: true },
+        );
 
-      await sendSystemNotification(
-        [contract.user.toString() || '', producer?.user.toString() || ''],
-        contract._id.toString(),
-        NotificationType.updated_producer_contract,
-        NotificationDetails.updatedProducerContract.title,
-        NotificationDetails.updatedProducerContract.message,
-        Channels.update_contract,
-      );
-    }
+        await sendSystemNotification(
+          [contract.user.toString(), producer? producer.user.toString() : ''],
+          contract._id.toString(),
+          'contract',
+          'producer contract update',
+          'producer contract canceled by system',
+          Channels.update_contract,
+        );
+      }
   } catch (error) {
     return new Error('Failed to cancelled producer contract');
   }
