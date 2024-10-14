@@ -1,4 +1,4 @@
-import { Channels, NotificationDetails, NotificationType } from '@duvdu-v1/duvdu';
+import { Channels } from '@duvdu-v1/duvdu';
 import Queue from 'bull';
 
 import { env } from '../config/env';
@@ -34,16 +34,16 @@ pendingQueue.process(async (job) => {
       { new: true },
     );
 
-    if (contract) {
+    if (contract) 
       await sendSystemNotification(
-        [contract.sp.toString() || '', contract.customer.toString() || ''],
-        contract._id.toString() || '',
-        NotificationType.update_project_contract,
-        NotificationDetails.updateProjectContract.title,
-        NotificationDetails.updateProjectContract.message,
+        [contract.sp.toString(), contract.customer.toString()],
+        contract._id.toString(),
+        'contract',
+        'project contract updates',
+        'project contract canceled by system',
         Channels.update_contract,
       );
-    }
+    
   } catch (error) {
     return new Error('Failed to cancelled project contract');
   }
@@ -57,16 +57,16 @@ firstPayMentQueue.process(async (job) => {
       { new: true },
     );
 
-    if (contract) {
+    if (contract) 
       await sendSystemNotification(
-        [contract?.sp!.toString() || '', contract?.customer!.toString() || ''],
-        contract?._id.toString() || '',
-        NotificationType.update_project_contract,
-        NotificationDetails.updateProjectContract.title,
-        NotificationDetails.updateProjectContract.message,
+        [contract.sp.toString(), contract.customer.toString()],
+        contract._id.toString(),
+        'contract',
+        'project contract updates',
+        'project contract canceled by system',
         Channels.update_contract,
       );
-    }
+
   } catch (error) {
     return new Error('Failed to cancelled project contract');
   }
@@ -79,14 +79,16 @@ secondPayMentQueue.process(async (job) => {
       { status: ContractStatus.canceled, actionAt: new Date() },
     );
 
-    await sendSystemNotification(
-      [contract?.sp!.toString() || '', contract?.customer!.toString() || ''],
-      contract?._id.toString() || '',
-      NotificationType.update_project_contract,
-      NotificationDetails.updateProjectContract.title,
-      NotificationDetails.updateProjectContract.message,
-      Channels.update_contract,
-    );
+    if (contract) 
+      await sendSystemNotification(
+        [contract.sp.toString(), contract.customer.toString()],
+        contract._id.toString(),
+        'contract',
+        'project contract updates',
+        'project contract canceled by system',
+        Channels.update_contract,
+      );
+
   } catch (error) {
     return new Error('Failed to cancelled project contract');
   }
@@ -99,14 +101,16 @@ updateAfterFirstPaymentQueeu.process(async (job) => {
       { status: ContractStatus.canceled, actionAt: new Date() },
     );
 
-    await sendSystemNotification(
-      [contract?.sp!.toString() || '', contract?.customer!.toString() || ''],
-      contract?._id.toString() || '',
-      NotificationType.update_project_contract,
-      NotificationDetails.updateProjectContract.title,
-      NotificationDetails.updateProjectContract.message,
-      Channels.update_contract,
-    );
+    if (contract) 
+      await sendSystemNotification(
+        [contract.sp.toString(), contract.customer.toString()],
+        contract._id.toString(),
+        'contract',
+        'project contract updates',
+        'project contract canceled by system',
+        Channels.update_contract,
+      );
+
   } catch (error) {
     return new Error('Failed to cancelled project contract');
   }

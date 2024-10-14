@@ -7,8 +7,6 @@ import {
   Channels,
   NotAllowedError,
   NotFound,
-  NotificationDetails,
-  NotificationType,
   Users,
 } from '@duvdu-v1/duvdu';
 
@@ -34,6 +32,9 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
 
   const isSp = contract.sp.toString() === req.loggedUser.id;
 
+  const sp = await Users.findById(contract.sp);
+  const customer = await Users.findById(contract.customer);
+
   if (isSp) {
     if (req.body.action === 'reject' && contract.status === ContractStatus.pending) {
       await ProjectContract.updateOne(
@@ -41,14 +42,14 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
         { status: ContractStatus.rejected, rejectedBy: 'sp', actionAt: new Date() },
       );
 
-      // send notification to sp
+      // send notification from sp
       await sendNotification(
         req.loggedUser.id,
         contract.customer.toString(),
         contract._id.toString(),
-        NotificationType.update_project_contract,
-        NotificationDetails.updateProjectContract.title,
-        NotificationDetails.updateProjectContract.message,
+        'contract',
+        'project contract updates',
+        `${sp?.name} reject this contract`,
         Channels.update_contract,
       );
     } else if (req.body.action === 'accept' && contract.status === ContractStatus.pending) {
@@ -73,14 +74,14 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
         },
       );
 
-      // send notification to sp
+      // send notification from sp
       await sendNotification(
         req.loggedUser.id,
         contract.customer.toString(),
         contract._id.toString(),
-        NotificationType.update_project_contract,
-        NotificationDetails.updateProjectContract.title,
-        NotificationDetails.updateProjectContract.message,
+        'contract',
+        'project contract updates',
+        `${sp?.name} accept this contract`,
         Channels.update_contract,
       );
 
@@ -97,14 +98,14 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
         { status: ContractStatus.rejected, rejectedBy: 'sp', actionAt: new Date() },
       );
 
-      // send notification to sp
+      // send notification from sp
       await sendNotification(
         req.loggedUser.id,
         contract.customer.toString(),
         contract._id.toString(),
-        NotificationType.update_project_contract,
-        NotificationDetails.updateProjectContract.title,
-        NotificationDetails.updateProjectContract.message,
+        'contract',
+        'project contract updates',
+        `${sp?.name} reject this contract`,
         Channels.update_contract,
       );
     } else if (
@@ -121,14 +122,14 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
         },
       );
 
-      // send notification to sp
+      // send notification from sp
       await sendNotification(
         req.loggedUser.id,
         contract.customer.toString(),
         contract._id.toString(),
-        NotificationType.update_project_contract,
-        NotificationDetails.updateProjectContract.title,
-        NotificationDetails.updateProjectContract.message,
+        'contract',
+        'project contract updates',
+        `${sp?.name} accept this contract`,
         Channels.update_contract,
       );
 
@@ -146,36 +147,40 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
         ),
       );
   } else {
-    if (req.body.action === 'reject' && contract.status === ContractStatus.waitingForFirstPayment)
+
+    if (req.body.action === 'cancel' && contract.status === ContractStatus.pending) {
       await ProjectContract.updateOne(
-        { _id: req.params.contractId },
-        { status: ContractStatus.rejected, rejectedBy: 'customer', actionAt: new Date() },
-      );
-    else if (
-      req.body.action === 'accept' &&
-      contract.status === ContractStatus.waitingForFirstPayment
-    ) {
-      await ProjectContract.updateOne(
-        { _id: req.params.contractId },
-        { status: ContractStatus.updateAfterFirstPayment, actionAt: new Date() },
+        { _id: req.params.contractId , status:ContractStatus.pending },
+        { status: ContractStatus.canceled, rejectedBy: 'customer', actionAt: new Date() },
       );
 
-      // send notification to sp
       await sendNotification(
         req.loggedUser.id,
         contract.sp.toString(),
         contract._id.toString(),
-        NotificationType.update_project_contract,
-        NotificationDetails.updateProjectContract.title,
-        NotificationDetails.updateProjectContract.message,
+        'contract',
+        'project contract updates',
+        `${customer?.name} canceled this contract`,
         Channels.update_contract,
       );
+    }
+    else if (req.body.action === 'reject' && contract.status === ContractStatus.waitingForFirstPayment){
+      await ProjectContract.updateOne(
+        { _id: req.params.contractId },
+        { status: ContractStatus.rejected, rejectedBy: 'customer', actionAt: new Date() },
+      );
 
-      // add update after payment expiration
-
-      // const delay = contract.stageExpiration * 3600 * 1000;
-      // await updateAfterFirstPaymentQueeu.add({contractId:contract._id.toString()} ,{delay});
-    } else if (
+      await sendNotification(
+        req.loggedUser.id,
+        contract.sp.toString(),
+        contract._id.toString(),
+        'contract',
+        'project contract updates',
+        `${customer?.name} reject this contract`,
+        Channels.update_contract,
+      );
+    }
+    else if (
       req.body.action === 'reject' &&
       contract.status === ContractStatus.waitingForTotalPayment
     ) {
@@ -184,13 +189,14 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
         { status: ContractStatus.rejected, rejectedBy: 'customer', actionAt: new Date() },
       );
       // send notification to sp
+      
       await sendNotification(
         req.loggedUser.id,
         contract.sp.toString(),
         contract._id.toString(),
-        NotificationType.update_project_contract,
-        NotificationDetails.updateProjectContract.title,
-        NotificationDetails.updateProjectContract.message,
+        'contract',
+        'project contract updates',
+        `${customer?.name} reject this contract`,
         Channels.update_contract,
       );
     } else

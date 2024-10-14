@@ -24,9 +24,6 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
   const contract = await CopyrightContracts.findOne({ paymentLink: req.params.paymentSession });
   if (!contract) return next(new NotFound(undefined, req.lang));
 
-  const user = await Users.findById(req.loggedUser.id);
-  if (!user) return next(new NotFound(undefined, req.lang));
-
   if (
     new Date(contract.actionAt).getTime() + contract.stageExpiration * 60 * 60 * 1000 <
     new Date().getTime()
@@ -37,6 +34,10 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
         req.lang,
       ),
     );
+
+  const user = await Users.findById(req.loggedUser.id);
+  if (!user) return next(new NotFound(undefined, req.lang));
+  
 
   // TODO: record the transaction from payment gateway webhook
   if (contract.status === ContractStatus.waitingForFirstPayment) {

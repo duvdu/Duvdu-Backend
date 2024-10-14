@@ -46,6 +46,6 @@ export interface ContractActionHandler
   extends RequestHandler<
     { contractId: string },
     SuccessResponse,
-    { action: 'accept' | 'reject' },
+    { action: 'accept' | 'reject' | 'cancel' },
     unknown
   > {}

@@ -1,6 +1,7 @@
-import { BadRequestError, NotAllowedError, NotFound, SuccessResponse } from '@duvdu-v1/duvdu';
+import { BadRequestError, Channels, NotAllowedError, NotFound, SuccessResponse, Users } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
+import { sendNotification } from './sendNotification';
 import { ContractStatus, ProjectContract } from '../../models/projectContract.model';
 
 export const payContract: RequestHandler<{ paymentSession: string }, SuccessResponse> = async (
@@ -22,9 +23,12 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
       ),
     );
 
+  const user = await Users.findById(req.loggedUser.id);
+  if (!user) return next(new NotFound(undefined, req.lang));
+  
   // TODO: record the transaction from payment gateway webhook
 
-  if (contract.status === ContractStatus.waitingForFirstPayment)
+  if (contract.status === ContractStatus.waitingForFirstPayment){
     await ProjectContract.updateOne(
       { paymentLink: req.params.paymentSession },
       {
@@ -33,7 +37,19 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
         firstPaymentAmount: ((10 * contract.totalPrice) / 100).toFixed(2),
       },
     );
-  else if (contract.status === ContractStatus.waitingForTotalPayment)
+
+    await sendNotification(
+      req.loggedUser.id,
+      contract.sp.toString(),
+      contract._id.toString(),
+      'contract',
+      'project contract updates',
+      `${user?.name} paid 10% of the amount`,
+      Channels.update_contract,
+    );
+
+  }
+  else if (contract.status === ContractStatus.waitingForTotalPayment){
     await ProjectContract.updateOne(
       { paymentLink: req.params.paymentSession },
       {
@@ -42,6 +58,18 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
         secondPaymentAmount: contract.totalPrice - contract.firstPaymentAmount,
       },
     );
+
+    await sendNotification(
+      req.loggedUser.id,
+      contract.sp.toString(),
+      contract._id.toString(),
+      'contract',
+      'project contract updates',
+      `${user?.name} paid the total amount`,
+      Channels.update_contract,
+    );
+
+  }
   else
     return next(
       new NotAllowedError(
