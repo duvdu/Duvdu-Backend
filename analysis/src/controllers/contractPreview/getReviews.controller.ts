@@ -26,7 +26,7 @@ export const getProjectsPagination: RequestHandler<
 
   if (req.query.sp) {
     const user = await Users.findOne({ username: req.query.sp });
-    req.pagination.filter.user = new mongoose.Types.ObjectId(user?._id);
+    req.pagination.filter.sp = new mongoose.Types.ObjectId(user?._id);
   }
 
   if (req.query.customer)
