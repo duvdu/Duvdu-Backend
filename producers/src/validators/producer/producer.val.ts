@@ -25,11 +25,7 @@ export const appendProducerVal = [
 export const updateProducerVal = [
   body('category')
     .optional()
-    .isMongoId()
-    .custom((val, { req }) => {
-      if (req.body.subcategory) return true;
-      throw new Error('categoryOptional');
-    }),
+    .isMongoId(),
   body('platforms').optional().isArray({ min: 1 }),
   body('platforms.*').isMongoId(),
   body('maxBudget')
