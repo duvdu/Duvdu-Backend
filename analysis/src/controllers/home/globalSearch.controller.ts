@@ -14,15 +14,15 @@ export const globalSearchHandler: RequestHandler<
 
   const category = await Categories.aggregate([
     { $match: {$or:[
-      { 'title.ar': searchKeyword }, 
-      { 'title.en': searchKeyword }, 
-      { 'jobTitles.ar': searchKeyword }, 
-      { 'jobTitles.en': searchKeyword }, 
-      { 'subCategories.title.ar': searchKeyword }, 
-      { 'subCategories.title.en': searchKeyword }, 
-      { 'tags.ar': searchKeyword }, 
-      { 'tags.en': searchKeyword }, 
-      { 'cycle': searchKeyword },
+      { 'title.ar': { $regex: searchKeyword, $options: 'i' } }, 
+      { 'title.en': { $regex: searchKeyword, $options: 'i' } }, 
+      { 'jobTitles.ar': { $regex: searchKeyword, $options: 'i' } }, 
+      { 'jobTitles.en': { $regex: searchKeyword, $options: 'i' } }, 
+      { 'subCategories.title.ar': { $regex: searchKeyword, $options: 'i' } }, 
+      { 'subCategories.title.en': { $regex: searchKeyword, $options: 'i' } }, 
+      { 'tags.ar': { $regex: searchKeyword, $options: 'i' } }, 
+      { 'tags.en': { $regex: searchKeyword, $options: 'i' } }, 
+      { 'cycle': { $regex: searchKeyword, $options: 'i' } },
     ]} 
     },
     {
