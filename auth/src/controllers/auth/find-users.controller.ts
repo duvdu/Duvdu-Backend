@@ -229,12 +229,13 @@ export const findUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser
   ];
   const users = await Users.aggregate(aggregationPipeline);
 
+  const resultCount = users[0]?.totalCount[0]? users[0]?.totalCount[0].totalCount : 0;
   res.status(200).json({
     message: 'success',
     pagination: {
       currentPage: req.pagination.page,
-      resultCount: users[0].totalCount[0].totalCount,
-      totalPages: Math.ceil(users[0].totalCount[0].totalCount / req.pagination.limit),
+      resultCount,
+      totalPages: Math.ceil(resultCount / req.pagination.limit),
     },
     data: users[0].users,
   });
