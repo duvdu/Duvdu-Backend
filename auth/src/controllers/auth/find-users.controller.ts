@@ -29,7 +29,10 @@ export const filterUsers: RequestHandler<
   if (req.query.username) req.pagination.filter.username = req.query.username;
   if (req.query.phoneNumber) req.pagination.filter['phoneNumber.number'] = req.query.phoneNumber;
   if (req.query.category)
-    req.pagination.filter.category = new mongoose.Types.ObjectId(req.query.category);
+    req.pagination.filter.category = { 
+      $in: [new mongoose.Types.ObjectId(req.query.category)] 
+    };
+  
   if (req.query.priceFrom) req.pagination.filter.price = { $gte: req.query.priceFrom };
   if (req.query.priceTo)
     req.pagination.filter.price = { ...req.pagination.filter.price, $lte: req.query.priceTo };
@@ -54,9 +57,185 @@ export const findUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser
   req,
   res,
 ) => {
-  const currentUser = await Users.findById(req.loggedUser.id, { location: 1 });
-  const aggregationPipeline: PipelineStage[] = [
-    {
+  const currentUser = await Users.findById(req.loggedUser?.id, { location: 1 });
+  // const aggregationPipeline: PipelineStage[] = [
+  //   {
+  //     $geoNear: {
+  //       near: {
+  //         type: 'Point',
+  //         coordinates: [
+  //           (currentUser as any).location.coordinates[0],
+  //           (currentUser as any).location.coordinates[1],
+  //         ],
+  //       },
+  //       distanceField: 'string',
+  //       maxDistance: (req.query.maxDistance as unknown as number) * 1000,
+  //       spherical: true,
+  //     },
+  //   },
+  //   {
+  //     $match: { ...req.pagination.filter, _id: { $ne: new mongoose.Types.ObjectId(req.loggedUser.id) } },
+  //   },
+  //   {
+  //     $project: {
+  //       _id: 1,
+  //       name: 1,
+  //       username: 1,
+  //       profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$profileImage'] },
+  //       coverImage: { $concat: [process.env.BUCKET_HOST, '/', '$coverImage'] },
+  //       about: 1,
+  //       isOnline: 1,
+  //       isAvaliableToInstantProjects: 1,
+  //       pricePerHour: 1,
+  //       hasVerificationBadge: 1,
+  //       rate: 1,
+  //       followCount: 1,
+  //       invalidAddress: 1,
+  //       likes: 1,
+  //       address: 1,
+  //       profileViews: 1,
+  //       rank: 1,
+  //       projectsView: 1,
+  //       category: 1, // Include category field in the projection
+  //     },
+  //   },
+  //   {
+  //     $lookup: {
+  //       from: MODELS.category,
+  //       localField: 'category',
+  //       foreignField: '_id',
+  //       as: 'categoryDetails',
+  //     },
+  //   },
+  //   {
+  //     $addFields: {
+  //       category: {
+  //         $cond: {
+  //           if: { $gt: [{ $size: '$categoryDetails' }, 0] },
+  //           then: {
+  //             _id: { $arrayElemAt: ['$categoryDetails._id', 0] },
+  //             title: {
+  //               $cond: {
+  //                 if: { $eq: [req.lang, 'ar'] },
+  //                 then: { $arrayElemAt: ['$categoryDetails.title.ar', 0] },
+  //                 else: { $arrayElemAt: ['$categoryDetails.title.en', 0] },
+  //               },
+  //             },
+  //           },
+  //           else: null,
+  //         },
+  //       },
+  //     },
+  //   },
+  //   {
+  //     $project: {
+  //       _id: 1,
+  //       name: 1,
+  //       username: 1,
+  //       profileImage: 1,
+  //       coverImage: 1,
+  //       about: 1,
+  //       isOnline: 1,
+  //       isAvaliableToInstantProjects: 1,
+  //       pricePerHour: 1,
+  //       hasVerificationBadge: 1,
+  //       rate: 1,
+  //       followCount: 1,
+  //       invalidAddress: 1,
+  //       likes: 1,
+  //       address: 1,
+  //       profileViews: 1,
+  //       rank: 1,
+  //       projectsView: 1,
+  //       category: 1, // Include the category object
+  //       isFollow: 1,
+  //     },
+  //   },
+  //   {
+  //     $lookup: {
+  //       from: MODELS.follow,
+  //       let: { userId: '$_id' },
+  //       pipeline: [
+  //         {
+  //           $match: {
+  //             $expr: {
+  //               $and: [
+  //                 { $eq: ['$following', '$$userId'] },
+  //                 { $eq: ['$follower', new mongoose.Types.ObjectId(req.loggedUser.id)] },
+  //               ],
+  //             },
+  //           },
+  //         },
+  //       ],
+  //       as: 'isFollow',
+  //     },
+  //   },
+  //   {
+  //     $addFields: {
+  //       isFollow: { $cond: { if: { $gt: [{ $size: '$isFollow' }, 0] }, then: true, else: false } },
+  //     },
+  //   },
+  //   {
+  //     $lookup: {
+  //       from: MODELS.allContracts,
+  //       let: { userId: '$_id' },
+  //       pipeline: [
+  //         {
+  //           $match: {
+  //             $expr: {
+  //               $or: [
+  //                 {
+  //                   $and: [
+  //                     { $eq: ['$sp', new mongoose.Types.ObjectId(req.loggedUser.id)] },
+  //                     { $eq: ['$customer', '$$userId'] },
+  //                   ],
+  //                 },
+  //                 {
+  //                   $and: [
+  //                     { $eq: ['$customer', new mongoose.Types.ObjectId(req.loggedUser?.id)] },
+  //                     { $eq: ['$sp', '$$userId'] },
+  //                   ],
+  //                 },
+  //               ],
+  //             },
+  //           },
+  //         },
+  //       ],
+  //       as: 'canChatDetails',
+  //     },
+  //   },
+  //   {
+  //     $addFields: {
+  //       canChat: {
+  //         $cond: { if: { $gt: [{ $size: '$canChatDetails' }, 0] }, then: true, else: false },
+  //       },
+  //     },
+  //   },
+  //   {
+  //     $project: {
+  //       canChatDetails: 0, // Exclude the canChatDetails field
+  //     },
+  //   },
+  //   {
+  //     $facet: {
+  //       totalCount: [{ $count: 'totalCount' }],
+  //       users: [
+  //         {
+  //           $skip: req.pagination.skip,
+  //         },
+  //         {
+  //           $limit: req.pagination.limit,
+  //         },
+  //       ],
+  //     },
+  //   },
+  // ];
+
+  const aggregationPipeline: PipelineStage[] = [];
+
+  // Conditionally add $geoNear stage if currentUser exists
+  if (currentUser && currentUser.location && currentUser.location.coordinates) {
+    aggregationPipeline.push({
       $geoNear: {
         near: {
           type: 'Point',
@@ -65,11 +244,15 @@ export const findUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser
             (currentUser as any).location.coordinates[1],
           ],
         },
-        distanceField: 'string',
+        distanceField: 'string', // Rename 'string' to an appropriate field name
         maxDistance: (req.query.maxDistance as unknown as number) * 1000,
         spherical: true,
       },
-    },
+    });
+  }
+
+  // Add the rest of the pipeline stages
+  aggregationPipeline.push(
     {
       $match: { ...req.pagination.filter, _id: { $ne: new mongoose.Types.ObjectId(req.loggedUser.id) } },
     },
@@ -124,90 +307,7 @@ export const findUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser
         },
       },
     },
-    {
-      $project: {
-        _id: 1,
-        name: 1,
-        username: 1,
-        profileImage: 1,
-        coverImage: 1,
-        about: 1,
-        isOnline: 1,
-        isAvaliableToInstantProjects: 1,
-        pricePerHour: 1,
-        hasVerificationBadge: 1,
-        rate: 1,
-        followCount: 1,
-        invalidAddress: 1,
-        likes: 1,
-        address: 1,
-        profileViews: 1,
-        rank: 1,
-        projectsView: 1,
-        category: 1, // Include the category object
-        isFollow: 1,
-      },
-    },
-    {
-      $lookup: {
-        from: MODELS.follow,
-        let: { userId: '$_id' },
-        pipeline: [
-          {
-            $match: {
-              $expr: {
-                $and: [
-                  { $eq: ['$following', '$$userId'] },
-                  { $eq: ['$follower', new mongoose.Types.ObjectId(req.loggedUser?.id)] },
-                ],
-              },
-            },
-          },
-        ],
-        as: 'isFollow',
-      },
-    },
-    {
-      $addFields: {
-        isFollow: { $cond: { if: { $gt: [{ $size: '$isFollow' }, 0] }, then: true, else: false } },
-      },
-    },
-    {
-      $lookup: {
-        from: MODELS.allContracts,
-        let: { userId: '$_id' },
-        pipeline: [
-          {
-            $match: {
-              $expr: {
-                $or: [
-                  {
-                    $and: [
-                      { $eq: ['$sp', new mongoose.Types.ObjectId(req.loggedUser?.id)] },
-                      { $eq: ['$customer', '$$userId'] },
-                    ],
-                  },
-                  {
-                    $and: [
-                      { $eq: ['$customer', new mongoose.Types.ObjectId(req.loggedUser?.id)] },
-                      { $eq: ['$sp', '$$userId'] },
-                    ],
-                  },
-                ],
-              },
-            },
-          },
-        ],
-        as: 'canChatDetails',
-      },
-    },
-    {
-      $addFields: {
-        canChat: {
-          $cond: { if: { $gt: [{ $size: '$canChatDetails' }, 0] }, then: true, else: false },
-        },
-      },
-    },
+    // Rest of the pipeline stages
     {
       $project: {
         canChatDetails: 0, // Exclude the canChatDetails field
@@ -225,8 +325,9 @@ export const findUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser
           },
         ],
       },
-    },
-  ];
+    }
+  );
+
   const users = await Users.aggregate(aggregationPipeline);
 
   const resultCount = users[0]?.totalCount[0]? users[0]?.totalCount[0].totalCount : 0;
