@@ -17,7 +17,12 @@ export const getCategoryHandler: GetCategoryHandler = async (req, res, next) => 
         pipeline: [
           {
             $match: {
-              $expr: { $in: ['$$categoryId', '$categories'] },
+              $expr: {
+                $and: [
+                  { $isArray: '$categories' }, // Ensure categories is an array
+                  { $in: ['$$categoryId', '$categories'] }, // Only match if categoryId is in categories
+                ],
+              },
             },
           },
           { $count: 'creativesCounter' },

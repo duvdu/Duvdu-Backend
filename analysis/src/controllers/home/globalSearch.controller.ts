@@ -1,6 +1,6 @@
-import { MODELS, ProjectCycle, Rentals, SuccessResponse, Users } from '@duvdu-v1/duvdu';
-import { RequestHandler } from 'express';
 import 'express-async-errors';
+import { Categories, MODELS, ProjectCycle, Rentals, SuccessResponse, Users } from '@duvdu-v1/duvdu';
+import { RequestHandler } from 'express';
 import mongoose from 'mongoose';
 
 export const globalSearchHandler: RequestHandler<
@@ -11,6 +11,114 @@ export const globalSearchHandler: RequestHandler<
 > = async (req, res) => {
   const searchKeyword = req.query.search || '';
 
+
+  const category = await Categories.aggregate([
+    { $match: {$or:[
+      { 'title.ar': searchKeyword }, 
+      { 'title.en': searchKeyword }, 
+      { 'jobTitles.ar': searchKeyword }, 
+      { 'jobTitles.en': searchKeyword }, 
+      { 'subCategories.title.ar': searchKeyword }, 
+      { 'subCategories.title.en': searchKeyword }, 
+      { 'tags.ar': searchKeyword }, 
+      { 'tags.en': searchKeyword }, 
+      { 'cycle': searchKeyword },
+    ]} 
+    },
+    {
+      $lookup: {
+        from: MODELS.user,
+        let: { categoryId: '$_id' },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $isArray: '$categories' }, // Ensure categories is an array
+                  { $in: ['$$categoryId', '$categories'] }, // Only match if categoryId is in categories
+                ],
+              },
+            },
+          },
+          { $count: 'creativesCounter' },
+        ],
+        as: 'creativesCount',
+      },
+    },
+    {
+      $project: {
+        title: {
+          $cond: {
+            if: { $eq: ['ar', req.lang] },
+            then: '$title.ar',
+            else: '$title.en',
+          },
+        },
+        _id: 1,
+        trend: 1,
+        creativesCounter: { $arrayElemAt: ['$creativesCount.creativesCounter', 0] },
+        cycle: 1,
+        subCategories: {
+          $map: {
+            input: '$subCategories',
+            as: 'subCat',
+            in: {
+              title: {
+                $cond: {
+                  if: { $eq: ['ar', req.lang] },
+                  then: '$$subCat.title.ar',
+                  else: '$$subCat.title.en',
+                },
+              },
+              tags: {
+                $map: {
+                  input: '$$subCat.tags',
+                  as: 'tag',
+                  in: {
+                    _id: '$$tag._id',
+                    title: {
+                      $cond: {
+                        if: { $eq: ['ar', req.lang] },
+                        then: '$$tag.ar',
+                        else: '$$tag.en',
+                      },
+                    },
+                  },
+                },
+              },
+              _id: '$$subCat._id',
+            },
+          },
+        },
+        status: 1,
+        createdAt: 1,
+        updatedAt: 1,
+        __v: 1,
+        image: 1,
+        media: 1,
+        jobTitles: {
+          $map: {
+            input: '$jobTitles',
+            as: 'title',
+            in: {
+              $cond: {
+                if: { $eq: ['ar', req.lang] },
+                then: '$$title.ar',
+                else: '$$title.en',
+              },
+            },
+          },
+        },
+      },
+    },
+    {
+      $addFields: {
+        image: {
+          $concat: [process.env.BUCKET_HOST, '/', '$image'],
+        },
+      },
+    },
+  ]);
 
 
   const aggregationPipeline = [
@@ -165,9 +273,6 @@ export const globalSearchHandler: RequestHandler<
     }
   ];
   const users = await Users.aggregate(aggregationPipeline);
-
-
-
 
 
   const projects = await ProjectCycle.aggregate([
@@ -449,6 +554,7 @@ export const globalSearchHandler: RequestHandler<
   res.status(200).json(<any>{message:'success' , data:{
     users,
     rentals,
-    projects
+    projects,
+    category
   }});
 };

@@ -45,37 +45,6 @@ export const getCategoriesAdminPagination: RequestHandler<
 };
 
 export const getCatogriesAdminHandler: GetCatogriesAdminHandler = async (req, res) => {
-  
-
-  // const category = await Categories.aggregate([
-  //   { $match: req.pagination.filter },
-  //   {$skip:req.pagination.skip},
-  //   {$limit:req.pagination.limit},
-  //   {
-  //     $project: {
-  //       title: 1,
-  //       _id: 1,
-  //       creativesCounter: 1,
-  //       cycle: 1,
-  //       subCategories: 1,
-  //       status: 1,
-  //       media:1,
-  //       trend:1,
-  //       createdAt: 1,
-  //       updatedAt: 1,
-  //       __v: 1,
-  //       image: 1,
-  //       jobTitles: 1,
-  //     },
-  //   },
-  //   {
-  //     $addFields: {
-  //       image: {
-  //         $concat: [process.env.BUCKET_HOST, '/', '$image'],
-  //       },
-  //     },
-  //   },
-  // ]);
 
   const category = await Categories.aggregate([
     { 
@@ -94,7 +63,12 @@ export const getCatogriesAdminHandler: GetCatogriesAdminHandler = async (req, re
         pipeline: [
           {
             $match: {
-              $expr: { $in: ['$$categoryId', '$categories'] },
+              $expr: {
+                $and: [
+                  { $isArray: '$categories' }, // Ensure categories is an array
+                  { $in: ['$$categoryId', '$categories'] }, // Only match if categoryId is in categories
+                ],
+              },
             },
           },
           { $count: 'creativesCounter' },

@@ -26,8 +26,8 @@ router.get(
 router
   .route('/')
   .post(
-    // isauthenticated,
-    // isauthorized(PERMISSIONS.createCategory),
+    isauthenticated,
+    isauthorized(PERMISSIONS.createCategory),
     uploadProjectMedia(FOLDERS.category),
     checkRequiredFields({ fields: ['cover'] }),
     val.createCategoryVal,
