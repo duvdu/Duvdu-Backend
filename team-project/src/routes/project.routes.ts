@@ -79,3 +79,11 @@ router
     controllers.addCreativeHandler,
   )
   .delete(isauthenticated, val.deleteCreative, controllers.deleteCreativeHandler);
+
+router
+  .route('/:teamId/category')
+  .post(isauthenticated, val.addCategory, controllers.addCategoryHandler);
+
+router
+  .route('/:teamId/category/:categoryId')
+  .delete(isauthenticated, val.deleteCategory, controllers.deleteCategoryHandler);

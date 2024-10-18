@@ -12,6 +12,7 @@ export enum UserStatus {
   canceled = 'canceled',
 }
 
+
 export interface ITeamProject {
   user: Types.ObjectId | Iuser;
   cover: string;

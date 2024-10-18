@@ -27,7 +27,8 @@ export const addCreativeHandler: AddCreativeHandler = async (req, res, next) => 
 
   const project = await TeamProject.findOne({ _id: req.params.teamId, isDeleted: { $ne: true } });
 
-  if (!project) return next(new NotFound({ en: 'team not found', ar: 'التيم غير موجود' }));
+  if (!project)
+    return next(new NotFound({ en: 'team not found', ar: 'التيم غير موجود' }, req.lang));
 
   if (project.user.toString() != req.loggedUser.id)
     return next(new NotAllowedError(undefined, req.lang));
@@ -108,7 +109,7 @@ export const addCreativeHandler: AddCreativeHandler = async (req, res, next) => 
 
   // create contract an all contracts
   await Contracts.create({
-    _id:contract._id,
+    _id: contract._id,
     contract: contract._id,
     customer: contract.customer,
     sp: contract.sp,

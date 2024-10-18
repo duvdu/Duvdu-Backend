@@ -76,3 +76,13 @@ export const action = [
 ];
 
 export const pay = [param('paymentSession').isString(), globalValidatorMiddleware];
+
+export const addCategory = [
+  param('teamId').isMongoId().withMessage('teamId'),
+  body('category').isMongoId().withMessage('category'),
+];
+
+export const deleteCategory = [
+  param('teamId').isMongoId().withMessage('teamId'),
+  param('categoryId').isMongoId().withMessage('category'),
+];

@@ -112,7 +112,7 @@ export const createProjectHandler: CreateProjectHandler = async (req, res, next)
         cycle: CYCLES.teamProject,
         ref: 'team_contracts',
       });
-   
+
       const customer = await Users.findById(req.loggedUser.id);
       // send notification to user
       await sendNotification(

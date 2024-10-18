@@ -6,3 +6,5 @@ export * from './getProjects.controller';
 export * from './deleteProject.controllers';
 export * from './getCrmTeam.controllers';
 export * from './getCrmTeams.controller';
+export * from './addCategory.controller';
+export * from './deleteCategory.controller';

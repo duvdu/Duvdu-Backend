@@ -98,12 +98,12 @@ export const getProducersHandler: GetProducersHandler = async (req, res, next) =
       { $unwind: '$user' },
       ...(isInstant !== undefined
         ? [
-            {
-              $match: {
-                'user.isAvaliableToInstantProjects': isInstant,
-              },
+          {
+            $match: {
+              'user.isAvaliableToInstantProjects': isInstant,
             },
-          ]
+          },
+        ]
         : []),
       {
         $count: 'totalCount',
