@@ -136,6 +136,14 @@ export const contractAction: RequestHandler<
           { status: TeamContractStatus.canceled, rejectedBy: 'customer', actionAt: new Date() },
         );
 
+        await updateUserStatus(
+          contract.project.toString(),
+          contract.category.toString(),
+          contract.sp.toString(),
+          UserStatus.canceled,
+          req.lang,
+        );
+
         await sendNotification(
           req.loggedUser.id,
           contract.sp.toString(),
@@ -176,7 +184,7 @@ export const contractAction: RequestHandler<
         contract.project.toString(),
         contract.category.toString(),
         contract.sp.toString(),
-        UserStatus.canceled,
+        UserStatus.rejected,
         req.lang,
       );
 
