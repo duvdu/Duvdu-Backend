@@ -129,6 +129,26 @@ export const contractAction: RequestHandler<
         // );
       }
     } else {
+
+      if (req.body.action === 'cancel' && contract.status === TeamContractStatus.pending) {
+        await TeamContract.updateOne(
+          { _id: req.params.contractId },
+          { status: TeamContractStatus.canceled, rejectedBy: 'customer', actionAt: new Date() },
+        );
+
+        await sendNotification(
+          req.loggedUser.id,
+          contract.sp.toString(),
+          contract._id.toString(),
+          'contract',
+          'team project contract update',
+          `${customer?.name} cancel contract`,
+          Channels.update_contract,
+        );
+
+        return res.status(200).json({message:'success'});
+      }
+      
       if (
         req.body.action !== 'reject' ||
         !contract.actionAt ||

@@ -68,7 +68,7 @@ export const action = [
     .isString()
     .bail()
     .custom((val) => {
-      if (['reject', 'accept'].includes(val)) return true;
+      if (['reject', 'accept' , 'cancel'].includes(val)) return true;
       throw new Error();
     }),
   param('contractId').isMongoId(),
