@@ -71,6 +71,7 @@ export const addCreativeHandler: AddCreativeHandler = async (req, res, next) => 
     ),
     status: UserStatus.pending,
     attachments: req.body.attachments,
+    contract:new mongoose.Types.ObjectId(req.body.user)
   });
 
   await project.save();
@@ -128,6 +129,9 @@ export const addCreativeHandler: AddCreativeHandler = async (req, res, next) => 
     `new team project contract from ${customer?.name}`,
     Channels.new_contract,
   );
+
+  user.contract = contract._id;
+  await project.save();
 
   // use pending expiration
   // TODO:
