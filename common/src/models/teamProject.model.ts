@@ -36,6 +36,7 @@ export interface ITeamProject {
           deadLine: Date;
           totalAmount: number;
           status: UserStatus;
+          contract:Types.ObjectId
         },
       ];
     },
@@ -45,6 +46,7 @@ export interface ITeamProject {
 
 const UserSchema = new Schema<ITeamProject['creatives'][0]['users'][0]>({
   user: { type: Schema.Types.ObjectId, ref: MODELS.user },
+  contract: { type: Schema.Types.ObjectId, ref: MODELS.user },
   attachments: [String],
   duration: { type: Number, default: 0 },
   startDate: Date,
