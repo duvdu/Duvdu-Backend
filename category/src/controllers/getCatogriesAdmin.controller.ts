@@ -1,4 +1,4 @@
-import { Categories } from '@duvdu-v1/duvdu';
+import { Categories, MODELS } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 import { GetCatogriesAdminHandler } from '../types/endpoints/endpoints';
@@ -47,25 +47,76 @@ export const getCategoriesAdminPagination: RequestHandler<
 export const getCatogriesAdminHandler: GetCatogriesAdminHandler = async (req, res) => {
   
 
+  // const category = await Categories.aggregate([
+  //   { $match: req.pagination.filter },
+  //   {$skip:req.pagination.skip},
+  //   {$limit:req.pagination.limit},
+  //   {
+  //     $project: {
+  //       title: 1,
+  //       _id: 1,
+  //       creativesCounter: 1,
+  //       cycle: 1,
+  //       subCategories: 1,
+  //       status: 1,
+  //       media:1,
+  //       trend:1,
+  //       createdAt: 1,
+  //       updatedAt: 1,
+  //       __v: 1,
+  //       image: 1,
+  //       jobTitles: 1,
+  //     },
+  //   },
+  //   {
+  //     $addFields: {
+  //       image: {
+  //         $concat: [process.env.BUCKET_HOST, '/', '$image'],
+  //       },
+  //     },
+  //   },
+  // ]);
+
   const category = await Categories.aggregate([
-    { $match: req.pagination.filter },
-    {$skip:req.pagination.skip},
-    {$limit:req.pagination.limit},
+    { 
+      $match: req.pagination.filter
+    },
+    { 
+      $skip: req.pagination.skip
+    },
+    { 
+      $limit: req.pagination.limit
+    },
+    {
+      $lookup: {
+        from: MODELS.user,
+        let: { categoryId: '$_id' },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $in: ['$$categoryId', '$categories'] },
+            },
+          },
+          { $count: 'creativesCounter' },
+        ],
+        as: 'creativesCount',
+      },
+    },
     {
       $project: {
         title: 1,
         _id: 1,
-        creativesCounter: 1,
         cycle: 1,
         subCategories: 1,
         status: 1,
-        media:1,
-        trend:1,
+        media: 1,
+        trend: 1,
         createdAt: 1,
         updatedAt: 1,
         __v: 1,
         image: 1,
         jobTitles: 1,
+        creativesCounter: { $arrayElemAt: ['$creativesCount.creativesCounter', 0] },
       },
     },
     {

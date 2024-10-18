@@ -1,78 +1,30 @@
-import { NotFound, Categories } from '@duvdu-v1/duvdu';
+import { NotFound, Categories, MODELS } from '@duvdu-v1/duvdu';
 import mongoose from 'mongoose';
 
 import { GetCategoryHandler } from '../types/endpoints/endpoints';
 
 export const getCategoryHandler: GetCategoryHandler = async (req, res, next) => {
-  // const category = await Categories.aggregate([
-  //   { $match: { status: true, _id: new mongoose.Types.ObjectId(req.params.categoryId) } },
-  //   { $limit: 1 },
-  //   {
-  //     $project: {
-  //       title: {
-  //         $cond: {
-  //           if: { $eq: ['ar', req.lang] },
-  //           then: '$title.ar',
-  //           else: '$title.en',
-  //         },
-  //       },
-  //       _id: 1,
-  //       creativesCounter: 1,
-  //       cycle: 1,
-  //       subCategories: {
-  //         $map: {
-  //           input: '$subCategories',
-  //           as: 'subCat',
-  //           in: {
-  //             title: {
-  //               $cond: {
-  //                 if: { $eq: ['ar', req.lang] },
-  //                 then: '$$subCat.title.ar',
-  //                 else: '$$subCat.title.en',
-  //               },
-  //             },
-  //             tags: {
-  //               $map: {
-  //                 input: '$$subCat.tags',
-  //                 as: 'tag',
-  //                 in: {
-  //                   $cond: {
-  //                     if: { $eq: ['ar', req.lang] },
-  //                     then: '$$tag.ar',
-  //                     else: '$$tag.en',
-  //                   },
-  //                 },
-  //               },
-  //             },
-  //             _id: '$$subCat._id',
-  //           },
-  //         },
-  //       },
-  //       jobTitles: {
-  //         $map: {
-  //           input: '$jobTitles',
-  //           as: 'title',
-  //           in: {
-  //             $cond: {
-  //               if: { $eq: ['ar', req.lang] },
-  //               then: '$$title.ar',
-  //               else: '$$title.en',
-  //             },
-  //           },
-  //         },
-  //       },
-  //       status: 1,
-  //       createdAt: 1,
-  //       updatedAt: 1,
-  //       __v: 1,
-  //       image: { $concat: [process.env.BUCKET_HOST, '/', '$image'] },
-  //     },
-  //   },
-  // ]);
   
   const category = await Categories.aggregate([
-    { $match: { status: true, _id: new mongoose.Types.ObjectId(req.params.categoryId) } },
+    { 
+      $match: { status: true, _id: new mongoose.Types.ObjectId(req.params.categoryId) } 
+    },
     { $limit: 1 },
+    {
+      $lookup: {
+        from: MODELS.user,
+        let: { categoryId: '$_id' },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $in: ['$$categoryId', '$categories'] },
+            },
+          },
+          { $count: 'creativesCounter' },
+        ],
+        as: 'creativesCount',
+      },
+    },
     {
       $project: {
         title: {
@@ -83,8 +35,8 @@ export const getCategoryHandler: GetCategoryHandler = async (req, res, next) => 
           },
         },
         _id: 1,
-        trend:1,
-        creativesCounter: 1,
+        trend: 1,
+        creativesCounter: { $arrayElemAt: ['$creativesCount.creativesCounter', 0] },
         cycle: 1,
         subCategories: {
           $map: {
@@ -134,13 +86,14 @@ export const getCategoryHandler: GetCategoryHandler = async (req, res, next) => 
         status: 1,
         createdAt: 1,
         updatedAt: 1,
-        media:1,
+        media: 1,
         __v: 1,
         image: { $concat: [process.env.BUCKET_HOST, '/', '$image'] },
       },
     },
   ]);
   
-  if (!category) return next(new NotFound({en:'category not found' , ar:'الفئة غير موجودة'} , req.lang));
+  
+  if (category.length === 0) return next(new NotFound({en:'category not found' , ar:'الفئة غير موجودة'} , req.lang));
   res.status(200).json({ message: 'success', data: category[0] });
 };

@@ -1,4 +1,4 @@
-import { Categories } from '@duvdu-v1/duvdu';
+import { Categories, MODELS } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 import { GetCategoriesHandler } from '../types/endpoints/endpoints';
@@ -42,12 +42,12 @@ export const getCategoriesPagination: RequestHandler<unknown, unknown, unknown, 
 
 
 
-export const getCategoriesHandler: GetCategoriesHandler = async (req, res) => {
-
+export const getCategoriesHandler: GetCategoriesHandler = async (req, res) => {  
+  
   // const category = await Categories.aggregate([
   //   { $match: req.pagination.filter },
-  //   {$skip:req.pagination.skip},
-  //   {$limit:req.pagination.limit},
+  //   { $skip: req.pagination.skip },
+  //   { $limit: req.pagination.limit },
   //   {
   //     $project: {
   //       title: {
@@ -58,6 +58,7 @@ export const getCategoriesHandler: GetCategoriesHandler = async (req, res) => {
   //         },
   //       },
   //       _id: 1,
+  //       trend:1,
   //       creativesCounter: 1,
   //       cycle: 1,
   //       subCategories: {
@@ -77,10 +78,13 @@ export const getCategoriesHandler: GetCategoriesHandler = async (req, res) => {
   //                 input: '$$subCat.tags',
   //                 as: 'tag',
   //                 in: {
-  //                   $cond: {
-  //                     if: { $eq: ['ar', req.lang] },
-  //                     then: '$$tag.ar',
-  //                     else: '$$tag.en',
+  //                   _id: '$$tag._id',
+  //                   title: {
+  //                     $cond: {
+  //                       if: { $eq: ['ar', req.lang] },
+  //                       then: '$$tag.ar',
+  //                       else: '$$tag.en',
+  //                     },
   //                   },
   //                 },
   //               },
@@ -94,6 +98,7 @@ export const getCategoriesHandler: GetCategoriesHandler = async (req, res) => {
   //       updatedAt: 1,
   //       __v: 1,
   //       image: 1,
+  //       media:1,
   //       jobTitles: {
   //         $map: {
   //           input: '$jobTitles',
@@ -117,11 +122,26 @@ export const getCategoriesHandler: GetCategoriesHandler = async (req, res) => {
   //     }
   //   },
   // ]);
-  
+
   const category = await Categories.aggregate([
     { $match: req.pagination.filter },
     { $skip: req.pagination.skip },
     { $limit: req.pagination.limit },
+    {
+      $lookup: {
+        from: MODELS.user,
+        let: { categoryId: '$_id' },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $in: ['$$categoryId', '$categories'] },
+            },
+          },
+          { $count: 'creativesCounter' },
+        ],
+        as: 'creativesCount',
+      },
+    },
     {
       $project: {
         title: {
@@ -132,8 +152,8 @@ export const getCategoriesHandler: GetCategoriesHandler = async (req, res) => {
           },
         },
         _id: 1,
-        trend:1,
-        creativesCounter: 1,
+        trend: 1,
+        creativesCounter: { $arrayElemAt: ['$creativesCount.creativesCounter', 0] },
         cycle: 1,
         subCategories: {
           $map: {
@@ -172,7 +192,7 @@ export const getCategoriesHandler: GetCategoriesHandler = async (req, res) => {
         updatedAt: 1,
         __v: 1,
         image: 1,
-        media:1,
+        media: 1,
         jobTitles: {
           $map: {
             input: '$jobTitles',
@@ -191,13 +211,13 @@ export const getCategoriesHandler: GetCategoriesHandler = async (req, res) => {
     {
       $addFields: {
         image: {
-          $concat: [process.env.BUCKET_HOST, '/', '$image']
-        }
-      }
+          $concat: [process.env.BUCKET_HOST, '/', '$image'],
+        },
+      },
     },
   ]);
   
-
+  
   const resultCount = await Categories.find(req.pagination.filter).countDocuments();
 
   res.status(200).json({ 
