@@ -137,6 +137,7 @@ export const getProducerHandler: GetProducerHandler = async (req, res, next) => 
           rate: '$user.rate',
           rank: '$user.rank',
           projectsView: '$user.projectsView',
+          address: '$user.address',
         },
       },
     },

@@ -141,6 +141,7 @@ export const getLoggedProducerHandler: GetLoggedProducerHandler = async (req, re
           rate: '$user.rate',
           rank: '$user.rank',
           projectsView: '$user.projectsView',
+          address: '$user.address',
         },
       },
     },

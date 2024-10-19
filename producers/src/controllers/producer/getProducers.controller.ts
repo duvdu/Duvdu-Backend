@@ -260,6 +260,7 @@ export const getProducersHandler: GetProducersHandler = async (req, res, next) =
             rate: '$user.rate',
             rank: '$user.rank',
             projectsView: '$user.projectsView',
+            address: '$user.address',
             _id: '$user._id',
           },
         },
