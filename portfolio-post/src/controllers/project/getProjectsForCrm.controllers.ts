@@ -161,6 +161,7 @@ export const getProjetcsCrm: GetProjectsForCrmHandler = async (req, res) => {
           },
         },
         cover: { $concat: [process.env.BUCKET_HOST, '/', '$cover'] },
+        audioCover: { $concat: [process.env.BUCKET_HOST, '/', '$audioCover'] },
         attachments: {
           $map: {
             input: '$attachments',

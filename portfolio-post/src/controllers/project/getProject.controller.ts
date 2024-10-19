@@ -165,6 +165,7 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
             },
           },
           cover: { $concat: [process.env.BUCKET_HOST, '/', '$cover'] },
+          audioCover: { $concat: [process.env.BUCKET_HOST, '/', '$audioCover'] },
           attachments: {
             $map: {
               input: '$attachments',
@@ -212,13 +213,6 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
     if (!projects[0])
       return next(new NotFound({ en: 'project not found', ar: 'المشروع غير موجود' }, req.lang));
 
-    // if (req.loggedUser?.id) {
-    //   const user = await Users.findById(req.loggedUser.id, { favourites: 1 });
-
-    //   projects[0].isFavourite = user?.favourites.some(
-    //     (el: any) => el.project.toString() === projects[0]._id.toString(),
-    //   );
-    // }
     await incrementProjectsView(
       projects[0].user._id,
       MODELS.portfolioPost,
