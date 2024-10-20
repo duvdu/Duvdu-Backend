@@ -20,6 +20,8 @@ export interface IcopyRights {
   isDeleted: boolean;
   tags: { ar: string; en: string }[];
   subCategory: { ar: string; en: string };
+  minBudget: number;
+  maxBudget: number;
 }
 
 export const CopyRights = model<IcopyRights>(
@@ -48,6 +50,8 @@ export const CopyRights = model<IcopyRights>(
         lat: { type: Number, default: null },
         lng: { type: Number, default: null },
       },
+      minBudget: { type: Number, default: null },
+      maxBudget: { type: Number, default: null },
     },
     {
       timestamps: true,

@@ -3,11 +3,10 @@ import { model, Schema, Types } from 'mongoose';
 import { MODELS } from '../types/model-names';
 import { Iuser } from '../types/User';
 
-
-export enum InviteStatus{
+export enum InviteStatus {
   accepted = 'accepted',
   rejected = 'rejected',
-  pending = 'pending'
+  pending = 'pending',
 }
 
 export interface IprojectCycle {
@@ -16,13 +15,13 @@ export interface IprojectCycle {
   subCategory: { ar: string; en: string };
   tags: { ar: string; en: string }[];
   cover: string;
-  audioCover:string;
+  audioCover: string;
   attachments: string[];
   name: string;
   description: string;
   tools: { name: string; unitPrice: number }[];
   functions: { name: string; unitPrice: number }[];
-  creatives: {creative:Types.ObjectId[] | Iuser[] , inviteStatus:InviteStatus}[];
+  creatives: { creative: Types.ObjectId[] | Iuser[]; inviteStatus: InviteStatus }[];
   location: { lat: number; lng: number };
   address: string;
   searchKeyWords: string[];
@@ -38,6 +37,8 @@ export interface IprojectCycle {
   rate: { ratersCounter: number; totalRates: number };
   duration: number;
   submitFiles: { files: string[]; url: string; note: string };
+  minBudget: number;
+  maxBudget: number;
 }
 
 export const ProjectCycle = model<IprojectCycle>(
@@ -57,7 +58,12 @@ export const ProjectCycle = model<IprojectCycle>(
       functions: [
         { name: { type: String, default: null }, unitPrice: { type: Number, default: 0 } },
       ],
-      creatives: [{creative:{ type: Schema.Types.ObjectId, ref: MODELS.user } , inviteStatus:{type:String , enum:InviteStatus , default:InviteStatus.pending}}],
+      creatives: [
+        {
+          creative: { type: Schema.Types.ObjectId, ref: MODELS.user },
+          inviteStatus: { type: String, enum: InviteStatus, default: InviteStatus.pending },
+        },
+      ],
       location: { lat: { type: Number, default: 0 }, lng: { type: Number, default: 0 } },
       address: { type: String, default: null },
       searchKeyWords: [String],
@@ -77,6 +83,8 @@ export const ProjectCycle = model<IprojectCycle>(
         url: { type: String, default: null },
         note: { type: String, default: null },
       },
+      minBudget: { type: Number, default: null },
+      maxBudget: { type: Number, default: null },
     },
     { timestamps: true, collection: MODELS.portfolioPost },
   ),

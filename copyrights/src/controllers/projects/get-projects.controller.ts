@@ -20,8 +20,17 @@ export const getProjectsPagination: RequestHandler<
     tags?: mongoose.Types.ObjectId[];
     subCategory?: mongoose.Types.ObjectId[];
     duration?: number;
+    maxBudget?: number;
+    minBudget?: number;
   }
 > = async (req, res, next) => {
+  if (req.query.maxBudget !== undefined) {
+    req.pagination.filter.maxBudget = { $lte: req.query.maxBudget };
+  }
+
+  if (req.query.minBudget !== undefined) {
+    req.pagination.filter.minBudget = { $gte: req.query.minBudget };
+  }
   if (req.query.duration) req.pagination.filter['duration.value'] = { $eq: req.query.duration };
   if (req.query.instant != undefined) req.pagination.filter.instant = req.query.instant;
   if (req.query.search) req.pagination.filter.$text = { $search: req.query.search };
