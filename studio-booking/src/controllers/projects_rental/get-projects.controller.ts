@@ -239,8 +239,17 @@ export const getProjectsPagination: RequestHandler<
     tags?: string;
     subCategory?: string[];
     instant?: boolean;
+    maxBudget?: number;
+    minBudget?: number;
   }
 > = async (req, res, next) => {
+  if (req.query.maxBudget !== undefined) {
+    req.pagination.filter.maxBudget = { $lte: req.query.maxBudget };
+  }
+
+  if (req.query.minBudget !== undefined) {
+    req.pagination.filter.minBudget = { $gte: req.query.minBudget };
+  }
   req.pagination.filter = {};
 
   if (req.query.instant != undefined) req.pagination.filter.instant = req.query.instant;

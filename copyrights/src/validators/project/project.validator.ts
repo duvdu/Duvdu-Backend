@@ -97,6 +97,8 @@ export const findAll = [
   query('limit').optional().isInt({ min: 1 }),
   query('page').optional().isInt({ min: 1 }),
   query('duration').optional().isInt({ gt: 0 }).toInt(),
+  query('maxBudget').optional().isInt({ gt: 0 }).toInt().withMessage('maxBudgetOptionalNumeric'),
+  query('minBudget').optional().isInt({ gt: 0 }).toInt().withMessage('minBudgetOptionalNumeric'),
   globalValidatorMiddleware,
 ];
 

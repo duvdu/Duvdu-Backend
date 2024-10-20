@@ -83,4 +83,4 @@ router
     isauthorized(PERMISSIONS.removeProjectHandler),
     val.getProject,
     handler.deleteProjectHandler,
-  ).post(isauthenticated , val.invitationAction , handler.invitationActionHandler);
+  ).post(isauthenticated ,val.acceptAction , handler.invitationActionHandler);

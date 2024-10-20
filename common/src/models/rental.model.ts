@@ -33,6 +33,8 @@ export interface Irental {
   rate: { ratersCounter: number; totalRates: number };
   createdAt: Date;
   updatedAt: Date;
+  minBudget: number;
+  maxBudget: number;
 }
 
 export const Rentals = model<Irental>(
@@ -62,6 +64,8 @@ export const Rentals = model<Irental>(
       },
       isDeleted: { type: Boolean, default: false },
       rate: { ratersCounter: Number, totalRates: Number },
+      minBudget: { type: Number, default: null },
+      maxBudget: { type: Number, default: null },
     },
     { collection: 'rentals', timestamps: true },
   ).index({ createdAt: 1, updatedAt: -1 }),

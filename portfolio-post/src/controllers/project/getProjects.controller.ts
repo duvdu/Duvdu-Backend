@@ -23,6 +23,8 @@ export const getProjectsPagination: RequestHandler<
     projectScaleMax?: number;
     instant?: boolean;
     duration?: number;
+    maxBudget?: number;
+    minBudget?: number;
   }
 > = async (req, res, next) => {
   if (req.query.duration) req.pagination.filter.duration = { $eq: req.query.duration };
@@ -103,6 +105,14 @@ export const getProjectsPagination: RequestHandler<
     }
   }
 
+  if (req.query.maxBudget !== undefined) {
+    req.pagination.filter.maxBudget = { $lte: req.query.maxBudget };
+  }
+
+  if (req.query.minBudget !== undefined) {
+    req.pagination.filter.minBudget = { $gte: req.query.minBudget };
+  }
+
   next();
 };
 
@@ -129,12 +139,12 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
     { $unwind: '$user' },
     ...(isInstant !== undefined
       ? [
-        {
-          $match: {
-            'user.isAvaliableToInstantProjects': isInstant,
+          {
+            $match: {
+              'user.isAvaliableToInstantProjects': isInstant,
+            },
           },
-        },
-      ]
+        ]
       : []),
     {
       $count: 'totalCount',

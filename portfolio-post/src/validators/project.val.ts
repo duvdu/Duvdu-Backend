@@ -154,6 +154,8 @@ export const getAll = [
     })
     .bail()
     .customSanitizer((val: string[]) => val.map((el) => new mongoose.Types.ObjectId(el))),
+  query('maxBudget').optional().isInt({ gt: 0 }).toInt().withMessage('maxBudgetOptionalNumeric'),
+  query('minBudget').optional().isInt({ gt: 0 }).toInt().withMessage('minBudgetOptionalNumeric'),
   globalValidatorMiddleware,
 ];
 
@@ -163,10 +165,6 @@ export const getProjectAnalysis = [
   globalValidatorMiddleware,
 ];
 
-export const invitationAction = [
-  body('status').isIn([InviteStatus.accepted , InviteStatus.rejected]),
-  globalValidatorMiddleware
-];
 
 export const acceptAction = [
   param('projectId').isMongoId().withMessage('projectId'),
