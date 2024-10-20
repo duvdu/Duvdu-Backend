@@ -10,6 +10,7 @@ export const globalSearchHandler: RequestHandler<
   {search:string}
 > = async (req, res) => {
   const searchKeyword = req.query.search || '';  
+  
 
   const category = await Categories.aggregate([
     { $match: {$or:[
@@ -405,17 +406,6 @@ export const globalSearchHandler: RequestHandler<
     },
   ]);
 
-  if (req.loggedUser?.id) {
-    const user = await Users.findById(req.loggedUser.id, { favourites: 1 });
-    projects.forEach((project) => {
-      project.isFavourite = user?.favourites.some(
-        (el: any) => el.project.toString() === project._id.toString(),
-      );
-    });
-  }
-
-
-
   // Execute the aggregation pipeline
   const pipelines = [
     {
@@ -538,16 +528,6 @@ export const globalSearchHandler: RequestHandler<
     },
     ...pipelines,
   ]);
-
-  if (req.loggedUser?.id) {
-    const user = await Users.findById(req.loggedUser.id, { favourites: 1 });
-
-    rentals.forEach((project) => {
-      project.isFavourite = user?.favourites.some(
-        (el: any) => el.project.toString() === project._id.toString(),
-      );
-    });
-  }
 
 
   res.status(200).json(<any>{message:'success' , data:{
