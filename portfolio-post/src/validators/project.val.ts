@@ -1,4 +1,4 @@
-import { globalValidatorMiddleware, InviteStatus } from '@duvdu-v1/duvdu';
+import { globalPaginationMiddleware, globalValidatorMiddleware, InviteStatus } from '@duvdu-v1/duvdu';
 import { body, param, query } from 'express-validator';
 import mongoose from 'mongoose';
 
@@ -166,4 +166,10 @@ export const getProjectAnalysis = [
 export const invitationAction = [
   body('status').isIn([InviteStatus.accepted , InviteStatus.rejected]),
   globalValidatorMiddleware
+];
+
+export const acceptAction = [
+  param('projectId').isMongoId().withMessage('projectId'),
+  body('status').isIn([InviteStatus.accepted , InviteStatus.rejected]),
+  globalPaginationMiddleware
 ];

@@ -9,8 +9,7 @@ export const globalSearchHandler: RequestHandler<
   unknown,
   {search:string}
 > = async (req, res) => {
-  const searchKeyword = req.query.search || '';
-
+  const searchKeyword = req.query.search || '';  
 
   const category = await Categories.aggregate([
     { $match: {$or:[
