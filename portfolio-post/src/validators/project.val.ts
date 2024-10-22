@@ -46,13 +46,6 @@ export const create = [
   body('tagsId.*').isMongoId().withMessage('tagsId'),
   body('subCategory').not().exists().withMessage('subCategory'),
   body('tags').not().exists().withMessage('tags'),
-  body('maxBudget').isInt().withMessage('maxBudgetInt'),
-  body('minBudget')
-    .isInt()
-    .custom((val, { req }) => {
-      if (req.body.maxBudget > val) return true;
-      throw new Error('minBudgetCustom');
-    }),
   globalValidatorMiddleware,
 ];
 
@@ -161,8 +154,6 @@ export const getAll = [
     })
     .bail()
     .customSanitizer((val: string[]) => val.map((el) => new mongoose.Types.ObjectId(el))),
-  query('maxBudget').optional().isInt({ gt: 0 }).toInt().withMessage('maxBudgetOptionalNumeric'),
-  query('minBudget').optional().isInt({ gt: 0 }).toInt().withMessage('minBudgetOptionalNumeric'),
   globalValidatorMiddleware,
 ];
 
