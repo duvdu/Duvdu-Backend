@@ -13,13 +13,13 @@ import {
 import { NewNotificationPublisher } from '../../event/publisher/newNotification.publisher';
 import { natsWrapper } from '../../nats-wrapper';
 import { FollowHandler } from '../../types/endpoints/follow.endpoints';
-import { NotificationDetails } from '../../types/notification_details';
 
 export const followHandler: FollowHandler = async (req, res, next) => {
   const follow = await Follow.findOne({
     follower: req.loggedUser.id,
     following: req.params.userId,
   });
+
 
   if (follow)
     return next(
@@ -57,8 +57,8 @@ export const followHandler: FollowHandler = async (req, res, next) => {
     targetUser: req.params.userId,
     type: NotificationType.new_follower,
     target: newFollow._id,
-    message: NotificationDetails.newFollow.message,
-    title: NotificationDetails.newFollow.title,
+    message: 'new follower',
+    title: `${sourceUser.name} start follow you`,
   });
 
   const populatedNotification = await (
