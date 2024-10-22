@@ -43,7 +43,7 @@ router
     isauthorized(PERMISSIONS.createProjectHandler),
     globalUploadMiddleware(FOLDERS.portfolio_post, {
       maxSize: 400 * 1024 * 1024,
-      fileTypes: ['video', 'image', 'audio/wav', 'audio/mpeg', 'application/pdf' , 'audio/x-wav'],
+      fileTypes: ['video', 'image', 'audio', 'application/pdf' ],
     }).fields([
       { name: 'attachments', maxCount: 10 },
       { name: 'cover', maxCount: 1 },
