@@ -46,6 +46,13 @@ export const create = [
   body('tagsId.*').isMongoId().withMessage('tagsId'),
   body('subCategory').not().exists().withMessage('subCategory'),
   body('tags').not().exists().withMessage('tags'),
+  body('maxBudget').isInt().withMessage('maxBudgetInt'),
+  body('minBudget')
+    .isInt()
+    .custom((val, { req }) => {
+      if (req.body.maxBudget > val) return true;
+      throw new Error('minBudgetCustom');
+    }),
   globalValidatorMiddleware,
 ];
 
