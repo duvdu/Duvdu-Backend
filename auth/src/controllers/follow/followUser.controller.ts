@@ -57,8 +57,8 @@ export const followHandler: FollowHandler = async (req, res, next) => {
     targetUser: req.params.userId,
     type: NotificationType.new_follower,
     target: newFollow._id,
-    message: 'new follower',
-    title: `${sourceUser.name} start follow you`,
+    title: 'new follower',
+    message: `${sourceUser.name} start follow you`,
   });
 
   const populatedNotification = await (

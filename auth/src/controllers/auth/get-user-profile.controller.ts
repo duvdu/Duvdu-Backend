@@ -83,8 +83,8 @@ export const getUserProfileHandler: GetUserProfileHandler = async (req, res, nex
   user[0].profileViews++;
   await Users.updateOne({ _id: user[0]._id }, { profileViews: user[0].profileViews });
 
-  // isFollow
-  const isFollow = await Follow.findOne({ follower: req.loggedUser?.id, following: user[0].id });
+  // isFollow  
+  const isFollow = await Follow.findOne({ follower: req.loggedUser?.id, following: user[0]._id });
   const canChat = await Contracts.findOne({
     $or: [
       { sp: req.loggedUser?.id, customer: user[0]._id },
