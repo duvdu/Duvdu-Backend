@@ -1,130 +1,3 @@
-// import 'express-async-errors';
-
-// import {
-//   BadRequestError,
-//   Bucket,
-//   CategoryMedia,
-//   CYCLES,
-//   Files,
-//   filterTagsForCategory,
-//   FOLDERS,
-//   IprojectCycle,
-//   MODELS,
-//   Project,
-//   ProjectCycle,
-//   SuccessResponse,
-//   Users,
-// } from '@duvdu-v1/duvdu';
-// import { RequestHandler } from 'express';
-
-// export const createProjectHandler:  RequestHandler<
-// unknown,
-// SuccessResponse<{ data: IprojectCycle }>,
-// Pick<
-//   IprojectCycle,
-//   | 'address'
-//   | 'attachments'
-//   | 'category'
-//   | 'cover'
-//   | 'creatives'
-//   | 'description'
-//   | 'functions'
-//   | 'duration'
-//   | 'location'
-//   | 'name'
-//   | 'projectScale'
-//   | 'searchKeyWords'
-//   | 'showOnHome'
-//   | 'tools'
-//   | 'subCategory'
-//   | 'tags'
-//   | 'audioCover'
-// > & { subCategoryId: string; tagsId: string[] },
-// unknown
-// > = async (req, res, next) => {
-//   try {
-//     const attachments = <Express.Multer.File[]>(req.files as any).attachments;
-//     const cover = <Express.Multer.File[]>(req.files as any).cover;
-//     const audioCover = <Express.Multer.File[]>(req.files as any).audioCover;
-
-//     const { filteredTags, subCategoryTitle, media } = await filterTagsForCategory(
-//       req.body.category.toString(),
-//       req.body.subCategoryId,
-//       req.body.tagsId,
-//       CYCLES.portfolioPost,
-//       req.lang,
-//     );
-//     req.body.subCategory = subCategoryTitle!;
-//     req.body.tags = filteredTags;
-
-//     console.log(filteredTags, subCategoryTitle, media);
-
-//     if (req.body.creatives) {
-//       const creativeCount = await Users.countDocuments({
-//         _id: req.body.creatives.map((el: any) => el),
-//       });
-//       if (creativeCount != req.body.creatives.length)
-//         return next(
-//           new BadRequestError(
-//             { en: 'invalid creatives', ar: 'مستخدمو المحتويات الإبداعية غير الصالحين' },
-//             req.lang,
-//           ),
-//         );
-//     }
-
-//     const s3 = new Bucket();
-//     await s3.saveBucketFiles(FOLDERS.portfolio_post, ...attachments, ...cover);
-//     req.body.cover = `${FOLDERS.portfolio_post}/${cover[0].filename}`;
-//     req.body.attachments = attachments.map((el) => `${FOLDERS.portfolio_post}/${el.filename}`);
-
-//     if (media === CategoryMedia.image || media === CategoryMedia.audio) {
-//       if (!cover[0].mimetype.startsWith('image/')) {
-//         Files.removeFiles(...req.body.attachments, req.body.cover);
-//         return next(
-//           new BadRequestError(
-//             { en: 'Cover must be an image ', ar: 'يجب أن يكون الغلاف صورة' },
-//             req.lang,
-//           ),
-//         );
-//       }
-//       if (media === CategoryMedia.audio) {
-//         if (audioCover && audioCover.length > 0 && audioCover[0].mimetype.startsWith('audio/')) {
-//           await s3.saveBucketFiles(FOLDERS.portfolio_post , ...audioCover);
-//           req.body.audioCover = `${FOLDERS.portfolio_post}/${audioCover[0].filename}`;
-//         }
-//         else
-//           return next(new BadRequestError({en:'audio cover required and must be an audio' , ar:'يجب أن يكون الغلاف الصوتي صوتيًا'} , req.lang));
-//       }
-//     } else if (media === CategoryMedia.video) {
-//       if (!cover[0].mimetype.startsWith('video/')) {
-//         Files.removeFiles(...req.body.attachments, req.body.cover);
-//         return next(
-//           new BadRequestError(
-//             { en: 'Cover must be a video for video media type', ar: 'يجب أن يكون الغلاف فيديو ' },
-//             req.lang,
-//           ),
-//         );
-//       }
-//     }
-//     Files.removeFiles(...req.body.attachments, req.body.cover);
-
-//     const project = await ProjectCycle.create({
-//       ...req.body,
-//       user: req.loggedUser.id,
-//     });
-
-//     await Project.create({
-//       project: { type: project.id, ref: MODELS.portfolioPost },
-//       user: req.loggedUser.id,
-//       ref: MODELS.portfolioPost,
-//     });
-
-//     res.status(201).json({ message: 'success', data: project });
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-
 import 'express-async-errors';
 import {
   BadRequestError,
@@ -329,6 +202,14 @@ export const createProjectHandler: RequestHandler<
         );
       }
     }
+    const totalProjectPrice =
+      projectCycle.tools.reduce((acc, tool) => acc + tool.unitPrice, 0) +
+      projectCycle.functions.reduce((acc, func) => acc + func.unitPrice, 0) +
+      projectCycle.projectScale.pricerPerUnit;
+    await ProjectCycle.updateOne(
+      { _id: projectCycle._id },
+      { minBudget: totalProjectPrice, maxBudget: totalProjectPrice },
+    );
 
     // Respond with success message
     res.status(201).json({ message: 'success', data: projectCycle });

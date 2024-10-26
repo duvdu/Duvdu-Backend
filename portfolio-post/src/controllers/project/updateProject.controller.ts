@@ -153,5 +153,14 @@ export const updateProjectHandler: RequestHandler<
   cover && (await s3.removeBucketFiles(project.cover));
   audioCover && (await s3.removeBucketFiles(project.audioCover));
 
+  const totalProjectPrice =
+    updatedProject.tools.reduce((acc, tool) => acc + tool.unitPrice, 0) +
+    updatedProject.functions.reduce((acc, func) => acc + func.unitPrice, 0) +
+    updatedProject.projectScale.pricerPerUnit;
+  await ProjectCycle.updateOne(
+    { _id: updatedProject._id },
+    { minBudget: totalProjectPrice, maxBudget: totalProjectPrice },
+  );
+
   res.status(200).json({ message: 'success', data: updatedProject });
 };
