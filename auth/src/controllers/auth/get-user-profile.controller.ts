@@ -1,11 +1,4 @@
-import {
-  BadRequestError,
-  Contracts,
-  Follow,
-  MODELS,
-  NotFound,
-  Users,
-} from '@duvdu-v1/duvdu';
+import { BadRequestError, Contracts, Follow, MODELS, NotFound, Users } from '@duvdu-v1/duvdu';
 
 import { GetUserProfileHandler } from '../../types/endpoints/user.endpoints';
 
@@ -74,6 +67,10 @@ export const getUserProfileHandler: GetUserProfileHandler = async (req, res, nex
             },
           },
         },
+        location: {
+          lang: { $arrayElemAt: ['$location.coordinates', 0] },
+          lat: { $arrayElemAt: ['$location.coordinates', 1] },
+        },
       },
     },
   ]);
@@ -83,7 +80,7 @@ export const getUserProfileHandler: GetUserProfileHandler = async (req, res, nex
   user[0].profileViews++;
   await Users.updateOne({ _id: user[0]._id }, { profileViews: user[0].profileViews });
 
-  // isFollow  
+  // isFollow
   const isFollow = await Follow.findOne({ follower: req.loggedUser?.id, following: user[0]._id });
   const canChat = await Contracts.findOne({
     $or: [
