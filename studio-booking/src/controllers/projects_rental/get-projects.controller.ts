@@ -146,16 +146,28 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
       },
     },
     {
-      $unwind: { path: '$favourite', preserveNullAndEmptyArrays: true },
-    },
-    {
       $addFields: {
         isFavourite: {
           $cond: {
             if: {
-              $eq: [
-                '$favourite.user',
-                req.loggedUser?.id ? new mongoose.Types.ObjectId(req.loggedUser.id as string) : '0',
+              $gt: [
+                {
+                  $size: {
+                    $filter: {
+                      input: '$favourite',
+                      as: 'fav',
+                      cond: {
+                        $eq: [
+                          '$$fav.user',
+                          req.loggedUser?.id
+                            ? new mongoose.Types.ObjectId(req.loggedUser.id as string)
+                            : '0',
+                        ],
+                      },
+                    },
+                  },
+                },
+                0,
               ],
             },
             then: true,
