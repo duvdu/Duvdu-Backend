@@ -1,11 +1,11 @@
-import { SuccessResponse, Favourites, MODELS } from '@duvdu-v1/duvdu';
+import { SuccessResponse, Favourites } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import mongoose, { PipelineStage } from 'mongoose';
 
 export const addToFavourite: RequestHandler<
   { projectId: string },
   SuccessResponse<{ data: any }>
-> = async (req, res, next) => {
+> = async (req, res) => {
   try {
     const post = await Favourites.create({
       project: req.params.projectId,
@@ -20,7 +20,7 @@ export const addToFavourite: RequestHandler<
 export const removeFromFavourite: RequestHandler<
   { projectId: string },
   SuccessResponse<{ data: any }>
-> = async (req, res, next) => {
+> = async (req, res) => {
   const post = await Favourites.deleteOne({
     project: req.params.projectId,
     user: req.loggedUser.id,
@@ -113,6 +113,9 @@ export const getFavourites: RequestHandler<unknown, SuccessResponse<{ data: any 
       $addFields: {
         'details.cover': {
           $concat: [process.env.BUCKET_HOST, '/', '$details.cover'],
+        },
+        'details.audioCover': {
+          $concat: [process.env.BUCKET_HOST, '/', '$details.audioCover'],
         },
         'details.attachments': {
           $map: {

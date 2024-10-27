@@ -91,7 +91,7 @@ export const getUserProjectsByUsername: RequestHandler<
   })
     .populate({
       path: 'project.type',
-      select: 'cover title name creatives cycle',
+      select: 'cover title name creatives cycle audioCover',
       populate: [
         { path: 'user', select: 'name username profileImage isOnline' },
         {
@@ -116,6 +116,7 @@ export const getUserProjectsByUsername: RequestHandler<
         (subEl: string) => process.env.BUCKET_HOST + '/' + subEl,
       );
     if (el.project.cover) el.project.cover = process.env.BUCKET_HOST + '/' + el.project.cover;
+    if (el.project.audioCover) el.project.audioCover = process.env.BUCKET_HOST + '/' + el.project.audioCover;
     if (
       el.project?.user?.profileImage &&
       !(el.project?.user?.profileImage as string).startsWith('http')

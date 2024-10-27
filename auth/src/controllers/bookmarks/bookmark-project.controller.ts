@@ -1,11 +1,11 @@
-import { SuccessResponse, Bookmarks, BookmarkProjects, Bucket, NotFound } from '@duvdu-v1/duvdu';
+import { SuccessResponse, BookmarkProjects } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
-import mongoose, { MongooseError, PipelineStage } from 'mongoose';
+import mongoose, {  PipelineStage } from 'mongoose';
 
 export const addToBookmark: RequestHandler<
   { bookmarkId: string; projectId: string },
   SuccessResponse<{ data: any }>
-> = async (req, res, next) => {
+> = async (req, res) => {
   try {
     const project = await BookmarkProjects.create({
       user: req.loggedUser.id,
@@ -21,7 +21,7 @@ export const addToBookmark: RequestHandler<
 export const removeFromBookmark: RequestHandler<
   { bookmarkId: string; projectId: string },
   SuccessResponse<{ data: any }>
-> = async (req, res, next) => {
+> = async (req, res) => {
   const project = await BookmarkProjects.deleteOne({
     user: req.loggedUser.id,
     bookmark: req.params.bookmarkId,
@@ -34,7 +34,7 @@ export const removeFromBookmark: RequestHandler<
 export const getBookmarkProjects: RequestHandler<
   { bookmarkId: string },
   SuccessResponse<{ data: any }>
-> = async (req, res, next) => {
+> = async (req, res) => {
   const pipelines: PipelineStage[] = [
     {
       $match: {
@@ -121,6 +121,9 @@ export const getBookmarkProjects: RequestHandler<
       $addFields: {
         'details.cover': {
           $concat: [process.env.BUCKET_HOST, '/', '$details.cover'],
+        },
+        'details.audioCover': {
+          $concat: [process.env.BUCKET_HOST, '/', '$details.audioCover'],
         },
         'details.attachments': {
           $map: {
