@@ -1,4 +1,8 @@
-import { globalPaginationMiddleware, globalValidatorMiddleware, InviteStatus } from '@duvdu-v1/duvdu';
+import {
+  globalPaginationMiddleware,
+  globalValidatorMiddleware,
+  InviteStatus,
+} from '@duvdu-v1/duvdu';
 import { body, param, query } from 'express-validator';
 import mongoose from 'mongoose';
 
@@ -154,6 +158,18 @@ export const getAll = [
     })
     .bail()
     .customSanitizer((val: string[]) => val.map((el) => new mongoose.Types.ObjectId(el))),
+  query('minBudget').optional().isInt({ min: 1 }).toInt().withMessage('minBudget'),
+  query('maxBudget')
+    .optional()
+    .isInt({ min: 1 })
+    .toInt()
+    .withMessage('maxBudget')
+    .custom((val, { req }) => {
+      if (req.query?.minBudget && val < req.query.minBudget) {
+        throw new Error('maxBudget');
+      }
+      return true;
+    }),
   globalValidatorMiddleware,
 ];
 
@@ -163,9 +179,8 @@ export const getProjectAnalysis = [
   globalValidatorMiddleware,
 ];
 
-
 export const acceptAction = [
   param('projectId').isMongoId().withMessage('projectId'),
-  body('status').isIn([InviteStatus.accepted , InviteStatus.rejected]),
-  globalPaginationMiddleware
+  body('status').isIn([InviteStatus.accepted, InviteStatus.rejected]),
+  globalPaginationMiddleware,
 ];
