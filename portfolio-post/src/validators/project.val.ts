@@ -71,8 +71,8 @@ export const update = [
     .bail()
     .toFloat()
     .withMessage('location'),
-  body('searchKeywords').optional().optional().isArray().withMessage('searchKeywords'),
-  body('searchKeywords.*')
+  body('searchKeyWords').optional().optional().isArray().withMessage('searchKeywords'),
+  body('searchKeyWords.*')
     .optional()
     .isString()
     .bail()
