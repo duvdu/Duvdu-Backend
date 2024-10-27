@@ -139,12 +139,12 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
     { $unwind: '$user' },
     ...(isInstant !== undefined
       ? [
-          {
-            $match: {
-              'user.isAvaliableToInstantProjects': isInstant,
-            },
+        {
+          $match: {
+            'user.isAvaliableToInstantProjects': isInstant,
           },
-        ]
+        },
+      ]
       : []),
     {
       $count: 'totalCount',

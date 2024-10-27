@@ -1,7 +1,8 @@
 import { model, Types, Schema } from 'mongoose';
+
 import { Icategory } from '../types/Category';
-import { Iuser } from '../types/User';
 import { MODELS } from '../types/model-names';
+import { Iuser } from '../types/User';
 
 export enum RentalUnits {
   minutes = 'minutes',

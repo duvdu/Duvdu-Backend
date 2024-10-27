@@ -33,6 +33,8 @@ export const updateProjectHandler: RequestHandler<
     | 'searchKeyWords'
     | 'showOnHome'
     | 'audioCover'
+    | 'functions'
+    | 'tools'
   >,
   unknown
 > = async (req, res, next) => {

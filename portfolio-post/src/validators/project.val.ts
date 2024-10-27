@@ -79,7 +79,7 @@ export const update = [
     .trim()
     .isLength({ min: 3 })
     .withMessage('searchKeywords'),
-  body('duration').isInt({ min: 1 }).withMessage('insurance'),
+  body('duration').optional().isInt({ min: 1 }).withMessage('insurance'),
   body('showOnHome').optional().optional().isBoolean().bail().toBoolean().withMessage('showOnHome'),
   body('projectScale').optional().isObject().withMessage('projectScale'),
   body('projectScale.unit').optional().isString().bail().trim().withMessage('projectScale'),
@@ -107,6 +107,14 @@ export const update = [
     .bail()
     .toFloat()
     .withMessage('projectScale'),
+  body('functions').optional().isArray({ min: 1 }).withMessage('functions'),
+  body('functions.*').isObject().withMessage('functions'),
+  body('functions.*.name').isString().exists().withMessage('functions'),
+  body('functions.*.unitPrice').isFloat({ min: 1 }).withMessage('functions'),
+  body('tools').optional().isArray({ min: 1 }).withMessage('tools'),
+  body('tools.*').isObject().withMessage('tools'),
+  body('tools.*.name').isString().exists().withMessage('tools'),
+  body('tools.*.unitPrice').isFloat({ min: 1 }).withMessage('tools'),
   globalValidatorMiddleware,
 ];
 
