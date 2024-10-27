@@ -16,7 +16,7 @@ export interface Irental {
   id: string;
   user: Types.ObjectId | Iuser;
   category: Types.ObjectId | Icategory;
-  subCategory: { ar: string; en: string };
+  subCategory: { ar: string; en: string , _id:string };
   tags: { ar: string; en: string }[];
   attachments: string[];
   cover: string;
@@ -44,7 +44,7 @@ export const Rentals = model<Irental>(
     {
       user: { type: Schema.Types.ObjectId, ref: MODELS.user },
       category: { type: Schema.Types.ObjectId, ref: MODELS.category },
-      subCategory: { ar: String, en: String },
+      subCategory: { ar: String, en: String  , _id:String},
       tags: [{ ar: String, en: String }],
       attachments: [String],
       cover: String,

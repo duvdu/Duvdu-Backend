@@ -12,7 +12,7 @@ export enum InviteStatus {
 export interface IprojectCycle {
   user: Types.ObjectId | Iuser;
   category: Types.ObjectId | Iuser;
-  subCategory: { ar: string; en: string };
+  subCategory: { ar: string; en: string , _id:string };
   tags: { ar: string; en: string }[];
   cover: string;
   audioCover: string;
@@ -47,7 +47,7 @@ export const ProjectCycle = model<IprojectCycle>(
     {
       user: { type: Schema.Types.ObjectId, ref: MODELS.user },
       category: { type: Schema.Types.ObjectId, ref: MODELS.category },
-      subCategory: { ar: { type: String, default: null }, en: { type: String, default: null } },
+      subCategory: { ar: { type: String, default: null }, en: { type: String, default: null } , _id:String },
       tags: [{ ar: { type: String, default: null }, en: { type: String, default: null } }],
       cover: { type: String, default: null },
       audioCover: { type: String, default: null },

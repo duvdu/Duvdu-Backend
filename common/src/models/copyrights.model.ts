@@ -19,7 +19,7 @@ export interface IcopyRights {
   rate: { ratersCounter: number; totalRates: number };
   isDeleted: boolean;
   tags: { ar: string; en: string }[];
-  subCategory: { ar: string; en: string };
+  subCategory: { ar: string; en: string , _id:string };
   minBudget: number;
   maxBudget: number;
 }
@@ -45,6 +45,7 @@ export const CopyRights = model<IcopyRights>(
       subCategory: {
         ar: String,
         en: String,
+        _id:String
       },
       location: {
         lat: { type: Number, default: null },
