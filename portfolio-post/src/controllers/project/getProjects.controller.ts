@@ -302,7 +302,10 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
           title: '$category.title.' + req.lang,
           _id: '$category._id',
         },
-        subCategory: '$subCategory.' + req.lang,
+        subCategory: {
+          title:'$subCategory.' + req.lang,
+          _id:'$subCategory._id',
+        },
         tags: {
           $map: {
             input: '$tags',
@@ -315,6 +318,7 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
                   else: '$$tag.ar',
                 },
               },
+              _id:'$$tag._id'
             },
           },
         },

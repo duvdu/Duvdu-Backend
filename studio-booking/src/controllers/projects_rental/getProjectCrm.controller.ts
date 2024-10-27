@@ -14,11 +14,8 @@ export const getProjectCrmHandler: RequestHandler = async (req, res, next) => {
     {
       $set: {
         subCategory: {
-          $cond: {
-            if: { $eq: [req.lang, 'en'] },
-            then: '$subCategory.en',
-            else: '$subCategory.ar',
-          },
+          title:`$subCategory.${req.lang}`,
+          _id:'$subCategory._id'
         },
         tags: {
           $map: {

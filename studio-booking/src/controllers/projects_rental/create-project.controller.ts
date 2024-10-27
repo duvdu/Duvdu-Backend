@@ -22,7 +22,7 @@ export const createProjectHandler: RequestHandler = async (req, res) => {
   );
 
   req.body.tags = filteredTags;
-  req.body.subCategory = subCategoryTitle;
+  req.body.subCategory = {...subCategoryTitle , _id:req.body.subCategory};
 
   await new Bucket().saveBucketFiles(FOLDERS.studio_booking, ...attachments, ...cover);
   req.body.cover = `${FOLDERS.studio_booking}/${cover[0].filename}`;

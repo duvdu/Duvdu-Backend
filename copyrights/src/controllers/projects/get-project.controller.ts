@@ -32,7 +32,7 @@ export const getProjectHandler: RequestHandler<
   if (!project)
     return next(new NotFound({ en: 'project not found', ar: 'المشروع غير موجود' }, req.lang));
   const localizedTags = project.tags.map((tag) => tag[req.lang]) as string[];
-  const localizedSubCategory = project.subCategory[req.lang];
+  const localizedSubCategory = {title: project.subCategory[req.lang] , _id:project.subCategory._id};
 
   (project.tags as any) = localizedTags;
   (project.subCategory as any) = localizedSubCategory;

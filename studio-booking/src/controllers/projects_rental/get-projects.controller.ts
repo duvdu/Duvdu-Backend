@@ -1,4 +1,4 @@
-import { MODELS, Users, Rentals, Categories } from '@duvdu-v1/duvdu';
+import { MODELS, Rentals, Categories } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import mongoose, { PipelineStage } from 'mongoose';
 
@@ -11,11 +11,8 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
     {
       $set: {
         subCategory: {
-          $cond: {
-            if: { $eq: [req.lang, 'en'] },
-            then: '$subCategory.en',
-            else: '$subCategory.ar',
-          },
+          title:`$subCategory.${req.lang}`,
+          _id:'$subCategory._id',
         },
         tags: {
           $map: {

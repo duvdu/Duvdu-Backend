@@ -57,7 +57,7 @@ export const createProjectHandler: RequestHandler<
       CYCLES.portfolioPost,
       req.lang,
     );
-    req.body.subCategory = subCategoryTitle!;
+    req.body.subCategory = {...subCategoryTitle! , _id:req.body.subCategoryId};
     req.body.tags = filteredTags;
 
     // Validate creatives if present

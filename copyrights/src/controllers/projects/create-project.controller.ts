@@ -23,7 +23,7 @@ export const createProjectHandler: RequestHandler<
       CYCLES.copyRights,
       req.lang,
     );
-    (req.body.subCategory as any) = subCategoryTitle;
+    (req.body.subCategory as any) = {...subCategoryTitle, _id:req.body.subCategory};
     (req.body.tags as any) = filteredTags;
 
     const project = await CopyRights.create({

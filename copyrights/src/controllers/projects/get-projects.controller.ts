@@ -198,11 +198,8 @@ export const getProjectsHandler: RequestHandler<
           },
         },
         subCategory: {
-          $cond: {
-            if: { $eq: ['ar', req.lang] },
-            then: '$subCategory.ar',
-            else: '$subCategory.en',
-          },
+          title:`$subCategory.${req.lang}`,
+          _id:'$subCategory._id'
         },
       },
     },
