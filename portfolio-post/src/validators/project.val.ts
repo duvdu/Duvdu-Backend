@@ -26,8 +26,8 @@ export const create = [
   body('location').isObject().withMessage('location'),
   body('location.lat').isFloat({ min: -90, max: 90 }).bail().toFloat().withMessage('location'),
   body('location.lng').isFloat({ min: -180, max: 180 }).bail().toFloat().withMessage('location'),
-  body('searchKeywords').optional().isArray().withMessage('searchKeywords'),
-  body('searchKeywords.*')
+  body('searchKeyWords').optional().isArray().withMessage('searchKeywords'),
+  body('searchKeyWords.*')
     .isString()
     .bail()
     .trim()
