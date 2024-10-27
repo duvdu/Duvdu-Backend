@@ -205,7 +205,7 @@ export const createProjectHandler: RequestHandler<
     const totalProjectPrice =
       projectCycle.tools.reduce((acc, tool) => acc + tool.unitPrice, 0) +
       projectCycle.functions.reduce((acc, func) => acc + func.unitPrice, 0) +
-      projectCycle.projectScale.pricerPerUnit;
+      projectCycle.projectScale.pricerPerUnit * projectCycle.projectScale.current;
     await ProjectCycle.updateOne(
       { _id: projectCycle._id },
       { minBudget: totalProjectPrice, maxBudget: totalProjectPrice },

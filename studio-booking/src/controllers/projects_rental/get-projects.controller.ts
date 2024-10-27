@@ -282,12 +282,12 @@ export const getProjectsPagination: RequestHandler<
     req.pagination.filter['equipments.name'] = { $in: req.query.equipments };
   }
   if (req.query.pricePerHourFrom || req.query.pricePerHourTo) {
-    req.pagination.filter.pricePerHour = {};
+    req.pagination.filter['projectScale.pricerPerUnit'] = {};
     if (req.query.pricePerHourFrom) {
-      req.pagination.filter.pricePerHour.$gte = req.query.pricePerHourFrom;
+      req.pagination.filter['projectScale.pricerPerUnit'].$gte = req.query.pricePerHourFrom;
     }
     if (req.query.pricePerHourTo) {
-      req.pagination.filter.pricePerHour.$lte = req.query.pricePerHourTo;
+      req.pagination.filter['projectScale.pricerPerUnit'].$lte = req.query.pricePerHourTo;
     }
   }
   if (req.query.showOnHome !== undefined) {
