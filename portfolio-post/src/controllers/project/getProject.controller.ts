@@ -163,8 +163,8 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
                     then: '$$tag.en',
                     else: '$$tag.ar',
                   },
-                  _id:'$$tag._id'
                 },
+                _id:'$$tag._id'
               },
             },
           },

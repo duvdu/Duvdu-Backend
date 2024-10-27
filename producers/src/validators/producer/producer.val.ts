@@ -17,7 +17,7 @@ export const appendProducerVal = [
   body('subcategory.*.subcategory').optional().isMongoId().withMessage('subcategoryMongoId'),
   body('subcategory.*.tags').optional().isArray({ min: 1 }).withMessage('tagsArray'),
   body('subcategory.*.tags.*').isMongoId().withMessage('tagsMongoId'),
-  body('platforms').isArray({ min: 1 }),
+  body('platforms').optional().isArray({ min: 1 }),
   body('platforms.*').isMongoId(),
   globalValidatorMiddleware,
 ];

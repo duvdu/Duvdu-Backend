@@ -27,8 +27,8 @@ export const create = [
   body('searchKeywords.*').isString().bail().trim().isLength({ min: 3 }),
   body('insurance').optional().isFloat({ min: 0 }).bail().toFloat(),
   body('showOnHome').optional().isBoolean().bail().toBoolean(),
-  body('maxBudget').isInt().withMessage('maxBudgetInt'),
-  body('minBudget')
+  body('maxBudget').optional().isInt().withMessage('maxBudgetInt'),
+  body('minBudget').optional()
     .isInt()
     .custom((val, { req }) => {
       if (req.body.maxBudget > val) return true;
