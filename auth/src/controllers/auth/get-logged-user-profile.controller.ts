@@ -56,7 +56,7 @@ export const getLoggedUserProfileHandler: GetLoggedUserProfileHandler = async (r
           },
         },
         location: {
-          lang: { $arrayElemAt: ['$location.coordinates', 0] },
+          lng: { $arrayElemAt: ['$location.coordinates', 0] },
           lat: { $arrayElemAt: ['$location.coordinates', 1] },
         },
       },
