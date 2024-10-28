@@ -75,5 +75,7 @@ export const Rentals = model<Irental>(
       maxBudget: { type: Number, default: null },
     },
     { collection: 'rentals', timestamps: true },
-  ).index({ createdAt: 1, updatedAt: -1 }),
+  )
+    .index({ createdAt: 1, updatedAt: -1 })
+    .index({ location: '2dsphere' }),
 );

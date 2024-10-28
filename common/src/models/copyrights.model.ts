@@ -63,5 +63,6 @@ export const CopyRights = model<IcopyRights>(
     },
   )
     .index({ createdAt: 1, updatedAt: -1 })
-    .index({ searchKeywords: 'text' }),
+    .index({ searchKeywords: 'text' })
+    .index({ location: '2dsphere' }),
 );
