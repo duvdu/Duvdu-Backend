@@ -83,6 +83,14 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
       },
     },
     { $unwind: '$userDetails' },
+    {
+      $addFields: {
+        location: {
+          lng: { $arrayElemAt: ['$location.coordinates', 0] },
+          lat: { $arrayElemAt: ['$location.coordinates', 1] },
+        },
+      },
+    },
   );
 
   // Conditionally add the $match stage for isAvaliableToInstantProjects

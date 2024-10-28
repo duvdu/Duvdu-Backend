@@ -248,7 +248,10 @@ export const getProjectsHandler: RequestHandler<
         price: 1,
         duration: 1,
         address: 1,
-        location: 1,
+        location: {
+          lng: { $arrayElemAt: ['$location.coordinates', 0] },
+          lat: { $arrayElemAt: ['$location.coordinates', 1] },
+        },
         searchKeywords: 1,
         showOnHome: 1,
         cycle: 1,
