@@ -139,12 +139,12 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
     { $unwind: '$user' },
     ...(isInstant !== undefined
       ? [
-        {
-          $match: {
-            'user.isAvaliableToInstantProjects': isInstant,
+          {
+            $match: {
+              'user.isAvaliableToInstantProjects': isInstant,
+            },
           },
-        },
-      ]
+        ]
       : []),
     {
       $count: 'totalCount',
@@ -192,14 +192,14 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
   );
 
   if (isInstant !== undefined) {
-    pipeline.push({
+    pipelines.push({
       $match: {
         'user.isAvaliableToInstantProjects': isInstant,
       },
     });
   }
 
-  pipeline.push(
+  pipelines.push(
     // Existing category lookup and unwind stages
     {
       $lookup: {
@@ -319,8 +319,8 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
           _id: '$category._id',
         },
         subCategory: {
-          title:'$subCategory.' + req.lang,
-          _id:'$subCategory._id',
+          title: '$subCategory.' + req.lang,
+          _id: '$subCategory._id',
         },
         tags: {
           $map: {
@@ -334,7 +334,7 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
                   else: '$$tag.ar',
                 },
               },
-              _id:'$$tag._id'
+              _id: '$$tag._id',
             },
           },
         },
@@ -388,7 +388,7 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
   );
 
   // Execute the aggregation pipeline
-  const projects = await ProjectCycle.aggregate(pipeline);
+  const projects = await ProjectCycle.aggregate(pipelines);
 
   res.status(200).json({
     message: 'success',
