@@ -47,7 +47,7 @@ export const getProjectHandler: RequestHandler<
       ? (project.category as Icategory).title?.en
       : (project.category as Icategory).title?.ar;
 
-  project.location = {
+  (project.location as any) = {
     lng: project.location?.coordinates?.[0],
     lat: project.location?.coordinates?.[1],
   };
