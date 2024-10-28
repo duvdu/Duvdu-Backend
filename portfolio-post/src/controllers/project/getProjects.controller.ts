@@ -25,8 +25,10 @@ export const getProjectsPagination: RequestHandler<
     duration?: number;
     maxBudget?: number;
     minBudget?: number;
+    maxDistance?: number;
   }
 > = async (req, res, next) => {
+  req.query.maxDistance = +(req.query.maxDistance || 1000);
   if (req.query.duration) req.pagination.filter.duration = { $eq: req.query.duration };
   if (req.query.instant != undefined) req.pagination.filter.instant = req.query.instant;
   if (req.query.search) {

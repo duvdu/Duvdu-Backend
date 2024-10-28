@@ -29,12 +29,13 @@ export const getProjectsPagination: RequestHandler<
     duration?: number;
     maxBudget?: number;
     minBudget?: number;
+    maxDistance?: number;
   }
 > = async (req, res, next) => {
   if (req.query.maxBudget !== undefined) {
     req.pagination.filter.maxBudget = { $lte: req.query.maxBudget };
   }
-
+  req.query.maxDistance = +(req.query.maxDistance || 1000);
   if (req.query.minBudget !== undefined) {
     req.pagination.filter.minBudget = { $gte: req.query.minBudget };
   }

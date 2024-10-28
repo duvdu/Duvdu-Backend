@@ -276,8 +276,10 @@ export const getProjectsPagination: RequestHandler<
     instant?: boolean;
     maxBudget?: number;
     minBudget?: number;
+    maxDistance?: number;
   }
 > = async (req, res, next) => {
+  req.query.maxDistance = +(req.query.maxDistance || 1000);
   if (req.query.maxBudget !== undefined) {
     req.pagination.filter.maxBudget = { $lte: req.query.maxBudget };
   }
