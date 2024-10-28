@@ -32,7 +32,10 @@ export const getProjectHandler: RequestHandler<
   if (!project)
     return next(new NotFound({ en: 'project not found', ar: 'المشروع غير موجود' }, req.lang));
   const localizedTags = project.tags.map((tag) => tag[req.lang]) as string[];
-  const localizedSubCategory = {title: project.subCategory[req.lang] , _id:project.subCategory._id};
+  const localizedSubCategory = {
+    title: project.subCategory[req.lang],
+    _id: project.subCategory._id,
+  };
 
   (project.tags as any) = localizedTags;
   (project.subCategory as any) = localizedSubCategory;
@@ -43,6 +46,11 @@ export const getProjectHandler: RequestHandler<
     req.lang === 'en'
       ? (project.category as Icategory).title?.en
       : (project.category as Icategory).title?.ar;
+
+  project.location = {
+    lng: project.location?.coordinates?.[0],
+    lat: project.location?.coordinates?.[1],
+  };
 
   res.status(200).json(<any>{ message: 'success', data: project });
 };

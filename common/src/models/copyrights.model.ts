@@ -12,14 +12,17 @@ export interface IcopyRights {
   price: number;
   duration: { value: number; unit: string };
   address: string;
-  location: { lat: number; lng: number };
+  location: {
+    type: 'Point';
+    coordinates: [number, number];
+  };
   searchKeywords: string[];
   showOnHome: boolean;
   cycle: string;
   rate: { ratersCounter: number; totalRates: number };
   isDeleted: boolean;
   tags: { ar: string; en: string }[];
-  subCategory: { ar: string; en: string , _id:string };
+  subCategory: { ar: string; en: string; _id: string };
   minBudget: number;
   maxBudget: number;
 }
@@ -45,11 +48,11 @@ export const CopyRights = model<IcopyRights>(
       subCategory: {
         ar: String,
         en: String,
-        _id:String
+        _id: String,
       },
       location: {
-        lat: { type: Number, default: null },
-        lng: { type: Number, default: null },
+        type: { type: String, default: 'Point' },
+        coordinates: { type: [Number], default: [31.2357, 30.0444] },
       },
       minBudget: { type: Number, default: null },
       maxBudget: { type: Number, default: null },

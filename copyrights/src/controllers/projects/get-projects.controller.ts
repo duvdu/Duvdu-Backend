@@ -1,4 +1,11 @@
-import { PaginationResponse, CopyRights, IcopyRights, MODELS, Categories } from '@duvdu-v1/duvdu';
+import {
+  PaginationResponse,
+  CopyRights,
+  IcopyRights,
+  MODELS,
+  Categories,
+  Users,
+} from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import mongoose, { PipelineStage } from 'mongoose';
 
@@ -128,7 +135,25 @@ export const getProjectsHandler: RequestHandler<
   const countResult = await CopyRights.aggregate(countPipeline);
   const resultCount = countResult.length > 0 ? countResult[0].totalCount : 0;
 
-  const pipeline: PipelineStage[] = [
+  const currentUser = await Users.findById(req.loggedUser?.id, { location: 1 });
+  const pipelines: PipelineStage[] = [];
+
+  // Add $geoNear if user location exists
+  if (currentUser?.location?.coordinates) {
+    pipelines.push({
+      $geoNear: {
+        near: {
+          type: 'Point',
+          coordinates: currentUser.location.coordinates,
+        },
+        distanceField: 'distance', // Rename 'string' to 'distance'
+        maxDistance: (req.query.maxDistance as unknown as number) * 1000, // Convert km to meters
+        spherical: true,
+      },
+    });
+  }
+
+  pipelines.push(
     {
       $match: {
         ...req.pagination.filter,
@@ -147,18 +172,18 @@ export const getProjectsHandler: RequestHandler<
       },
     },
     { $unwind: '$userDetails' },
-  ];
+  );
 
   // Conditionally add the $match stage for isInstant
   if (isInstant !== undefined) {
-    pipeline.push({
+    pipelines.push({
       $match: {
         'userDetails.isAvaliableToInstantProjects': isInstant,
       },
     });
   }
 
-  pipeline.push(
+  pipelines.push(
     {
       $lookup: {
         from: MODELS.category,
@@ -198,8 +223,8 @@ export const getProjectsHandler: RequestHandler<
           },
         },
         subCategory: {
-          title:`$subCategory.${req.lang}`,
-          _id:'$subCategory._id'
+          title: `$subCategory.${req.lang}`,
+          _id: '$subCategory._id',
         },
       },
     },
@@ -235,7 +260,7 @@ export const getProjectsHandler: RequestHandler<
   );
 
   // Run the aggregation pipeline
-  const projects = await CopyRights.aggregate(pipeline);
+  const projects = await CopyRights.aggregate(pipelines);
 
   res.status(200).json({
     message: 'success',

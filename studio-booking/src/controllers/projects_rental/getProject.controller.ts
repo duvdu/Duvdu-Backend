@@ -1,10 +1,4 @@
-import {
-  incrementProjectsView,
-  MODELS,
-  NotFound,
-  Rentals,
-  Contracts,
-} from '@duvdu-v1/duvdu';
+import { incrementProjectsView, MODELS, NotFound, Rentals, Contracts } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import mongoose, { Types } from 'mongoose';
 
@@ -13,8 +7,8 @@ export const getProjectHandler: RequestHandler = async (req, res, next) => {
     {
       $set: {
         subCategory: {
-          title:`$subCategory.${req.lang}`,
-          _id:'$subCategory._id'
+          title: `$subCategory.${req.lang}`,
+          _id: '$subCategory._id',
         },
         tags: {
           $map: {
@@ -137,6 +131,14 @@ export const getProjectHandler: RequestHandler = async (req, res, next) => {
             then: true,
             else: false,
           },
+        },
+      },
+    },
+    {
+      $addFields: {
+        location: {
+          lng: { $arrayElemAt: ['$location.coordinates', 0] },
+          lat: { $arrayElemAt: ['$location.coordinates', 1] },
         },
       },
     },

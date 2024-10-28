@@ -1,4 +1,4 @@
-import { MODELS, Rentals, Categories } from '@duvdu-v1/duvdu';
+import { MODELS, Rentals, Categories, Users } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import mongoose, { PipelineStage } from 'mongoose';
 
@@ -7,12 +7,30 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
   if (req.pagination.filter.instant != undefined) isInstant = req.pagination.filter.instant;
   delete req.pagination.filter.instant;
 
-  const pipelines: PipelineStage[] = [
+  const currentUser = await Users.findById(req.loggedUser?.id, { location: 1 });
+  const pipelines: PipelineStage[] = [];
+
+  // Add $geoNear if user location exists
+  if (currentUser?.location?.coordinates) {
+    pipelines.push({
+      $geoNear: {
+        near: {
+          type: 'Point',
+          coordinates: currentUser.location.coordinates,
+        },
+        distanceField: 'distance', // Rename 'string' to 'distance'
+        maxDistance: (req.query.maxDistance as unknown as number) * 1000, // Convert km to meters
+        spherical: true,
+      },
+    });
+  }
+
+  pipelines.push(
     {
       $set: {
         subCategory: {
-          title:`$subCategory.${req.lang}`,
-          _id:'$subCategory._id',
+          title: `$subCategory.${req.lang}`,
+          _id: '$subCategory._id',
         },
         tags: {
           $map: {
@@ -65,7 +83,7 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
       },
     },
     { $unwind: '$userDetails' },
-  ];
+  );
 
   // Conditionally add the $match stage for isAvaliableToInstantProjects
   if (isInstant !== undefined) {
