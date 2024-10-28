@@ -22,7 +22,10 @@ export interface IprojectCycle {
   tools: { name: string; unitPrice: number }[];
   functions: { name: string; unitPrice: number }[];
   creatives: { creative: Types.ObjectId[] | Iuser[]; inviteStatus: InviteStatus }[];
-  location: { lat: number; lng: number };
+  location: {
+    type: 'Point';
+    coordinates: [number, number];
+  };
   address: string;
   searchKeyWords: string[];
   showOnHome: boolean;
@@ -64,7 +67,10 @@ export const ProjectCycle = model<IprojectCycle>(
           inviteStatus: { type: String, enum: InviteStatus, default: InviteStatus.pending },
         },
       ],
-      location: { lat: { type: Number, default: 0 }, lng: { type: Number, default: 0 } },
+      location: {
+        type: { type: String, default: 'Point' },
+        coordinates: { type: [Number], default: [31.2357, 30.0444] },
+      },
       address: { type: String, default: null },
       searchKeyWords: [String],
       showOnHome: { type: Boolean, default: true },

@@ -124,6 +124,7 @@ export const getProject = [
 ];
 
 export const getAll = [
+  query('maxDistance').optional().isInt({ min: 1, max: 1000 }).bail().toInt(),
   query('instant').optional().isBoolean().toBoolean(),
   query('search').optional().isString().withMessage('searchKeywords'),
   query('location.lat').optional().isFloat().toFloat().withMessage('location'),

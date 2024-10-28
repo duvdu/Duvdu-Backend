@@ -188,7 +188,10 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
               cond: { $ne: ['$$creative', null] }, // Filter out null values
             },
           }, // Include the populated creatives array
-          location: 1,
+          location: {
+            lng: { $arrayElemAt: ['$location.coordinates', 0] },
+            lat: { $arrayElemAt: ['$location.coordinates', 1] },
+          },
           address: 1,
           searchKeyWords: 1,
           duration: 1,
