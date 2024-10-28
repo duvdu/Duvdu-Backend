@@ -27,8 +27,9 @@ export const create = [
   body('subCategory').optional().isMongoId().withMessage('subCategoryInvalid'),
   body('location.lat').isFloat({ min: -90, max: 90 }).withMessage('latInvalid'),
   body('location.lng').isFloat({ min: -180, max: 180 }).withMessage('lngInvalid'),
-  body('maxBudget').isInt().withMessage('maxBudgetInt'),
+  body('maxBudget').optional().isInt().withMessage('maxBudgetInt'),
   body('minBudget')
+    .optional()
     .isInt()
     .custom((val, { req }) => {
       if (req.body.maxBudget > val) return true;
