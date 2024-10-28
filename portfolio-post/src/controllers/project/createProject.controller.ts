@@ -84,7 +84,7 @@ export const createProjectHandler: RequestHandler<
 
     if (media === CategoryMedia.image) {
       const imageFiles = filterFilesByType(attachments, 'image/');
-      if (imageFiles.length !== 1) {
+      if (imageFiles.length === 0) {
         return next(
           new BadRequestError(
             {
@@ -97,7 +97,7 @@ export const createProjectHandler: RequestHandler<
       }
     } else if (media === CategoryMedia.audio) {
       const audioFiles = filterFilesByType(attachments, 'audio/');
-      if (audioFiles.length !== 1) {
+      if (audioFiles.length === 0) {
         return next(
           new BadRequestError(
             {
@@ -110,7 +110,7 @@ export const createProjectHandler: RequestHandler<
       }
     } else if (media === CategoryMedia.video) {
       const videoFiles = filterFilesByType(attachments, 'video/');
-      if (videoFiles.length !== 1) {
+      if (videoFiles.length === 0) {
         return next(
           new BadRequestError(
             {
