@@ -347,15 +347,16 @@ export const globalSearchHandler: RequestHandler<
           title: '$category.title.' + req.lang,
           _id: '$category._id',
         },
-        subCategory: '$subCategory.' + req.lang,
-        tags: {
-          $map: {
-            input: '$tags',
-            as: 'tag',
-            in: '$$tag.' + req.lang,
-          },
-        },
+        // subCategory: '$subCategory.' + req.lang,
+        // tags: {
+        //   $map: {
+        //     input: '$tags',
+        //     as: 'tag',
+        //     in: '$$tag.' + req.lang,
+        //   },
+        // },
         cover: { $concat: [process.env.BUCKET_HOST, '/', '$cover'] },
+        audioCover: { $concat: [process.env.BUCKET_HOST, '/', '$audioCover'] },
         attachments: {
           $map: {
             input: '$attachments',
@@ -408,33 +409,33 @@ export const globalSearchHandler: RequestHandler<
 
   // Execute the aggregation pipeline
   const pipelines = [
-    {
-      $set: {
-        subCategory: {
-          $cond: {
-            if: { $eq: [req.lang, 'en'] },
-            then: '$subCategory.en',
-            else: '$subCategory.ar',
-          },
-        },
-        tags: {
-          $map: {
-            input: '$tags',
-            as: 'tag',
-            in: {
-              _id: '$$tag._id',
-              title: {
-                $cond: {
-                  if: { $eq: [req.lang, 'en'] },
-                  then: '$$tag.en',
-                  else: '$$tag.ar',
-                },
-              },
-            },
-          },
-        },
-      },
-    },
+    // {
+    //   $set: {
+    //     subCategory: {
+    //       $cond: {
+    //         if: { $eq: [req.lang, 'en'] },
+    //         then: '$subCategory.en',
+    //         else: '$subCategory.ar',
+    //       },
+    //     },
+    //     tags: {
+    //       $map: {
+    //         input: '$tags',
+    //         as: 'tag',
+    //         in: {
+    //           _id: '$$tag._id',
+    //           title: {
+    //             $cond: {
+    //               if: { $eq: [req.lang, 'en'] },
+    //               then: '$$tag.en',
+    //               else: '$$tag.ar',
+    //             },
+    //           },
+    //         },
+    //       },
+    //     },
+    //   },
+    // },
     {
       $lookup: {
         from: MODELS.category,
