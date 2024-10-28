@@ -10,21 +10,6 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
   const currentUser = await Users.findById(req.loggedUser?.id, { location: 1 });
   const pipelines: PipelineStage[] = [];
 
-  // Add $geoNear if user location exists
-  if (currentUser?.location?.coordinates) {
-    pipelines.push({
-      $geoNear: {
-        near: {
-          type: 'Point',
-          coordinates: currentUser.location.coordinates,
-        },
-        distanceField: 'distance', // Rename 'string' to 'distance'
-        maxDistance: (req.query.maxDistance as unknown as number) * 1000, // Convert km to meters
-        spherical: true,
-      },
-    });
-  }
-
   pipelines.push(
     {
       $set: {
@@ -140,7 +125,23 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
     },
   );
 
-  const projects = await Rentals.aggregate([
+  const secondPipelines: PipelineStage[] = [];
+  // Add $geoNear if user location exists
+  if (currentUser?.location?.coordinates) {
+    secondPipelines.push({
+      $geoNear: {
+        near: {
+          type: 'Point',
+          coordinates: currentUser.location.coordinates,
+        },
+        distanceField: 'distance', // Rename 'string' to 'distance'
+        maxDistance: (req.query.maxDistance as unknown as number) * 1000, // Convert km to meters
+        spherical: true,
+      },
+    });
+  }
+
+  secondPipelines.push(
     {
       $match: {
         ...req.pagination.filter,
@@ -204,7 +205,9 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
         favourite: 0,
       },
     },
-  ]);
+  );
+
+  const projects = await Rentals.aggregate(secondPipelines);
 
   const count = await Rentals.aggregate([
     {
