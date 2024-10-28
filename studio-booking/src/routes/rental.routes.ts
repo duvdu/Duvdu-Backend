@@ -23,7 +23,10 @@ router
   .route('/')
   .post(
     isauthenticated,
-    globalUploadMiddleware(FOLDERS.studio_booking).fields([
+    globalUploadMiddleware(FOLDERS.studio_booking , {
+      maxSize: 400 * 1024 * 1024,
+      fileTypes: ['video', 'image', 'audio', 'application/pdf' ],
+    }).fields([
       { name: 'attachments', maxCount: 10 },
       { name: 'cover', maxCount: 1 },
     ]),
@@ -31,6 +34,7 @@ router
     val.create,
     handlers.createProjectHandler,
   )
+
   .get(
     optionalAuthenticated,
     val.getAll,
@@ -67,7 +71,10 @@ router
   .get(optionalAuthenticated, val.getOne, handlers.getProjectHandler)
   .patch(
     isauthenticated,
-    globalUploadMiddleware(FOLDERS.studio_booking).fields([
+    globalUploadMiddleware(FOLDERS.studio_booking , {
+      maxSize: 400 * 1024 * 1024,
+      fileTypes: ['video', 'image', 'audio', 'application/pdf' ],
+    }).fields([
       { name: 'attachments', maxCount: 10 },
       { name: 'cover', maxCount: 1 },
     ]),
