@@ -48,8 +48,8 @@ export const getProjectHandler: RequestHandler<
       : (project.category as Icategory).title?.ar;
 
   (project.location as any) = {
-    lng: project.location?.coordinates?.[0],
-    lat: project.location?.coordinates?.[1],
+    lng: (project.location as any).coordinates?.[0],
+    lat: (project.location as any).coordinates?.[1],
   };
 
   res.status(200).json(<any>{ message: 'success', data: project });
