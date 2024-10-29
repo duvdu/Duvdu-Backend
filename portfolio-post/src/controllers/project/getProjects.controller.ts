@@ -158,19 +158,19 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
   const currentUser = await Users.findById(req.loggedUser?.id, { location: 1 });
 
   const pipelines: PipelineStage[] = [];
-  if (currentUser?.location?.coordinates) {
-    pipelines.push({
-      $geoNear: {
-        near: {
-          type: 'Point',
-          coordinates: currentUser.location.coordinates,
-        },
-        distanceField: 'distance', // Rename 'string' to 'distance'
-        maxDistance: ((req as any).query.maxDistance as unknown as number) * 1000, // Convert km to meters
-        spherical: true,
-      },
-    });
-  }
+  // if (currentUser?.location?.coordinates) {
+  //   pipelines.push({
+  //     $geoNear: {
+  //       near: {
+  //         type: 'Point',
+  //         coordinates: currentUser.location.coordinates,
+  //       },
+  //       distanceField: 'distance', // Rename 'string' to 'distance'
+  //       maxDistance: ((req as any).query.maxDistance as unknown as number) * 1000, // Convert km to meters
+  //       spherical: true,
+  //     },
+  //   });
+  // }
 
   pipelines.push(
     {

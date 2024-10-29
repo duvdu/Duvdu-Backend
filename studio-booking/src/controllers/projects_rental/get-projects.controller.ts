@@ -126,20 +126,20 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
   );
 
   const secondPipelines: PipelineStage[] = [];
-  // Add $geoNear if user location exists
-  if (currentUser?.location?.coordinates) {
-    secondPipelines.push({
-      $geoNear: {
-        near: {
-          type: 'Point',
-          coordinates: currentUser.location.coordinates,
-        },
-        distanceField: 'distance', // Rename 'string' to 'distance'
-        maxDistance: (req.query.maxDistance as unknown as number) * 1000, // Convert km to meters
-        spherical: true,
-      },
-    });
-  }
+  // // Add $geoNear if user location exists
+  // if (currentUser?.location?.coordinates) {
+  //   secondPipelines.push({
+  //     $geoNear: {
+  //       near: {
+  //         type: 'Point',
+  //         coordinates: currentUser.location.coordinates,
+  //       },
+  //       distanceField: 'distance', // Rename 'string' to 'distance'
+  //       maxDistance: (req.query.maxDistance as unknown as number) * 1000, // Convert km to meters
+  //       spherical: true,
+  //     },
+  //   });
+  // }
 
   secondPipelines.push(
     {
