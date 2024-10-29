@@ -18,6 +18,9 @@ export class Bucket {
   async saveBucketFiles(folder: string, ...files: Express.Multer.File[]) {
     for (const file of files) {
       const fileStream = fs.createReadStream(path.resolve(`media/${folder}/${file.filename}`));
+
+      const contentType = this.getContentType(file.filename);
+
       await new Promise((resolve, reject) => {
         this.s3.putObject(
           {
@@ -25,6 +28,7 @@ export class Bucket {
             Key: `${folder}/${file.filename}`,
             Body: fileStream,
             ContentDisposition: 'inline',
+            ContentType: contentType,
           },
           (err, data) => {
             if (err) reject(err);
@@ -47,4 +51,70 @@ export class Bucket {
       );
     });
   }
+
+  private getContentType(filename: string): string {
+    const ext = path.extname(filename).toLowerCase();
+    switch (ext) {
+    // Video Types
+    case '.mp4':
+      return 'video/mp4';
+    case '.webm':
+      return 'video/webm';
+    case '.ogg':
+      return 'video/ogg';
+    case '.avi':
+      return 'video/x-msvideo';
+    case '.mov':
+      return 'video/quicktime';
+    case '.wmv':
+      return 'video/x-ms-wmv';
+    case '.mkv':
+      return 'video/x-matroska';
+    case '.flv':
+      return 'video/x-flv';
+  
+      // Audio Types
+    case '.mp3':
+      return 'audio/mpeg';
+    case '.wav':
+      return 'audio/wav';
+    case '.aac':
+      return 'audio/aac';
+    case '.flac':
+      return 'audio/flac';
+    case '.m4a':
+      return 'audio/x-m4a';
+    case '.wma':
+      return 'audio/x-ms-wma';
+  
+      // Image Types
+    case '.jpg':
+    case '.jpeg':
+      return 'image/jpeg';
+    case '.png':
+      return 'image/png';
+    case '.gif':
+      return 'image/gif';
+    case '.bmp':
+      return 'image/bmp';
+    case '.webp':
+      return 'image/webp';
+    case '.svg':
+      return 'image/svg+xml';
+    case '.tiff':
+    case '.tif':
+      return 'image/tiff';
+        
+      // PDF and other document types
+    case '.pdf':
+      return 'application/pdf';
+      
+      // Default fallback
+    default:
+      return 'application/octet-stream'; // Fallback for unknown types
+    }
+  }
+
 }
+
+
