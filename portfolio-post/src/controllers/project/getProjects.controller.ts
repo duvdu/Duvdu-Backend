@@ -141,12 +141,12 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
     { $unwind: '$user' },
     ...(isInstant !== undefined
       ? [
-          {
-            $match: {
-              'user.isAvaliableToInstantProjects': isInstant,
-            },
+        {
+          $match: {
+            'user.isAvaliableToInstantProjects': isInstant,
           },
-        ]
+        },
+      ]
       : []),
     {
       $count: 'totalCount',
@@ -290,9 +290,9 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
         favouriteCount: { $size: '$favourite' },
       },
     },
-    {
-      $unwind: { path: '$favourite', preserveNullAndEmptyArrays: true },
-    },
+    // {
+    //   $unwind: { path: '$favourite', preserveNullAndEmptyArrays: true },
+    // },
     {
       $project: {
         _id: 1,
