@@ -22,17 +22,24 @@ export const createProjectHandler: RequestHandler = async (req, res) => {
   );
 
   req.body.tags = filteredTags;
-  req.body.subCategory = {...subCategoryTitle , _id:req.body.subCategory};
+  req.body.subCategory = { ...subCategoryTitle, _id: req.body.subCategory };
 
   await new Bucket().saveBucketFiles(FOLDERS.studio_booking, ...attachments, ...cover);
   req.body.cover = `${FOLDERS.studio_booking}/${cover[0].filename}`;
   req.body.attachments = attachments.map((el) => `${FOLDERS.studio_booking}/${el.filename}`);
   Files.removeFiles(...req.body.attachments, req.body.cover);
 
+  // location
+  if (req.body.location)
+    req.body.location = {
+      type: 'Point',
+      coordinates: [(req as any).body.location.lng, (req as any).body.location.lat],
+    } as any;
+
   const project = await Rentals.create({ ...req.body, user: req.loggedUser.id });
 
   await Project.create({
-    _id:project._id,
+    _id: project._id,
     project: { type: project.id, ref: 'rentals' },
     user: req.loggedUser.id,
     ref: 'rentals',

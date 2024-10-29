@@ -170,6 +170,13 @@ export const createProjectHandler: RequestHandler<
     req.body.cover = `${FOLDERS.portfolio_post}/${cover[0].filename}`;
     req.body.attachments = attachments.map((f) => `${FOLDERS.portfolio_post}/${f.filename}`);
 
+    // location
+    if (req.body.location)
+      req.body.location = {
+        type: 'Point',
+        coordinates: [(req as any).body.location.lng, (req as any).body.location.lat],
+      } as any;
+
     // Create project cycle and project records
     const projectCycle = await ProjectCycle.create({
       ...req.body,

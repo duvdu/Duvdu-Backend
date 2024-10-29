@@ -141,6 +141,12 @@ export const updateProjectHandler: RequestHandler<
     Files.removeFiles(req.body.audioCover);
   }
 
+  if (req.body.location)
+    req.body.location = {
+      type: 'Point',
+      coordinates: [(req as any).body.location.lng, (req as any).body.location.lat],
+    } as any;
+
   const updatedProject = await ProjectCycle.findOneAndUpdate(
     { _id: req.params.projectId, user: req.loggedUser.id },
     req.body,

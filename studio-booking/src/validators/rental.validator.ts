@@ -28,7 +28,8 @@ export const create = [
   body('insurance').optional().isFloat({ min: 0 }).bail().toFloat(),
   body('showOnHome').optional().isBoolean().bail().toBoolean(),
   body('maxBudget').optional().isInt().withMessage('maxBudgetInt'),
-  body('minBudget').optional()
+  body('minBudget')
+    .optional()
     .isInt()
     .custom((val, { req }) => {
       if (req.body.maxBudget > val) return true;
@@ -96,6 +97,7 @@ export const update = [
 export const getOne = [param('projectId').isMongoId(), globalValidatorMiddleware];
 
 export const getAll = [
+  query('maxDistance').optional().isInt({ min: 1, max: 1000 }).bail().toInt(),
   query('instant').optional().isBoolean().toBoolean(),
   query('searchKeywords').optional().isArray().withMessage('searchKeywords'),
   query('searchKeywords.*').optional().isString().withMessage('searchKeywords'),

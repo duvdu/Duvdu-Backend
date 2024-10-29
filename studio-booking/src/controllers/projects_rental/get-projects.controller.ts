@@ -1,4 +1,4 @@
-import { MODELS, Rentals, Categories } from '@duvdu-v1/duvdu';
+import { MODELS, Rentals, Categories, Users } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import mongoose, { PipelineStage } from 'mongoose';
 
@@ -7,12 +7,15 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
   if (req.pagination.filter.instant != undefined) isInstant = req.pagination.filter.instant;
   delete req.pagination.filter.instant;
 
-  const pipelines: PipelineStage[] = [
+  const currentUser = await Users.findById(req.loggedUser?.id, { location: 1 });
+  const pipelines: PipelineStage[] = [];
+
+  pipelines.push(
     {
       $set: {
         subCategory: {
-          title:`$subCategory.${req.lang}`,
-          _id:'$subCategory._id',
+          title: `$subCategory.${req.lang}`,
+          _id: '$subCategory._id',
         },
         tags: {
           $map: {
@@ -65,7 +68,15 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
       },
     },
     { $unwind: '$userDetails' },
-  ];
+    {
+      $addFields: {
+        location: {
+          lng: { $arrayElemAt: ['$location.coordinates', 0] },
+          lat: { $arrayElemAt: ['$location.coordinates', 1] },
+        },
+      },
+    },
+  );
 
   // Conditionally add the $match stage for isAvaliableToInstantProjects
   if (isInstant !== undefined) {
@@ -114,7 +125,23 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
     },
   );
 
-  const projects = await Rentals.aggregate([
+  const secondPipelines: PipelineStage[] = [];
+  // Add $geoNear if user location exists
+  if (currentUser?.location?.coordinates) {
+    secondPipelines.push({
+      $geoNear: {
+        near: {
+          type: 'Point',
+          coordinates: currentUser.location.coordinates,
+        },
+        distanceField: 'distance', // Rename 'string' to 'distance'
+        maxDistance: (req.query.maxDistance as unknown as number) * 1000, // Convert km to meters
+        spherical: true,
+      },
+    });
+  }
+
+  secondPipelines.push(
     {
       $match: {
         ...req.pagination.filter,
@@ -178,7 +205,9 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
         favourite: 0,
       },
     },
-  ]);
+  );
+
+  const projects = await Rentals.aggregate(secondPipelines);
 
   const count = await Rentals.aggregate([
     {
@@ -250,8 +279,10 @@ export const getProjectsPagination: RequestHandler<
     instant?: boolean;
     maxBudget?: number;
     minBudget?: number;
+    maxDistance?: number;
   }
 > = async (req, res, next) => {
+  req.query.maxDistance = +(req.query.maxDistance || 1000);
   if (req.query.maxBudget !== undefined) {
     req.pagination.filter.maxBudget = { $lte: req.query.maxBudget };
   }

@@ -1,6 +1,6 @@
 import 'express-async-errors';
 
-import { Categories, InviteStatus, MODELS, ProjectCycle } from '@duvdu-v1/duvdu';
+import { Categories, InviteStatus, MODELS, ProjectCycle, Users } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import mongoose, { PipelineStage, Types } from 'mongoose';
 
@@ -25,8 +25,10 @@ export const getProjectsPagination: RequestHandler<
     duration?: number;
     maxBudget?: number;
     minBudget?: number;
+    maxDistance?: number;
   }
 > = async (req, res, next) => {
+  req.query.maxDistance = +(req.query.maxDistance || 1000);
   if (req.query.duration) req.pagination.filter.duration = { $eq: req.query.duration };
   if (req.query.instant != undefined) req.pagination.filter.instant = req.query.instant;
   if (req.query.search) {
@@ -139,12 +141,12 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
     { $unwind: '$user' },
     ...(isInstant !== undefined
       ? [
-        {
-          $match: {
-            'user.isAvaliableToInstantProjects': isInstant,
+          {
+            $match: {
+              'user.isAvaliableToInstantProjects': isInstant,
+            },
           },
-        },
-      ]
+        ]
       : []),
     {
       $count: 'totalCount',
@@ -153,8 +155,24 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
 
   const countResult = await ProjectCycle.aggregate(countPipeline);
   const resultCount = countResult.length > 0 ? countResult[0].totalCount : 0;
+  const currentUser = await Users.findById(req.loggedUser?.id, { location: 1 });
 
-  const pipeline: PipelineStage[] = [
+  const pipelines: PipelineStage[] = [];
+  if (currentUser?.location?.coordinates) {
+    pipelines.push({
+      $geoNear: {
+        near: {
+          type: 'Point',
+          coordinates: currentUser.location.coordinates,
+        },
+        distanceField: 'distance', // Rename 'string' to 'distance'
+        maxDistance: ((req as any).query.maxDistance as unknown as number) * 1000, // Convert km to meters
+        spherical: true,
+      },
+    });
+  }
+
+  pipelines.push(
     {
       $match: {
         ...req.pagination.filter,
@@ -173,17 +191,17 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
       },
     },
     { $unwind: '$user' },
-  ];
+  );
 
   if (isInstant !== undefined) {
-    pipeline.push({
+    pipelines.push({
       $match: {
         'user.isAvaliableToInstantProjects': isInstant,
       },
     });
   }
 
-  pipeline.push(
+  pipelines.push(
     // Existing category lookup and unwind stages
     {
       $lookup: {
@@ -303,8 +321,8 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
           _id: '$category._id',
         },
         subCategory: {
-          title:'$subCategory.' + req.lang,
-          _id:'$subCategory._id',
+          title: '$subCategory.' + req.lang,
+          _id: '$subCategory._id',
         },
         tags: {
           $map: {
@@ -318,7 +336,7 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
                   else: '$$tag.ar',
                 },
               },
-              _id:'$$tag._id'
+              _id: '$$tag._id',
             },
           },
         },
@@ -342,7 +360,10 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
             cond: { $ne: ['$$creative', null] }, // Filter out null values
           },
         },
-        location: 1,
+        location: {
+          lng: { $arrayElemAt: ['$location.coordinates', 0] },
+          lat: { $arrayElemAt: ['$location.coordinates', 1] },
+        },
         address: 1,
         searchKeyWords: 1,
         duration: 1,
@@ -369,7 +390,7 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
   );
 
   // Execute the aggregation pipeline
-  const projects = await ProjectCycle.aggregate(pipeline);
+  const projects = await ProjectCycle.aggregate(pipelines);
 
   res.status(200).json({
     message: 'success',

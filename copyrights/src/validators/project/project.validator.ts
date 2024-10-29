@@ -56,6 +56,7 @@ export const update = [
 ];
 
 export const findAll = [
+  query('maxDistance').optional().isInt({ min: 1, max: 1000 }).bail().toInt(),
   query('instant').optional().isBoolean().toBoolean(),
   query('search').optional().isLength({ min: 3 }).withMessage('searchLength'),
   query('address').optional().isLength({ min: 3 }).withMessage('addressLength'),

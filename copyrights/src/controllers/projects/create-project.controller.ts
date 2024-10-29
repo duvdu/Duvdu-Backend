@@ -23,8 +23,15 @@ export const createProjectHandler: RequestHandler<
       CYCLES.copyRights,
       req.lang,
     );
-    (req.body.subCategory as any) = {...subCategoryTitle, _id:req.body.subCategory};
+    (req.body.subCategory as any) = { ...subCategoryTitle, _id: req.body.subCategory };
     (req.body.tags as any) = filteredTags;
+
+    // location
+    if (req.body.location)
+      req.body.location = {
+        type: 'Point',
+        coordinates: [(req as any).body.location.lng, (req as any).body.location.lat],
+      } as any;
 
     const project = await CopyRights.create({
       ...req.body,

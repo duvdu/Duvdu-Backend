@@ -16,7 +16,7 @@ export interface Irental {
   id: string;
   user: Types.ObjectId | Iuser;
   category: Types.ObjectId | Icategory;
-  subCategory: { ar: string; en: string , _id:string };
+  subCategory: { ar: string; en: string; _id: string };
   tags: { ar: string; en: string }[];
   attachments: string[];
   cover: string;
@@ -24,7 +24,10 @@ export interface Irental {
   phoneNumber: string;
   email: string;
   description: string;
-  location: { lat: number; lng: number };
+  location: {
+    type: 'Point';
+    coordinates: [number, number];
+  };
   address: string;
   searchKeywords: string[];
   insurance: number;
@@ -44,7 +47,7 @@ export const Rentals = model<Irental>(
     {
       user: { type: Schema.Types.ObjectId, ref: MODELS.user },
       category: { type: Schema.Types.ObjectId, ref: MODELS.category },
-      subCategory: { ar: String, en: String  , _id:String},
+      subCategory: { ar: String, en: String, _id: String },
       tags: [{ ar: String, en: String }],
       attachments: [String],
       cover: String,
@@ -52,7 +55,10 @@ export const Rentals = model<Irental>(
       phoneNumber: String,
       email: String,
       description: String,
-      location: { lat: Number, lng: Number },
+      location: {
+        type: { type: String, default: 'Point' },
+        coordinates: { type: [Number], default: [31.2357, 30.0444] },
+      },
       address: String,
       searchKeywords: [String],
       insurance: { type: Number, default: null },
@@ -69,5 +75,7 @@ export const Rentals = model<Irental>(
       maxBudget: { type: Number, default: null },
     },
     { collection: 'rentals', timestamps: true },
-  ).index({ createdAt: 1, updatedAt: -1 }),
+  )
+    .index({ createdAt: 1, updatedAt: -1 })
+    .index({ location: '2dsphere' }),
 );
