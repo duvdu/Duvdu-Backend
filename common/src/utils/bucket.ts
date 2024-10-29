@@ -24,6 +24,7 @@ export class Bucket {
             Bucket: this.bucketName,
             Key: `${folder}/${file.filename}`,
             Body: fileStream,
+            ContentDisposition: 'inline',
           },
           (err, data) => {
             if (err) reject(err);
