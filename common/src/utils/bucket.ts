@@ -29,6 +29,7 @@ export class Bucket {
             Body: fileStream,
             ContentDisposition: 'inline',
             ContentType: contentType,
+            ACL: 'public-read'
           },
           (err, data) => {
             if (err) reject(err);
