@@ -155,9 +155,9 @@ export const getBookmarkProjects: RequestHandler<
         as: 'favourite',
       },
     },
-    {
-      $unwind: { path: '$favourite', preserveNullAndEmptyArrays: true },
-    },
+    // {
+    //   $unwind: { path: '$favourite', preserveNullAndEmptyArrays: true },
+    // },
     {
       $project: {
         _id: 1,
