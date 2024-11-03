@@ -41,7 +41,16 @@ export const create = [
 export const update = [
   param('projectId').isMongoId().withMessage('projectIdInvalid'),
   body('price').optional().isFloat({ gt: 0 }).withMessage('priceInvalid'),
-  body('duration').optional().isInt().withMessage('durationInvalid'),
+  body('duration').optional().isObject(),
+  body('duration.value').optional().isInt({ gt: 0 }),
+  body('duration.unit')
+    .optional()
+    .isString()
+    .bail()
+    .custom((val) => {
+      if (['minutes', 'hours', 'days', 'months', 'weeks'].includes(val)) return true;
+      throw new Error('durationUnit');
+    }),
   body('address').optional().isString().trim().withMessage('addressString'),
   body('searchKeywords').optional().isArray().withMessage('searchKeywordsArray'),
   body('searchKeywords.*')
