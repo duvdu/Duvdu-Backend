@@ -1,4 +1,4 @@
-import { MODELS, Rentals, Categories, Users } from '@duvdu-v1/duvdu';
+import { MODELS, Rentals, Categories } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import mongoose, { PipelineStage } from 'mongoose';
 
@@ -7,7 +7,6 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
   if (req.pagination.filter.instant != undefined) isInstant = req.pagination.filter.instant;
   delete req.pagination.filter.instant;
 
-  const currentUser = await Users.findById(req.loggedUser?.id, { location: 1 });
   const pipelines: PipelineStage[] = [];
 
   pipelines.push(
@@ -194,6 +193,7 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
                 0,
               ],
             },
+
             then: true,
             else: false,
           },

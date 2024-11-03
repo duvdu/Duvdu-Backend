@@ -1,6 +1,6 @@
 import 'express-async-errors';
 
-import { Categories, InviteStatus, MODELS, ProjectCycle, Users } from '@duvdu-v1/duvdu';
+import { Categories, InviteStatus, MODELS, ProjectCycle } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import mongoose, { PipelineStage, Types } from 'mongoose';
 
@@ -155,7 +155,6 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
 
   const countResult = await ProjectCycle.aggregate(countPipeline);
   const resultCount = countResult.length > 0 ? countResult[0].totalCount : 0;
-  const currentUser = await Users.findById(req.loggedUser?.id, { location: 1 });
 
   const pipelines: PipelineStage[] = [];
   // if (currentUser?.location?.coordinates) {
@@ -375,11 +374,27 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
         isFavourite: {
           $cond: {
             if: {
-              $eq: [
-                '$favourite.user',
-                req.loggedUser?.id ? new mongoose.Types.ObjectId(req.loggedUser.id) : '0',
+              $gt: [
+                {
+                  $size: {
+                    $filter: {
+                      input: '$favourite',
+                      as: 'fav',
+                      cond: {
+                        $eq: [
+                          '$$fav.user',
+                          req.loggedUser?.id
+                            ? new mongoose.Types.ObjectId(req.loggedUser.id as string)
+                            : '0',
+                        ],
+                      },
+                    },
+                  },
+                },
+                0,
               ],
             },
+            
             then: true,
             else: false,
           },
