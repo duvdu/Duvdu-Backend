@@ -374,27 +374,11 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
         isFavourite: {
           $cond: {
             if: {
-              $gt: [
-                {
-                  $size: {
-                    $filter: {
-                      input: '$favourite',
-                      as: 'fav',
-                      cond: {
-                        $eq: [
-                          '$$fav.user',
-                          req.loggedUser?.id
-                            ? new mongoose.Types.ObjectId(req.loggedUser.id as string)
-                            : '0',
-                        ],
-                      },
-                    },
-                  },
-                },
-                0,
+              $eq: [
+                '$favourite.user',
+                req.loggedUser?.id ? new mongoose.Types.ObjectId(req.loggedUser.id) : '0',
               ],
             },
-            
             then: true,
             else: false,
           },
