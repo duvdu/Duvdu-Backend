@@ -289,9 +289,6 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
         favouriteCount: { $size: '$favourite' },
       },
     },
-    // {
-    //   $unwind: { path: '$favourite', preserveNullAndEmptyArrays: true },
-    // },
     {
       $project: {
         _id: 1,
