@@ -23,7 +23,8 @@ export class Bucket {
   }
 
   async saveBucketFiles(folder: string, ...files: Express.Multer.File[]) {
-    const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB chunks (AWS minimum)
+    const CHUNK_SIZE = 20 * 1024 * 1024; // 20MB chunks for better performance
+    const MAX_PARALLEL_CHUNKS = 4; // Control parallel uploads
     
     await Promise.all(
       files.map(async (file) => {
@@ -31,12 +32,10 @@ export class Bucket {
         const fileSize = fs.statSync(filePath).size;
         const contentType = this.getContentType(file.filename);
 
-        // Use regular upload for small files (less than 15MB)
-        if (fileSize < CHUNK_SIZE * 3) {
+        if (fileSize < CHUNK_SIZE) {
           return this.uploadSmallFile(folder, file, contentType);
         }
 
-        // Use multipart upload for large files
         let multipartUpload: aws.S3.CreateMultipartUploadOutput | undefined;
         try {
           // Initiate multipart upload
@@ -55,37 +54,47 @@ export class Bucket {
 
           const uploadId = multipartUpload.UploadId!;
           const parts: aws.S3.CompletedPart[] = [];
-          const fileStream = fs.createReadStream(filePath, { highWaterMark: CHUNK_SIZE });
+          const fileStream = fs.createReadStream(filePath);
           
-          let partNumber = 1;
-          let buffer = Buffer.alloc(0);
-
+          // Prepare chunks for parallel upload
+          const chunks: Buffer[] = [];
+          let currentChunk = Buffer.alloc(0);
+          
           for await (const chunk of fileStream) {
-            buffer = Buffer.concat([buffer, chunk]);
-            
-            // Upload when buffer reaches CHUNK_SIZE or it's the last chunk
-            if (buffer.length >= CHUNK_SIZE || partNumber * CHUNK_SIZE >= fileSize) {
-              const partData = await new Promise<aws.S3.UploadPartOutput>((resolve, reject) => {
+            currentChunk = Buffer.concat([currentChunk, chunk]);
+            if (currentChunk.length >= CHUNK_SIZE) {
+              chunks.push(Buffer.from(currentChunk));
+              currentChunk = Buffer.alloc(0);
+            }
+          }
+          if (currentChunk.length > 0) {
+            chunks.push(Buffer.from(currentChunk));
+          }
+
+          // Upload chunks in parallel batches
+          for (let i = 0; i < chunks.length; i += MAX_PARALLEL_CHUNKS) {
+            const batch = chunks.slice(i, i + MAX_PARALLEL_CHUNKS);
+            const partUploads = batch.map((chunkBuffer, index) => {
+              const partNumber = i + index + 1;
+              return new Promise<aws.S3.CompletedPart>((resolve, reject) => {
                 this.s3.uploadPart({
                   Bucket: this.bucketName,
                   Key: `${folder}/${file.filename}`,
                   PartNumber: partNumber,
                   UploadId: uploadId,
-                  Body: buffer,
+                  Body: chunkBuffer,
                 }, (err, data) => {
                   if (err) reject(err);
-                  else resolve(data);
+                  else resolve({
+                    PartNumber: partNumber,
+                    ETag: data.ETag!
+                  });
                 });
               });
+            });
 
-              parts.push({
-                PartNumber: partNumber,
-                ETag: partData.ETag!
-              });
-
-              buffer = Buffer.alloc(0);
-              partNumber++;
-            }
+            const completedParts = await Promise.all(partUploads);
+            parts.push(...completedParts.sort((a, b) => (a.PartNumber ?? 0) - (b.PartNumber ?? 0)));
           }
 
           // Complete multipart upload
@@ -108,7 +117,7 @@ export class Bucket {
               this.s3.abortMultipartUpload({
                 Bucket: this.bucketName,
                 Key: `${folder}/${file.filename}`,
-                UploadId: multipartUpload!.UploadId!  // Add non-null assertion here
+                UploadId: multipartUpload!.UploadId!
               }, () => resolve(null));
             });
           }
@@ -142,7 +151,7 @@ export class Bucket {
   }
 
   async removeBucketFiles(...filePaths: string[]) {
-    const BATCH_SIZE = 1000; // AWS limit is 1000 objects per delete operation
+    const BATCH_SIZE = 1000;
     
     for (let i = 0; i < filePaths.length; i += BATCH_SIZE) {
       const batch = filePaths.slice(i, i + BATCH_SIZE);
@@ -163,65 +172,14 @@ export class Bucket {
 
   private getContentType(filename: string): string {
     const ext = path.extname(filename).toLowerCase();
-    switch (ext) {
-    // Video Types
-    case '.mp4':
-      return 'video/mp4';
-    case '.webm':
-      return 'video/webm';
-    case '.ogg':
-      return 'video/ogg';
-    case '.avi':
-      return 'video/x-msvideo';
-    case '.mov':
-      return 'video/quicktime';
-    case '.wmv':
-      return 'video/x-ms-wmv';
-    case '.mkv':
-      return 'video/x-matroska';
-    case '.flv':
-      return 'video/x-flv';
     
-      // Audio Types
-    case '.mp3':
-      return 'audio/mpeg';
-    case '.wav':
-      return 'audio/wav';
-    case '.aac':
-      return 'audio/aac';
-    case '.flac':
-      return 'audio/flac';
-    case '.m4a':
-      return 'audio/x-m4a';
-    case '.wma':
-      return 'audio/x-ms-wma';
-    
-      // Image Types
-    case '.jpg':
-    case '.jpeg':
-      return 'image/jpeg';
-    case '.png':
-      return 'image/png';
-    case '.gif':
-      return 'image/gif';
-    case '.bmp':
-      return 'image/bmp';
-    case '.webp':
-      return 'image/webp';
-    case '.svg':
-      return 'image/svg+xml';
-    case '.tiff':
-    case '.tif':
-      return 'image/tiff';
-          
-      // PDF and other document types
-    case '.pdf':
-      return 'application/pdf';
-        
-      // Default fallback
-    default:
-      return 'application/octet-stream'; // Fallback for unknown types
+    for (const category of Object.values(MIME_TYPES)) {
+      if (ext in category) {
+        return category[ext as keyof typeof category];
+      }
     }
+    
+    return 'application/octet-stream';
   }
 
   async validateFace(imageKey: string): Promise<{ 
@@ -241,7 +199,6 @@ export class Bucket {
 
       const result = await this.rekognition.detectFaces(params).promise();
       
-      // Check if exactly one face is detected
       if (!result.FaceDetails || result.FaceDetails.length === 0) {
         return {
           isValid: false,
@@ -252,13 +209,12 @@ export class Bucket {
       if (result.FaceDetails.length > 1) {
         return {
           isValid: false,
-          error: {en: 'Multiple faces detected in the image', ar: 'تم الكشف عن أكثر من وجه ف�� الصورة'}
+          error: {en: 'Multiple faces detected in the image', ar: 'تم الكشف عن أكثر من وجه في الصورة'}
         };
       }
 
       const face = result.FaceDetails[0];
 
-      // Stricter confidence threshold (95%)
       if (!face.Confidence || face.Confidence < 95) {
         return {
           isValid: false,
@@ -266,7 +222,6 @@ export class Bucket {
         };
       }
 
-      // Check for sunglasses or eyeglasses
       if (face.Sunglasses?.Value || face.Eyeglasses?.Value) {
         return {
           isValid: false,
@@ -274,7 +229,6 @@ export class Bucket {
         };
       }
 
-      // Check if eyes are open with higher confidence
       const leftEyeOpen = face.EyesOpen?.Value && (face.EyesOpen?.Confidence ?? 0) > 95;
       const rightEyeOpen = face.EyesOpen?.Value && (face.EyesOpen?.Confidence ?? 0) > 95;
       if (!leftEyeOpen || !rightEyeOpen) {
@@ -284,7 +238,6 @@ export class Bucket {
         };
       }
 
-      // Check for mouth open
       if (face.MouthOpen?.Value) {
         return {
           isValid: false,
@@ -292,9 +245,8 @@ export class Bucket {
         };
       }
 
-      // Stricter face orientation check
       const pose = face.Pose;
-      const poseThreshold = 15; // Stricter threshold (15 degrees)
+      const poseThreshold = 15;
       if (Math.abs(pose?.Pitch || 0) > poseThreshold || 
           Math.abs(pose?.Roll || 0) > poseThreshold || 
           Math.abs(pose?.Yaw || 0) > poseThreshold) {
@@ -304,14 +256,13 @@ export class Bucket {
         };
       }
 
-      // Check for facial occlusions
       if (face.FaceOccluded?.Value) {
         return {
           isValid: false,
           error: {en: 'Face must be fully visible without any coverings', ar: 'يجب أن يكون الوجه مرئياً بالكامل بدون أي أغطية'}
         };
       }
-      // Check for neutral expression
+
       if (face.Smile?.Value) {
         return {
           isValid: false,
@@ -330,3 +281,38 @@ export class Bucket {
     }
   }
 }
+
+const MIME_TYPES = {
+  video: {
+    '.mp4': 'video/mp4',
+    '.webm': 'video/webm',
+    '.ogg': 'video/ogg',
+    '.avi': 'video/x-msvideo',
+    '.mov': 'video/quicktime',
+    '.wmv': 'video/x-ms-wmv',
+    '.mkv': 'video/x-matroska',
+    '.flv': 'video/x-flv'
+  },
+  audio: {
+    '.mp3': 'audio/mpeg',
+    '.wav': 'audio/wav',
+    '.aac': 'audio/aac',
+    '.flac': 'audio/flac',
+    '.m4a': 'audio/x-m4a',
+    '.wma': 'audio/x-ms-wma'
+  },
+  image: {
+    '.jpg': 'image/jpeg',
+    '.jpeg': 'image/jpeg',
+    '.png': 'image/png',
+    '.gif': 'image/gif',
+    '.bmp': 'image/bmp',
+    '.webp': 'image/webp',
+    '.svg': 'image/svg+xml',
+    '.tiff': 'image/tiff',
+    '.tif': 'image/tiff'
+  },
+  document: {
+    '.pdf': 'application/pdf'
+  }
+} as const;
