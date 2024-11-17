@@ -20,7 +20,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@duvdu-v1/duvdu": "^1.1.205",
+    "@duvdu-v1/duvdu": "^1.1.206",
     "@fingerprintjs/fingerprintjs": "^4.4.0",
     "@jridgewell/sourcemap-codec": "^1.4.15",
     "@types/bcryptjs": "^2.4.5",
