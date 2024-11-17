@@ -252,39 +252,70 @@ export class Bucket {
       if (result.FaceDetails.length > 1) {
         return {
           isValid: false,
-          error: {en: 'Multiple faces detected in the image', ar: 'تم الكشف عن أكثر من وجه في الصورة'}
+          error: {en: 'Multiple faces detected in the image', ar: 'تم الكشف عن أكثر من وجه ف�� الصورة'}
         };
       }
 
       const face = result.FaceDetails[0];
 
-      // Validate if it's a real human face (confidence check)
-      if (!face.Confidence || face.Confidence < 90) {
+      // Stricter confidence threshold (95%)
+      if (!face.Confidence || face.Confidence < 95) {
         return {
           isValid: false,
-          error: {en: 'Low confidence in face detection', ar: 'الثقة في الكشف عن الوجه منخفضة'}
+          error: {en: 'Image quality is not sufficient', ar: 'جودة الصورة غير كافية'}
         };
       }
 
-      // Check if eyes are open
-      const leftEyeOpen = face.EyesOpen?.Value && (face.EyesOpen?.Confidence ?? 0) > 90;
-      const rightEyeOpen = face.EyesOpen?.Value && (face.EyesOpen?.Confidence ?? 0) > 90;
+      // Check for sunglasses or eyeglasses
+      if (face.Sunglasses?.Value || face.Eyeglasses?.Value) {
+        return {
+          isValid: false,
+          error: {en: 'Please remove glasses or sunglasses', ar: 'يرجى إزالة النظارات أو النظارات الشمسية'}
+        };
+      }
+
+      // Check if eyes are open with higher confidence
+      const leftEyeOpen = face.EyesOpen?.Value && (face.EyesOpen?.Confidence ?? 0) > 95;
+      const rightEyeOpen = face.EyesOpen?.Value && (face.EyesOpen?.Confidence ?? 0) > 95;
       if (!leftEyeOpen || !rightEyeOpen) {
         return {
           isValid: false,
-          error: {en: 'Eyes must be open and clearly visible', ar: 'يجب أن تكون العينين مفتوحة وواضحة بشكل مباشر'}
+          error: {en: 'Eyes must be fully open and clearly visible', ar: 'يجب أن تكون العينين مفتوحتين بالكامل وواضحتين'}
         };
       }
 
-      // Check face orientation (looking straight ahead)
+      // Check for mouth open
+      if (face.MouthOpen?.Value) {
+        return {
+          isValid: false,
+          error: {en: 'Mouth should be closed', ar: 'يجب أن يكون الفم مغلقاً'}
+        };
+      }
+
+      // Stricter face orientation check
       const pose = face.Pose;
-      const poseThreshold = 20; // degrees
+      const poseThreshold = 15; // Stricter threshold (15 degrees)
       if (Math.abs(pose?.Pitch || 0) > poseThreshold || 
           Math.abs(pose?.Roll || 0) > poseThreshold || 
           Math.abs(pose?.Yaw || 0) > poseThreshold) {
         return {
           isValid: false,
-          error: {en: 'Face must be looking straight ahead', ar: 'يجب أن يكون الوجه منظراً مباشراً'}
+          error: {en: 'Face must be directly facing the camera', ar: 'يجب أن يكون الوجه مواجهاً للكاميرا مباشرة'}
+        };
+      }
+
+      // Check for facial occlusions
+      if (face.FaceOccluded?.Value) {
+        return {
+          isValid: false,
+          error: {en: 'Face must be fully visible without any coverings', ar: 'يجب أن يكون الوجه مرئياً بالكامل بدون أي أغطية'}
+        };
+      }
+      // Check for neutral expression
+      if (face.Smile?.Value) {
+        return {
+          isValid: false,
+          error: {en: 'Please maintain a neutral expression (no smiling)', ar: 'يرجى الحفاظ على تعبير محايد (بدون ابتسامة)'}
         };
       }
 
@@ -294,7 +325,7 @@ export class Bucket {
       console.error('Error validating face:', error);
       return {
         isValid: false,
-        error: {en:'Error processing image' , ar:'خطأ في معالجة الصورة'}
+        error: {en: 'Error processing image', ar: 'خطأ في معالجة الصورة'}
       };
     }
   }
