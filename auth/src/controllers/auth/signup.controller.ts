@@ -11,9 +11,12 @@ export const signupHandler: SignupHandler = async (req, res, next) => {
   if (!role) return next(new NotFound(undefined, req.lang));
   const verificationCode = generateRandom6Digit();
 
-  // handle invention users 
-  let newUser = await Users.findOne({'phoneNumber.number':req.body.phoneNumber.number , haveInvitation:true});
-  
+  // handle invention users
+  let newUser = await Users.findOne({
+    'phoneNumber.number': req.body.phoneNumber.number,
+    haveInvitation: true,
+  });
+
   if (!newUser) {
     newUser = await Users.create({
       ...req.body,
@@ -26,19 +29,23 @@ export const signupHandler: SignupHandler = async (req, res, next) => {
         reason: VerificationReason.signup,
       },
     });
-  }else{
-    await Users.findByIdAndUpdate(newUser._id , {
-      ...req.body,
-      password: await hashPassword(req.body.password),
-      role: role.id,
-      isVerified: false,
-      haveInvitation:false,
-      verificationCode: {
-        code: hashVerificationCode(verificationCode),
-        expireAt: new Date(Date.now() + 60 * 1000),
-        reason: VerificationReason.signup,
+  } else {
+    await Users.findByIdAndUpdate(
+      newUser._id,
+      {
+        ...req.body,
+        password: await hashPassword(req.body.password),
+        role: role.id,
+        isVerified: false,
+        haveInvitation: false,
+        verificationCode: {
+          code: hashVerificationCode(verificationCode),
+          expireAt: new Date(Date.now() + 60 * 1000),
+          reason: VerificationReason.signup,
+        },
       },
-    } , {new:true});
+      { new: true },
+    );
   }
 
   await newUser.save();

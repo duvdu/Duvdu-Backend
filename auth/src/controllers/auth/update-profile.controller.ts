@@ -49,7 +49,7 @@ export const updateProfileHandler: RequestHandler<
   if (profileImage?.length) {
     await s3.saveBucketFiles(FOLDERS.auth, ...profileImage);
     const imageKey = `${FOLDERS.auth}/${profileImage[0].filename}`;
-    
+
     // Validate face in the uploaded image
     const faceValidation = await s3.validateFace(imageKey);
     if (!faceValidation.isValid) {
@@ -73,9 +73,16 @@ export const updateProfileHandler: RequestHandler<
     } as any;
 
   if (req.body.categories) {
-    const categoriesLength = await Categories.countDocuments({_id:req.body.categories.map(el => el)});
-    if (req.body.categories.length != categoriesLength) 
-      return next(new BadRequestError({en:'invalid categories ids' , ar:'معرفات الفئات غير صالحة'} , req.lang));
+    const categoriesLength = await Categories.countDocuments({
+      _id: req.body.categories.map((el) => el),
+    });
+    if (req.body.categories.length != categoriesLength)
+      return next(
+        new BadRequestError(
+          { en: 'invalid categories ids', ar: 'معرفات الفئات غير صالحة' },
+          req.lang,
+        ),
+      );
   }
 
   const user = await Users.findByIdAndUpdate(req.loggedUser?.id, req.body, { new: true })

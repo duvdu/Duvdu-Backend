@@ -29,10 +29,10 @@ export const filterUsers: RequestHandler<
   if (req.query.username) req.pagination.filter.username = req.query.username;
   if (req.query.phoneNumber) req.pagination.filter['phoneNumber.number'] = req.query.phoneNumber;
   if (req.query.category)
-    req.pagination.filter.categories = { 
-      $in: [new mongoose.Types.ObjectId(req.query.category)] 
+    req.pagination.filter.categories = {
+      $in: [new mongoose.Types.ObjectId(req.query.category)],
     };
-  
+
   if (req.query.priceFrom) req.pagination.filter.price = { $gte: req.query.priceFrom };
   if (req.query.priceTo)
     req.pagination.filter.price = { ...req.pagination.filter.price, $lte: req.query.priceTo };
@@ -57,7 +57,6 @@ export const findUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser
   req,
   res,
 ) => {
-  
   const currentUser = await Users.findById(req.loggedUser?.id, { location: 1 });
 
   const aggregationPipeline: PipelineStage[] = [];
@@ -77,11 +76,13 @@ export const findUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser
     });
   }
 
-  
   // Add filtering and matching stages
   aggregationPipeline.push(
     {
-      $match: { ...req.pagination.filter, _id: { $ne: new mongoose.Types.ObjectId(req.loggedUser?.id) } },
+      $match: {
+        ...req.pagination.filter,
+        _id: { $ne: new mongoose.Types.ObjectId(req.loggedUser?.id) },
+      },
     },
     {
       $project: {
@@ -90,6 +91,7 @@ export const findUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser
         username: 1,
         profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$profileImage'] },
         coverImage: { $concat: [process.env.BUCKET_HOST, '/', '$coverImage'] },
+        faceRecognition: { $concat: [process.env.BUCKET_HOST, '/', '$faceRecognition'] },
         about: 1,
         isOnline: 1,
         isAvaliableToInstantProjects: 1,
@@ -201,18 +203,14 @@ export const findUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser
     {
       $facet: {
         totalCount: [{ $count: 'totalCount' }],
-        users: [
-          { $skip: req.pagination.skip },
-          { $limit: req.pagination.limit },
-        ],
+        users: [{ $skip: req.pagination.skip }, { $limit: req.pagination.limit }],
       },
-    }
+    },
   );
 
   // Execute aggregation pipeline
   const users = await Users.aggregate(aggregationPipeline);
   const resultCount = users[0]?.totalCount[0]?.totalCount || 0;
-
 
   res.status(200).json({
     message: 'success',

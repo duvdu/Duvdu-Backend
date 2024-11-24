@@ -68,11 +68,17 @@ export const updateUserHandler: RequestHandler<
   }
 
   if (req.body.categories) {
-    const categoriesLength = await Categories.countDocuments({_id:req.body.categories.map(el => el)});
-    if (req.body.categories.length != categoriesLength) 
-      return next(new BadRequestError({en:'invalid categories ids' , ar:'معرفات الفئات غير صالحة'} , req.lang));
+    const categoriesLength = await Categories.countDocuments({
+      _id: req.body.categories.map((el) => el),
+    });
+    if (req.body.categories.length != categoriesLength)
+      return next(
+        new BadRequestError(
+          { en: 'invalid categories ids', ar: 'معرفات الفئات غير صالحة' },
+          req.lang,
+        ),
+      );
   }
-
 
   if (req.body.password) req.body.password = await hashPassword(req.body.password);
 

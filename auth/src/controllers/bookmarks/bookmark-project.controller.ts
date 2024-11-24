@@ -1,6 +1,6 @@
 import { SuccessResponse, BookmarkProjects } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
-import mongoose, {  PipelineStage } from 'mongoose';
+import mongoose, { PipelineStage } from 'mongoose';
 
 export const addToBookmark: RequestHandler<
   { bookmarkId: string; projectId: string },

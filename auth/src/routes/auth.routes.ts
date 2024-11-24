@@ -1,4 +1,5 @@
 import {
+  checkRequiredFields,
   FOLDERS,
   globalPaginationMiddleware,
   globalUploadMiddleware,
@@ -119,5 +120,13 @@ router.get('/profile/projects/:username', handlers.getUserProjectsByUsername);
 router.route('/profile/:username').get(optionalAuthenticated, handlers.getUserProfileHandler);
 
 router.route('/verify').post(val.verify, handlers.verifyHandler);
+router.post(
+  '/face-recognition',
+  isauthenticated,
+  globalUploadMiddleware(FOLDERS.auth).fields([{ name: 'faceRecognition', maxCount: 1 }]),
+  checkRequiredFields({ fields: ['faceRecognition'] }),
+  isauthenticated,
+  handlers.faceRecognitionController,
+);
 
 export const authRoutes = router;

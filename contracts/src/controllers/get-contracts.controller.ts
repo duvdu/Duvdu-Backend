@@ -143,6 +143,9 @@ export const getContracts: RequestHandler<
           profileImage: {
             $concat: [process.env.BUCKET_HOST, '/', '$sp.profileImage'],
           },
+          faceRecognition: {
+            $concat: [process.env.BUCKET_HOST, '/', '$sp.faceRecognition'],
+          },
         },
         contract: {
           attachments: {
@@ -176,6 +179,7 @@ export const getContracts: RequestHandler<
           username: '$sp.username',
           isOnline: '$sp.isOnline',
           profileImage: '$sp.profileImage',
+          faceRecognition: '$sp.faceRecognition',
         },
       },
     },

@@ -112,6 +112,13 @@ export const getContractsHandler: GetUserContractsHandler = async (req, res) => 
                     { $concat: [process.env.BUCKET_HOST, '/', '$producerUser.profileImage'] },
                   ],
                 },
+                faceRecognition: {
+                  $cond: [
+                    { $eq: ['$producerUser.faceRecognition', null] },
+                    null,
+                    { $concat: [process.env.BUCKET_HOST, '/', '$producerUser.faceRecognition'] },
+                  ],
+                },
                 username: '$producerUser.username',
                 isOnline: '$producerUser.isOnline',
                 acceptedProjectsCounter: '$producerUser.acceptedProjectsCounter',
@@ -164,6 +171,7 @@ export const getContractsHandler: GetUserContractsHandler = async (req, res) => 
           _id: '$userDetails._id',
           username: '$userDetails.username',
           profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$userDetails.profileImage'] },
+          faceRecognition: { $concat: [process.env.BUCKET_HOST, '/', '$userDetails.faceRecognition'] },
           isOnline: '$userDetails.isOnline',
           acceptedProjectsCounter: '$userDetails.acceptedProjectsCounter',
           name: '$userDetails.name',

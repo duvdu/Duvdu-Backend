@@ -1,8 +1,8 @@
-import { Categories, MODELS, UnauthenticatedError, Users } from '@duvdu-v1/duvdu';
+import { MODELS, UnauthenticatedError, Users } from '@duvdu-v1/duvdu';
+import mongoose from 'mongoose';
 
 import { updateRankForUser } from '../../services/rank.service';
 import { GetLoggedUserProfileHandler } from '../../types/endpoints/user.endpoints';
-import mongoose from 'mongoose';
 
 export const getLoggedUserProfileHandler: GetLoggedUserProfileHandler = async (req, res, next) => {
   await updateRankForUser(req.loggedUser.id, req.lang);
@@ -39,6 +39,7 @@ export const getLoggedUserProfileHandler: GetLoggedUserProfileHandler = async (r
         },
         coverImage: { $concat: [process.env.BUCKET_HOST, '/', '$coverImage'] },
         profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$profileImage'] },
+        faceRecognition: { $concat: [process.env.BUCKET_HOST, '/', '$faceRecognition'] },
         categories: {
           $map: {
             input: '$categories',

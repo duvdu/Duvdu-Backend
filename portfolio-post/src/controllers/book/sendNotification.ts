@@ -23,7 +23,7 @@ export const sendNotification = async (
 
   const populatedNotification = await (
     await notification.save()
-  ).populate('sourceUser', 'isOnline profileImage username');
+  ).populate('sourceUser', 'isOnline profileImage username faceRecognition');
 
   await new NewNotificationPublisher(natsWrapper.client).publish({
     notificationDetails: { message: notification.message, title: notification.title },
@@ -52,7 +52,7 @@ export const sendSystemNotification = async (
 
     const populatedNotification = await (
       await notification.save()
-    ).populate('sourceUser', 'isOnline profileImage username');
+    ).populate('sourceUser', 'isOnline profileImage username faceRecognition');
 
     await new NewNotificationPublisher(natsWrapper.client).publish({
       notificationDetails: { message: notification.message, title: notification.title },

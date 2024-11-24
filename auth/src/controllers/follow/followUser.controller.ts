@@ -20,7 +20,6 @@ export const followHandler: FollowHandler = async (req, res, next) => {
     following: req.params.userId,
   });
 
-
   if (follow)
     return next(
       new BadRequestError(

@@ -20,8 +20,11 @@ export const updateProviderPhoneNumberHandler: RequestHandler<
   const currentUser = await Users.findById(req.loggedUser?.id);
   if (!currentUser) return next(new NotFound(undefined, req.lang));
 
-  const user = await Users.findOne({ 'phoneNumber.number': req.body.phoneNumber , haveInvitation:false });
-  if (user) 
+  const user = await Users.findOne({
+    'phoneNumber.number': req.body.phoneNumber,
+    haveInvitation: false,
+  });
+  if (user)
     return next(
       new BadRequestError(
         { en: 'phone number already exist', ar: 'رقم الهاتف موجود بالفعل' },
@@ -30,7 +33,10 @@ export const updateProviderPhoneNumberHandler: RequestHandler<
     );
 
   // handle invitedUser
-  const invitedUser = await Users.findOne({ 'phoneNumber.number': req.body.phoneNumber , haveInvitation:true });
+  const invitedUser = await Users.findOne({
+    'phoneNumber.number': req.body.phoneNumber,
+    haveInvitation: true,
+  });
 
   if (invitedUser) {
     await Users.findByIdAndDelete(invitedUser._id);

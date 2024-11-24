@@ -51,6 +51,7 @@ export const getUserProfileHandler: GetUserProfileHandler = async (req, res, nex
         },
         coverImage: { $concat: [process.env.BUCKET_HOST, '/', '$coverImage'] },
         profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$profileImage'] },
+        faceRecognition: { $concat: [process.env.BUCKET_HOST, '/', '$faceRecognition'] },
         categories: {
           $map: {
             input: '$categories',

@@ -116,12 +116,15 @@ export const getUserProjectsByUsername: RequestHandler<
         (subEl: string) => process.env.BUCKET_HOST + '/' + subEl,
       );
     if (el.project.cover) el.project.cover = process.env.BUCKET_HOST + '/' + el.project.cover;
-    if (el.project.audioCover) el.project.audioCover = process.env.BUCKET_HOST + '/' + el.project.audioCover;
+    if (el.project.audioCover)
+      el.project.audioCover = process.env.BUCKET_HOST + '/' + el.project.audioCover;
     if (
       el.project?.user?.profileImage &&
       !(el.project?.user?.profileImage as string).startsWith('http')
     )
       el.project.user.profileImage = process.env.BUCKET_HOST + '/' + el.project.user.profileImage;
+    if (el.project.faceRecognition)
+      el.project.faceRecognition = process.env.BUCKET_HOST + '/' + el.project.faceRecognition;
     if (el.project.creatives)
       el.project.creatives = (el.project.creatives as { profileImage?: string }[])?.map((el) => ({
         ...el,
