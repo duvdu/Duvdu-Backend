@@ -35,4 +35,5 @@ export enum MODELS {
   copyrightContract = 'copyright_contracts',
   projectContract = 'project_contracts',
   rentalContract = 'rental_contracts',
+  teamContract = 'team_contracts',
 }

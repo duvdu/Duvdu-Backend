@@ -141,7 +141,7 @@ export interface ITeamContract {
 }
 
 export const TeamContract = model<ITeamContract>(
-  'team_contracts',
+  MODELS.teamContract,
   new Schema<ITeamContract>(
     {
       sp: { type: Schema.Types.ObjectId, ref: MODELS.user },
@@ -165,6 +165,6 @@ export const TeamContract = model<ITeamContract>(
       attachments: [String],
       totalCheckoutAt: Date,
     },
-    { timestamps: true, collection: 'team_contracts' },
+    { timestamps: true, collection: MODELS.teamContract },
   ),
 );
