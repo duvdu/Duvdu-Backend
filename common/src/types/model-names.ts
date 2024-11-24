@@ -32,4 +32,7 @@ export enum MODELS {
   projectsViews = 'projects_views',
   coupon = 'coupons',
   producerPlatforms = 'producers-platforms',
+  copyrightContract = 'copyright_contracts',
+  projectContract = 'project_contracts',
+  rentalContract = 'rental_contracts',
 }
