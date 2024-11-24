@@ -1,7 +1,6 @@
-import { SuccessResponse } from '@duvdu-v1/duvdu';
+import { SuccessResponse , IprojectContract } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-import { IprojectContract } from './../models/projectContract.model';
 
 export interface CreateContractHandler
   extends RequestHandler<
