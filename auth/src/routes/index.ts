@@ -6,6 +6,8 @@ import { Router } from 'express';
 
 import { authRoutes } from './auth.routes';
 // import { bookmarkRoutes } from './bookmark.routes';
+import { bookmarksRoutes } from './bookmarks.routes';
+import { favouriteRoutes } from './favourites.routes';
 import { router as followRouter } from './follow.routes';
 import { planRoutes } from './plan.routes';
 import { router as reportRoutes } from './report.routes';
@@ -13,8 +15,6 @@ import { roleRoutes } from './role.routes';
 import { splashRoutes } from './splash.routes';
 import { termsRoutes } from './term.routes';
 import { ticketsRoutes } from './ticket.routes';
-import { favouriteRoutes } from './favourites.routes';
-import { bookmarksRoutes } from './bookmarks.routes';
 
 const router = Router();
 

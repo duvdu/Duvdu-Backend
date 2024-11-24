@@ -13,8 +13,7 @@ export const router = express.Router();
 
 router.use(isauthenticated);
 
-
-router.route('/avaliable-chat').get(isauthenticated , handler.getAvaliableUserICanChatHandler);
+router.route('/avaliable-chat').get(isauthenticated, handler.getAvaliableUserICanChatHandler);
 
 router.get(
   '/:receiver/chat/:sender',

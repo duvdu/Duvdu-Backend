@@ -9,36 +9,41 @@ export const getAvaliableUserICanChatHandler: RequestHandler<
   unknown
 > = async (req, res) => {
   const loggedUserId = req.loggedUser.id;
-    
+
   const contracts = await Contracts.find({
-    $or: [
-      { sp: loggedUserId },
-      { customer: loggedUserId }
-    ]
+    $or: [{ sp: loggedUserId }, { customer: loggedUserId }],
+  }).populate({
+    path: 'contract',
+    match: {
+      status: { $nin: ['canceled', 'pending', 'rejected', 'reject', 'cancel'] },
+    },
   });
-    
+
   const contractUserIds = contracts
-    .map(contract => contract.sp.toString() === loggedUserId ? contract.customer : contract.sp)
-    .filter(id => id.toString() !== loggedUserId.toString());
-    
+    .map((contract) => (contract.sp.toString() === loggedUserId ? contract.customer : contract.sp))
+    .filter((id) => id.toString() !== loggedUserId.toString());
+
   const projects = await TeamProject.find({
     isDeleted: false,
-    'creatives.users.user': { $all: [loggedUserId] }
+    'creatives.users.user': { $all: [loggedUserId] },
   });
-    
-  const creativeUserIds = projects.flatMap(project => 
-    project.creatives.flatMap(creative => 
+
+  const creativeUserIds = projects.flatMap((project) =>
+    project.creatives.flatMap((creative) =>
       creative.users
-        .filter(user => user.user.toString() !== loggedUserId)
-        .map(user => user.user.toString())
-    )
+        .filter((user) => user.user.toString() !== loggedUserId)
+        .map((user) => user.user.toString()),
+    ),
   );
-    
+
   const potentialChatUserIds = [...new Set([...contractUserIds, ...creativeUserIds])];
-    
-  const potentialChatUsers = await Users.find({
-    _id: { $in: potentialChatUserIds }
-  }, 'name email username isOnline profileImage'); 
-    
-  res.json({ message:'success' , data: potentialChatUsers });
+
+  const potentialChatUsers = await Users.find(
+    {
+      _id: { $in: potentialChatUserIds },
+    },
+    'name email username isOnline profileImage',
+  );
+
+  res.json({ message: 'success', data: potentialChatUsers });
 };

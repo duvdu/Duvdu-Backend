@@ -38,6 +38,13 @@ export const sendMessageHandler: SendMessageHandler = async (req, res, next) => 
       { sp: req.loggedUser.id, customer: req.body.receiver },
       { sp: req.body.receiver, customer: req.loggedUser.id },
     ],
+  }).populate({
+    path: 'contract',
+    match: {
+      status: {
+        $nin: ['canceled', 'pending', 'rejected', 'reject', 'cancel'],
+      },
+    },
   });
 
   const project = await TeamProject.findOne({
@@ -115,7 +122,10 @@ export const sendMessageHandler: SendMessageHandler = async (req, res, next) => 
     io,
     Channels.new_message,
     notification.targetUser.toString(),
-    { title: `${(populatedNotification.sourceUser as Iuser).name}`, message: `${notification.message} from ${(populatedNotification.sourceUser as Iuser).name}` },
+    {
+      title: `${(populatedNotification.sourceUser as Iuser).name}`,
+      message: `${notification.message} from ${(populatedNotification.sourceUser as Iuser).name}`,
+    },
     populatedNotification,
     populatedMessage,
   );

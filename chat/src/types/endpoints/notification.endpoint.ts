@@ -4,7 +4,7 @@ import { RequestHandler } from 'express';
 export interface GetLoggedUserNotificationHandler
   extends RequestHandler<
     unknown,
-    PaginationResponse<{ data: Inotification[] } & { unWatchiedCount: number }>,
+    PaginationResponse<{ data: Inotification[] }>,
     unknown,
     { limit?: number; page?: number }
   > {}

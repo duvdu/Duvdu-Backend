@@ -232,7 +232,13 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
         { sp: req.loggedUser?.id, customer: projects[0].customer },
         { customer: req.loggedUser?.id, sp: projects[0].sp },
       ],
-    }));
+    }).populate({
+      path: 'contract',
+      match: {
+        status: { $nin: ['canceled', 'pending', 'rejected', 'reject', 'cancel'] }
+      }
+    })
+    );
     projects[0].user.canChat = canChat;
     res.status(200).json({ message: 'success', data: projects[0] });
   } catch (error) {

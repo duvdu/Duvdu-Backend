@@ -24,7 +24,13 @@ export class SocketServer {
   constructor(server: HTTPServer) {
     this.io = new Server(server, {
       cors: {
-        origin: ['*', 'http://localhost:3000', 'http://localhost:3001' , 'https://duvdu.com' , 'https://dashboard.duvdu.com'],
+        origin: [
+          '*',
+          'http://localhost:3000',
+          'http://localhost:3001',
+          'https://duvdu.com',
+          'https://dashboard.duvdu.com',
+        ],
       },
     });
 

@@ -185,6 +185,38 @@ export const findUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser
               },
             },
           },
+          {
+            $addFields: {
+              contractCollection: {
+                $switch: {
+                  branches: [
+                    { case: { $eq: ['$ref', 'producer_contract'] }, then: 'producer_contracts' },
+                    { case: { $eq: ['$ref', 'project_contracts'] }, then: 'project_contracts' },
+                    { case: { $eq: ['$ref', 'rental_contract'] }, then: 'rental_contracts' },
+                    { case: { $eq: ['$ref', 'rental_contract'] }, then: 'copyright_contracts' },
+                    { case: { $eq: ['$ref', 'team_contracts'] }, then: 'team_contracts' }
+                  ],
+                  default: 'project_contracts'
+                }
+              }
+            }
+          },
+          {
+            $lookup: {
+              from: '$contractCollection',
+              localField: 'contract',
+              foreignField: '_id',
+              as: 'contractDetails'
+            }
+          },
+          {
+            $match: {
+              $or: [
+                { 'contractDetails.status': { $exists: false } },
+                { 'contractDetails.status': { $nin: ['canceled', 'pending', 'rejected', 'reject', 'cancel'] }}
+              ]
+            }
+          }
         ],
         as: 'canChatDetails',
       },

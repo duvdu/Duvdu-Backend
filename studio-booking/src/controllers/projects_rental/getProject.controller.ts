@@ -169,7 +169,14 @@ export const getProjectHandler: RequestHandler = async (req, res, next) => {
       { sp: req.loggedUser?.id, customer: project.customer },
       { customer: req.loggedUser?.id, sp: project.sp },
     ],
-  }));
+  }).populate({
+    path: 'contract',
+    match: {
+      status: { $nin: ['canceled', 'pending', 'rejected', 'reject', 'cancel'] }
+    }
+  })
+  );
+  
   project.user.canChat = canChat;
   res.status(200).json({
     message: 'success',

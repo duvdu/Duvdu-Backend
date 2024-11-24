@@ -2,6 +2,7 @@ import 'express-async-errors';
 import { Categories, MODELS, ProjectCycle, Rentals, SuccessResponse, Users } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import mongoose from 'mongoose';
+import { PipelineStage } from 'mongoose';
 
 export const globalSearchHandler: RequestHandler<
   unknown,
@@ -230,6 +231,35 @@ export const globalSearchHandler: RequestHandler<
         isFollow: { $cond: { if: { $gt: [{ $size: '$isFollow' }, 0] }, then: true, else: false } },
       },
     },
+    // {
+    //   $lookup: {
+    //     from: MODELS.allContracts,
+    //     let: { userId: '$_id' },
+    //     pipeline: [
+    //       {
+    //         $match: {
+    //           $expr: {
+    //             $or: [
+    //               {
+    //                 $and: [
+    //                   { $eq: ['$sp', new mongoose.Types.ObjectId(req.loggedUser?.id)] },
+    //                   { $eq: ['$customer', '$$userId'] },
+    //                 ],
+    //               },
+    //               {
+    //                 $and: [
+    //                   { $eq: ['$customer', new mongoose.Types.ObjectId(req.loggedUser?.id)] },
+    //                   { $eq: ['$sp', '$$userId'] },
+    //                 ],
+    //               },
+    //             ],
+    //           },
+    //         },
+    //       },
+    //     ],
+    //     as: 'canChatDetails'
+    //   },
+    // },
     {
       $lookup: {
         from: MODELS.allContracts,
@@ -255,6 +285,35 @@ export const globalSearchHandler: RequestHandler<
               },
             },
           },
+          {
+            $lookup: {
+              from: {
+                $switch: {
+                  branches: [
+                    { case: { $eq: ['$ref', 'ProducerContract'] }, then: 'producercontracts' },
+                    { case: { $eq: ['$ref', 'ProjectContract'] }, then: 'projectcontracts' },
+                    { case: { $eq: ['$ref', 'RentalContract'] }, then: 'rentalcontracts' },
+                    { case: { $eq: ['$ref', 'CopyrightContract'] }, then: 'copyrightcontracts' },
+                    { case: { $eq: ['$ref', 'TeamContract'] }, then: 'teamcontracts' }
+                  ],
+                  default: 'projectcontracts'
+                }
+              },
+              localField: 'contract',
+              foreignField: '_id',
+              as: 'contractDetails'
+            }
+          },
+          {
+            $match: {
+              $or: [
+                { 'contractDetails.status': { $exists: false } },
+                { 'contractDetails.status': { 
+                  $nin: ['canceled', 'pending', 'rejected', 'reject', 'cancel'] 
+                }}
+              ]
+            }
+          }
         ],
         as: 'canChatDetails',
       },
@@ -271,7 +330,7 @@ export const globalSearchHandler: RequestHandler<
         canChatDetails: 0, // Exclude the canChatDetails field
       },
     }
-  ];
+  ] as PipelineStage[];
   const users = await Users.aggregate(aggregationPipeline);
 
 

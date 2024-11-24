@@ -33,3 +33,4 @@ router.patch(
   val.updateOneNotificationVal,
   handler.updateOneWatchNotificationHandler,
 );
+router.get('/unread-count', handler.getUnReadNotificationAndMessagesCountController);
