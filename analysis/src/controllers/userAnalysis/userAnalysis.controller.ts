@@ -352,7 +352,7 @@ export const userAnalysisHandler: RequestHandler<
     },
     {
       $lookup: {
-        from: MODELS.teamContrac,
+        from: MODELS.teamContract,
         localField: 'contract',
         foreignField: '_id',
         as: 'team_contracts',
