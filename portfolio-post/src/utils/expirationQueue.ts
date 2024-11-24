@@ -1,9 +1,8 @@
-import { Channels } from '@duvdu-v1/duvdu';
+import { Channels , ProjectContract , ProjectContractStatus } from '@duvdu-v1/duvdu';
 import Queue from 'bull';
 
 import { env } from '../config/env';
 import { sendSystemNotification } from '../controllers/book/sendNotification';
-import { ContractStatus, ProjectContract } from '../models/projectContract.model';
 
 interface IcontarctQueue {
   contractId: string;
@@ -29,8 +28,8 @@ export const updateAfterFirstPaymentQueeu = new Queue<IcontarctQueue>(
 pendingQueue.process(async (job) => {
   try {
     const contract = await ProjectContract.findOneAndUpdate(
-      { _id: job.data.contractId, status: ContractStatus.pending },
-      { status: ContractStatus.canceled, actionAt: new Date() },
+      { _id: job.data.contractId, status: ProjectContractStatus.pending },
+      { status: ProjectContractStatus.canceled, actionAt: new Date() },
       { new: true },
     );
 
@@ -52,8 +51,8 @@ pendingQueue.process(async (job) => {
 firstPayMentQueue.process(async (job) => {
   try {
     const contract = await ProjectContract.findOneAndUpdate(
-      { _id: job.data.contractId, status: ContractStatus.waitingForFirstPayment },
-      { status: ContractStatus.canceled, actionAt: new Date() },
+      { _id: job.data.contractId, status: ProjectContractStatus.waitingForFirstPayment },
+      { status: ProjectContractStatus.canceled, actionAt: new Date() },
       { new: true },
     );
 
@@ -75,8 +74,8 @@ firstPayMentQueue.process(async (job) => {
 secondPayMentQueue.process(async (job) => {
   try {
     const contract = await ProjectContract.findOneAndUpdate(
-      { _id: job.data.contractId, status: ContractStatus.waitingForTotalPayment },
-      { status: ContractStatus.canceled, actionAt: new Date() },
+      { _id: job.data.contractId, status: ProjectContractStatus.waitingForTotalPayment },
+      { status: ProjectContractStatus.canceled, actionAt: new Date() },
     );
 
     if (contract) 
@@ -97,8 +96,8 @@ secondPayMentQueue.process(async (job) => {
 updateAfterFirstPaymentQueeu.process(async (job) => {
   try {
     const contract = await ProjectContract.findOneAndUpdate(
-      { _id: job.data.contractId, status: ContractStatus.updateAfterFirstPayment },
-      { status: ContractStatus.canceled, actionAt: new Date() },
+      { _id: job.data.contractId, status: ProjectContractStatus.updateAfterFirstPayment },
+      { status: ProjectContractStatus.canceled, actionAt: new Date() },
     );
 
     if (contract) 

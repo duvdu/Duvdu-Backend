@@ -1,9 +1,8 @@
-import { Channels, ContractReports } from '@duvdu-v1/duvdu';
+import { Channels, ContractReports, CopyrightContracts  , CopyrightContractStatus} from '@duvdu-v1/duvdu';
 import Queue from 'bull';
 
 import { env } from './env';
 import { sendSystemNotification } from '../controllers/booking/contract-notification.controller';
-import { ContractStatus, CopyrightContracts } from '../../../common/src/models/copyright-contract.model';
 
 export const pendingExpiration = new Queue<{ contractId: string }>(
   'copyright_pending_expiration',
@@ -32,8 +31,8 @@ export const onGoingExpiration = new Queue<{ contractId: string }>(
 
 pendingExpiration.process(async (job) => {
   const contract = await CopyrightContracts.findOneAndUpdate(
-    { _id: job.data.contractId, status: ContractStatus.pending },
-    { status: ContractStatus.canceled, actionAt: new Date() },
+    { _id: job.data.contractId, status: CopyrightContractStatus.pending },
+    { status: CopyrightContractStatus.canceled, actionAt: new Date() },
   );
 
   if (contract)
@@ -49,8 +48,8 @@ pendingExpiration.process(async (job) => {
 
 firstPaymentExpiration.process(async (job) => {
   const contract = await CopyrightContracts.findOneAndUpdate(
-    { _id: job.data.contractId, status: ContractStatus.waitingForFirstPayment },
-    { status: ContractStatus.canceled, actionAt: new Date() },
+    { _id: job.data.contractId, status: CopyrightContractStatus.waitingForFirstPayment },
+    { status: CopyrightContractStatus.canceled, actionAt: new Date() },
   );
 
   if (contract)
@@ -68,8 +67,8 @@ firstPaymentExpiration.process(async (job) => {
 updateAfterFirstPaymentExpiration.process(async (job) => {
   // if there are no update status will be wait for the total payment (act as sp reject)
   const contract = await CopyrightContracts.findOneAndUpdate(
-    { _id: job.data.contractId, status: ContractStatus.updateAfterFirstPayment },
-    { status: ContractStatus.canceled, actionAt: new Date() },
+    { _id: job.data.contractId, status: CopyrightContractStatus.updateAfterFirstPayment },
+    { status: CopyrightContractStatus.canceled, actionAt: new Date() },
   );
 
   if (contract)
@@ -87,8 +86,8 @@ updateAfterFirstPaymentExpiration.process(async (job) => {
 totalPaymentExpiration.process(async (job) => {
   // if there are no update status will be wait for the total payment (act as sp accept)
   const contract = await CopyrightContracts.findOneAndUpdate(
-    { _id: job.data.contractId, status: ContractStatus.waitingForTotalPayment },
-    { status: ContractStatus.canceled, actionAt: new Date() },
+    { _id: job.data.contractId, status: CopyrightContractStatus.waitingForTotalPayment },
+    { status: CopyrightContractStatus.canceled, actionAt: new Date() },
   );
 
   if (contract)
@@ -107,9 +106,9 @@ onGoingExpiration.process(async (job) => {
   const contractComplain = await ContractReports.findOne({ contract: job.data.contractId });
 
   await CopyrightContracts.findOneAndUpdate(
-    { _id: job.data.contractId, status: ContractStatus.ongoing },
+    { _id: job.data.contractId, status: CopyrightContractStatus.ongoing },
     {
-      status: contractComplain ? ContractStatus.complaint : ContractStatus.completed,
+      status: contractComplain ? CopyrightContractStatus.complaint : CopyrightContractStatus.completed,
       actionAt: new Date(),
     },
   );

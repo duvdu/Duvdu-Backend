@@ -1,9 +1,8 @@
-import { Channels, ContractReports } from '@duvdu-v1/duvdu';
+import { Channels, ContractReports , RentalContracts , RentalContractStatus} from '@duvdu-v1/duvdu';
 import Queue from 'bull';
 
 import { env } from './env';
 import { sendSystemNotification } from '../controllers/booking/contract-notification.controller';
-import { ContractStatus, RentalContracts } from '../models/rental-contracts.model';
 
 export const pendingExpiration = new Queue<{ contractId: string }>(
   'rental_pending_expiration',
@@ -22,8 +21,8 @@ export const onGoingExpiration = new Queue<{ contractId: string }>(
 
 pendingExpiration.process(async (job) => {
   const contract =await RentalContracts.findOneAndUpdate(
-    { _id: job.data.contractId, status: ContractStatus.pending },
-    { status: ContractStatus.canceled, actionAt: new Date() },
+    { _id: job.data.contractId, status: RentalContractStatus.pending },
+    { status: RentalContractStatus.canceled, actionAt: new Date() },
   );
 
   if (contract)
@@ -40,8 +39,8 @@ pendingExpiration.process(async (job) => {
 
 paymentExpiration.process(async (job) => {
   const contract = await RentalContracts.findOneAndUpdate(
-    { _id: job.data.contractId, status: ContractStatus.waitingForPayment },
-    { status: ContractStatus.canceled, actionAt: new Date() },
+    { _id: job.data.contractId, status: RentalContractStatus.waitingForPayment },
+    { status: RentalContractStatus.canceled, actionAt: new Date() },
   );
 
   if (contract)
@@ -60,9 +59,9 @@ onGoingExpiration.process(async (job) => {
   const contractComplain = await ContractReports.findOne({ contract: job.data.contractId });
 
   await RentalContracts.findOneAndUpdate(
-    { _id: job.data.contractId, status: ContractStatus.ongoing },
+    { _id: job.data.contractId, status: RentalContractStatus.ongoing },
     {
-      status: contractComplain ? ContractStatus.complaint : ContractStatus.completed,
+      status: contractComplain ? RentalContractStatus.complaint : RentalContractStatus.completed,
       actionAt: new Date(),
     },
   );
