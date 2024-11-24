@@ -42,7 +42,7 @@ export const createProjectHandler: RequestHandler = async (req, res) => {
     _id: project._id,
     project: { type: project.id, ref: 'rentals' },
     user: req.loggedUser.id,
-    ref: 'rentals',
+    ref: 'rentals'
   });
 
   res.status(201).json({ message: 'success', data: project });

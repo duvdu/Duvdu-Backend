@@ -13,6 +13,7 @@ import {
   TeamProject,
   Users,
   UserStatus,
+  MODELS,
 } from '@duvdu-v1/duvdu';
 import mongoose from 'mongoose';
 
@@ -115,7 +116,7 @@ export const addCreativeHandler: AddCreativeHandler = async (req, res, next) => 
     customer: contract.customer,
     sp: contract.sp,
     cycle: CYCLES.teamProject,
-    ref: 'team_contracts',
+    ref: MODELS.teamContract,
   });
 
   const customer = await Users.findById(req.loggedUser.id);

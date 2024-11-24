@@ -1,6 +1,14 @@
-import { Iuser, MODELS, PaginationResponse, Roles, SystemRoles, Users } from '@duvdu-v1/duvdu';
+import {
+  Contracts,
+  Iuser,
+  MODELS,
+  PaginationResponse,
+  Roles,
+  SystemRoles,
+  Users,
+} from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
-import mongoose, { PipelineStage } from 'mongoose';
+import mongoose, { PipelineStage, Document } from 'mongoose';
 
 export const filterUsers: RequestHandler<
   unknown,
@@ -161,72 +169,6 @@ export const findUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser
       },
     },
     {
-      $lookup: {
-        from: MODELS.allContracts,
-        let: { userId: '$_id' },
-        pipeline: [
-          {
-            $match: {
-              $expr: {
-                $or: [
-                  {
-                    $and: [
-                      { $eq: ['$sp', new mongoose.Types.ObjectId(req.loggedUser?.id)] },
-                      { $eq: ['$customer', '$$userId'] },
-                    ],
-                  },
-                  {
-                    $and: [
-                      { $eq: ['$customer', new mongoose.Types.ObjectId(req.loggedUser?.id)] },
-                      { $eq: ['$sp', '$$userId'] },
-                    ],
-                  },
-                ],
-              },
-            },
-          },
-          {
-            $addFields: {
-              contractCollection: {
-                $switch: {
-                  branches: [
-                    { case: { $eq: ['$ref', 'producer_contract'] }, then: 'producer_contracts' },
-                    { case: { $eq: ['$ref', 'project_contracts'] }, then: 'project_contracts' },
-                    { case: { $eq: ['$ref', 'rental_contract'] }, then: 'rental_contracts' },
-                    { case: { $eq: ['$ref', 'rental_contract'] }, then: 'copyright_contracts' },
-                    { case: { $eq: ['$ref', 'team_contracts'] }, then: 'team_contracts' }
-                  ],
-                  default: 'project_contracts'
-                }
-              }
-            }
-          },
-          {
-            $lookup: {
-              from: '$contractCollection',
-              localField: 'contract',
-              foreignField: '_id',
-              as: 'contractDetails'
-            }
-          },
-          {
-            $match: {
-              $or: [
-                { 'contractDetails.status': { $exists: false } },
-                { 'contractDetails.status': { $nin: ['canceled', 'pending', 'rejected', 'reject', 'cancel'] }}
-              ]
-            }
-          }
-        ],
-        as: 'canChatDetails',
-      },
-    },
-    {
-      $addFields: {
-        canChat: { $gt: [{ $size: '$canChatDetails' }, 0] },
-      },
-    },
-    {
       $project: {
         canChatDetails: 0,
         categoryDetails: 0,
@@ -244,6 +186,29 @@ export const findUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser
   const users = await Users.aggregate(aggregationPipeline);
   const resultCount = users[0]?.totalCount[0]?.totalCount || 0;
 
+  const processedUsers = await Promise.all(
+    users[0].users.map(async (user: Iuser & Document) => {
+      // Check contract status using simple query
+      const contract = await Contracts.findOne({
+        $or: [
+          { sp: req.loggedUser?.id, customer: user._id },
+          { sp: user._id, customer: req.loggedUser?.id },
+        ],
+      }).populate({
+        path: 'contract',
+        match: {
+          status: {
+            $nin: ['canceled', 'pending', 'rejected', 'reject', 'cancel'],
+          },
+        },
+      });
+      return {
+        ...user,
+        canChat: !!contract?.contract, // Will be true if valid contract exists
+      };
+    }),
+  );
+
   res.status(200).json({
     message: 'success',
     pagination: {
@@ -251,6 +216,6 @@ export const findUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser
       resultCount,
       totalPages: Math.ceil(resultCount / req.pagination.limit),
     },
-    data: users[0].users,
+    data: processedUsers,
   });
 };

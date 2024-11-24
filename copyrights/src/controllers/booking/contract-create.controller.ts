@@ -15,12 +15,14 @@ import {
   BadRequestError,
   Users,
   Channels,
+  CopyrightContractStatus,
+  CopyrightContracts,
+  MODELS
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 // import { pendingExpiration } from '../../config/expiration-queue';
 import { sendNotification } from './contract-notification.controller';
-import { ContractStatus, CopyrightContracts } from '../../models/copyright-contract.model';
 
 export const createContractHandler: RequestHandler<
   { projectId: string },
@@ -70,7 +72,7 @@ export const createContractHandler: RequestHandler<
     project: project._id,
     totalPrice: project.price,
     stageExpiration,
-    status: ContractStatus.pending,
+    status: CopyrightContractStatus.pending,
   });
 
   await Contracts.create({
@@ -78,7 +80,7 @@ export const createContractHandler: RequestHandler<
     customer: contract.customer,
     sp: contract.sp,
     contract: contract.id,
-    ref: 'copyright_contracts',
+    ref: MODELS.copyrightContract,
     cycle: CYCLES.copyRights,
   });
 

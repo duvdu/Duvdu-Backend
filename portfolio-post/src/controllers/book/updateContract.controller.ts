@@ -1,8 +1,7 @@
 import 'express-async-errors';
 
-import { BadRequestError, NotAllowedError, NotFound } from '@duvdu-v1/duvdu';
+import { BadRequestError, NotAllowedError, NotFound, ProjectContract, ProjectContractStatus } from '@duvdu-v1/duvdu';
 
-import { ContractStatus, ProjectContract } from '../../models/projectContract.model';
 import { calculateTotalPrice } from '../../services/checkToolsAndFunctions.service';
 import { UpdateContractHandler } from '../../types/contract.endpoint';
 
@@ -14,7 +13,7 @@ export const updateContractHandler: UpdateContractHandler = async (req, res, nex
   if (contract.sp.toString() != req.loggedUser.id)
     return next(new NotAllowedError(undefined, req.lang));
 
-  if (contract.status != ContractStatus.updateAfterFirstPayment)
+  if (contract.status != ProjectContractStatus.updateAfterFirstPayment)
     return next(
       new BadRequestError({ en: 'invalid contract status', ar: 'حالة العقد غير صالحة' }, req.lang),
     );

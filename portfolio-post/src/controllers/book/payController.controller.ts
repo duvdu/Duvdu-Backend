@@ -1,8 +1,7 @@
-import { BadRequestError, Channels, NotAllowedError, NotFound, SuccessResponse, Users } from '@duvdu-v1/duvdu';
+import { BadRequestError, Channels, NotAllowedError, NotFound, SuccessResponse, Users, ProjectContract, ProjectContractStatus } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 import { sendNotification } from './sendNotification';
-import { ContractStatus, ProjectContract } from '../../models/projectContract.model';
 
 export const payContract: RequestHandler<{ paymentSession: string }, SuccessResponse> = async (
   req,
@@ -28,11 +27,11 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
   
   // TODO: record the transaction from payment gateway webhook
 
-  if (contract.status === ContractStatus.waitingForFirstPayment){
+  if (contract.status === ProjectContractStatus.waitingForFirstPayment){
     await ProjectContract.updateOne(
       { paymentLink: req.params.paymentSession },
       {
-        status: ContractStatus.updateAfterFirstPayment,
+        status: ProjectContractStatus.updateAfterFirstPayment,
         firstCheckoutAt: new Date(),
         firstPaymentAmount: ((10 * contract.totalPrice) / 100).toFixed(2),
       },
@@ -49,11 +48,11 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
     );
 
   }
-  else if (contract.status === ContractStatus.waitingForTotalPayment){
+  else if (contract.status === ProjectContractStatus.waitingForTotalPayment){
     await ProjectContract.updateOne(
       { paymentLink: req.params.paymentSession },
       {
-        status: ContractStatus.ongoing,
+        status: ProjectContractStatus.ongoing,
         totalCheckoutAt: new Date(),
         secondPaymentAmount: contract.totalPrice - contract.firstPaymentAmount,
       },

@@ -14,10 +14,12 @@ import {
   FOLDERS,
   Files,
   CYCLES,
+  CopyrightContractStatus,
+  CopyrightContracts,
+  MODELS,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-import { ContractStatus, CopyrightContracts } from '../../models/copyright-contract.model';
 
 export const createContractHandler: RequestHandler<
   { projectId: string },
@@ -58,14 +60,14 @@ export const createContractHandler: RequestHandler<
     project: project._id,
     totalPrice: project.price,
     stageExpiration,
-    status: ContractStatus.pending,
+    status: CopyrightContractStatus.pending,
   });
 
   await Contracts.create({
     customer: contract.customer,
     sp: contract.sp,
     contract: contract.id,
-    ref: 'copyright_contracts',
+    ref: MODELS.copyrightContract,
     cycle: CYCLES.copyRights,
   });
 
@@ -117,20 +119,20 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
     );
 
   // TODO: record the transaction from payment gateway webhook
-  if (contract.status === ContractStatus.waitingForFirstPayment)
+  if (contract.status === CopyrightContractStatus.waitingForFirstPayment)
     await CopyrightContracts.updateOne(
       { paymentLink: req.params.paymentSession },
       {
-        status: ContractStatus.updateAfterFirstPayment,
+        status: CopyrightContractStatus.updateAfterFirstPayment,
         firstCheckoutAt: new Date(),
         firstPaymentAmount: ((10 * contract.totalPrice) / 100).toFixed(2),
       },
     );
-  else if (contract.status === ContractStatus.waitingForTotalPayment)
+  else if (contract.status === CopyrightContractStatus.waitingForTotalPayment)
     await CopyrightContracts.updateOne(
       { paymentLink: req.params.paymentSession },
       {
-        status: ContractStatus.ongoing,
+        status: CopyrightContractStatus.ongoing,
         totalCheckoutAt: new Date(),
         secondPaymentAmount: contract.totalPrice - contract.firstPaymentAmount,
       },
@@ -183,12 +185,12 @@ export const contractAction: RequestHandler<
       if action = accept && contract.status = update after first pay
         - project status = waiting for totol payment
     */
-    if (req.body.action === 'reject' && contract.status === ContractStatus.pending)
+    if (req.body.action === 'reject' && contract.status === CopyrightContractStatus.pending)
       await CopyrightContracts.updateOne(
         { _id: req.params.contractId },
-        { status: ContractStatus.rejected, rejectedBy: 'sp', actionAt: new Date() },
+        { status: CopyrightContractStatus.rejected, rejectedBy: 'sp', actionAt: new Date() },
       );
-    else if (req.body.action === 'accept' && contract.status === ContractStatus.pending) {
+    else if (req.body.action === 'accept' && contract.status === CopyrightContractStatus.pending) {
       const spUser = await Users.findOne({ _id: req.loggedUser.id }, { avaliableContracts: 1 });
 
       if ((spUser?.avaliableContracts || 0) < 1)
@@ -204,28 +206,28 @@ export const contractAction: RequestHandler<
       await CopyrightContracts.updateOne(
         { _id: req.params.contractId },
         {
-          status: ContractStatus.waitingForFirstPayment,
+          status: CopyrightContractStatus.waitingForFirstPayment,
           actionAt: new Date(),
           paymentLink: paymentSession,
         },
       );
     } else if (
       req.body.action === 'reject' &&
-      contract.status === ContractStatus.updateAfterFirstPayment
+      contract.status === CopyrightContractStatus.updateAfterFirstPayment
     )
       await CopyrightContracts.updateOne(
         { _id: req.params.contractId },
-        { status: ContractStatus.rejected, rejectedBy: 'sp', actionAt: new Date() },
+        { status: CopyrightContractStatus.rejected, rejectedBy: 'sp', actionAt: new Date() },
       );
     else if (
       req.body.action === 'accept' &&
-      contract.status === ContractStatus.updateAfterFirstPayment
+      contract.status === CopyrightContractStatus.updateAfterFirstPayment
     ) {
       const paymentSession = crypto.randomBytes(16).toString('hex');
       await CopyrightContracts.updateOne(
         { _id: req.params.contractId },
         {
-          status: ContractStatus.waitingForTotalPayment,
+          status: CopyrightContractStatus.waitingForTotalPayment,
           actionAt: new Date(),
           paymentLink: paymentSession,
         },
@@ -249,26 +251,26 @@ export const contractAction: RequestHandler<
       if action = reject && contract.status = waiting for total payment
         - project rejected & done
     */
-    if (req.body.action === 'reject' && contract.status === ContractStatus.waitingForFirstPayment)
+    if (req.body.action === 'reject' && contract.status === CopyrightContractStatus.waitingForFirstPayment)
       await CopyrightContracts.updateOne(
         { _id: req.params.contractId },
-        { status: ContractStatus.rejected, rejectedBy: 'customer', actionAt: new Date() },
+        { status: CopyrightContractStatus.rejected, rejectedBy: 'customer', actionAt: new Date() },
       );
     else if (
       req.body.action === 'accept' &&
-      contract.status === ContractStatus.waitingForFirstPayment
+      contract.status === CopyrightContractStatus.waitingForFirstPayment
     )
       await CopyrightContracts.updateOne(
         { _id: req.params.contractId },
-        { status: ContractStatus.updateAfterFirstPayment, actionAt: new Date() },
+        { status: CopyrightContractStatus.updateAfterFirstPayment, actionAt: new Date() },
       );
     else if (
       req.body.action === 'reject' &&
-      contract.status === ContractStatus.waitingForTotalPayment
+      contract.status === CopyrightContractStatus.waitingForTotalPayment
     )
       await CopyrightContracts.updateOne(
         { _id: req.params.contractId },
-        { status: ContractStatus.rejected, rejectedBy: 'customer', actionAt: new Date() },
+        { status: CopyrightContractStatus.rejected, rejectedBy: 'customer', actionAt: new Date() },
       );
     else
       return next(

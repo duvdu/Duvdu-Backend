@@ -8,10 +8,11 @@ import {
   NotAllowedError,
   NotFound,
   Users,
+  ProjectContract,
+  ProjectContractStatus,
 } from '@duvdu-v1/duvdu';
 
 import { sendNotification } from './sendNotification';
-import { ContractStatus, ProjectContract } from '../../models/projectContract.model';
 import { ContractActionHandler } from '../../types/contract.endpoint';
 
 export const contractActionHandler: ContractActionHandler = async (req, res, next) => {
@@ -36,10 +37,10 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
   const customer = await Users.findById(contract.customer);
 
   if (isSp) {
-    if (req.body.action === 'reject' && contract.status === ContractStatus.pending) {
+    if (req.body.action === 'reject' && contract.status === ProjectContractStatus.pending) {
       await ProjectContract.updateOne(
         { _id: req.params.contractId },
-        { status: ContractStatus.rejected, rejectedBy: 'sp', actionAt: new Date() },
+        { status: ProjectContractStatus.rejected, rejectedBy: 'sp', actionAt: new Date() },
       );
 
       // send notification from sp
@@ -52,7 +53,7 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
         `${sp?.name} reject this contract`,
         Channels.update_contract,
       );
-    } else if (req.body.action === 'accept' && contract.status === ContractStatus.pending) {
+    } else if (req.body.action === 'accept' && contract.status === ProjectContractStatus.pending) {
       const spUser = await Users.findOne({ _id: req.loggedUser.id }, { avaliableContracts: 1 });
 
       if ((spUser?.avaliableContracts || 0) < 1)
@@ -68,7 +69,7 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
       await ProjectContract.updateOne(
         { _id: req.params.contractId },
         {
-          status: ContractStatus.waitingForFirstPayment,
+          status: ProjectContractStatus.waitingForFirstPayment,
           actionAt: new Date(),
           paymentLink: paymentSession,
         },
@@ -91,11 +92,11 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
       // await firstPayMentQueue.add({contractId:contract._id.toString()} , {delay});
     } else if (
       req.body.action === 'reject' &&
-      contract.status === ContractStatus.updateAfterFirstPayment
+      contract.status === ProjectContractStatus.updateAfterFirstPayment
     ) {
       await ProjectContract.updateOne(
         { _id: req.params.contractId },
-        { status: ContractStatus.rejected, rejectedBy: 'sp', actionAt: new Date() },
+        { status: ProjectContractStatus.rejected, rejectedBy: 'sp', actionAt: new Date() },
       );
 
       // send notification from sp
@@ -110,13 +111,13 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
       );
     } else if (
       req.body.action === 'accept' &&
-      contract.status === ContractStatus.updateAfterFirstPayment
+      contract.status === ProjectContractStatus.updateAfterFirstPayment
     ) {
       const paymentSession = crypto.randomBytes(16).toString('hex');
       await ProjectContract.updateOne(
         { _id: req.params.contractId },
         {
-          status: ContractStatus.waitingForTotalPayment,
+          status: ProjectContractStatus.waitingForTotalPayment,
           actionAt: new Date(),
           paymentLink: paymentSession,
         },
@@ -148,10 +149,10 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
       );
   } else {
 
-    if (req.body.action === 'cancel' && contract.status === ContractStatus.pending) {
+    if (req.body.action === 'cancel' && contract.status === ProjectContractStatus.pending) {
       await ProjectContract.updateOne(
-        { _id: req.params.contractId , status:ContractStatus.pending },
-        { status: ContractStatus.canceled, rejectedBy: 'customer', actionAt: new Date() },
+        { _id: req.params.contractId , status:ProjectContractStatus.pending },
+        { status: ProjectContractStatus.canceled, rejectedBy: 'customer', actionAt: new Date() },
       );
 
       await sendNotification(
@@ -164,10 +165,10 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
         Channels.update_contract,
       );
     }
-    else if (req.body.action === 'reject' && contract.status === ContractStatus.waitingForFirstPayment){
+    else if (req.body.action === 'reject' && contract.status === ProjectContractStatus.waitingForFirstPayment){
       await ProjectContract.updateOne(
         { _id: req.params.contractId },
-        { status: ContractStatus.rejected, rejectedBy: 'customer', actionAt: new Date() },
+        { status: ProjectContractStatus.rejected, rejectedBy: 'customer', actionAt: new Date() },
       );
 
       await sendNotification(
@@ -182,11 +183,11 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
     }
     else if (
       req.body.action === 'reject' &&
-      contract.status === ContractStatus.waitingForTotalPayment
+      contract.status === ProjectContractStatus.waitingForTotalPayment
     ) {
       await ProjectContract.updateOne(
         { _id: req.params.contractId },
-        { status: ContractStatus.rejected, rejectedBy: 'customer', actionAt: new Date() },
+        { status: ProjectContractStatus.rejected, rejectedBy: 'customer', actionAt: new Date() },
       );
       // send notification to sp
       

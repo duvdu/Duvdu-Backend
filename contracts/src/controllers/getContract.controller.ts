@@ -1,4 +1,4 @@
-import { Contracts, NotFound, SuccessResponse } from '@duvdu-v1/duvdu';
+import { Contracts, NotFound, SuccessResponse, MODELS } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import mongoose from 'mongoose';
 
@@ -20,7 +20,7 @@ export const getContract: RequestHandler<
     },
     {
       $lookup: {
-        from: 'copyright_contracts',
+        from: MODELS.copyrightContract,
         localField: 'contract',
         foreignField: '_id',
         as: 'copyright_contract',
@@ -28,7 +28,7 @@ export const getContract: RequestHandler<
     },
     {
       $lookup: {
-        from: 'rental_contracts',
+        from: MODELS.rentalContract,
         localField: 'contract',
         foreignField: '_id',
         as: 'rental_contract',
@@ -36,7 +36,7 @@ export const getContract: RequestHandler<
     },
     {
       $lookup: {
-        from: 'producer-contracts',
+        from: MODELS.producerContract,
         localField: 'contract',
         foreignField: '_id',
         as: 'producer_contract',
@@ -44,7 +44,7 @@ export const getContract: RequestHandler<
     },
     {
       $lookup: {
-        from: 'project_contracts',
+        from: MODELS.projectContract,
         localField: 'contract',
         foreignField: '_id',
         as: 'project_contracts',
@@ -52,7 +52,7 @@ export const getContract: RequestHandler<
     },
     {
       $lookup: {
-        from: 'team_contracts',
+        from: MODELS.teamContract,
         localField: 'contract',
         foreignField: '_id',
         as: 'team_contracts',
@@ -112,7 +112,7 @@ export const getContract: RequestHandler<
     },
     {
       $lookup: {
-        from: 'users',
+        from: MODELS.user,
         localField: 'customer',
         foreignField: '_id',
         as: 'customer',
@@ -121,7 +121,7 @@ export const getContract: RequestHandler<
     { $unwind: '$customer' },
     {
       $lookup: {
-        from: 'users',
+        from: MODELS.user,
         localField: 'sp',
         foreignField: '_id',
         as: 'sp',

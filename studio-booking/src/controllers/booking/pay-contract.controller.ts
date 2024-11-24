@@ -1,8 +1,7 @@
-import { SuccessResponse, NotFound, BadRequestError, Users, Channels } from '@duvdu-v1/duvdu';
+import { SuccessResponse, NotFound, BadRequestError, Users, Channels, RentalContracts, RentalContractStatus } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 import { sendNotification } from './contract-notification.controller';
-import { RentalContracts, ContractStatus } from '../../models/rental-contracts.model';
 
 export const payContract: RequestHandler<{ paymentSession: string }, SuccessResponse> = async (
   req,
@@ -29,7 +28,7 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
 
   await RentalContracts.updateOne(
     { paymentLink: req.params.paymentSession },
-    { status: ContractStatus.ongoing, checkoutAt: new Date() },
+    { status: RentalContractStatus.ongoing, checkoutAt: new Date() },
   );
   
   await sendNotification(

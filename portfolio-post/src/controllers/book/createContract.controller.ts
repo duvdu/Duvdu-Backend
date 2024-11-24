@@ -12,10 +12,13 @@ import {
   NotFound,
   ProjectCycle,
   Users,
+  ProjectContract,
+  ProjectContractStatus,
+  MODELS,
 } from '@duvdu-v1/duvdu';
 
+
 import { sendNotification } from './sendNotification';
-import { ContractStatus, ProjectContract } from '../../models/projectContract.model';
 import { calculateTotalPrice } from '../../services/checkToolsAndFunctions.service';
 import { getBestExpirationTime } from '../../services/getBestExpirationTime.service';
 import { CreateContractHandler } from '../../types/contract.endpoint';
@@ -97,7 +100,7 @@ export const createContractHandler: CreateContractHandler = async (req, res, nex
       tools,
       deadline,
       stageExpiration,
-      status: ContractStatus.pending,
+      status: ProjectContractStatus.pending,
       duration: project.duration,
       equipmentPrice: totalPrice,
     });
@@ -107,7 +110,7 @@ export const createContractHandler: CreateContractHandler = async (req, res, nex
       customer: contract.customer,
       sp: contract.sp,
       contract: contract._id,
-      ref: 'project_contracts',
+      ref: MODELS.projectContract,
       cycle: CYCLES.portfolioPost,
     });
 

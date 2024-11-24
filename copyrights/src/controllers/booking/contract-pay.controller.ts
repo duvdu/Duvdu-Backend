@@ -5,6 +5,8 @@ import {
   NotAllowedError,
   Users,
   Channels,
+  CopyrightContracts,
+  CopyrightContractStatus,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
@@ -14,7 +16,6 @@ import { RequestHandler } from 'express';
 //   updateAfterFirstPaymentExpiration,
 // } from '../../config/expiration-queue';
 import { sendNotification } from './contract-notification.controller';
-import { CopyrightContracts, ContractStatus } from '../../models/copyright-contract.model';
 
 export const payContract: RequestHandler<{ paymentSession: string }, SuccessResponse> = async (
   req,
@@ -40,11 +41,11 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
   
 
   // TODO: record the transaction from payment gateway webhook
-  if (contract.status === ContractStatus.waitingForFirstPayment) {
+  if (contract.status === CopyrightContractStatus.waitingForFirstPayment) {
     await CopyrightContracts.updateOne(
       { paymentLink: req.params.paymentSession },
       {
-        status: ContractStatus.updateAfterFirstPayment,
+        status: CopyrightContractStatus.updateAfterFirstPayment,
         firstCheckoutAt: new Date(),
         firstPaymentAmount: ((10 * contract.totalPrice) / 100).toFixed(2),
       },
@@ -69,11 +70,11 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
       `${user?.name} paid 10% of the amount`,
       Channels.update_contract,
     );
-  } else if (contract.status === ContractStatus.waitingForTotalPayment) {
+  } else if (contract.status === CopyrightContractStatus.waitingForTotalPayment) {
     await CopyrightContracts.updateOne(
       { paymentLink: req.params.paymentSession },
       {
-        status: ContractStatus.ongoing,
+        status: CopyrightContractStatus.ongoing,
         totalCheckoutAt: new Date(),
         secondPaymentAmount: contract.totalPrice - contract.firstPaymentAmount,
       },

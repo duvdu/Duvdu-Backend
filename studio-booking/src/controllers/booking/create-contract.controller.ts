@@ -13,11 +13,12 @@ import {
   FOLDERS,
   Users,
   Channels,
+  RentalContracts,
+  MODELS,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 import { sendNotification } from './contract-notification.controller';
-import { RentalContracts } from '../../models/rental-contracts.model';
 
 export const createContractHandler: RequestHandler<
   { projectId: string },
@@ -96,7 +97,7 @@ export const createContractHandler: RequestHandler<
     customer: contract.customer,
     sp: contract.sp,
     contract: contract.id,
-    ref: 'rental_contracts',
+    ref: MODELS.rentalContract,
     cycle: CYCLES.studioBooking,
   });
 

@@ -7,11 +7,12 @@ import {
   Users,
   NotAllowedError,
   Channels,
+  RentalContractStatus,
+  RentalContracts,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 import { sendNotification } from './contract-notification.controller';
-import { ContractStatus, RentalContracts } from '../../models/rental-contracts.model';
 
 export const contractAction: RequestHandler<
   { contractId: string },
@@ -31,7 +32,7 @@ export const contractAction: RequestHandler<
 
   if (isSp) {
     // throw if actionAt not undefiend or current state not pending
-    if (contract.actionAt || contract.status !== ContractStatus.pending)
+    if (contract.actionAt || contract.status !== RentalContractStatus.pending)
       return next(
         new BadRequestError(
           { en: 'action is already taken', ar: 'action is already taken' },
@@ -51,7 +52,7 @@ export const contractAction: RequestHandler<
       {
         await RentalContracts.updateOne(
           { _id: req.params.contractId },
-          { status: ContractStatus.rejected, rejectedBy: 'sp', actionAt: new Date() },
+          { status: RentalContractStatus.rejected, rejectedBy: 'sp', actionAt: new Date() },
         );
 
         await sendNotification(
@@ -85,7 +86,7 @@ export const contractAction: RequestHandler<
           _id: req.params.contractId,
         },
         {
-          status: ContractStatus.waitingForPayment,
+          status: RentalContractStatus.waitingForPayment,
           actionAt: new Date(),
           paymentLink: paymentSession,
         },
@@ -108,10 +109,10 @@ export const contractAction: RequestHandler<
     }
   } else {
 
-    if (req.body.action === 'cancel' && contract.status === ContractStatus.pending) {
+    if (req.body.action === 'cancel' && contract.status === RentalContractStatus.pending) {
       await RentalContracts.updateOne(
         { _id: req.params.contractId },
-        { status: ContractStatus.canceled, rejectedBy: 'customer', actionAt: new Date() },
+        { status: RentalContractStatus.canceled, rejectedBy: 'customer', actionAt: new Date() },
       );
   
       await sendNotification(
@@ -127,7 +128,7 @@ export const contractAction: RequestHandler<
     else if (
       req.body.action !== 'reject' ||
       !contract.actionAt ||
-      ![ContractStatus.pending, ContractStatus.waitingForPayment].includes(contract.status)
+      ![RentalContractStatus.pending, RentalContractStatus.waitingForPayment].includes(contract.status)
     )
       return next(new BadRequestError({ en: 'invalid action', ar: 'invalid action' }, req.lang));
 
@@ -143,7 +144,7 @@ export const contractAction: RequestHandler<
     if (req.body.action === 'reject') {
       await RentalContracts.updateOne(
         { _id: req.params.contractId },
-        { status: ContractStatus.rejected, rejectedBy: 'customer', actionAt: new Date() },
+        { status: RentalContractStatus.rejected, rejectedBy: 'customer', actionAt: new Date() },
       );
   
       await sendNotification(

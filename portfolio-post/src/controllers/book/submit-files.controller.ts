@@ -1,7 +1,6 @@
-import { BadRequestError, NotFound, SuccessResponse } from '@duvdu-v1/duvdu';
+import { BadRequestError, NotFound, SuccessResponse, ProjectContract, ProjectContractStatus } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-import { ContractStatus, ProjectContract } from '../../models/projectContract.model';
 
 export const submitFilesHandler: RequestHandler<
   { contractId: string },
@@ -16,7 +15,7 @@ export const submitFilesHandler: RequestHandler<
   if (!contract) return next(new NotFound(undefined, req.lang));
 
   // assert booking state
-  if (!(contract.status === ContractStatus.ongoing))
+  if (!(contract.status === ProjectContractStatus.ongoing))
     return next(new BadRequestError(undefined, req.lang));
 
   await ProjectContract.updateOne(

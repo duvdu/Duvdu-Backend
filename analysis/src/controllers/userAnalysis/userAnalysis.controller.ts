@@ -320,7 +320,7 @@ export const userAnalysisHandler: RequestHandler<
     },
     {
       $lookup: {
-        from: 'copyright_contracts',
+        from: MODELS.copyrightContract,
         localField: 'contract',
         foreignField: '_id',
         as: 'copyright_contract',
@@ -328,7 +328,7 @@ export const userAnalysisHandler: RequestHandler<
     },
     {
       $lookup: {
-        from: 'rental_contracts',
+        from: MODELS.rentalContract,
         localField: 'contract',
         foreignField: '_id',
         as: 'rental_contract',
@@ -336,7 +336,7 @@ export const userAnalysisHandler: RequestHandler<
     },
     {
       $lookup: {
-        from: 'producer-contracts',
+        from: MODELS.producerContract,
         localField: 'contract',
         foreignField: '_id',
         as: 'producer_contract',
@@ -344,7 +344,7 @@ export const userAnalysisHandler: RequestHandler<
     },
     {
       $lookup: {
-        from: 'project_contracts',
+        from: MODELS.projectContract,
         localField: 'contract',
         foreignField: '_id',
         as: 'project_contracts',
@@ -352,7 +352,7 @@ export const userAnalysisHandler: RequestHandler<
     },
     {
       $lookup: {
-        from: 'team_contracts',
+        from: MODELS.teamContrac,
         localField: 'contract',
         foreignField: '_id',
         as: 'team_contracts',

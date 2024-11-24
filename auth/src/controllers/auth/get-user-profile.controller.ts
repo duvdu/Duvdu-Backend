@@ -93,9 +93,9 @@ export const getUserProfileHandler: GetUserProfileHandler = async (req, res, nex
     path: 'contract',
     match: {
       status: {
-        $nin: ['canceled', 'pending', 'rejected', 'reject', 'cancel']
-      }
-    }
+        $nin: ['canceled', 'pending', 'rejected', 'reject', 'cancel'],
+      },
+    },
   });
 
   res.status(200).json({

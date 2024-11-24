@@ -7,12 +7,13 @@ import {
   Users,
   NotAllowedError,
   Channels,
+  CopyrightContracts,
+  CopyrightContractStatus,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 // import { firstPaymentExpiration, totalPaymentExpiration } from '../../config/expiration-queue';
 import { sendNotification } from './contract-notification.controller';
-import { CopyrightContracts, ContractStatus } from '../../models/copyright-contract.model';
 
 export const contractAction: RequestHandler<
   { contractId: string },
@@ -45,10 +46,10 @@ export const contractAction: RequestHandler<
       if action = accept && contract.status = pending
         - project status = waiting for pay 10
     */
-    if (req.body.action === 'reject' && contract.status === ContractStatus.pending) {
+    if (req.body.action === 'reject' && contract.status === CopyrightContractStatus.pending) {
       await CopyrightContracts.updateOne(
         { _id: req.params.contractId },
-        { status: ContractStatus.rejected, rejectedBy: 'sp', actionAt: new Date() },
+        { status: CopyrightContractStatus.rejected, rejectedBy: 'sp', actionAt: new Date() },
       );
 
       await sendNotification(
@@ -60,7 +61,7 @@ export const contractAction: RequestHandler<
         `${sp?.name} reject this contract`,
         Channels.update_contract,
       );
-    } else if (req.body.action === 'accept' && contract.status === ContractStatus.pending) {
+    } else if (req.body.action === 'accept' && contract.status === CopyrightContractStatus.pending) {
       const spUser = await Users.findOne({ _id: req.loggedUser.id }, { avaliableContracts: 1 });
 
       if ((spUser?.avaliableContracts || 0) < 1)
@@ -76,7 +77,7 @@ export const contractAction: RequestHandler<
       await CopyrightContracts.updateOne(
         { _id: req.params.contractId },
         {
-          status: ContractStatus.waitingForFirstPayment,
+          status: CopyrightContractStatus.waitingForFirstPayment,
           actionAt: new Date(),
           paymentLink: paymentSession,
         },
@@ -98,11 +99,11 @@ export const contractAction: RequestHandler<
       // );
     } else if (
       req.body.action === 'reject' &&
-      contract.status === ContractStatus.updateAfterFirstPayment
+      contract.status === CopyrightContractStatus.updateAfterFirstPayment
     ) {
       await CopyrightContracts.updateOne(
         { _id: req.params.contractId },
-        { status: ContractStatus.rejected, rejectedBy: 'sp', actionAt: new Date() },
+        { status: CopyrightContractStatus.rejected, rejectedBy: 'sp', actionAt: new Date() },
       );
 
       await sendNotification(
@@ -116,13 +117,13 @@ export const contractAction: RequestHandler<
       );
     } else if (
       req.body.action === 'accept' &&
-      contract.status === ContractStatus.updateAfterFirstPayment
+      contract.status === CopyrightContractStatus.updateAfterFirstPayment
     ) {
       const paymentSession = crypto.randomBytes(16).toString('hex');
       await CopyrightContracts.updateOne(
         { _id: req.params.contractId },
         {
-          status: ContractStatus.waitingForTotalPayment,
+          status: CopyrightContractStatus.waitingForTotalPayment,
           actionAt: new Date(),
           paymentLink: paymentSession,
         },
@@ -167,10 +168,10 @@ export const contractAction: RequestHandler<
         - project status = waiting for totol payment
     */
 
-    if (req.body.action === 'cancel' && contract.status === ContractStatus.pending) {
+    if (req.body.action === 'cancel' && contract.status === CopyrightContractStatus.pending) {
       await CopyrightContracts.updateOne(
         { _id: req.params.contractId },
-        { status: ContractStatus.canceled, rejectedBy: 'customer', actionAt: new Date() },
+        { status: CopyrightContractStatus.canceled, rejectedBy: 'customer', actionAt: new Date() },
       );
 
       await sendNotification(
@@ -182,10 +183,13 @@ export const contractAction: RequestHandler<
         `${customer?.name} canceled this contract`,
         Channels.update_contract,
       );
-    } else if (req.body.action === 'reject' && contract.status === ContractStatus.waitingForFirstPayment) {
+    } else if (
+      req.body.action === 'reject' &&
+      contract.status === CopyrightContractStatus.waitingForFirstPayment
+    ) {
       await CopyrightContracts.updateOne(
         { _id: req.params.contractId },
-        { status: ContractStatus.rejected, rejectedBy: 'customer', actionAt: new Date() },
+        { status: CopyrightContractStatus.rejected, rejectedBy: 'customer', actionAt: new Date() },
       );
 
       await sendNotification(
@@ -199,11 +203,11 @@ export const contractAction: RequestHandler<
       );
     } else if (
       req.body.action === 'reject' &&
-      contract.status === ContractStatus.waitingForTotalPayment
+      contract.status === CopyrightContractStatus.waitingForTotalPayment
     ) {
       await CopyrightContracts.updateOne(
         { _id: req.params.contractId },
-        { status: ContractStatus.rejected, rejectedBy: 'customer', actionAt: new Date() },
+        { status: CopyrightContractStatus.rejected, rejectedBy: 'customer', actionAt: new Date() },
       );
 
       await sendNotification(

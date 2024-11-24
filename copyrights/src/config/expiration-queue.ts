@@ -3,7 +3,7 @@ import Queue from 'bull';
 
 import { env } from './env';
 import { sendSystemNotification } from '../controllers/booking/contract-notification.controller';
-import { ContractStatus, CopyrightContracts } from '../models/copyright-contract.model';
+import { ContractStatus, CopyrightContracts } from '../../../common/src/models/copyright-contract.model';
 
 export const pendingExpiration = new Queue<{ contractId: string }>(
   'copyright_pending_expiration',

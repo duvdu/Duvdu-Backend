@@ -1,8 +1,7 @@
-import { addToDate, BadRequestError, NotFound, SuccessResponse } from '@duvdu-v1/duvdu';
+import { addToDate, BadRequestError, NotFound, SuccessResponse, CopyrightContracts, CopyrightContractStatus } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 // import { contractNotification } from './contract-notification.controller';
-import { ContractStatus, CopyrightContracts } from '../../models/copyright-contract.model';
 
 export const updateContractHandler: RequestHandler<
   { contractId: string },
@@ -21,7 +20,7 @@ export const updateContractHandler: RequestHandler<
   });
   if (!contract) return next(new NotFound(undefined, req.lang));
 
-  if (contract.status !== ContractStatus.updateAfterFirstPayment) {
+  if (contract.status !== CopyrightContractStatus.updateAfterFirstPayment) {
     return next(
       new BadRequestError(
         {
