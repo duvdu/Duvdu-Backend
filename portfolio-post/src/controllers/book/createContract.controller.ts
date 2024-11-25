@@ -59,7 +59,7 @@ export const createContractHandler: CreateContractHandler = async (req, res, nex
       );
 
     const attachments = <Express.Multer.File[] | undefined>(req.files as any)?.attachments;
-    if (attachments) {
+    if (attachments && attachments.length > 0) {
       req.body.attachments = attachments.map((el) => FOLDERS.portfolio_post + '/' + el.filename);
       await new Bucket().saveBucketFiles(FOLDERS.portfolio_post, ...attachments);
       Files.removeFiles(...req.body.attachments);

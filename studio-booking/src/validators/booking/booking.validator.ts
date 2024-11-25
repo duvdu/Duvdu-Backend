@@ -3,7 +3,7 @@ import { body, param } from 'express-validator';
 
 export const bookProject = [
   param('projectId').isMongoId().withMessage('projectId'),
-  body('jobDetails').isString().withMessage('jobDetails'),
+  body('jobDetails').optional().isString().withMessage('jobDetails'),
   body('equipments').isArray().withMessage('equipments'),
   body('equipments.*').isMongoId().withMessage('equipments.*'),
   body('address').isString().withMessage('address'),

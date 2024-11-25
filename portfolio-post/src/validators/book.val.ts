@@ -13,7 +13,7 @@ export const create = [
     }),
   body('location.lat').isFloat({ min: -90, max: 90 }).bail().toFloat().withMessage('location'),
   body('location.lng').isFloat({ min: -180, max: 180 }).bail().toFloat().withMessage('location'),
-  body('details').isString().exists(),
+  body('details').optional().isString(),
   body('projectScale.numberOfUnits').isInt({ min: 1 }),
   body('startDate')
     .isISO8601()
