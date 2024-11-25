@@ -102,15 +102,27 @@ export const updateContractHandler: UpdateContractHandler = async (req, res, nex
   );
 
   if (updatedContract?.status == ContractStatus.acceptedWithUpdate) {
-    await sendNotification(
-      req.loggedUser.id,
-      contract.user.toString(),
-      contract._id.toString(),
-      'contract',
-      'producer contract update',
-      `${sp?.name} accept this contract` ,
-      Channels.update_contract,
-    );
+    await Promise.all([
+      sendNotification(
+        req.loggedUser.id,
+        contract.user.toString(),
+        contract._id.toString(),
+        'contract',
+        'producer contract update',
+        `${sp?.name} accept this contract` ,
+        Channels.update_contract,
+      ),
+      sendNotification(
+        req.loggedUser.id,
+        req.loggedUser.id,
+        contract._id.toString(),
+        'contract',
+        'producer contract update',
+        'you accept this contract successfully',
+        Channels.update_contract,
+      ),
+    ]);
+
     // const delay = updatedContract.stageExpiration * 3600 * 1000;
     // await UpdateContractQueue.add(
     //   {
@@ -127,30 +139,52 @@ export const updateContractHandler: UpdateContractHandler = async (req, res, nex
       updatedContract?.status == ContractStatus.rejected) &&
     req.loggedUser.id == producer.user.toString()
   )
-    await sendNotification(
-      req.loggedUser.id,
-      contract.user.toString(),
-      contract._id.toString(),
-      'contract',
-      'producer contract updated',
-      `${sp?.name} ${updatedContract.status} this contract`,
-      Channels.update_contract,
-    );
+    await Promise.all([
+      await sendNotification(
+        req.loggedUser.id,
+        contract.user.toString(),
+        contract._id.toString(),
+        'contract',
+        'producer contract updated',
+        `${sp?.name} ${updatedContract.status} this contract`,
+        Channels.update_contract,
+      ),
+      sendNotification(
+        req.loggedUser.id,
+        req.loggedUser.id,
+        contract._id.toString(),
+        'contract',
+        'producer contract updated',
+        'this contract updated successfully',
+        Channels.update_contract,
+      ),
+    ]);
 
   if (
     (updatedContract?.status == ContractStatus.accepted ||
       updatedContract?.status == ContractStatus.rejected) &&
     req.loggedUser.id == contract.user.toString()
   )
-    await sendNotification(
-      req.loggedUser.id,
-      producer.user.toString(),
-      contract._id.toString(),
-      'contract',
-      'producer contract updated',
-      `${user?.name} ${updatedContract.status} this contract`,
-      Channels.update_contract,
-    );
+    await Promise.all([
+      await sendNotification(
+        req.loggedUser.id,
+        producer.user.toString(),
+        contract._id.toString(),
+        'contract',
+        'producer contract updated',
+        `${user?.name} ${updatedContract.status} this contract`,
+        Channels.update_contract,
+      ),
+      sendNotification(
+        req.loggedUser.id,
+        req.loggedUser.id,
+        contract._id.toString(),
+        'contract',
+        'producer contract updated',
+        'this contract updated successfully',
+        Channels.update_contract,
+      ),
+    ]);
 
   res.status(200).json({ message: 'success', data: updatedContract! });
 };

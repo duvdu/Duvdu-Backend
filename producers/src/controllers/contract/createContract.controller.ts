@@ -67,15 +67,26 @@ export const createContractHandler: CreateContractHandler = async (req, res, nex
     });
 
     const user = await Users.findById(req.loggedUser.id);
-    await sendNotification(
-      req.loggedUser.id,
-      producer.user.toString(),
-      contract._id.toString(),
-      'contract',
-      'new producer contract',
-      `new contract created by ${user?.name}`,
-      Channels.new_contract,
-    );
+    await Promise.all([
+      await sendNotification(
+        req.loggedUser.id,
+        producer.user.toString(),
+        contract._id.toString(),
+        'contract',
+        'new producer contract',
+        `new contract created by ${user?.name}`,
+        Channels.new_contract,
+      ),
+      sendNotification(
+        req.loggedUser.id,
+        req.loggedUser.id,
+        contract._id.toString(),
+        'contract',
+        'new producer contract',
+        'contract created successfully',
+        Channels.new_contract,
+      ),
+    ]);
 
     // const delay = contract.stageExpiration * 3600 * 1000;
     // // const delay = 1*60 * 1000;

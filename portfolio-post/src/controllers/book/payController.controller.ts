@@ -37,16 +37,26 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
       },
     );
 
-    await sendNotification(
-      req.loggedUser.id,
-      contract.sp.toString(),
-      contract._id.toString(),
-      'contract',
-      'project contract updates',
-      `${user?.name} paid 10% of the amount`,
-      Channels.update_contract,
-    );
-
+    await Promise.all([
+      sendNotification(
+        req.loggedUser.id,
+        contract.sp.toString(),
+        contract._id.toString(),
+        'contract',
+        'project contract updates',
+        `${user?.name} paid 10% of the amount`,
+        Channels.update_contract,
+      ),
+      sendNotification(
+        req.loggedUser.id,
+        req.loggedUser.id,
+        contract._id.toString(),
+        'contract',
+        'project contract updates',
+        'you paid 10% of the amount',
+        Channels.update_contract,
+      ),
+    ]);
   }
   else if (contract.status === ProjectContractStatus.waitingForTotalPayment){
     await ProjectContract.updateOne(
@@ -58,16 +68,26 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
       },
     );
 
-    await sendNotification(
-      req.loggedUser.id,
-      contract.sp.toString(),
-      contract._id.toString(),
-      'contract',
-      'project contract updates',
-      `${user?.name} paid the total amount`,
-      Channels.update_contract,
-    );
-
+    await Promise.all([
+      sendNotification(
+        req.loggedUser.id,
+        contract.sp.toString(),
+        contract._id.toString(),
+        'contract',
+        'project contract updates',
+        `${user?.name} paid the total amount`,
+        Channels.update_contract,
+      ),
+      sendNotification(
+        req.loggedUser.id,
+        req.loggedUser.id,
+        contract._id.toString(),
+        'contract',
+        'project contract updates',
+        'you paid the total amount',
+        Channels.update_contract,
+      ),
+    ]);
   }
   else
     return next(

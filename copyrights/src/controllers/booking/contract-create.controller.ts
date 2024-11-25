@@ -86,15 +86,26 @@ export const createContractHandler: RequestHandler<
 
   const user = await Users.findById(req.loggedUser.id);
 
-  await sendNotification(
-    req.loggedUser.id,
-    contract.sp.toString(),
-    contract._id.toString(),
-    'contract',
-    'new contract',
-    `new contract created from ${user?.name}`,
-    Channels.new_contract,
-  );
+  await Promise.all([
+    sendNotification(
+      req.loggedUser.id,
+      contract.sp.toString(),
+      contract._id.toString(),
+      'contract',
+      'new contract',
+      `new contract created from ${user?.name}`,
+      Channels.new_contract,
+    ),
+    sendNotification(
+      req.loggedUser.id,
+      req.loggedUser.id,
+      contract._id.toString(),
+      'contract',
+      'new contract',
+      'contract created successfully',
+      Channels.new_contract,
+    ),
+  ]);
 
   // await pendingExpiration.add(
   //   { contractId: contract.id },

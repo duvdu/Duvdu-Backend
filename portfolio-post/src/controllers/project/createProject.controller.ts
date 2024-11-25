@@ -198,15 +198,27 @@ export const createProjectHandler: RequestHandler<
 
     if (projectCycle.creatives.length > 0) {
       for (const creative of projectCycle.creatives) {
-        await sendNotification(
-          req.loggedUser.id,
-          creative.creative.toString(),
-          projectCycle._id.toString(),
-          'new tag',
-          'You were mentioned in the project.',
-          `${loggedUser?.name} has tagged you in his project. Accept or decline.`,
-          'new-tag',
-        );
+        const creativeUser = await Users.findById(creative.creative);
+        await Promise.all([
+          sendNotification(
+            req.loggedUser.id,
+            creative.creative.toString(),
+            projectCycle._id.toString(),
+            'new tag',
+            'You were mentioned in the project.',
+            `${loggedUser?.name} has tagged you in his project. Accept or decline.`,
+            'new-tag',
+          ),
+          sendNotification(
+            req.loggedUser.id,
+            creative.creative.toString(),
+            projectCycle._id.toString(),
+            'new tag',
+            `tagged from project ${projectCycle.name}`,
+            `you tagged ${creativeUser?.name} in your project successfully`,
+            'new-tag',
+          ),
+        ]);
       }
     }
     const totalProjectPrice =

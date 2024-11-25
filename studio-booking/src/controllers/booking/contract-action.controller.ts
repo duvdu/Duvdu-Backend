@@ -55,16 +55,26 @@ export const contractAction: RequestHandler<
           { status: RentalContractStatus.rejected, rejectedBy: 'sp', actionAt: new Date() },
         );
 
-        await sendNotification(
-          req.loggedUser.id,
-          contract.customer.toString(),
-          contract._id.toString(),
-          'contract',
-          'rental contract updates',
-          `${sp?.name} reject this contract`,
-          Channels.update_contract,
-        );
-
+        await Promise.all([
+          await sendNotification(
+            req.loggedUser.id,
+            contract.customer.toString(),
+            contract._id.toString(),
+            'contract',
+            'rental contract updates',
+            `${sp?.name} reject this contract`,
+            Channels.update_contract,
+          ),
+          sendNotification(
+            req.loggedUser.id,
+            req.loggedUser.id,
+            contract._id.toString(),
+            'contract',
+            'rental contract updates',
+            'you reject this contract successfully',
+            Channels.update_contract,
+          ),
+        ]);
       }
     } else if (req.body.action === 'accept') {
       const spUser = await Users.findOne({ _id: req.loggedUser.id }, { avaliableContracts: 1 });
@@ -92,15 +102,26 @@ export const contractAction: RequestHandler<
         },
       );
 
-      await sendNotification(
-        req.loggedUser.id,
-        contract.customer.toString(),
-        contract._id.toString(),
-        'contract',
-        'rental contract updates',
-        `${sp?.name} accept this contract`,
-        Channels.update_contract,
-      );
+      await Promise.all([
+        await sendNotification(
+          req.loggedUser.id,
+          contract.customer.toString(),
+          contract._id.toString(),
+          'contract',
+          'rental contract updates',
+          `${sp?.name} accept this contract`,
+          Channels.update_contract,
+        ),
+        sendNotification(
+          req.loggedUser.id,
+          req.loggedUser.id,
+          contract._id.toString(),
+          'contract',
+          'rental contract updates',
+          'you accept this contract successfully',
+          Channels.update_contract,
+        ),
+      ]);
 
       // await paymentExpiration.add(
       //   { contractId: contract.id },
@@ -115,17 +136,27 @@ export const contractAction: RequestHandler<
         { status: RentalContractStatus.canceled, rejectedBy: 'customer', actionAt: new Date() },
       );
   
-      await sendNotification(
-        req.loggedUser.id,
-        contract.sp.toString(),
-        contract._id.toString(),
-        'contract',
-        'rental contract updates',
-        `${customer?.name} cancel this contract`,
-        Channels.update_contract,
-      );
-    }
-    else if (
+      await Promise.all([
+        sendNotification(
+          req.loggedUser.id,
+          contract.sp.toString(),
+          contract._id.toString(),
+          'contract',
+          'rental contract updates',
+          `${customer?.name} cancel this contract`,
+          Channels.update_contract,
+        ),
+        sendNotification(
+          req.loggedUser.id,
+          req.loggedUser.id,
+          contract._id.toString(),
+          'contract',
+          'rental contract updates',
+          'you cancel this contract successfully',
+          Channels.update_contract,
+        ),
+      ]);
+    } else if (
       req.body.action !== 'reject' ||
       !contract.actionAt ||
       ![RentalContractStatus.pending, RentalContractStatus.waitingForPayment].includes(contract.status)
@@ -147,16 +178,27 @@ export const contractAction: RequestHandler<
         { status: RentalContractStatus.rejected, rejectedBy: 'customer', actionAt: new Date() },
       );
   
-      await sendNotification(
-        req.loggedUser.id,
-        contract.sp.toString(),
-        contract._id.toString(),
-        'contract',
-        'rental contract updates',
-        `${customer?.name} reject this contract`,
-        Channels.update_contract,
-      );
-    } 
+      await Promise.all([
+        sendNotification(
+          req.loggedUser.id,
+          contract.sp.toString(),
+          contract._id.toString(),
+          'contract',
+          'rental contract updates',
+          `${customer?.name} reject this contract`,
+          Channels.update_contract,
+        ),
+        sendNotification(
+          req.loggedUser.id,
+          req.loggedUser.id,
+          contract._id.toString(),
+          'contract',
+          'rental contract updates',
+          'you reject this contract successfully',
+          Channels.update_contract,
+        ),
+      ]);
+    }
   }
 
   res.status(200).json({ message: 'success' });

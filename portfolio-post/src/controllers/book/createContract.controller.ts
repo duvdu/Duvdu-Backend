@@ -116,15 +116,26 @@ export const createContractHandler: CreateContractHandler = async (req, res, nex
 
     // send notification to sp
     const user = await Users.findById(req.loggedUser.id);
-    await sendNotification(
-      req.loggedUser.id,
-      contract.sp.toString(),
-      contract._id.toString(),
-      'contract',
-      'project new contract',
-      `new contract created by ${user?.name}`,
-      Channels.new_contract,
-    );
+    await Promise.all([
+      sendNotification(
+        req.loggedUser.id,
+        contract.sp.toString(),
+        contract._id.toString(),
+        'contract',
+        'project new contract',
+        `new contract created by ${user?.name}`,
+        Channels.new_contract,
+      ),
+      sendNotification(
+        req.loggedUser.id,
+        req.loggedUser.id,
+        contract._id.toString(),
+        'contract',
+        'project new contract',
+        'contract created successfully',
+        Channels.new_contract,
+      ),
+    ]);
 
     // add expiration queue
     // const delay = contract.stageExpiration * 3600 * 1000;

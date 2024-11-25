@@ -44,15 +44,26 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
       );
 
       // send notification from sp
-      await sendNotification(
-        req.loggedUser.id,
-        contract.customer.toString(),
-        contract._id.toString(),
-        'contract',
-        'project contract updates',
-        `${sp?.name} reject this contract`,
-        Channels.update_contract,
-      );
+      await Promise.all([
+        sendNotification(
+          req.loggedUser.id,
+          contract.customer.toString(),
+          contract._id.toString(),
+          'contract',
+          'project contract updates',
+          `${sp?.name} reject this contract`,
+          Channels.update_contract,
+        ),
+        sendNotification(
+          req.loggedUser.id,
+          req.loggedUser.id,
+          contract._id.toString(),
+          'contract',
+          'project contract updates',
+          'you rejected this contract',
+          Channels.update_contract,
+        ),
+      ]);
     } else if (req.body.action === 'accept' && contract.status === ProjectContractStatus.pending) {
       const spUser = await Users.findOne({ _id: req.loggedUser.id }, { avaliableContracts: 1 });
 
@@ -76,15 +87,26 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
       );
 
       // send notification from sp
-      await sendNotification(
-        req.loggedUser.id,
-        contract.customer.toString(),
-        contract._id.toString(),
-        'contract',
-        'project contract updates',
-        `${sp?.name} accept this contract`,
-        Channels.update_contract,
-      );
+      await Promise.all([
+        sendNotification(
+          req.loggedUser.id,
+          contract.customer.toString(),
+          contract._id.toString(),
+          'contract',
+          'project contract updates',
+          `${sp?.name} accept this contract`,
+          Channels.update_contract,
+        ),
+        sendNotification(
+          req.loggedUser.id,
+          req.loggedUser.id,
+          contract._id.toString(),
+          'contract',
+          'project contract updates',
+          'you accepted this contract',
+          Channels.update_contract,
+        ),
+      ]);
 
       // add expiration for first payment
       // const delay = contract.stageExpiration * 3600 * 1000;
@@ -100,15 +122,26 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
       );
 
       // send notification from sp
-      await sendNotification(
-        req.loggedUser.id,
-        contract.customer.toString(),
-        contract._id.toString(),
-        'contract',
-        'project contract updates',
-        `${sp?.name} reject this contract`,
-        Channels.update_contract,
-      );
+      await Promise.all([
+        sendNotification(
+          req.loggedUser.id,
+          contract.customer.toString(),
+          contract._id.toString(),
+          'contract',
+          'project contract updates',
+          `${sp?.name} reject this contract`,
+          Channels.update_contract,
+        ),
+        sendNotification(
+          req.loggedUser.id,
+          req.loggedUser.id,
+          contract._id.toString(),
+          'contract',
+          'project contract updates',
+          'you rejected this contract',
+          Channels.update_contract,
+        ),
+      ]);
     } else if (
       req.body.action === 'accept' &&
       contract.status === ProjectContractStatus.updateAfterFirstPayment
@@ -124,15 +157,26 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
       );
 
       // send notification from sp
-      await sendNotification(
-        req.loggedUser.id,
-        contract.customer.toString(),
-        contract._id.toString(),
-        'contract',
-        'project contract updates',
-        `${sp?.name} accept this contract`,
-        Channels.update_contract,
-      );
+      await Promise.all([
+        sendNotification(
+          req.loggedUser.id,
+          contract.customer.toString(),
+          contract._id.toString(),
+          'contract',
+          'project contract updates',
+          `${sp?.name} accept this contract`,
+          Channels.update_contract,
+        ),
+        sendNotification(
+          req.loggedUser.id,
+          req.loggedUser.id,
+          contract._id.toString(),
+          'contract',
+          'project contract updates',
+          'you accepted this contract',
+          Channels.update_contract,
+        ),
+      ]);
 
       // add second payment expiration
       // const delay = contract.stageExpiration * 3600 * 1000;
@@ -155,15 +199,26 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
         { status: ProjectContractStatus.canceled, rejectedBy: 'customer', actionAt: new Date() },
       );
 
-      await sendNotification(
-        req.loggedUser.id,
-        contract.sp.toString(),
-        contract._id.toString(),
-        'contract',
-        'project contract updates',
-        `${customer?.name} canceled this contract`,
-        Channels.update_contract,
-      );
+      await Promise.all([
+        sendNotification(
+          req.loggedUser.id,
+          contract.sp.toString(),
+          contract._id.toString(),
+          'contract',
+          'project contract updates',
+          `${customer?.name} canceled this contract`,
+          Channels.update_contract,
+        ),
+        sendNotification(
+          req.loggedUser.id,
+          req.loggedUser.id,
+          contract._id.toString(),
+          'contract',
+          'project contract updates',
+          'you canceled this contract',
+          Channels.update_contract,
+        ),
+      ]);
     }
     else if (req.body.action === 'reject' && contract.status === ProjectContractStatus.waitingForFirstPayment){
       await ProjectContract.updateOne(
@@ -171,17 +226,27 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
         { status: ProjectContractStatus.rejected, rejectedBy: 'customer', actionAt: new Date() },
       );
 
-      await sendNotification(
-        req.loggedUser.id,
-        contract.sp.toString(),
-        contract._id.toString(),
-        'contract',
-        'project contract updates',
-        `${customer?.name} reject this contract`,
-        Channels.update_contract,
-      );
-    }
-    else if (
+      await Promise.all([
+        sendNotification(
+          req.loggedUser.id,
+          contract.sp.toString(),
+          contract._id.toString(),
+          'contract',
+          'project contract updates',
+          `${customer?.name} reject this contract`,
+          Channels.update_contract,
+        ),
+        sendNotification(
+          req.loggedUser.id,
+          req.loggedUser.id,
+          contract._id.toString(),
+          'contract',
+          'project contract updates',
+          'you rejected this contract',
+          Channels.update_contract,
+        ),
+      ]);
+    } else if (
       req.body.action === 'reject' &&
       contract.status === ProjectContractStatus.waitingForTotalPayment
     ) {
@@ -190,16 +255,26 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
         { status: ProjectContractStatus.rejected, rejectedBy: 'customer', actionAt: new Date() },
       );
       // send notification to sp
-      
-      await sendNotification(
-        req.loggedUser.id,
-        contract.sp.toString(),
-        contract._id.toString(),
-        'contract',
-        'project contract updates',
-        `${customer?.name} reject this contract`,
-        Channels.update_contract,
-      );
+      await Promise.all([
+        sendNotification(
+          req.loggedUser.id,
+          contract.sp.toString(),
+          contract._id.toString(),
+          'contract',
+          'project contract updates',
+          `${customer?.name} reject this contract`,
+          Channels.update_contract,
+        ),
+        sendNotification(
+          req.loggedUser.id,
+          req.loggedUser.id,
+          contract._id.toString(),
+          'contract',
+          'project contract updates',
+          'you rejected this contract',
+          Channels.update_contract,
+        ),
+      ]);
     } else
       return next(
         new NotAllowedError(

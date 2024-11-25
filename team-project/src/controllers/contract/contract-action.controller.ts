@@ -67,15 +67,26 @@ export const contractAction: RequestHandler<
             req.lang,
           );
 
-          await sendNotification(
-            req.loggedUser.id,
-            contract.customer.toString(),
-            contract._id.toString(),
-            'contract',
-            'team project contract update',
-            `${sp?.name} reject contract`,
-            Channels.update_contract,
-          );
+          await Promise.all([
+            await sendNotification(
+              req.loggedUser.id,
+              contract.customer.toString(),
+              contract._id.toString(),
+              'contract',
+              'team project contract update',
+              `${sp?.name} reject contract`,
+              Channels.update_contract,
+            ),
+            sendNotification(
+              req.loggedUser.id,
+              req.loggedUser.id,
+              contract._id.toString(),
+              'contract',
+              'team project contract update',
+              'you reject this contract successfully',
+              Channels.update_contract,
+            ),
+          ]);
         }
       } else if (req.body.action === 'accept') {
         const spUser = await Users.findOne({ _id: req.loggedUser.id }, { avaliableContracts: 1 });
@@ -111,15 +122,26 @@ export const contractAction: RequestHandler<
           req.lang,
         );
 
-        await sendNotification(
-          req.loggedUser.id,
-          contract.customer.toString(),
-          contract._id.toString(),
-          'contract',
-          'team project contract update',
-          `${sp?.name} accept contract`,
-          Channels.update_contract,
-        );
+        await Promise.all([
+          await sendNotification(
+            req.loggedUser.id,
+            contract.customer.toString(),
+            contract._id.toString(),
+            'contract',
+            'team project contract update',
+            `${sp?.name} accept contract`,
+            Channels.update_contract,
+          ),
+          sendNotification(
+            req.loggedUser.id,
+            req.loggedUser.id,
+            contract._id.toString(),
+            'contract',
+            'team project contract update',
+            'you accept this contract successfully',
+            Channels.update_contract,
+          ),
+        ]);
 
         // TODO:
         // const delay =  contract.stageExpiration * 60 * 60 * 1000;
@@ -144,15 +166,26 @@ export const contractAction: RequestHandler<
           req.lang,
         );
 
-        await sendNotification(
-          req.loggedUser.id,
-          contract.sp.toString(),
-          contract._id.toString(),
-          'contract',
-          'team project contract update',
-          `${customer?.name} cancel contract`,
-          Channels.update_contract,
-        );
+        await Promise.all([
+          await sendNotification(
+            req.loggedUser.id,
+            contract.sp.toString(),
+            contract._id.toString(),
+            'contract',
+            'team project contract update',
+            `${customer?.name} cancel contract`,
+            Channels.update_contract,
+          ),
+          sendNotification(
+            req.loggedUser.id,
+            req.loggedUser.id,
+            contract._id.toString(),
+            'contract',
+            'team project contract update',
+            'you cancel this contract successfully',
+            Channels.update_contract,
+          ),
+        ]);
 
         return res.status(200).json({message:'success'});
       }
@@ -188,15 +221,26 @@ export const contractAction: RequestHandler<
         req.lang,
       );
 
-      await sendNotification(
-        req.loggedUser.id,
-        contract.sp.toString(),
-        contract._id.toString(),
-        'contract',
-        'team project contract update',
-        `${customer?.name} reject contract`,
-        Channels.update_contract,
-      );
+      await Promise.all([
+        await sendNotification(
+          req.loggedUser.id,
+          contract.sp.toString(),
+          contract._id.toString(),
+          'contract',
+          'team project contract update',
+          `${customer?.name} reject contract`,
+          Channels.update_contract,
+        ),
+        sendNotification(
+          req.loggedUser.id,
+          req.loggedUser.id,
+          contract._id.toString(),
+          'contract',
+          'team project contract update',
+          'you reject this contract successfully',
+          Channels.update_contract,
+        ),
+      ]);
     }
 
     res.status(200).json({ message: 'success' });

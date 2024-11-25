@@ -30,18 +30,27 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
     { paymentLink: req.params.paymentSession },
     { status: RentalContractStatus.ongoing, checkoutAt: new Date() },
   );
-  
-  await sendNotification(
-    req.loggedUser.id,
-    contract.sp.toString(),
-    contract._id.toString(),
-    'contract',
-    'rental contract updates',
-    `${customer?.name} pay rental contract`,
-    Channels.update_contract,
-  );
 
-
+  await Promise.all([
+    sendNotification(
+      req.loggedUser.id,
+      contract.sp.toString(),
+      contract._id.toString(),
+      'contract',
+      'rental contract updates',
+      `${customer?.name} pay rental contract`,
+      Channels.update_contract,
+    ),
+    sendNotification(
+      req.loggedUser.id,
+      req.loggedUser.id,
+      contract._id.toString(),
+      'contract',
+      'rental contract updates',
+      'you pay rental contract successfully',
+      Channels.update_contract,
+    ),
+  ]);
 
   // await onGoingExpiration.add(
   //   { contractId: contract.id },

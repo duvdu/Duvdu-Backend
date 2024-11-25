@@ -116,15 +116,26 @@ export const createProjectHandler: CreateProjectHandler = async (req, res, next)
 
       const customer = await Users.findById(req.loggedUser.id);
       // send notification to user
-      await sendNotification(
-        contract.customer.toString(),
-        contract.sp.toString(),
-        contract._id.toString(),
-        'contract',
-        'team project new contract',
-        `new team project contract from ${customer?.name}`,
-        Channels.new_contract,
-      );
+      await Promise.all([
+        sendNotification(
+          contract.customer.toString(),
+          contract.sp.toString(),
+          contract._id.toString(),
+          'contract',
+          'team project new contract',
+          `new team project contract from ${customer?.name}`,
+          Channels.new_contract,
+        ),
+        sendNotification(
+          contract.customer.toString(),
+          contract.customer.toString(),
+          contract._id.toString(),
+          'contract',
+          'team project new contract',
+          'your team project contract created successfully',
+          Channels.new_contract,
+        ),
+      ]);
 
       // TODO: use pending expiration
       // const delay = contract.stageExpiration * 3600 * 1000;
