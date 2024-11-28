@@ -16,6 +16,15 @@ import * as val from '../validators/auth';
 
 const router = Router();
 
+router.post(
+  '/face-recognition',
+  isauthenticated,
+  globalUploadMiddleware(FOLDERS.auth).fields([{ name: 'faceRecognition', maxCount: 1 }]),
+  checkRequiredFields({ fields: ['faceRecognition'] }),
+  isauthenticated,
+  handlers.faceRecognitionController,
+);
+
 router.route('/provider').post(val.loginProvider, handlers.loginWithProviderHandler);
 router
   .route('/provider/phone')
@@ -120,13 +129,6 @@ router.get('/profile/projects/:username', handlers.getUserProjectsByUsername);
 router.route('/profile/:username').get(optionalAuthenticated, handlers.getUserProfileHandler);
 
 router.route('/verify').post(val.verify, handlers.verifyHandler);
-router.post(
-  '/face-recognition',
-  isauthenticated,
-  globalUploadMiddleware(FOLDERS.auth).fields([{ name: 'faceRecognition', maxCount: 1 }]),
-  checkRequiredFields({ fields: ['faceRecognition'] }),
-  isauthenticated,
-  handlers.faceRecognitionController,
-);
+
 
 export const authRoutes = router;
