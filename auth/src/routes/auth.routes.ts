@@ -18,7 +18,7 @@ const router = Router();
 
 router.post(
   '/face-recognition',
-  // isauthenticated,
+  isauthenticated,
   globalUploadMiddleware(FOLDERS.auth).fields([{ name: 'faceRecognition', maxCount: 1 }]),
   checkRequiredFields({ fields: ['faceRecognition'] }),
   handlers.faceRecognitionController,
