@@ -1,4 +1,11 @@
-import { CopyrightContracts, ProducerContract, ProjectContract, RentalContracts, SuccessResponse, TeamContract } from '@duvdu-v1/duvdu';
+import {
+  CopyrightContracts,
+  ProducerContract,
+  ProjectContract,
+  RentalContracts,
+  SuccessResponse,
+  TeamContract,
+} from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 export const contractAnalysis: RequestHandler<
@@ -21,7 +28,7 @@ export const contractAnalysis: RequestHandler<
     }
   }
 
-  const copyrightContracts = await CopyrightContracts .aggregate([
+  const copyrightContracts = await CopyrightContracts.aggregate([
     filter,
     {
       $facet: {

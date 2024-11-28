@@ -128,7 +128,7 @@ export interface ITeamContract {
   deadline: Date;
   details: string;
   attachments: string[];
-  totalAmount: number;
+  totalPrice: number;
   actionAt: Date;
   rejectedBy?: 'customer' | 'sp';
   paymentLink: string;
@@ -154,7 +154,7 @@ export const TeamContract = model<ITeamContract>(
       hourPrice: { type: Number, default: 0 },
       deadline: Date,
       details: { type: String, default: null },
-      totalAmount: { type: Number, default: 0 },
+      totalPrice: { type: Number, default: 0 },
       actionAt: Date,
       rejectedBy: { type: String, enum: ['customer', 'sp'] },
       paymentLink: { type: String, default: null },
