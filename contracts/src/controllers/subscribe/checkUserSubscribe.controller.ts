@@ -1,8 +1,7 @@
 import 'express-async-errors';
-import { NotFound, Setting, SuccessResponse, Users } from '@duvdu-v1/duvdu';
+import { Contracts, NotFound, Setting, SuccessResponse, Users } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-import { Contracts } from '../../../../common/src/models/all-contracts.model';
 
 export const checkUserSubscribeController: RequestHandler<
   unknown,
