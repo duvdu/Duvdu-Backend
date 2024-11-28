@@ -35,7 +35,7 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
       {
         status: TeamContractStatus.ongoing,
         totalCheckoutAt: new Date(),
-        paymentAmount: contract.totalAmount,
+        paymentAmount: contract.totalPrice,
       },
     );
   else

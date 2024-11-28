@@ -14,6 +14,28 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
   const customer = await Users.findById(req.loggedUser.id);
   if (!customer) return next(new NotFound(undefined, req.lang));
 
+  // check if the service provider have avaliable contracts
+  const user = await Users.findById(contract.sp);
+  if (user && user.avaliableContracts === 0) {
+    await sendNotification(
+      req.loggedUser.id,
+      contract.sp.toString(),
+      contract._id.toString(),
+      'contract',
+      'contract subscription',
+      'you not have avaliable contracts right now',
+      Channels.update_contract,
+    );
+    return next(
+      new BadRequestError(
+        {
+          en: 'service provider not have avaliable contracts right now',
+          ar: 'لا يتوفر لدى مقدم الخدمة عقود متاحة في الوقت الحالي',
+        },
+        req.lang,
+      ),
+    );
+  }
 
   if (
     new Date(contract.actionAt).getTime() + contract.stageExpiration * 60 * 60 * 1000 <

@@ -109,7 +109,6 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
         user.attachments = user.attachments.map(
           (attachment: string) => `${process.env.BUCKET_HOST}/${attachment}`,
         );
-
       }
     }
 

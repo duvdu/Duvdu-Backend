@@ -72,7 +72,7 @@ export const addCreativeHandler: AddCreativeHandler = async (req, res, next) => 
     ),
     status: UserStatus.pending,
     attachments: req.body.attachments,
-    contract:new mongoose.Types.ObjectId(req.body.user)
+    contract: new mongoose.Types.ObjectId(req.body.user),
   });
 
   await project.save();
@@ -102,7 +102,7 @@ export const addCreativeHandler: AddCreativeHandler = async (req, res, next) => 
     hourPrice: user.hourPrice,
     deadline: user.deadLine,
     details: user.details,
-    totalAmount: user.totalAmount,
+    totalPrice: user.totalAmount,
     cycle: CYCLES.teamProject,
     attachments: user.attachments,
     stageExpiration,

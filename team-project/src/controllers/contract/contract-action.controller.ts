@@ -151,7 +151,6 @@ export const contractAction: RequestHandler<
         // );
       }
     } else {
-
       if (req.body.action === 'cancel' && contract.status === TeamContractStatus.pending) {
         await TeamContract.updateOne(
           { _id: req.params.contractId },
@@ -187,9 +186,9 @@ export const contractAction: RequestHandler<
           ),
         ]);
 
-        return res.status(200).json({message:'success'});
+        return res.status(200).json({ message: 'success' });
       }
-      
+
       if (
         req.body.action !== 'reject' ||
         !contract.actionAt ||

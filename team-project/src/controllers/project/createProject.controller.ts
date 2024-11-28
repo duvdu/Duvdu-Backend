@@ -97,7 +97,7 @@ export const createProjectHandler: CreateProjectHandler = async (req, res, next)
         hourPrice: user.hourPrice,
         deadline: user.deadLine,
         details: user.details,
-        totalAmount: user.totalAmount,
+        totalPrice: user.totalAmount,
         attachments: user.attachments,
         cycle: CYCLES.teamProject,
         stageExpiration,

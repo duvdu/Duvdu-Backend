@@ -42,6 +42,33 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
 
   // TODO: record the transaction from payment gateway webhook
   if (contract.status === CopyrightContractStatus.waitingForFirstPayment) {
+
+    const user = await Users.findById(contract.sp);
+    if (user && user.avaliableContracts === 0) {
+      await sendNotification(
+        req.loggedUser.id,
+        contract.sp.toString(),
+        contract._id.toString(),
+        'contract',
+        'contract subscription',
+        'you not have avaliable contracts right now',
+        Channels.update_contract,
+      );
+      return next(
+        new BadRequestError(
+          {
+            en: 'service provider not have avaliable contracts right now',
+            ar: 'لا يتوفر لدى مقدم الخدمة عقود متاحة في الوقت الحالي',
+          },
+          req.lang,
+        ),
+      );
+    }
+
+    await Users.findByIdAndUpdate(req.loggedUser.id, {
+      $inc: { avaliableContracts: -1 },
+    });
+
     await CopyrightContracts.updateOne(
       { paymentLink: req.params.paymentSession },
       {
