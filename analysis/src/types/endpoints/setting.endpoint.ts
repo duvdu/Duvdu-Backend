@@ -37,6 +37,6 @@ export interface AddSettingHandler
   extends RequestHandler<
     { settingId: string },
     SuccessResponse<{ data: Isetting }>,
-    { time: number },
+    { time?: number; contractSubscriptionPercentage?: number },
     unknown
   > {}
