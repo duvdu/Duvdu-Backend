@@ -4,6 +4,7 @@ import { MODELS } from '../types/model-names';
 
 export interface Isetting {
   expirationTime: { time: number }[];
+  contractSubscriptionPercentage: number;
   default_profile: string;
   default_cover: string;
   splash: {
@@ -20,6 +21,7 @@ export const Setting = model<Isetting>(
       expirationTime: [{ time: { type: Number, unique: true } }],
       default_profile: String,
       default_cover: String,
+      contractSubscriptionPercentage: { type: Number, default: 10 },
       splash: [
         {
           cover: { type: String, default: null },
