@@ -29,6 +29,11 @@ export const getExpirationVal = [
 export const addExpirationVal = [
   param('settingId').isMongoId().withMessage('settingIdMongoId'),
   body('time').isInt({ min: 1 }).withMessage('timeInt'),
+  globalValidatorMiddleware,
+];
+
+export const updateSettingVal = [
+  param('settingId').isMongoId().withMessage('settingIdMongoId'),
   body('contractSubscriptionPercentage')
     .isInt({ min: 1, max: 100 })
     .withMessage('contractSubscriptionPercentageInt'),

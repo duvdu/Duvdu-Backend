@@ -29,6 +29,11 @@ router
     val.updateExpirationVal,
     handler.updateExpirationHandler,
   )
+  .put(
+    isauthorized(PERMISSIONS.updateSettingHandler),
+    val.updateSettingVal,
+    handler.updateSettingHandler,
+  )
   .delete(
     isauthorized(PERMISSIONS.deleteSettingHandler),
     val.deleteExpirationVal,
