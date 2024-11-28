@@ -4,7 +4,7 @@ import 'express-async-errors';
 
 export const getUnReadNotificationAndMessagesCountController: RequestHandler<
   unknown,
-  SuccessResponse<{ data: { count: number } }>,
+  SuccessResponse<{ data: { messagesCount: number; notificationsCount: number; count: number } }>,
   unknown,
   unknown
 > = async (req, res) => {
@@ -26,6 +26,8 @@ export const getUnReadNotificationAndMessagesCountController: RequestHandler<
   res.status(200).json({
     message: 'success',
     data: {
+      messagesCount: unreadMessagesCount,
+      notificationsCount: unWatchedNotificationsCount,
       count: unWatchedNotificationsCount + unreadMessagesCount,
     },
   });
