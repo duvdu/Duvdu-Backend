@@ -14,40 +14,61 @@ import {
   Users,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
+import { Document } from 'mongoose';
 
 import { inviteCreatives } from '../../services/inviteCreative.service';
 import { sendNotification } from '../book/sendNotification';
 
+interface ProjectRequestBody extends Pick<
+  IprojectCycle,
+  | 'address'
+  | 'attachments'
+  | 'category'
+  | 'cover'
+  | 'description'
+  | 'functions'
+  | 'duration'
+  | 'location'
+  | 'name'
+  | 'projectScale'
+  | 'searchKeyWords'
+  | 'showOnHome'
+  | 'tools'
+  | 'subCategory'
+  | 'tags'
+  | 'audioCover'
+  | 'creatives'
+> {
+  subCategoryId: string;
+  tagsId: string[];
+  invitedCreatives: { number: string }[];
+}
+
+
 export const createProjectHandler: RequestHandler<
   unknown,
   SuccessResponse<{ data: IprojectCycle }>,
-  Pick<
-    IprojectCycle,
-    | 'address'
-    | 'attachments'
-    | 'category'
-    | 'cover'
-    | 'description'
-    | 'functions'
-    | 'duration'
-    | 'location'
-    | 'name'
-    | 'projectScale'
-    | 'searchKeyWords'
-    | 'showOnHome'
-    | 'tools'
-    | 'subCategory'
-    | 'tags'
-    | 'audioCover'
-    | 'creatives'
-  > & { subCategoryId: string; tagsId: string[]; invitedCreatives: { number: string }[] },
+  ProjectRequestBody,
   unknown
 > = async (req, res, next) => {
   try {
-    // Extract files from request
-    const attachments = <Express.Multer.File[]>(req.files as any).attachments;
-    const cover = <Express.Multer.File[]>(req.files as any).cover;
-    const audioCover = <Express.Multer.File[]>(req.files as any).audioCover;
+    // Extract files from request with type checking
+    const files = req.files as { 
+      attachments?: Express.Multer.File[];
+      cover?: Express.Multer.File[];
+      audioCover?: Express.Multer.File[];
+    } | undefined;
+
+    if (!files) {
+      return next(new BadRequestError(
+        { en: 'No files uploaded', ar: 'لم يتم تحميل أي ملفات' },
+        req.lang
+      ));
+    }
+
+    const attachments = files.attachments || [];
+    const cover = files.cover || [];
+    const audioCover = files.audioCover || [];
 
     // Filter and prepare tags for category
     const { filteredTags, subCategoryTitle, media } = await filterTagsForCategory(
@@ -57,136 +78,105 @@ export const createProjectHandler: RequestHandler<
       CYCLES.portfolioPost,
       req.lang,
     );
-    req.body.subCategory = {...subCategoryTitle! , _id:req.body.subCategoryId};
+
+    req.body.subCategory = { ...subCategoryTitle!, _id: req.body.subCategoryId };
     req.body.tags = filteredTags;
 
-    // Validate creatives if present
+    // Validate media requirements
+    await validateMediaRequirements(
+      media as CategoryMedia,
+      attachments,
+      cover,
+      audioCover,
+      req.lang,
+    );
 
+    // Validate creatives if present
     if (req.body.creatives) {
       const creativeCount = await Users.countDocuments({
         _id: { $in: req.body.creatives.map((el) => el.creative) },
       });
+      
       if (creativeCount !== req.body.creatives.length) {
         return next(
           new BadRequestError(
-            { en: 'Invalid creatives', ar: 'مستخدمو المحتويات الإبداعية غير الصالحين' },
+            { en: 'Invalid creatives', ar: 'مستخدمو المحتويات الإبداعية غير صالحين' },
             req.lang,
           ),
         );
       }
     }
 
-    let invitedCreative;
-    if (req.body.invitedCreatives)
-      invitedCreative = (await inviteCreatives(req.body.invitedCreatives)) || [];
+    // Handle invited creatives
+    let invitedCreative:any = [];
+    if (req.body.invitedCreatives) {
+      invitedCreative = await inviteCreatives(req.body.invitedCreatives) || [];
+    }
 
+    // Initialize S3 bucket and handle file uploads
     const s3 = new Bucket();
+    const uploadTasks = [];
 
-    if (media === CategoryMedia.image) {
-      const imageFiles = filterFilesByType(attachments, 'image/');
-      if (imageFiles.length === 0) {
-        return next(
-          new BadRequestError(
-            {
-              en: 'There must be exactly one image file as an attachment',
-              ar: 'يجب أن يكون هناك ملف صورة واحد كمرفق',
-            },
-            req.lang,
-          ),
-        );
-      }
-    } else if (media === CategoryMedia.audio) {
-      const audioFiles = filterFilesByType(attachments, 'audio/');
-      if (audioFiles.length === 0) {
-        return next(
-          new BadRequestError(
-            {
-              en: 'There must be exactly one audio file as an attachment',
-              ar: 'يجب أن يكون هناك ملف صوتي واحد كمرفق',
-            },
-            req.lang,
-          ),
-        );
-      }
-    } else if (media === CategoryMedia.video) {
-      const videoFiles = filterFilesByType(attachments, 'video/');
-      if (videoFiles.length === 0) {
-        return next(
-          new BadRequestError(
-            {
-              en: 'There must be exactly one video file as an attachment',
-              ar: 'يجب أن يكون هناك ملف فيديو واحد كمرفق',
-            },
-            req.lang,
-          ),
-        );
-      }
+    // Handle cover upload
+    if (cover.length > 0) {
+      uploadTasks.push(
+        s3.saveBucketFiles(FOLDERS.portfolio_post, cover[0])
+          .then(() => {
+            req.body.cover = `${FOLDERS.portfolio_post}/${cover[0].filename}`;
+          })
+      );
     }
 
-    // Validate cover file based on media type
-    if (media === CategoryMedia.image || media === CategoryMedia.audio) {
-      if (!cover[0].mimetype.startsWith('image/')) {
-        return next(
-          new BadRequestError(
-            { en: 'Cover must be an image', ar: 'يجب أن يكون الغلاف صورة' },
-            req.lang,
-          ),
-        );
-      }
-
-      // Additional validation for audio media
-      if (media === CategoryMedia.audio) {
-        if (
-          !audioCover ||
-          audioCover.length === 0 ||
-          !audioCover[0].mimetype.startsWith('audio/')
-        ) {
-          return next(
-            new BadRequestError(
-              {
-                en: 'Audio cover is required and must be an audio file',
-                ar: 'يجب أن يكون الغلاف الصوتي صوتيًا',
-              },
-              req.lang,
-            ),
-          );
-        }
-        await s3.saveBucketFiles(FOLDERS.portfolio_post, ...audioCover);
-        req.body.audioCover = `${FOLDERS.portfolio_post}/${audioCover[0].filename}`;
-      }
-    } else if (media === CategoryMedia.video) {
-      if (!cover[0].mimetype.startsWith('video/')) {
-        return next(
-          new BadRequestError(
-            { en: 'Cover must be a video for video media type', ar: 'يجب أن يكون الغلاف فيديو' },
-            req.lang,
-          ),
-        );
-      }
+    // Handle attachments upload
+    if (attachments.length > 0) {
+      uploadTasks.push(
+        s3.saveBucketFiles(FOLDERS.portfolio_post, ...attachments)
+          .then(() => {
+            req.body.attachments = attachments.map(
+              (f) => `${FOLDERS.portfolio_post}/${f.filename}`
+            );
+          })
+      );
     }
 
-    // Save cover and attachments to bucket
-    await s3.saveBucketFiles(FOLDERS.portfolio_post, ...attachments, ...cover);
-    req.body.cover = `${FOLDERS.portfolio_post}/${cover[0].filename}`;
-    req.body.attachments = attachments.map((f) => `${FOLDERS.portfolio_post}/${f.filename}`);
+    // Handle audioCover upload
+    if (audioCover.length > 0) {
+      uploadTasks.push(
+        s3.saveBucketFiles(FOLDERS.portfolio_post, audioCover[0])
+          .then(() => {
+            req.body.audioCover = `${FOLDERS.portfolio_post}/${audioCover[0].filename}`;
+          })
+      );
+    }
 
-    // location
-    if (req.body.location)
+    // Execute all uploads in parallel
+    await Promise.all(uploadTasks).catch((error) => {
+      console.error('Upload error:', error);
+      throw new BadRequestError(
+        { en: 'Error uploading files', ar: 'خطأ في تحميل الملفات' },
+        req.lang
+      );
+    });
+
+    // Process location data if present
+    if (req.body.location) {
       req.body.location = {
         type: 'Point',
-        coordinates: [(req as any).body.location.lng, (req as any).body.location.lat],
-      } as any;
+        coordinates: [(req.body.location as any).lng, (req.body.location as any).lat],
+      };
+    }
 
-    // Create project cycle and project records
+    // Create project cycle
     const projectCycle = await ProjectCycle.create({
       ...req.body,
       user: req.loggedUser.id,
       creatives: [
-        ...(req.body.creatives ? req.body.creatives : []),
-        ...(invitedCreative ? invitedCreative : []),
+        ...(req.body.creatives || []),
+        ...invitedCreative,
       ],
     });
 
+    // Create project record
     await Project.create({
       _id: projectCycle._id,
       project: { type: projectCycle.id, ref: MODELS.portfolioPost },
@@ -194,49 +184,141 @@ export const createProjectHandler: RequestHandler<
       ref: MODELS.portfolioPost,
     });
 
-    const loggedUser = await Users.findById(req.loggedUser.id);
+    // Handle notifications
+    await handleProjectNotifications(projectCycle as IprojectCycle & Document, req.loggedUser.id);
 
-    if (projectCycle.creatives.length > 0) {
-      for (const creative of projectCycle.creatives) {
-        const creativeUser = await Users.findById(creative.creative);
-        await Promise.all([
-          sendNotification(
-            req.loggedUser.id,
-            creative.creative.toString(),
-            projectCycle._id.toString(),
-            'new tag',
-            'You were mentioned in the project.',
-            `${loggedUser?.name} has tagged you in his project. Accept or decline.`,
-            'new-tag',
-          ),
-          sendNotification(
-            req.loggedUser.id,
-            creative.creative.toString(),
-            projectCycle._id.toString(),
-            'new tag',
-            `tagged from project ${projectCycle.name}`,
-            `you tagged ${creativeUser?.name} in your project successfully`,
-            'new-tag',
-          ),
-        ]);
-      }
-    }
-    const totalProjectPrice =
-      projectCycle.tools.reduce((acc, tool) => acc + tool.unitPrice, 0) +
-      projectCycle.functions.reduce((acc, func) => acc + func.unitPrice, 0) +
-      projectCycle.projectScale.pricerPerUnit * projectCycle.projectScale.current;
+    // Calculate and update project budget
+    const totalProjectPrice = calculateProjectPrice(projectCycle);
     await ProjectCycle.updateOne(
       { _id: projectCycle._id },
       { minBudget: totalProjectPrice, maxBudget: totalProjectPrice },
     );
 
-    // Respond with success message
+    // Send success response
     res.status(201).json({ message: 'success', data: projectCycle });
   } catch (error) {
     console.error('Error creating project:', error);
     next(error);
   }
 };
+
+// Helper Functions
+
+async function validateMediaRequirements(
+  media: CategoryMedia,
+  attachments: Express.Multer.File[],
+  cover: Express.Multer.File[],
+  audioCover: Express.Multer.File[],
+  lang: string,
+) {
+  const mediaValidators = {
+    [CategoryMedia.image]: () => {
+      const imageFiles = filterFilesByType(attachments, 'image/');
+      if (imageFiles.length === 0) {
+        throw new BadRequestError(
+          {
+            en: 'There must be exactly one image file as an attachment',
+            ar: 'يجب أن يكون هناك ملف صورة واحد كمرفق',
+          },
+          lang,
+        );
+      }
+    },
+    [CategoryMedia.audio]: () => {
+      const audioFiles = filterFilesByType(attachments, 'audio/');
+      if (audioFiles.length === 0) {
+        throw new BadRequestError(
+          {
+            en: 'There must be exactly one audio file as an attachment',
+            ar: 'يجب أن يكون هناك ملف صوتي واحد كمرفق',
+          },
+          lang,
+        );  
+      }
+    },
+    [CategoryMedia.video]: () => {
+      const videoFiles = filterFilesByType(attachments, 'video/');
+      if (videoFiles.length === 0) {
+        throw new BadRequestError(
+          {
+            en: 'There must be exactly one video file as an attachment',
+            ar: 'يجب أن يكون هناك ملف فيديو واحد كمرفق',
+          },
+          lang,
+        );
+      }
+    },
+  };
+
+  // Execute media-specific validation
+  mediaValidators[media]?.();
+
+  // Validate cover based on media type
+  if ((media === CategoryMedia.image || media === CategoryMedia.audio) && 
+      (!cover[0]?.mimetype.startsWith('image/'))) {
+    throw new BadRequestError(
+      { en: 'Cover must be an image', ar: 'يجب أن يكون الغلاف صورة' },
+      lang,
+    );
+  }
+
+  // Additional audio validation
+  if (media === CategoryMedia.audio) {
+    if (!audioCover?.[0]?.mimetype.startsWith('audio/')) {
+      throw new BadRequestError(
+        {
+          en: 'Audio cover is required and must be an audio file',
+          ar: 'يجب أن يكون الغلاف الصوتي صوتيًا',
+        },
+        lang,
+      );
+    }
+  }
+
+  // Video cover validation
+  if (media === CategoryMedia.video && !cover[0]?.mimetype.startsWith('video/')) {
+    throw new BadRequestError(
+      { en: 'Cover must be a video for video media type', ar: 'يجب أن يكون الغلاف فيديو' },
+      lang,
+    );
+  }
+}
+
+async function handleProjectNotifications(projectCycle: (IprojectCycle & Document), userId: string) {
+  if (projectCycle.creatives.length === 0) return;
+
+  const loggedUser = await Users.findById(userId);
+
+  for (const creative of projectCycle.creatives) {
+    const creativeUser = await Users.findById(creative.creative);
+    await Promise.all([
+      sendNotification(
+        userId,
+        creative.creative.toString(),
+        (projectCycle as any)._id.toString(),
+        'new tag',
+        'You were mentioned in the project.',
+        `${loggedUser?.name} has tagged you in his project. Accept or decline.`,
+        'new-tag',
+      ),
+      sendNotification(
+        userId,
+        creative.creative.toString(),
+        (projectCycle as any)._id.toString(),
+        'new tag',
+        `tagged from project ${projectCycle.name}`,
+        `you tagged ${creativeUser?.name} in your project successfully`,
+        'new-tag',
+      ),
+    ]);
+  }
+}
+
+function calculateProjectPrice(projectCycle: IprojectCycle): number {
+  return projectCycle.tools.reduce((acc, tool) => acc + tool.unitPrice, 0) +
+    projectCycle.functions.reduce((acc, func) => acc + func.unitPrice, 0) +
+    projectCycle.projectScale.pricerPerUnit * projectCycle.projectScale.current;
+}
 
 export const filterFilesByType = (
   attachments: Express.Multer.File[],

@@ -16,11 +16,15 @@ export const createPlatformHandler: RequestHandler<
   unknown
 > = async (req, res) => {
   const image = <Express.Multer.File[]>(req.files as any).image;
-
-  await new Bucket().saveBucketFiles(FOLDERS.producer, ...image);
-  req.body.image = `${FOLDERS.producer}/${image[0].filename}`;
-  Files.removeFiles(req.body.image);
-  const platform = await ProducerPlatform.create(req.body);
+  
+  const [platform] = await Promise.all([
+    ProducerPlatform.create({
+      ...req.body,
+      image: `${FOLDERS.producer}/${image[0].filename}`
+    }),
+    new Bucket().saveBucketFiles(FOLDERS.producer, ...image),
+    Files.removeFiles(`${FOLDERS.producer}/${image[0].filename}`)
+  ]);
 
   res.status(201).json({ message: 'success', data: platform });
 };

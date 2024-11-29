@@ -24,9 +24,19 @@ import { AddCreativeHandler } from '../../types/project.endpoints';
 
 export const addCreativeHandler: AddCreativeHandler = async (req, res, next) => {
   const attachments = <Express.Multer.File[] | undefined>(req.files as any)?.attachments;
-  console.log(attachments);
+  
+  // Start file upload early and in parallel with other operations
+  let uploadPromise;
+  if (attachments) {
+    const s3 = new Bucket();
+    uploadPromise = s3.saveBucketFiles(FOLDERS.team_project, ...attachments);
+  }
 
-  const project = await TeamProject.findOne({ _id: req.params.teamId, isDeleted: { $ne: true } });
+  // Run database queries in parallel
+  const [project, creative] = await Promise.all([
+    TeamProject.findOne({ _id: req.params.teamId, isDeleted: { $ne: true } }),
+    Users.findById(req.body.user)
+  ]);
 
   if (!project)
     return next(new NotFound({ en: 'team not found', ar: 'التيم غير موجود' }, req.lang));
@@ -34,7 +44,6 @@ export const addCreativeHandler: AddCreativeHandler = async (req, res, next) => 
   if (project.user.toString() != req.loggedUser.id)
     return next(new NotAllowedError(undefined, req.lang));
 
-  const creative = await Users.findById(req.body.user);
   if (!creative)
     return next(new NotFound({ en: 'user not found', ar: 'المستخدم غير موجود' }, req.lang));
 
@@ -50,9 +59,9 @@ export const addCreativeHandler: AddCreativeHandler = async (req, res, next) => 
       ),
     );
 
-  const s3 = new Bucket();
-  if (attachments) {
-    await s3.saveBucketFiles(FOLDERS.team_project, ...attachments);
+  // Wait for file upload to complete if there were attachments
+  if (attachments && uploadPromise) {
+    await uploadPromise;
     req.body.attachments = attachments.map((el) => `${FOLDERS.team_project}/${el.filename}`);
     Files.removeFiles(...(req.body as any).attachments);
   }

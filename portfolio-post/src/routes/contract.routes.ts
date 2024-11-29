@@ -14,7 +14,6 @@ router.route('/:projectId').post(
     fileTypes: ['video', 'image'],
   }).fields([{ name: 'attachments', maxCount: 10 }]),
   val.create,
-  // checkRequiredFields({ fields: ['attachments'] }),
   handler.createContractHandler,
 );
 router.post('/pay/:paymentSession', val.pay, handler.payContract);

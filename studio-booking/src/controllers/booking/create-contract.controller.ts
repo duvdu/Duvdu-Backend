@@ -30,20 +30,17 @@ export const createContractHandler: RequestHandler<
     attachments: string[];
   }
 > = async (req, res, next) => {
-  if (req.files) {
-    req.body.attachments = (req.files as Express.Multer.File[]).map(
-      (el: any) => 'studio-booking/' + el.filename,
-    );
-    await new Bucket().saveBucketFiles(
-      FOLDERS.studio_booking,
-      ...(req.files as Express.Multer.File[]),
-    );
-  }
+  // Start file upload process early and in parallel
+  const fileUploadPromise = req.files ? handleFileUpload(req.files as Express.Multer.File[]) : null;
+
+  // Validate project and other checks
   const project = await Rentals.findOne({ _id: req.params.projectId, isDeleted: { $ne: true } });
   if (!project)
     return next(new NotFound({ en: 'project not found', ar: 'المشروع غير موجود' }, req.lang));
+
   if (project.user.toString() === req.loggedUser.id)
     return next(new NotAllowedError(undefined, req.lang));
+
   if (
     project.projectScale.minimum > req.body.projectScale.numberOfUnits ||
     project.projectScale.maximum < req.body.projectScale.numberOfUnits
@@ -54,6 +51,15 @@ export const createContractHandler: RequestHandler<
         req.lang,
       ),
     );
+
+  // Wait for file upload to complete and get attachments
+  if (fileUploadPromise) {
+    try {
+      req.body.attachments = await fileUploadPromise;
+    } catch (error) {
+      return next(new BadRequestError({ en: 'File upload failed', ar: 'فشل تحميل الملف' }, req.lang));
+    }
+  }
 
   const deadline: Date = addToDate(
     new Date(req.body.startDate),
@@ -78,7 +84,6 @@ export const createContractHandler: RequestHandler<
     },
     location: project.location,
     address: project.address,
-
     totalPrice: (req.body.projectScale.numberOfUnits * project.projectScale.pricerPerUnit).toFixed(
       2,
     ),
@@ -93,7 +98,7 @@ export const createContractHandler: RequestHandler<
   // );
 
   await Contracts.create({
-    _id:contract._id,
+    _id: contract._id,
     customer: contract.customer,
     sp: contract.sp,
     contract: contract.id,
@@ -103,8 +108,9 @@ export const createContractHandler: RequestHandler<
 
   const user = await Users.findById(req.loggedUser.id);
 
+  // Send notifications in parallel
   await Promise.all([
-    await sendNotification(
+    sendNotification(
       req.loggedUser.id,
       contract.sp.toString(),
       contract._id.toString(),
@@ -126,6 +132,18 @@ export const createContractHandler: RequestHandler<
 
   res.status(201).json({ message: 'success' });
 };
+
+// Helper function to handle file uploads
+async function handleFileUpload(files: Express.Multer.File[]): Promise<string[]> {
+  const attachments = files.map(file => 'studio-booking/' + file.filename);
+  
+  await new Bucket().saveBucketFiles(
+    FOLDERS.studio_booking,
+    ...files
+  );
+
+  return attachments;
+}
 
 async function getStageExpiration(isoDate: string, lang: string) {
   const givenDate = new Date(isoDate);

@@ -1,5 +1,4 @@
 import 'express-async-errors';
-
 import {
   BadRequestError,
   Bucket,
@@ -25,6 +24,7 @@ import { CreateContractHandler } from '../../types/contract.endpoint';
 
 export const createContractHandler: CreateContractHandler = async (req, res, next) => {
   try {
+    // Project validation
     const project = await ProjectCycle.findOne({
       _id: req.params.projectId,
       isDeleted: { $ne: true },
@@ -36,6 +36,7 @@ export const createContractHandler: CreateContractHandler = async (req, res, nex
     if (req.loggedUser.id === project.user.toString())
       return next(new NotAllowedError(undefined, req.lang));
 
+    // Scale validation
     if (req.body.projectScale.numberOfUnits < project.projectScale.minimum)
       return next(
         new BadRequestError(
@@ -58,65 +59,72 @@ export const createContractHandler: CreateContractHandler = async (req, res, nex
         ),
       );
 
+    // Enhanced file upload handling
+    let uploadPromise = Promise.resolve();
     const attachments = <Express.Multer.File[] | undefined>(req.files as any)?.attachments;
     if (attachments && attachments.length > 0) {
+      const bucket = new Bucket();
       req.body.attachments = attachments.map((el) => FOLDERS.portfolio_post + '/' + el.filename);
-      await new Bucket().saveBucketFiles(FOLDERS.portfolio_post, ...attachments);
-      Files.removeFiles(...req.body.attachments);
+      
+      // Process file upload in parallel
+      uploadPromise = Promise.all([
+        bucket.saveBucketFiles(FOLDERS.portfolio_post, ...attachments),
+        Files.removeFiles(...req.body.attachments)
+      ]).then(()=>{});
     }
 
-    const deadline = new Date(
-      new Date(req.body.startDate).setDate(
-        new Date(req.body.startDate).getDate() + project.duration,
-      ),
-    ).toISOString();
+    // Parallel processing of deadline, expiration, and price calculations
+    const [deadline, stageExpiration, priceData] = await Promise.all([
+      Promise.resolve(new Date(
+        new Date(req.body.startDate).setDate(
+          new Date(req.body.startDate).getDate() + project.duration,
+        ),
+      ).toISOString()),
+      getBestExpirationTime(req.body.appointmentDate.toString(), req.lang),
+      calculateTotalPrice(project._id.toString(), req.body.equipment, req.lang)
+    ]);
 
-    const stageExpiration = await getBestExpirationTime(
-      req.body.appointmentDate.toString(),
-      req.lang,
-    );
+    const { functions, tools, totalPrice } = priceData;
 
-    const { functions, tools, totalPrice } = await calculateTotalPrice(
-      project._id.toString(),
-      req.body.equipment,
-      req.lang,
-    );
-
+    // Price calculations
     const unitPriceTotal = project.projectScale.pricerPerUnit * req.body.projectScale.numberOfUnits;
     const allPrice = totalPrice + unitPriceTotal;
 
-    const contract = await ProjectContract.create({
-      ...req.body,
-      sp: project.user,
-      customer: req.loggedUser.id,
-      project: project._id,
-      projectScale: {
-        unit: project.projectScale.unit,
-        numberOfUnits: req.body.projectScale.numberOfUnits,
-        unitPrice: project.projectScale.pricerPerUnit,
-      },
-      totalPrice: allPrice,
-      functions,
-      tools,
-      deadline,
-      stageExpiration,
-      status: ProjectContractStatus.pending,
-      duration: project.duration,
-      equipmentPrice: totalPrice,
-    });
+    // Create contract and wait for file upload in parallel
+    const [contract] = await Promise.all([
+      ProjectContract.create({
+        ...req.body,
+        sp: project.user,
+        customer: req.loggedUser.id,
+        project: project._id,
+        projectScale: {
+          unit: project.projectScale.unit,
+          numberOfUnits: req.body.projectScale.numberOfUnits,
+          unitPrice: project.projectScale.pricerPerUnit,
+        },
+        totalPrice: allPrice,
+        functions,
+        tools,
+        deadline,
+        stageExpiration,
+        status: ProjectContractStatus.pending,
+        duration: project.duration,
+        equipmentPrice: totalPrice,
+      }),
+      uploadPromise
+    ]);
 
-    await Contracts.create({
-      _id: contract._id,
-      customer: contract.customer,
-      sp: contract.sp,
-      contract: contract._id,
-      ref: MODELS.projectContract,
-      cycle: CYCLES.portfolioPost,
-    });
-
-    // send notification to sp
+    // Parallel processing of contract record creation and notifications
     const user = await Users.findById(req.loggedUser.id);
     await Promise.all([
+      Contracts.create({
+        _id: contract._id,
+        customer: contract.customer,
+        sp: contract.sp,
+        contract: contract._id,
+        ref: MODELS.projectContract,
+        cycle: CYCLES.portfolioPost,
+      }),
       sendNotification(
         req.loggedUser.id,
         contract.sp.toString(),
@@ -137,7 +145,7 @@ export const createContractHandler: CreateContractHandler = async (req, res, nex
       ),
     ]);
 
-    // add expiration queue
+    // Optional: Add expiration queue if needed
     // const delay = contract.stageExpiration * 3600 * 1000;
     // await pendingQueue.add({contractId:contract._id.toString()} , {delay});
 

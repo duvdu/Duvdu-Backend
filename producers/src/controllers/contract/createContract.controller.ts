@@ -23,7 +23,13 @@ import { CreateContractHandler } from '../../types/endpoints';
 export const createContractHandler: CreateContractHandler = async (req, res, next) => {
   try {
     const attachments = <Express.Multer.File[]>(req.files as any).attachments;
-    const producer = await Producer.findById(req.body.producer);
+    
+    // Run producer validation and file upload in parallel
+    const [producer] = await Promise.all([
+      Producer.findById(req.body.producer),
+      new Bucket().saveBucketFiles(FOLDERS.producer, ...attachments)
+    ]);
+
     if (!producer)
       return next(
         new NotFound({ en: 'producer not found', ar: 'لم يتم العثور على المنتج' }, req.lang),
@@ -55,20 +61,22 @@ export const createContractHandler: CreateContractHandler = async (req, res, nex
       );
 
     req.body.stageExpiration = await getBestExpirationTime(req.body.appointmentDate.toString());
-
-    await new Bucket().saveBucketFiles(FOLDERS.producer, ...attachments);
     req.body.attachments = attachments.map((el) => `${FOLDERS.producer}/${el.filename}`);
     Files.removeFiles(...req.body.attachments);
 
-    const contract = await ProducerContract.create({
-      ...req.body,
-      user: req.loggedUser.id,
-      sp: producer.user,
-    });
+    // Create contract and fetch user in parallel
+    const [contract, user] = await Promise.all([
+      ProducerContract.create({
+        ...req.body,
+        user: req.loggedUser.id,
+        sp: producer.user,
+      }),
+      Users.findById(req.loggedUser.id)
+    ]);
 
-    const user = await Users.findById(req.loggedUser.id);
+    // Run notifications and contract creation in parallel
     await Promise.all([
-      await sendNotification(
+      sendNotification(
         req.loggedUser.id,
         producer.user.toString(),
         contract._id.toString(),
@@ -86,8 +94,17 @@ export const createContractHandler: CreateContractHandler = async (req, res, nex
         'contract created successfully',
         Channels.new_contract,
       ),
+      Contracts.create({
+        _id: contract._id,
+        contract: contract._id,
+        customer: contract.user,
+        sp: producer.user,
+        cycle: CYCLES.producer,
+        ref: MODELS.producerContract,
+      })
     ]);
 
+    // Commented out queue logic as in original code
     // const delay = contract.stageExpiration * 3600 * 1000;
     // // const delay = 1*60 * 1000;
     // await createContractQueue.add(
@@ -98,15 +115,6 @@ export const createContractHandler: CreateContractHandler = async (req, res, nex
     //     delay,
     //   },
     // );
-
-    await Contracts.create({
-      _id: contract._id,
-      contract: contract._id,
-      customer: contract.user,
-      sp: producer.user,
-      cycle: CYCLES.producer,
-      ref: MODELS.producerContract,
-    });
 
     res.status(201).json({ message: 'success', data: contract });
   } catch (error) {

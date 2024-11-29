@@ -20,45 +20,61 @@ import { getBestExpirationTime } from '../../services/getBestExpirationTime.serv
 import { CreateProjectHandler } from '../../types/project.endpoints';
 // import { pendingQueue } from '../../utils/expirationQueue';
 
-export const createProjectHandler: CreateProjectHandler = async (req, res, next) => {
+export const createProjectHandler: CreateProjectHandler = async (req, res) => {
   const files = req.files as { [fieldName: string]: Express.Multer.File[] };
-  const creatives = req.body.creatives;
 
   const s3 = new Bucket();
-  // handle cover
-  await s3.saveBucketFiles(FOLDERS.team_project, ...files['cover']);
-  req.body.cover = `${FOLDERS.team_project}/${files['cover'][0].filename}`;
-  console.log(req.body.cover);
+  
+  // Handle cover upload in parallel with other operations
+  const coverUploadPromise = s3.saveBucketFiles(FOLDERS.team_project, ...files['cover'])
+    .then(() => {
+      req.body.cover = `${FOLDERS.team_project}/${files['cover'][0].filename}`;
+      Files.removeFiles(req.body.cover);
+    });
 
-  Files.removeFiles(req.body.cover);
-
-  // validate user and upload attachments
-  for (const creative of req.body.creatives) {
-    if (!(await Categories.findById(creative.category)))
-      return next(new BadRequestError({ en: 'invalid category', ar: 'فئة غير صالحة' }, req.lang));
-    if (creative.users?.length) {
-      for (const user of creative.users) {
-        if (!(await Users.findById(user.user)))
-          return next(
-            new BadRequestError({ en: 'invalid users', ar: 'المستخدمين غير الصالحين' }, req.lang),
-          );
-
-        user.attachments = [];
-        const key = `creatives[${creatives.indexOf(creative)}][users][${creative.users.indexOf(user)}][attachments]`;
-        if (key?.length && Array.isArray(files[key]))
-          await s3.saveBucketFiles(FOLDERS.team_project, ...files[key]);
-
-        for (let i = 0; i < key.length; i++) {
-          const fileArray = files[key];
-          if (fileArray && fileArray[i]) {
-            user.attachments.push(`${FOLDERS.team_project}/${fileArray[i].filename}`);
-            Files.removeFiles(`${FOLDERS.team_project}/${fileArray[i].filename}`);
-          }
-        }
-      }
+  // Validate categories and users first
+  const validationPromises = req.body.creatives.map(async (creative) => {
+    if (!(await Categories.findById(creative.category))) {
+      throw new BadRequestError({ en: 'invalid category', ar: 'فئة غير صالحة' }, req.lang);
     }
-  }
+    
+    if (creative.users?.length) {
+      await Promise.all(creative.users.map(async (user) => {
+        if (!(await Users.findById(user.user))) {
+          throw new BadRequestError({ en: 'invalid users', ar: 'المستخدمين غير الصالحين' }, req.lang);
+        }
+      }));
+    }
+  });
 
+  // Handle all file uploads in parallel
+  const uploadPromises = req.body.creatives.map(async (creative, creativeIndex) => {
+    if (creative.users?.length) {
+      await Promise.all(creative.users.map(async (user, userIndex) => {
+        user.attachments = [];
+        const key = `creatives[${creativeIndex}][users][${userIndex}][attachments]`;
+        
+        if (key?.length && Array.isArray(files[key])) {
+          await s3.saveBucketFiles(FOLDERS.team_project, ...files[key]);
+          
+          files[key].forEach((file) => {
+            const filePath = `${FOLDERS.team_project}/${file.filename}`;
+            user.attachments.push(filePath);
+            Files.removeFiles(filePath);
+          });
+        }
+      }));
+    }
+  });
+
+  // Wait for all operations to complete
+  await Promise.all([
+    coverUploadPromise,
+    ...validationPromises,
+    ...uploadPromises
+  ]);
+
+  // Calculate deadlines and total amounts
   req.body.creatives.forEach((creative) => {
     creative.users?.forEach((user) => {
       user.deadLine = new Date(
@@ -70,11 +86,13 @@ export const createProjectHandler: CreateProjectHandler = async (req, res, next)
     });
   });
 
+  // Create team project
   const team = await TeamProject.create({
     ...req.body,
     user: req.loggedUser?.id,
   });
 
+  // Create contracts and send notifications
   for (const creative of team.creatives) {
     for (const user of creative.users) {
       const stageExpiration = await getBestExpirationTime(
@@ -104,7 +122,7 @@ export const createProjectHandler: CreateProjectHandler = async (req, res, next)
         category: creative.category,
       });
 
-      // create contract an all contracts
+      // create contract in all contracts
       await Contracts.create({
         _id: contract._id,
         contract: contract._id,
@@ -115,7 +133,7 @@ export const createProjectHandler: CreateProjectHandler = async (req, res, next)
       });
 
       const customer = await Users.findById(req.loggedUser.id);
-      // send notification to user
+      // send notifications in parallel
       await Promise.all([
         sendNotification(
           contract.customer.toString(),

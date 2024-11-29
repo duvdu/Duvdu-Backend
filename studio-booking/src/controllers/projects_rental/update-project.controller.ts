@@ -10,15 +10,24 @@ export const updateProjectHandler: RequestHandler<{ projectId: string }, Success
   const cover = <Express.Multer.File[] | undefined>(req.files as any)?.cover;
 
   const s3 = new Bucket();
+  const uploadPromises: Promise<any>[] = [];
+
+  // Prepare upload promises
   if (attachments) {
-    await s3.saveBucketFiles(FOLDERS.studio_booking, ...attachments);
+    uploadPromises.push(s3.saveBucketFiles(FOLDERS.studio_booking, ...attachments));
     req.body.attachments = attachments.map((el) => `${FOLDERS.studio_booking}/${el.filename}`);
     Files.removeFiles(...(req.body as any).attachments);
   }
+  
   if (cover) {
-    await s3.saveBucketFiles(FOLDERS.studio_booking, ...cover);
+    uploadPromises.push(s3.saveBucketFiles(FOLDERS.studio_booking, ...cover));
     req.body.cover = `${FOLDERS.studio_booking}/${cover[0].filename}`;
     Files.removeFiles(req.body.cover);
+  }
+
+  // Execute all uploads in parallel
+  if (uploadPromises.length > 0) {
+    await Promise.all(uploadPromises);
   }
 
   const project = await Rentals.findOneAndUpdate(
@@ -28,8 +37,14 @@ export const updateProjectHandler: RequestHandler<{ projectId: string }, Success
 
   if (!project) return next(new NotAllowedError(undefined, req.lang));
 
-  attachments && (await s3.removeBucketFiles(...project.attachments));
-  cover && (await s3.removeBucketFiles(project.cover));
+  // Remove old files in parallel
+  const removePromises: Promise<any>[] = [];
+  if (attachments) removePromises.push(s3.removeBucketFiles(...project.attachments));
+  if (cover) removePromises.push(s3.removeBucketFiles(project.cover));
+  
+  if (removePromises.length > 0) {
+    await Promise.all(removePromises);
+  }
 
   res.status(200).json({ message: 'success' });
 };

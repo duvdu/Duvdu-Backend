@@ -1,5 +1,3 @@
-// TODO: update contract
-
 import {
   CopyRights,
   NotAllowedError,
@@ -21,8 +19,22 @@ import {
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-// import { pendingExpiration } from '../../config/expiration-queue';
 import { sendNotification } from './contract-notification.controller';
+
+async function handleAttachments(attachments: Express.Multer.File[]) {
+  if (!attachments.length) return [];
+  
+  const fileNames = attachments.map(el => `${FOLDERS.copyrights}/${el.filename}`);
+  const bucket = new Bucket();
+  
+  // Run file operations in parallel
+  await Promise.all([
+    bucket.saveBucketFiles(FOLDERS.copyrights, ...attachments),
+    Files.removeFiles(...fileNames)
+  ]);
+  
+  return fileNames;
+}
 
 export const createContractHandler: RequestHandler<
   { projectId: string },
@@ -35,8 +47,6 @@ export const createContractHandler: RequestHandler<
     address: string;
     attachments: string[];
   }
-  // TODO:
-  // status updateAfterFirst will end by appointmentDate + stage
 > = async (req, res, next) => {
   // assert project
   const project = await CopyRights.findOne({
@@ -49,44 +59,44 @@ export const createContractHandler: RequestHandler<
   if (project.user.toString() === req.loggedUser.id)
     return next(new NotAllowedError(undefined, req.lang));
 
-  const attachments = req.files as Express.Multer.File[];
-  if (attachments.length > 0) {
-    req.body.attachments = attachments.map((el) => FOLDERS.copyrights + '/' + el.filename);
-    await new Bucket().saveBucketFiles(FOLDERS.copyrights, ...attachments);
-    Files.removeFiles(...req.body.attachments);
-  }
+  // Handle attachments
+  req.body.attachments = await handleAttachments(req.files as Express.Multer.File[]);
 
   const deadline = addToDate(
     new Date(req.body.startDate),
     project.duration.unit as any,
     project.duration.value,
   ).toISOString();
-  const stageExpiration = await getStageExpiration(new Date(deadline).toString(), req.lang);
+  
+  // Run these operations in parallel
+  const [stageExpiration, user] = await Promise.all([
+    getStageExpiration(new Date(deadline).toString(), req.lang),
+    Users.findById(req.loggedUser.id)
+  ]);
 
-  const contract = await CopyrightContracts.create({
-    ...req.body,
-    deadline,
-    duration: project.duration,
-    customer: req.loggedUser.id,
-    sp: project.user,
-    project: project._id,
-    totalPrice: project.price,
-    stageExpiration,
-    status: CopyrightContractStatus.pending,
-  });
+  // Create both contracts in parallel
+  const [contract] = await Promise.all([
+    CopyrightContracts.create({
+      ...req.body,
+      deadline,
+      duration: project.duration,
+      customer: req.loggedUser.id,
+      sp: project.user,
+      project: project._id,
+      totalPrice: project.price,
+      stageExpiration,
+      status: CopyrightContractStatus.pending,
+    }),
+    Contracts.create({
+      customer: req.loggedUser.id,
+      sp: project.user,
+      ref: MODELS.copyrightContract,
+      cycle: CYCLES.copyRights,
+    })
+  ]);
 
-  await Contracts.create({
-    _id: contract._id,
-    customer: contract.customer,
-    sp: contract.sp,
-    contract: contract.id,
-    ref: MODELS.copyrightContract,
-    cycle: CYCLES.copyRights,
-  });
-
-  const user = await Users.findById(req.loggedUser.id);
-
-  await Promise.all([
+  // Send notifications in parallel with response
+  Promise.all([
     sendNotification(
       req.loggedUser.id,
       contract.sp.toString(),
@@ -104,15 +114,9 @@ export const createContractHandler: RequestHandler<
       'new contract',
       'contract created successfully',
       Channels.new_contract,
-    ),
+    )
   ]);
 
-  // await pendingExpiration.add(
-  //   { contractId: contract.id },
-  //   { delay: (stageExpiration || 0) * 60 * 60 * 1000 },
-  // );
-
-  // TODO: send notification
   res.status(201).json({ message: 'success', data: { contractId: contract.id } });
 };
 

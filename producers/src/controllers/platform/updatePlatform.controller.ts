@@ -26,13 +26,17 @@ export const updatePlatformHandler: RequestHandler<
 
   const s3 = new Bucket();
   if (image && image.length > 0) {
-    await s3.saveBucketFiles(FOLDERS.producer, ...image);
-    await s3.removeBucketFiles(platform.image);
+    await Promise.all([
+      s3.saveBucketFiles(FOLDERS.producer, ...image),
+      platform.image ? s3.removeBucketFiles(platform.image) : Promise.resolve(),
+    ]);
+
     req.body.image = `${FOLDERS.producer}/${image[0].filename}`;
     Files.removeFiles(req.body.image);
   }
 
   if (req.body.name) platform.name = req.body.name;
+  if (req.body.image) platform.image = req.body.image;
 
   await platform.save();
   res.status(200).json({ message: 'success', data: platform });
