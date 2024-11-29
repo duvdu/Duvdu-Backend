@@ -1,4 +1,3 @@
-import fs from 'fs';
 import path from 'path';
 
 import aws from 'aws-sdk';
@@ -23,69 +22,62 @@ export class Bucket {
   }
 
   async saveBucketFiles(folder: string, ...files: Express.Multer.File[]) {
-    const CHUNK_SIZE = 50 * 1024 * 1024; // 50MB chunks
-    const MAX_PARALLEL_CHUNKS = 8; // Increased parallel uploads
+    const CHUNK_SIZE = 20 * 1024 * 1024;
+    const MAX_PARALLEL_FILES = 30;
     const MAX_RETRIES = 3;
     
-    await Promise.all(
-      files.map(async (file) => {
-        const filePath = path.resolve(`media/${folder}/${file.filename}`);
-        const fileSize = fs.statSync(filePath).size;
-        const contentType = this.getContentType(file.filename);
+    // Process files in parallel batches
+    for (let i = 0; i < files.length; i += MAX_PARALLEL_FILES) {
+      const fileBatch = files.slice(i, i + MAX_PARALLEL_FILES);
+      await Promise.all(
+        fileBatch.map(async (file) => {
+          const contentType = this.getContentType(file.filename);
+          const fileSize = file.size;
 
-        if (fileSize < CHUNK_SIZE) {
-          return this.uploadSmallFile(folder, file, contentType);
-        }
-
-        let multipartUpload: aws.S3.CreateMultipartUploadOutput | undefined;
-        try {
-          // Initiate multipart upload
-          multipartUpload = await new Promise<aws.S3.CreateMultipartUploadOutput>((resolve, reject) => {
-            this.s3.createMultipartUpload({
-              Bucket: this.bucketName,
-              Key: `${folder}/${file.filename}`,
-              ContentType: contentType,
-              ContentDisposition: 'inline',
-              ServerSideEncryption: 'AES256',
-            }, (err, data) => {
-              if (err) reject(err);
-              else resolve(data);
-            });
-          });
-
-          const uploadId = multipartUpload.UploadId!;
-          const parts: aws.S3.CompletedPart[] = [];
-          
-          // Prepare chunks for upload
-          const chunks: { buffer: Buffer; index: number }[] = [];
-          let chunkIndex = 0;
-          
-          const fileStream = fs.createReadStream(filePath, {
-            highWaterMark: CHUNK_SIZE // Optimize read buffer size
-          });
-
-          for await (const chunk of fileStream) {
-            chunks.push({ 
-              buffer: Buffer.from(chunk), 
-              index: chunkIndex++ 
-            });
+          if (fileSize < CHUNK_SIZE) {
+            return this.uploadSmallFile(folder, file, contentType);
           }
 
-          // Upload chunks in parallel batches with retry logic
-          for (let i = 0; i < chunks.length; i += MAX_PARALLEL_CHUNKS) {
-            const batch = chunks.slice(i, i + MAX_PARALLEL_CHUNKS);
-            const partUploads = batch.map(({ buffer, index }) => {
+          let multipartUpload: aws.S3.CreateMultipartUploadOutput | undefined;
+          try {
+            // Initiate multipart upload
+            multipartUpload = await new Promise<aws.S3.CreateMultipartUploadOutput>((resolve, reject) => {
+              this.s3.createMultipartUpload({
+                Bucket: this.bucketName,
+                Key: `${folder}/${file.filename}`,
+                ContentType: contentType,
+                ContentDisposition: 'inline',
+                ServerSideEncryption: 'AES256',
+              }, (err, data) => {
+                if (err) reject(err);
+                else resolve(data);
+              });
+            });
+
+            const uploadId = multipartUpload.UploadId!;
+            const parts: aws.S3.CompletedPart[] = [];
+            
+            // Split buffer into chunks
+            const buffer = file.buffer;
+            const chunks: Buffer[] = [];
+            
+            for (let i = 0; i < buffer.length; i += CHUNK_SIZE) {
+              chunks.push(buffer.slice(i, i + CHUNK_SIZE));
+            }
+
+            // Upload chunks
+            const partUploads = chunks.map((chunk, index) => {
               const partNumber = index + 1;
               
               const uploadChunkWithRetry = async (retryCount = 0): Promise<aws.S3.CompletedPart> => {
                 try {
-                  return await new Promise((resolve, reject) => {
+                  const uploadPromise = new Promise((resolve, reject) => {
                     this.s3.uploadPart({
                       Bucket: this.bucketName,
                       Key: `${folder}/${file.filename}`,
                       PartNumber: partNumber,
                       UploadId: uploadId,
-                      Body: buffer,
+                      Body: chunk,
                     }, (err, data) => {
                       if (err) reject(err);
                       else resolve({
@@ -94,9 +86,14 @@ export class Bucket {
                       });
                     });
                   });
+
+                  const timeoutPromise = new Promise((_, reject) => {
+                    setTimeout(() => reject(new Error('Upload timeout')), 30000);
+                  });
+
+                  return await Promise.race([uploadPromise, timeoutPromise]) as aws.S3.CompletedPart;
                 } catch (error) {
                   if (retryCount < MAX_RETRIES) {
-                    // Exponential backoff
                     await new Promise(resolve => 
                       setTimeout(resolve, Math.pow(2, retryCount) * 1000)
                     );
@@ -113,59 +110,53 @@ export class Bucket {
             parts.push(...completedParts.sort((a, b) => 
               (a.PartNumber ?? 0) - (b.PartNumber ?? 0))
             );
-          }
 
-          // Complete multipart upload
-          await new Promise((resolve, reject) => {
-            this.s3.completeMultipartUpload({
-              Bucket: this.bucketName,
-              Key: `${folder}/${file.filename}`,
-              UploadId: uploadId,
-              MultipartUpload: { Parts: parts }
-            }, (err, data) => {
-              if (err) reject(err);
-              else resolve(data);
-            });
-          });
-
-        } catch (error) {
-          // Attempt to abort multipart upload if it fails
-          if (multipartUpload?.UploadId) {
-            await new Promise((resolve) => {
-              this.s3.abortMultipartUpload({
+            // Complete multipart upload
+            await new Promise((resolve, reject) => {
+              this.s3.completeMultipartUpload({
                 Bucket: this.bucketName,
                 Key: `${folder}/${file.filename}`,
-                UploadId: multipartUpload!.UploadId!
-              }, () => resolve(null));
+                UploadId: uploadId,
+                MultipartUpload: { Parts: parts }
+              }, (err, data) => {
+                if (err) reject(err);
+                else resolve(data);
+              });
             });
+
+          } catch (error) {
+            if (multipartUpload?.UploadId) {
+              await new Promise((resolve) => {
+                this.s3.abortMultipartUpload({
+                  Bucket: this.bucketName,
+                  Key: `${folder}/${file.filename}`,
+                  UploadId: multipartUpload!.UploadId!
+                }, () => resolve(null));
+              });
+            }
+            throw error;
           }
-          throw error;
-        }
-      })
-    );
+        })
+      );
+    }
   }
 
   private async uploadSmallFile(folder: string, file: Express.Multer.File, contentType: string) {
-    const fileStream = fs.createReadStream(path.resolve(`media/${folder}/${file.filename}`));
-    try {
-      await new Promise((resolve, reject) => {
-        this.s3.putObject({
-          Bucket: this.bucketName,
-          Key: `${folder}/${file.filename}`,
-          Body: fileStream,
-          ContentDisposition: 'inline',
-          ContentType: contentType,
-          ServerSideEncryption: 'AES256',
-        }, (err, data) => {
-          fileStream.destroy();
-          if (err) reject(err);
-          else resolve(data);
-        });
+
+    await new Promise((resolve, reject) => {
+      this.s3.putObject({
+        Bucket: this.bucketName,
+        Key: `${folder}/${file.filename}`,
+        Body: file.buffer,
+        ContentDisposition: 'inline',
+        ContentType: contentType,
+        ServerSideEncryption: 'AES256',
+      }, (err, data) => {
+        if (err) reject(err);
+        else resolve(data);
       });
-    } catch (error) {
-      fileStream.destroy();
-      throw error;
-    }
+    });
+
   }
 
   async removeBucketFiles(...filePaths: string[]) {
