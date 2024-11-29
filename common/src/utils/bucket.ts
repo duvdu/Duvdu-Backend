@@ -23,8 +23,9 @@ export class Bucket {
   }
 
   async saveBucketFiles(folder: string, ...files: Express.Multer.File[]) {
-    const CHUNK_SIZE = 20 * 1024 * 1024; // 20MB chunks for better performance
-    const MAX_PARALLEL_CHUNKS = 4; // Control parallel uploads
+    const CHUNK_SIZE = 50 * 1024 * 1024; // 50MB chunks
+    const MAX_PARALLEL_CHUNKS = 8; // Increased parallel uploads
+    const MAX_RETRIES = 3;
     
     await Promise.all(
       files.map(async (file) => {
@@ -54,47 +55,64 @@ export class Bucket {
 
           const uploadId = multipartUpload.UploadId!;
           const parts: aws.S3.CompletedPart[] = [];
-          const fileStream = fs.createReadStream(filePath);
           
-          // Prepare chunks for parallel upload
-          const chunks: Buffer[] = [];
-          let currentChunk = Buffer.alloc(0);
+          // Prepare chunks for upload
+          const chunks: { buffer: Buffer; index: number }[] = [];
+          let chunkIndex = 0;
           
+          const fileStream = fs.createReadStream(filePath, {
+            highWaterMark: CHUNK_SIZE // Optimize read buffer size
+          });
+
           for await (const chunk of fileStream) {
-            currentChunk = Buffer.concat([currentChunk, chunk]);
-            if (currentChunk.length >= CHUNK_SIZE) {
-              chunks.push(Buffer.from(currentChunk));
-              currentChunk = Buffer.alloc(0);
-            }
-          }
-          if (currentChunk.length > 0) {
-            chunks.push(Buffer.from(currentChunk));
+            chunks.push({ 
+              buffer: Buffer.from(chunk), 
+              index: chunkIndex++ 
+            });
           }
 
-          // Upload chunks in parallel batches
+          // Upload chunks in parallel batches with retry logic
           for (let i = 0; i < chunks.length; i += MAX_PARALLEL_CHUNKS) {
             const batch = chunks.slice(i, i + MAX_PARALLEL_CHUNKS);
-            const partUploads = batch.map((chunkBuffer, index) => {
-              const partNumber = i + index + 1;
-              return new Promise<aws.S3.CompletedPart>((resolve, reject) => {
-                this.s3.uploadPart({
-                  Bucket: this.bucketName,
-                  Key: `${folder}/${file.filename}`,
-                  PartNumber: partNumber,
-                  UploadId: uploadId,
-                  Body: chunkBuffer,
-                }, (err, data) => {
-                  if (err) reject(err);
-                  else resolve({
-                    PartNumber: partNumber,
-                    ETag: data.ETag!
+            const partUploads = batch.map(({ buffer, index }) => {
+              const partNumber = index + 1;
+              
+              const uploadChunkWithRetry = async (retryCount = 0): Promise<aws.S3.CompletedPart> => {
+                try {
+                  return await new Promise((resolve, reject) => {
+                    this.s3.uploadPart({
+                      Bucket: this.bucketName,
+                      Key: `${folder}/${file.filename}`,
+                      PartNumber: partNumber,
+                      UploadId: uploadId,
+                      Body: buffer,
+                    }, (err, data) => {
+                      if (err) reject(err);
+                      else resolve({
+                        PartNumber: partNumber,
+                        ETag: data.ETag!
+                      });
+                    });
                   });
-                });
-              });
+                } catch (error) {
+                  if (retryCount < MAX_RETRIES) {
+                    // Exponential backoff
+                    await new Promise(resolve => 
+                      setTimeout(resolve, Math.pow(2, retryCount) * 1000)
+                    );
+                    return uploadChunkWithRetry(retryCount + 1);
+                  }
+                  throw error;
+                }
+              };
+
+              return uploadChunkWithRetry();
             });
 
             const completedParts = await Promise.all(partUploads);
-            parts.push(...completedParts.sort((a, b) => (a.PartNumber ?? 0) - (b.PartNumber ?? 0)));
+            parts.push(...completedParts.sort((a, b) => 
+              (a.PartNumber ?? 0) - (b.PartNumber ?? 0))
+            );
           }
 
           // Complete multipart upload
