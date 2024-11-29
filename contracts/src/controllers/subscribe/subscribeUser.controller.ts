@@ -27,6 +27,7 @@ export const subscribeUserController: RequestHandler = async (req, res) => {
     sourceUser: req.loggedUser.id,
     targetUser: req.loggedUser.id,
     type: NotificationType.new_follower,
+    target: req.loggedUser.id,
     title: 'subscribe success',
     message: 'you have a new five contracts available',
   });
