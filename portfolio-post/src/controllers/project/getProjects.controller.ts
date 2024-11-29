@@ -278,16 +278,22 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
     // Continue with the favourite lookup and project stages
     {
       $lookup: {
-        from: 'favourites',
-        localField: '_id',
-        foreignField: 'project',
-        as: 'favourite',
-      },
-    },
-    {
-      $addFields: {
-        favouriteCount: { $size: '$favourite' },
-      },
+        from: MODELS.favourites,
+        let: { projectId: '$_id' },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ['$project', '$$projectId'] },
+                  { $eq: ['$user', req.loggedUser?.id ? new Types.ObjectId(req.loggedUser.id) : null] }
+                ]
+              }
+            }
+          }
+        ],
+        as: 'userFavourite'
+      }
     },
     {
       $project: {
@@ -370,18 +376,13 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
         createdAt: 1,
         isFavourite: {
           $cond: {
-            if: {
-              $in: [
-                req.loggedUser?.id ? new mongoose.Types.ObjectId(req.loggedUser.id) : null,
-                '$favourite.user'
-              ]
-            },
+            if: { $gt: [{ $size: '$userFavourite' }, 0] },
             then: true,
-            else: false,
-          },
+            else: false
+          }
         },
         favouriteCount: 1,
-      },
+      }
     },
   );
 

@@ -104,19 +104,18 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
         },
       },
 
-      // Replace the existing favourite lookup with this updated version
+      // Update the favourite lookup
       {
         $lookup: {
           from: MODELS.favourites,
-          let: { projectId: '$_id', userId: new mongoose.Types.ObjectId(req.loggedUser?.id || '000000000000000000000000') },
+          let: { projectId: '$_id' },
           pipeline: [
             {
               $match: {
                 $expr: {
                   $and: [
                     { $eq: ['$project', '$$projectId'] },
-                    { $eq: ['$user', '$$userId'] },
-                    { $eq: ['$type', 'portfolio'] }  // Add type check for portfolio
+                    { $eq: ['$user', new mongoose.Types.ObjectId(req.loggedUser?.id || '000000000000000000000000')] }
                   ]
                 }
               }
