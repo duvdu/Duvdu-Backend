@@ -34,6 +34,7 @@ export const updateContractHandler: UpdateContractHandler = async (req, res, nex
 
   // update duration and deadline
   if (req.body.duration) {
+    contract.duration = req.body.duration;
     contract.deadline = new Date(
       new Date(contract.startDate).setDate(
         new Date(contract.startDate).getDate() + req.body.duration,
@@ -51,6 +52,7 @@ export const updateContractHandler: UpdateContractHandler = async (req, res, nex
     contract.equipmentPrice + contract.projectScale.unitPrice * contract.projectScale.numberOfUnits;
   contract.secondPaymentAmount = contract.totalPrice - contract.firstPaymentAmount;
   await contract.save();
+
 
   res.status(200).json({ message: 'success', data: contract });
 };

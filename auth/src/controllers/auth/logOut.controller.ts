@@ -17,7 +17,7 @@ export const logoutHandler: LogoutHandler = async (req, res) => {
 
   await Users.findByIdAndUpdate(
     { _id: req.loggedUser.id },
-    { $pull: { refreshTokens: { token: req.session.refresh }, notificationToken: null } },
+    { $pull: { refreshTokens: { token: req.session.refresh } }, notificationToken: null },
   );
 
   req.session.access = '';
