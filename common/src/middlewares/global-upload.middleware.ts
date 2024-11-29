@@ -1,43 +1,5 @@
-// /* eslint-disable indent */
-// import path from 'path';
-
-// import multer from 'multer';
-// import { v4 } from 'uuid';
-
-// import { BadRequestError } from '../errors/bad-request-error';
-
-// interface uploadOptions {
-//   fileTypes?: string[];
-//   maxSize?: number;
-//   fileFilter?(req: Request, file: Express.Multer.File, callback: multer.FileFilterCallback): void;
-// }
-
-// export const globalUploadMiddleware = (folder: string, options?: uploadOptions) =>
-//   multer({
-//     storage: multer.diskStorage({
-//       destination: path.resolve(`media/${folder}`),
-//       filename(req, file, callback) {
-//         callback(null, `${v4()}.${file.originalname.split('.').at(-1)}`);
-//       },
-//     }),
-//     limits: { fileSize: options?.maxSize || 3 * 1024 * 1024 }, // 3MB
-//     fileFilter: options?.fileFilter
-//       ? (options.fileFilter as any)
-//       : function fileFilter(req, file, callback) {
-//           if (!options?.fileTypes) {
-//             if (!file.mimetype.startsWith('image'))
-//               return callback(new BadRequestError('invalid file format'));
-//             return callback(null, true);
-//           }
-
-//           if (options?.fileTypes?.some((type) => file.mimetype.startsWith(type)))
-//             return callback(null, true);
-//           else return callback(new BadRequestError('invalid file format'));
-//         },
-//   });
-
-
 import multer from 'multer';
+import { v4 as uuidv4 } from 'uuid';
 
 import { BadRequestError } from '../errors/bad-request-error';
 
@@ -47,21 +9,62 @@ interface UploadOptions {
   fileFilter?(req: Request, file: Express.Multer.File, callback: multer.FileFilterCallback): void;
 }
 
-export const globalUploadMiddleware = (folder: string, options?: UploadOptions) =>
-  multer({
-    storage: multer.memoryStorage(),
-    limits: { fileSize: options?.maxSize || 3 * 1024 * 1024 }, // 3MB
+const generateUniqueFileName = (originalname: string): string => {
+  const timestamp = Date.now();
+  const uuid = uuidv4().slice(0, 8);
+  const extension = originalname.split('.').pop();
+  return `${timestamp}-${uuid}.${extension}`;
+};
+
+export const globalUploadMiddleware = (folder: string, options?: UploadOptions) => {
+  const storage = multer.memoryStorage();
+  
+  // Extend memory storage to include filename generation
+  const customStorage = Object.create(storage);
+  customStorage._handleFile = function(req: any, file: Express.Multer.File, cb: any) {
+    // Generate unique filename before storing
+    file.filename = generateUniqueFileName(file.originalname);
+    
+    // Call original memory storage handler
+    storage._handleFile(req, file, cb);
+  };
+
+  return multer({
+    storage: customStorage,
+    limits: { 
+      fileSize: options?.maxSize || 3 * 1024 * 1024 // 3MB default
+    },
     fileFilter: options?.fileFilter
       ? (options.fileFilter as any)
       : function fileFilter(req, file, callback) {
         if (!options?.fileTypes) {
-          if (!file.mimetype.startsWith('image'))
-            return callback(new BadRequestError('invalid file format'));
+          if (!file.mimetype.startsWith('image')) {
+            return callback(
+              new BadRequestError(
+                { 
+                  en: 'Invalid file format', 
+                  ar: 'صيغة الملف غير صالحة' 
+                },
+                'en'
+              )
+            );
+          }
           return callback(null, true);
         }
 
-        if (options?.fileTypes?.some((type) => file.mimetype.startsWith(type)))
+        if (options?.fileTypes?.some((type) => file.mimetype.startsWith(type))) {
           return callback(null, true);
-        else return callback(new BadRequestError('invalid file format'));
+        } else {
+          return callback(
+            new BadRequestError(
+              { 
+                en: 'Invalid file format', 
+                ar: 'صيغة الملف غير صالحة' 
+              },
+              'en'
+            )
+          );
+        }
       },
-  });
+  }).any();
+};
