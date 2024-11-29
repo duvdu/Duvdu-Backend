@@ -5,7 +5,6 @@ import {
   Channels,
   Contracts,
   CYCLES,
-  Files,
   FOLDERS,
   NotAllowedError,
   NotFound,
@@ -20,16 +19,20 @@ import mongoose from 'mongoose';
 import { sendNotification } from './sendNotification';
 import { getBestExpirationTime } from '../../services/getBestExpirationTime.service';
 import { AddCreativeHandler } from '../../types/project.endpoints';
-// import { pendingQueue } from '../../utils/expirationQueue';
 
 export const addCreativeHandler: AddCreativeHandler = async (req, res, next) => {
-  const attachments = <Express.Multer.File[] | undefined>(req.files as any)?.attachments;
+  const files = req.files as { [fieldName: string]: Express.Multer.File[] };
   
   // Start file upload early and in parallel with other operations
   let uploadPromise;
-  if (attachments) {
+  if (files['attachments']?.length) {
     const s3 = new Bucket();
-    uploadPromise = s3.saveBucketFiles(FOLDERS.team_project, ...attachments);
+    uploadPromise = s3.saveBucketFiles(FOLDERS.team_project, ...files['attachments'])
+      .then(() => {
+        req.body.attachments = files['attachments'].map(
+          (file) => `${FOLDERS.team_project}/${file.filename}`
+        );
+      });
   }
 
   // Run database queries in parallel
@@ -60,10 +63,8 @@ export const addCreativeHandler: AddCreativeHandler = async (req, res, next) => 
     );
 
   // Wait for file upload to complete if there were attachments
-  if (attachments && uploadPromise) {
+  if (uploadPromise) {
     await uploadPromise;
-    req.body.attachments = attachments.map((el) => `${FOLDERS.team_project}/${el.filename}`);
-    Files.removeFiles(...(req.body as any).attachments);
   }
 
   project.creatives[index].users.push({
@@ -80,7 +81,7 @@ export const addCreativeHandler: AddCreativeHandler = async (req, res, next) => 
       ),
     ),
     status: UserStatus.pending,
-    attachments: req.body.attachments,
+    attachments: req.body.attachments || [],
     contract: new mongoose.Types.ObjectId(req.body.user),
   });
 
@@ -100,7 +101,7 @@ export const addCreativeHandler: AddCreativeHandler = async (req, res, next) => 
     req.lang,
   );
 
-  // create contract
+  // Create contract
   const contract = await TeamContract.create({
     sp: user.user,
     customer: req.loggedUser.id,
@@ -118,7 +119,7 @@ export const addCreativeHandler: AddCreativeHandler = async (req, res, next) => 
     category: project.creatives[index].category,
   });
 
-  // create contract an all contracts
+  // Create contract in all contracts
   await Contracts.create({
     _id: contract._id,
     contract: contract._id,
@@ -129,7 +130,8 @@ export const addCreativeHandler: AddCreativeHandler = async (req, res, next) => 
   });
 
   const customer = await Users.findById(req.loggedUser.id);
-  // send notification to user
+  
+  // Send notifications in parallel
   await Promise.all([
     sendNotification(
       contract.customer.toString(),
@@ -153,11 +155,6 @@ export const addCreativeHandler: AddCreativeHandler = async (req, res, next) => 
 
   user.contract = contract._id;
   await project.save();
-
-  // use pending expiration
-  // TODO:
-  // const delay = contract.stageExpiration * 3600 * 1000;
-  // pendingQueue.add({contractId:contract._id.toString() , lang:req.lang} , {delay});
 
   res.status(200).json({ message: 'success', data: project });
 };

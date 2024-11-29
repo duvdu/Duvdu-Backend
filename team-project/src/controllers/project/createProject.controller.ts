@@ -7,7 +7,6 @@ import {
   Channels,
   Contracts,
   CYCLES,
-  Files,
   FOLDERS,
   TeamContract,
   TeamProject,
@@ -22,15 +21,20 @@ import { CreateProjectHandler } from '../../types/project.endpoints';
 
 export const createProjectHandler: CreateProjectHandler = async (req, res) => {
   const files = req.files as { [fieldName: string]: Express.Multer.File[] };
-
   const s3 = new Bucket();
   
-  // Handle cover upload in parallel with other operations
-  const coverUploadPromise = s3.saveBucketFiles(FOLDERS.team_project, ...files['cover'])
-    .then(() => {
-      req.body.cover = `${FOLDERS.team_project}/${files['cover'][0].filename}`;
-      Files.removeFiles(req.body.cover);
-    });
+  // Initialize upload promises array
+  const uploadPromises: Promise<void>[] = [];
+
+  // Handle cover upload if exists
+  if (files['cover']?.[0]) {
+    uploadPromises.push(
+      s3.saveBucketFiles(FOLDERS.team_project, files['cover'][0])
+        .then(() => {
+          req.body.cover = `${FOLDERS.team_project}/${files['cover'][0].filename}`;
+        })
+    );
+  }
 
   // Validate categories and users first
   const validationPromises = req.body.creatives.map(async (creative) => {
@@ -47,29 +51,29 @@ export const createProjectHandler: CreateProjectHandler = async (req, res) => {
     }
   });
 
-  // Handle all file uploads in parallel
-  const uploadPromises = req.body.creatives.map(async (creative, creativeIndex) => {
+  // Handle attachments upload for each user
+  req.body.creatives.forEach((creative, creativeIndex) => {
     if (creative.users?.length) {
-      await Promise.all(creative.users.map(async (user, userIndex) => {
+      creative.users.forEach((user, userIndex) => {
         user.attachments = [];
         const key = `creatives[${creativeIndex}][users][${userIndex}][attachments]`;
         
-        if (key?.length && Array.isArray(files[key])) {
-          await s3.saveBucketFiles(FOLDERS.team_project, ...files[key]);
-          
-          files[key].forEach((file) => {
-            const filePath = `${FOLDERS.team_project}/${file.filename}`;
-            user.attachments.push(filePath);
-            Files.removeFiles(filePath);
-          });
+        if (files[key]?.length) {
+          uploadPromises.push(
+            s3.saveBucketFiles(FOLDERS.team_project, ...files[key])
+              .then(() => {
+                files[key].forEach((file) => {
+                  user.attachments.push(`${FOLDERS.team_project}/${file.filename}`);
+                });
+              })
+          );
         }
-      }));
+      });
     }
   });
 
-  // Wait for all operations to complete
+  // Wait for all validations and uploads to complete
   await Promise.all([
-    coverUploadPromise,
     ...validationPromises,
     ...uploadPromises
   ]);
@@ -92,9 +96,9 @@ export const createProjectHandler: CreateProjectHandler = async (req, res) => {
     user: req.loggedUser?.id,
   });
 
-  // Create contracts and send notifications
-  for (const creative of team.creatives) {
-    for (const user of creative.users) {
+  // Create contracts and send notifications in parallel
+  const contractPromises = team.creatives.flatMap((creative) =>
+    creative.users.map(async (user) => {
       const stageExpiration = await getBestExpirationTime(
         new Date(
           new Date(user.startDate).setDate(
@@ -104,7 +108,7 @@ export const createProjectHandler: CreateProjectHandler = async (req, res) => {
         req.lang,
       );
 
-      // create contract
+      // Create contract
       const contract = await TeamContract.create({
         sp: user.user,
         customer: req.loggedUser.id,
@@ -122,7 +126,7 @@ export const createProjectHandler: CreateProjectHandler = async (req, res) => {
         category: creative.category,
       });
 
-      // create contract in all contracts
+      // Create contract in all contracts
       await Contracts.create({
         _id: contract._id,
         contract: contract._id,
@@ -133,8 +137,9 @@ export const createProjectHandler: CreateProjectHandler = async (req, res) => {
       });
 
       const customer = await Users.findById(req.loggedUser.id);
-      // send notifications in parallel
-      await Promise.all([
+      
+      // Send notifications
+      return Promise.all([
         sendNotification(
           contract.customer.toString(),
           contract.sp.toString(),
@@ -154,12 +159,11 @@ export const createProjectHandler: CreateProjectHandler = async (req, res) => {
           Channels.new_contract,
         ),
       ]);
+    })
+  );
 
-      // TODO: use pending expiration
-      // const delay = contract.stageExpiration * 3600 * 1000;
-      // pendingQueue.add({contractId:contract._id.toString() , lang:req.lang} , {delay});
-    }
-  }
+  // Wait for all contracts and notifications to be created
+  await Promise.all(contractPromises);
 
   res.status(201).json({ message: 'success', data: team });
 };
