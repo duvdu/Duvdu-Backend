@@ -1,4 +1,4 @@
-import {  Notification, NotificationType, Users } from '@duvdu-v1/duvdu';
+import {  Notification, Users } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 import 'express-async-errors';
@@ -26,7 +26,7 @@ export const subscribeUserController: RequestHandler = async (req, res) => {
   const currentUserNotification = await Notification.create({
     sourceUser: req.loggedUser.id,
     targetUser: req.loggedUser.id,
-    type: NotificationType.new_follower,
+    type: 'contract_subscription',
     target: req.loggedUser.id,
     title: 'subscribe success',
     message: 'you have a new five contracts available',
@@ -44,7 +44,7 @@ export const subscribeUserController: RequestHandler = async (req, res) => {
         title: currentUserNotification.title,
       },
       populatedNotification: populatedCurrentUserNotification,
-      socketChannel: 'subscribe_success',
+      socketChannel: 'contract_subscription',
       targetUser: currentUserNotification.targetUser.toString(),
     }),
   ]);
