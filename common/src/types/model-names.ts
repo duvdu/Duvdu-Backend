@@ -36,4 +36,5 @@ export enum MODELS {
   projectContract = 'project_contracts',
   rentalContract = 'rental_contracts',
   teamContract = 'team_contracts',
+  favourites = 'favourites',
 }
