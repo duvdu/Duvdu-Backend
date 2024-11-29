@@ -29,7 +29,7 @@ export const globalUploadMiddleware = (folder: string, options?: UploadOptions) 
     storage._handleFile(req, file, cb);
   };
 
-  return multer({
+  const upload = multer({
     storage: customStorage,
     limits: { 
       fileSize: options?.maxSize || 3 * 1024 * 1024 // 3MB default
@@ -66,5 +66,13 @@ export const globalUploadMiddleware = (folder: string, options?: UploadOptions) 
           );
         }
       },
-  }).any();
+  });
+
+  return {
+    single: upload.single.bind(upload),
+    array: upload.array.bind(upload),
+    fields: upload.fields.bind(upload),
+    none: upload.none.bind(upload),
+    any: upload.any.bind(upload)
+  };
 };
