@@ -1,6 +1,6 @@
 import { incrementProjectsView, MODELS, NotFound, Rentals, Contracts } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
-import mongoose, { Types } from 'mongoose';
+import { Types } from 'mongoose';
 
 export const getProjectHandler: RequestHandler = async (req, res, next) => {
   const pipelines = [
@@ -104,35 +104,33 @@ export const getProjectHandler: RequestHandler = async (req, res, next) => {
     },
     {
       $lookup: {
-        from: 'favourites',
-        localField: '_id',
-        foreignField: 'project',
-        as: 'favourite',
-      },
+        from: MODELS.favourites,
+        let: { projectId: '$_id' },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ['$project', '$$projectId'] },
+                  { $eq: ['$user', req.loggedUser?.id ? new Types.ObjectId(req.loggedUser.id) : null] }
+                ]
+              }
+            }
+          }
+        ],
+        as: 'favourite'
+      }
     },
     {
       $addFields: {
         favouriteCount: { $size: '$favourite' },
-      },
+        isFavourite: { $gt: [{ $size: '$favourite' }, 0] }
+      }
     },
     {
-      $unwind: { path: '$favourite', preserveNullAndEmptyArrays: true },
-    },
-    {
-      $addFields: {
-        isFavourite: {
-          $cond: {
-            if: {
-              $eq: [
-                '$favourite.user',
-                req.loggedUser?.id ? new mongoose.Types.ObjectId(req.loggedUser.id as string) : '0',
-              ],
-            },
-            then: true,
-            else: false,
-          },
-        },
-      },
+      $project: {
+        favourite: 0
+      }
     },
     {
       $addFields: {
@@ -140,11 +138,6 @@ export const getProjectHandler: RequestHandler = async (req, res, next) => {
           lng: { $arrayElemAt: ['$location.coordinates', 0] },
           lat: { $arrayElemAt: ['$location.coordinates', 1] },
         },
-      },
-    },
-    {
-      $project: {
-        favourite: 0,
       },
     },
   ];

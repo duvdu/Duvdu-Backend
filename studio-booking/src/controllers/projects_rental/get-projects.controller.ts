@@ -157,54 +157,47 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
     ...pipelines,
     {
       $lookup: {
-        from: 'favourites',
-        localField: '_id',
-        foreignField: 'project',
-        as: 'favourite',
-      },
+        from: MODELS.favourites,
+        let: { projectId: '$_id' },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ['$project', '$$projectId'] },
+                  {
+                    $eq: [
+                      '$user',
+                      req.loggedUser?.id 
+                        ? new mongoose.Types.ObjectId(req.loggedUser.id)
+                        : null
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        as: 'favourite'
+      }
     },
     {
       $addFields: {
         favouriteCount: { $size: '$favourite' },
-      },
-    },
-    {
-      $addFields: {
         isFavourite: {
           $cond: {
-            if: {
-              $gt: [
-                {
-                  $size: {
-                    $filter: {
-                      input: '$favourite',
-                      as: 'fav',
-                      cond: {
-                        $eq: [
-                          '$$fav.user',
-                          req.loggedUser?.id
-                            ? new mongoose.Types.ObjectId(req.loggedUser.id as string)
-                            : '0',
-                        ],
-                      },
-                    },
-                  },
-                },
-                0,
-              ],
-            },
-
+            if: { $gt: [{ $size: '$favourite' }, 0] },
             then: true,
-            else: false,
-          },
-        },
-      },
+            else: false
+          }
+        }
+      }
     },
     {
       $project: {
-        favourite: 0,
-      },
-    },
+        favourite: 0
+      }
+    }
   );
 
   const projects = await Rentals.aggregate(secondPipelines);

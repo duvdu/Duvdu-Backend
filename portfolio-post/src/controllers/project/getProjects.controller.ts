@@ -371,10 +371,10 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
         isFavourite: {
           $cond: {
             if: {
-              $eq: [
-                '$favourite.user',
-                req.loggedUser?.id ? new mongoose.Types.ObjectId(req.loggedUser.id) : '0',
-              ],
+              $in: [
+                req.loggedUser?.id ? new mongoose.Types.ObjectId(req.loggedUser.id) : null,
+                '$favourite.user'
+              ]
             },
             then: true,
             else: false,

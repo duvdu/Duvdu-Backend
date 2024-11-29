@@ -104,23 +104,34 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
         },
       },
 
-      // Continue with the favourite lookup and project stages
+      // Replace the existing favourite lookup with this updated version
       {
         $lookup: {
-          from: 'favourites',
-          localField: '_id',
-          foreignField: 'project',
-          as: 'favourite',
-        },
+          from: MODELS.favourites,
+          let: { projectId: '$_id', userId: new mongoose.Types.ObjectId(req.loggedUser?.id || '000000000000000000000000') },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ['$project', '$$projectId'] },
+                    { $eq: ['$user', '$$userId'] },
+                    { $eq: ['$type', 'portfolio'] }  // Add type check for portfolio
+                  ]
+                }
+              }
+            }
+          ],
+          as: 'favourite'
+        }
       },
       {
         $addFields: {
-          favouriteCount: { $size: '$favourite' },
-        },
+          isFavourite: { $gt: [{ $size: '$favourite' }, 0] },
+          favouriteCount: { $size: '$favourite' }
+        }
       },
-      {
-        $unwind: { path: '$favourite', preserveNullAndEmptyArrays: true },
-      },
+
       {
         $project: {
           _id: 1,
@@ -200,18 +211,7 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
           rate: 1,
           updatedAt: 1,
           createdAt: 1,
-          isFavourite: {
-            $cond: {
-              if: {
-                $eq: [
-                  '$favourite.user',
-                  req.loggedUser?.id ? new mongoose.Types.ObjectId(req.loggedUser.id) : '0',
-                ],
-              },
-              then: true,
-              else: false,
-            },
-          },
+          isFavourite: 1,
           favouriteCount: 1,
         },
       },
