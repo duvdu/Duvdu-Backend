@@ -1,4 +1,4 @@
-import { NotFound, Categories, Bucket, FOLDERS, Files } from '@duvdu-v1/duvdu';
+import { NotFound, Categories, Bucket, FOLDERS } from '@duvdu-v1/duvdu';
 
 import { UpdateCategoryHandler } from '../types/endpoints/endpoints';
 
@@ -12,7 +12,6 @@ export const updateCategoryHandler: UpdateCategoryHandler = async (req, res, nex
     await s3.saveBucketFiles(FOLDERS.category , ...cover);
     req.body.image = `${FOLDERS.category}/${cover[0].filename}`;
     await s3.removeBucketFiles(category.image);
-    Files.removeFiles(req.body.image);
     delete req.body.cover;
   }
 

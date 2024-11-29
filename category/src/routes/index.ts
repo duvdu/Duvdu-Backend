@@ -3,9 +3,9 @@ import {
   PERMISSIONS,
   isauthenticated,
   FOLDERS,
-  uploadProjectMedia,
   checkRequiredFields,
   globalPaginationMiddleware,
+  globalUploadMiddleware
 } from '@duvdu-v1/duvdu';
 import express from 'express';
 
@@ -27,8 +27,7 @@ router
   .route('/')
   .post(
     isauthenticated,
-    isauthorized(PERMISSIONS.createCategory),
-    uploadProjectMedia(FOLDERS.category),
+    globalUploadMiddleware(FOLDERS.category).fields([{ name: 'cover', maxCount: 1 }]),
     checkRequiredFields({ fields: ['cover'] }),
     val.createCategoryVal,
     handler.createCategoryHandler,
@@ -48,7 +47,7 @@ router
   .put(
     isauthenticated,
     isauthorized(PERMISSIONS.updateCategory),
-    uploadProjectMedia(FOLDERS.category),
+    globalUploadMiddleware(FOLDERS.category).fields([{ name: 'cover', maxCount: 1 }]),
     val.updateCategoryVal,
     handler.updateCategoryHandler,
   )

@@ -6,7 +6,6 @@ import {
   Channels,
   Contracts,
   CYCLES,
-  Files,
   FOLDERS,
   MODELS,
   NotAllowedError,
@@ -27,18 +26,20 @@ export const createContractHandler: CreateContractHandler = async (req, res, nex
     // Run producer validation and file upload in parallel
     const [producer] = await Promise.all([
       Producer.findById(req.body.producer),
-      new Bucket().saveBucketFiles(FOLDERS.producer, ...attachments)
+      attachments?.length && new Bucket().saveBucketFiles(FOLDERS.producer, ...attachments)
     ]);
 
-    if (!producer)
+    if (!producer) {
       return next(
         new NotFound({ en: 'producer not found', ar: 'لم يتم العثور على المنتج' }, req.lang),
       );
+    }
 
-    if (req.loggedUser.id === producer.user.toString())
+    if (req.loggedUser.id === producer.user.toString()) {
       return next(new NotAllowedError(undefined, req.lang));
+    }
 
-    if (req.body.expectedBudget < producer.minBudget)
+    if (req.body.expectedBudget < producer.minBudget) {
       return next(
         new BadRequestError(
           {
@@ -48,8 +49,9 @@ export const createContractHandler: CreateContractHandler = async (req, res, nex
           req.lang,
         ),
       );
+    }
 
-    if (req.body.expectedBudget > producer.maxBudget)
+    if (req.body.expectedBudget > producer.maxBudget) {
       return next(
         new BadRequestError(
           {
@@ -59,18 +61,26 @@ export const createContractHandler: CreateContractHandler = async (req, res, nex
           req.lang,
         ),
       );
+    }
 
-    req.body.stageExpiration = await getBestExpirationTime(req.body.appointmentDate.toString());
-    req.body.attachments = attachments.map((el) => `${FOLDERS.producer}/${el.filename}`);
-    Files.removeFiles(...req.body.attachments);
+    // Get stage expiration and prepare contract data
+    const stageExpiration = await getBestExpirationTime(req.body.appointmentDate.toString());
+    const contractData = {
+      ...req.body,
+      stageExpiration,
+      user: req.loggedUser.id,
+      sp: producer.user,
+    };
+
+    if (attachments?.length) {
+      contractData.attachments = attachments.map(
+        (file) => `${FOLDERS.producer}/${file.filename}`
+      );
+    }
 
     // Create contract and fetch user in parallel
     const [contract, user] = await Promise.all([
-      ProducerContract.create({
-        ...req.body,
-        user: req.loggedUser.id,
-        sp: producer.user,
-      }),
+      ProducerContract.create(contractData),
       Users.findById(req.loggedUser.id)
     ]);
 
@@ -103,18 +113,6 @@ export const createContractHandler: CreateContractHandler = async (req, res, nex
         ref: MODELS.producerContract,
       })
     ]);
-
-    // Commented out queue logic as in original code
-    // const delay = contract.stageExpiration * 3600 * 1000;
-    // // const delay = 1*60 * 1000;
-    // await createContractQueue.add(
-    //   {
-    //     contractId: contract._id.toString(),
-    //   },
-    //   {
-    //     delay,
-    //   },
-    // );
 
     res.status(201).json({ message: 'success', data: contract });
   } catch (error) {

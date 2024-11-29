@@ -2,7 +2,6 @@ import {
   BadRequestError,
   Bucket,
   Categories,
-  Files,
   FOLDERS,
   Iuser,
   NotFound,
@@ -87,14 +86,12 @@ export const updateUserHandler: RequestHandler<
     await s3.saveBucketFiles(FOLDERS.auth, ...coverImage);
     req.body.coverImage = `${FOLDERS.auth}/${coverImage[0].filename}`;
     if (profile.coverImage) await s3.removeBucketFiles(profile.coverImage);
-    Files.removeFiles(req.body.coverImage);
   }
   if (profileImage?.length) {
     await s3.saveBucketFiles(FOLDERS.auth, ...profileImage);
     req.body.profileImage = `${FOLDERS.auth}/${profileImage[0].filename}`;
     if (profile.profileImage && !profile.profileImage.startsWith('defaults'))
       await s3.removeBucketFiles(profile.profileImage);
-    Files.removeFiles(req.body.profileImage);
   }
 
   await Users.findByIdAndUpdate(req.params.userId, req.body, { new: true, runValidators: true });

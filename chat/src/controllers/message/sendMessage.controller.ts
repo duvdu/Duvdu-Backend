@@ -2,7 +2,6 @@ import 'express-async-errors';
 import {
   Bucket,
   Contracts,
-  Files,
   FOLDERS,
   Iuser,
   Message,
@@ -83,7 +82,6 @@ export const sendMessageHandler: SendMessageHandler = async (req, res, next) => 
         url: `${FOLDERS.chat}/${attach.filename}`,
         type: attach.mimetype,
       };
-      Files.removeFiles(`${FOLDERS.chat}/${attach.filename}`);
       mediaArray.push(media);
     }
     (req.body as any).media = mediaArray;

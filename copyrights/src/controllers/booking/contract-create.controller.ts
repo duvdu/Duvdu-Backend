@@ -7,7 +7,6 @@ import {
   Contracts,
   Bucket,
   FOLDERS,
-  Files,
   CYCLES,
   addToDate,
   BadRequestError,
@@ -30,7 +29,6 @@ async function handleAttachments(attachments: Express.Multer.File[]) {
   // Run file operations in parallel
   await Promise.all([
     bucket.saveBucketFiles(FOLDERS.copyrights, ...attachments),
-    Files.removeFiles(...fileNames)
   ]);
   
   return fileNames;

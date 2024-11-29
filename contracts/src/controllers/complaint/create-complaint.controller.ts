@@ -2,7 +2,6 @@ import {
   Bucket,
   ContractReports,
   Contracts,
-  Files,
   FOLDERS,
   NotFound,
   SuccessResponse,
@@ -25,7 +24,6 @@ export const createComplaintHandler: RequestHandler<unknown, SuccessResponse> = 
   if (attachments) {
     await s3.saveBucketFiles(FOLDERS.report, ...attachments);
     (req.body as any).attachments = attachments.map((el) => `${FOLDERS.report}/${el.filename}`);
-    Files.removeFiles(...(req.body as any).attachments);
   }
   await ContractReports.create({
     attachments: req.body.attachments,

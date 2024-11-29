@@ -1,7 +1,6 @@
 import {
   BadRequestError,
   Bucket,
-  Files,
   FOLDERS,
   NotFound,
   SuccessResponse,
@@ -35,7 +34,6 @@ export const faceRecognitionController: RequestHandler<
   if (!faceValidation.isValid) {
     // Clean up the uploaded file if validation fails
     await s3.removeBucketFiles(imageKey);
-    Files.removeFiles(imageKey);
     return next(new BadRequestError(faceValidation.error!, req.lang));
   }
 

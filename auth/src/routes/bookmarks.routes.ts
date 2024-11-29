@@ -1,7 +1,8 @@
-import { Router } from 'express';
 import { isauthenticated, globalUploadMiddleware } from '@duvdu-v1/duvdu';
-import * as controllers from '../controllers/bookmarks/bookmark.controller';
+import { Router } from 'express';
+
 import * as bookmarkProjectControllers from '../controllers/bookmarks/bookmark-project.controller';
+import * as controllers from '../controllers/bookmarks/bookmark.controller';
 import * as val from '../validators/bookmark/bookmark.validator';
 
 const router = Router();

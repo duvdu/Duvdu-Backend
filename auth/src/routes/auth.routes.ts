@@ -7,7 +7,6 @@ import {
   isauthorized,
   optionalAuthenticated,
   PERMISSIONS,
-  uploadProjectMedia,
 } from '@duvdu-v1/duvdu';
 import { Router } from 'express';
 
@@ -42,7 +41,10 @@ router
   .patch(
     isauthenticated,
     isauthorized(PERMISSIONS.updateUser),
-    uploadProjectMedia(FOLDERS.auth),
+    globalUploadMiddleware(FOLDERS.auth).fields([
+      { name: 'profile', maxCount: 1 },
+      { name: 'cover', maxCount: 1 },
+    ]),
     val.updateUser,
     handlers.updateUserHandler,
   );
@@ -109,7 +111,10 @@ router
   .get(handlers.getLoggedUserProfileHandler)
   .patch(
     isauthorized(PERMISSIONS.updateProfile),
-    uploadProjectMedia(FOLDERS.auth),
+    globalUploadMiddleware(FOLDERS.auth).fields([
+      { name: 'profile', maxCount: 1 },
+      { name: 'cover', maxCount: 1 },
+    ]),
     val.updateProfileVal,
     handlers.updateProfileHandler,
   )

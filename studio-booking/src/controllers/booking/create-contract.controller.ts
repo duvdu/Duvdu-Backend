@@ -30,10 +30,9 @@ export const createContractHandler: RequestHandler<
     attachments: string[];
   }
 > = async (req, res, next) => {
-  // Start file upload process early and in parallel
-  const fileUploadPromise = req.files ? handleFileUpload(req.files as Express.Multer.File[]) : null;
+  const files = req.files as Express.Multer.File[] | undefined;
 
-  // Validate project and other checks
+  // Validate project and other checks first
   const project = await Rentals.findOne({ _id: req.params.projectId, isDeleted: { $ne: true } });
   if (!project)
     return next(new NotFound({ en: 'project not found', ar: 'المشروع غير موجود' }, req.lang));
@@ -47,17 +46,21 @@ export const createContractHandler: RequestHandler<
   )
     return next(
       new BadRequestError(
-        { en: 'invalid number of units', ar: 'invalid number of units' },
+        { en: 'invalid number of units', ar: 'عدد الوحدات غير صالح' },
         req.lang,
       ),
     );
 
-  // Wait for file upload to complete and get attachments
-  if (fileUploadPromise) {
+  // Handle file uploads if files exist
+  if (files?.length) {
     try {
-      req.body.attachments = await fileUploadPromise;
+      await new Bucket().saveBucketFiles(FOLDERS.studio_booking, ...files);
+      req.body.attachments = files.map(file => `${FOLDERS.studio_booking}/${file.filename}`);
     } catch (error) {
-      return next(new BadRequestError({ en: 'File upload failed', ar: 'فشل تحميل الملف' }, req.lang));
+      return next(new BadRequestError(
+        { en: 'File upload failed', ar: 'فشل تحميل الملف' },
+        req.lang
+      ));
     }
   }
 
@@ -66,6 +69,7 @@ export const createContractHandler: RequestHandler<
     project.projectScale.unit,
     req.body.projectScale.numberOfUnits,
   );
+  
   const stageExpiration = await getStageExpiration(
     new Date(req.body.startDate).toString(),
     req.lang,
@@ -84,18 +88,11 @@ export const createContractHandler: RequestHandler<
     },
     location: project.location,
     address: project.address,
-    totalPrice: (req.body.projectScale.numberOfUnits * project.projectScale.pricerPerUnit).toFixed(
-      2,
-    ),
+    totalPrice: (req.body.projectScale.numberOfUnits * project.projectScale.pricerPerUnit).toFixed(2),
     insurance: project.insurance,
     stageExpiration,
     status: ContractStatus.pending,
   });
-
-  // await pendingExpiration.add(
-  //   { contractId: contract._id.toString() },
-  //   { delay: (stageExpiration || 0) * 60 * 60 * 1000 },
-  // );
 
   await Contracts.create({
     _id: contract._id,
@@ -133,18 +130,7 @@ export const createContractHandler: RequestHandler<
   res.status(201).json({ message: 'success' });
 };
 
-// Helper function to handle file uploads
-async function handleFileUpload(files: Express.Multer.File[]): Promise<string[]> {
-  const attachments = files.map(file => 'studio-booking/' + file.filename);
-  
-  await new Bucket().saveBucketFiles(
-    FOLDERS.studio_booking,
-    ...files
-  );
-
-  return attachments;
-}
-
+// Helper functions remain unchanged
 async function getStageExpiration(isoDate: string, lang: string) {
   const givenDate = new Date(isoDate);
   const currentDate = new Date();

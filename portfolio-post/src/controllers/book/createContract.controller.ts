@@ -5,7 +5,6 @@ import {
   Channels,
   Contracts,
   CYCLES,
-  Files,
   FOLDERS,
   NotAllowedError,
   NotFound,
@@ -69,7 +68,6 @@ export const createContractHandler: CreateContractHandler = async (req, res, nex
       // Process file upload in parallel
       uploadPromise = Promise.all([
         bucket.saveBucketFiles(FOLDERS.portfolio_post, ...attachments),
-        Files.removeFiles(...req.body.attachments)
       ]).then(()=>{});
     }
 

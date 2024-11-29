@@ -1,8 +1,8 @@
 import {
   FOLDERS,
   globalPaginationMiddleware,
+  globalUploadMiddleware,
   isauthenticated,
-  uploadProjectMedia,
 } from '@duvdu-v1/duvdu';
 import express from 'express';
 
@@ -24,7 +24,14 @@ router.get(
 
 router
   .route('/')
-  .post(uploadProjectMedia(FOLDERS.chat), val.sendNessageVal, handler.sendMessageHandler)
+  .post(
+    globalUploadMiddleware(FOLDERS.chat, {
+      fileTypes: ['image/*', 'video/*', 'audio/*'],
+      maxSize: 100 * 1024 * 1024,
+    }).fields([{ name: 'attachments', maxCount: 10 }]),
+    val.sendNessageVal,
+    handler.sendMessageHandler,
+  )
   .get(globalPaginationMiddleware, val.gelLoggedUserVal, handler.getLoggedUserChatsHandler);
 
 router
@@ -35,5 +42,12 @@ router
 
 router
   .route('/:message')
-  .patch(uploadProjectMedia(FOLDERS.chat), val.updateMessageVal, handler.updateMessageHandler)
+  .patch(
+    globalUploadMiddleware(FOLDERS.chat, {
+      fileTypes: ['image/*', 'video/*', 'audio/*'],
+      maxSize: 100 * 1024 * 1024,
+    }).fields([{ name: 'attachments', maxCount: 10 }]),
+    val.updateMessageVal,
+    handler.updateMessageHandler,
+  )
   .delete(val.deleteMessageVal, handler.deleteMessageHandler);

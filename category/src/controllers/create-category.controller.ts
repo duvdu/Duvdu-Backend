@@ -1,4 +1,4 @@
-import { Bucket, Categories, Files, FOLDERS } from '@duvdu-v1/duvdu';
+import { Bucket, Categories, FOLDERS } from '@duvdu-v1/duvdu';
 
 import { CreateCategoryHandler } from '../types/endpoints/endpoints';
 
@@ -10,6 +10,5 @@ export const createCategoryHandler: CreateCategoryHandler = async (req, res) => 
   await new Bucket().saveBucketFiles(FOLDERS.category, ...cover);
   category.image = `${FOLDERS.category}/${cover[0].filename}`;
   await category.save();
-  Files.removeFiles(category.image);
   res.status(201).json({ message: 'success', data: category });
 };

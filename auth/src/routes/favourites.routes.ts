@@ -1,5 +1,6 @@
-import { Router } from 'express';
 import { isauthenticated } from '@duvdu-v1/duvdu';
+import { Router } from 'express';
+
 import * as controllers from '../controllers/favourites/favourites.controller';
 import * as val from '../validators/favourites/favourites.validator';
 

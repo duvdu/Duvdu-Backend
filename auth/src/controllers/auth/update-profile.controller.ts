@@ -4,7 +4,6 @@ import {
   NotFound,
   Users,
   Bucket,
-  Files,
   FOLDERS,
   SuccessResponse,
   Iuser,
@@ -44,7 +43,6 @@ export const updateProfileHandler: RequestHandler<
     req.body.coverImage = `${FOLDERS.auth}/${coverImage[0].filename}`;
     if (profile.coverImage && !profile.coverImage.startsWith('defaults'))
       await s3.removeBucketFiles(profile.coverImage);
-    Files.removeFiles(req.body.coverImage);
   }
   if (profileImage?.length) {
     await s3.saveBucketFiles(FOLDERS.auth, ...profileImage);
@@ -55,7 +53,6 @@ export const updateProfileHandler: RequestHandler<
     if (!faceValidation.isValid) {
       // Clean up the uploaded file if validation fails
       await s3.removeBucketFiles(imageKey);
-      Files.removeFiles(imageKey);
       return next(new BadRequestError(faceValidation.error!, req.lang));
     }
 
@@ -63,7 +60,6 @@ export const updateProfileHandler: RequestHandler<
     if (profile.profileImage && !profile.profileImage.startsWith('defaults')) {
       await s3.removeBucketFiles(profile.profileImage);
     }
-    Files.removeFiles(req.body.profileImage);
   }
 
   if (req.body.location)

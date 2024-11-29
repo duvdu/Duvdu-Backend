@@ -5,7 +5,6 @@ import {
   Bucket,
   Categories,
   CategoryMedia,
-  Files,
   FOLDERS,
   IprojectCycle,
   NotAllowedError,
@@ -126,7 +125,6 @@ export const updateProjectHandler: RequestHandler<
             req.body.attachments = attachments.map(
               (el) => `${FOLDERS.portfolio_post}/${el.filename}`
             );
-            Files.removeFiles(...req.body.attachments);
           })
         );
       }
@@ -152,7 +150,6 @@ export const updateProjectHandler: RequestHandler<
         uploadTasks.push(
           s3.saveBucketFiles(FOLDERS.portfolio_post, ...cover).then(() => {
             req.body.cover = `${FOLDERS.portfolio_post}/${cover[0].filename}`;
-            Files.removeFiles(req.body.cover);
           })
         );
       }
@@ -171,7 +168,6 @@ export const updateProjectHandler: RequestHandler<
         uploadTasks.push(
           s3.saveBucketFiles(FOLDERS.portfolio_post, ...audioCover).then(() => {
             req.body.audioCover = `${FOLDERS.portfolio_post}/${audioCover[0].filename}`;
-            Files.removeFiles(req.body.audioCover);
           })
         );
       }

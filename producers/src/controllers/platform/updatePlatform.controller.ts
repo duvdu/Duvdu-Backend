@@ -1,6 +1,5 @@
 import {
   Bucket,
-  Files,
   FOLDERS,
   IProducerPlatform,
   NotFound,
@@ -24,15 +23,14 @@ export const updatePlatformHandler: RequestHandler<
       new NotFound({ en: 'platform not found', ar: 'لم يتم العثور على المنصة' }, req.lang),
     );
 
-  const s3 = new Bucket();
-  if (image && image.length > 0) {
+  if (image?.length) {
+    const s3 = new Bucket();
     await Promise.all([
       s3.saveBucketFiles(FOLDERS.producer, ...image),
       platform.image ? s3.removeBucketFiles(platform.image) : Promise.resolve(),
     ]);
 
     req.body.image = `${FOLDERS.producer}/${image[0].filename}`;
-    Files.removeFiles(req.body.image);
   }
 
   if (req.body.name) platform.name = req.body.name;

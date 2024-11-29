@@ -1,7 +1,7 @@
 import {
-  uploadProjectMedia,
   FOLDERS,
   globalPaginationMiddleware,
+  globalUploadMiddleware,
   isauthenticated,
   isauthorized,
   PERMISSIONS,
@@ -17,7 +17,9 @@ router
   .route('/')
   .post(
     isauthenticated,
-    uploadProjectMedia(FOLDERS.studio_booking),
+    globalUploadMiddleware(FOLDERS.studio_booking).fields([
+      { name: 'attachments', maxCount: 10 },
+    ]),
     val.createReportVal,
     handler.createReportHandler,
   )

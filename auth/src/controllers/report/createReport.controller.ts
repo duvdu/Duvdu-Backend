@@ -1,5 +1,5 @@
 import 'express-async-errors';
-import { Bucket, Files, FOLDERS, NotFound, Project, Report } from '@duvdu-v1/duvdu';
+import { Bucket, FOLDERS, NotFound, Project, Report } from '@duvdu-v1/duvdu';
 
 import { CreateReportHandler } from '../../types/endpoints/report.endpoints';
 
@@ -12,7 +12,6 @@ export const createReportHandler: CreateReportHandler = async (req, res, next) =
   if (attachments) {
     await s3.saveBucketFiles(FOLDERS.report, ...attachments);
     (req.body as any).attachments = attachments.map((el) => `${FOLDERS.report}/${el.filename}`);
-    Files.removeFiles(...(req.body as any).attachments);
   }
   const report = await Report.create({
     ...req.body,

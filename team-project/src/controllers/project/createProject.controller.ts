@@ -30,7 +30,7 @@ export const createProjectHandler: CreateProjectHandler = async (req, res) => {
   if (files['cover']?.[0]) {
     uploadPromises.push(
       s3.saveBucketFiles(FOLDERS.team_project, files['cover'][0])
-        .then(() => {
+        .then(() => {          
           req.body.cover = `${FOLDERS.team_project}/${files['cover'][0].filename}`;
         })
     );

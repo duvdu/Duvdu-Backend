@@ -1,4 +1,4 @@
-import { Bucket, Files, FOLDERS, NotAllowedError, SuccessResponse, Rentals } from '@duvdu-v1/duvdu';
+import { Bucket, FOLDERS, NotAllowedError, SuccessResponse, Rentals } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 export const updateProjectHandler: RequestHandler<{ projectId: string }, SuccessResponse> = async (
@@ -9,38 +9,58 @@ export const updateProjectHandler: RequestHandler<{ projectId: string }, Success
   const attachments = <Express.Multer.File[] | undefined>(req.files as any)?.attachments;
   const cover = <Express.Multer.File[] | undefined>(req.files as any)?.cover;
 
-  const s3 = new Bucket();
-  const uploadPromises: Promise<any>[] = [];
+  // Find the existing project first to ensure it exists and belongs to the user
+  const existingProject = await Rentals.findOne({ 
+    _id: req.params.projectId, 
+    user: req.loggedUser.id 
+  });
 
-  // Prepare upload promises
+  if (!existingProject) {
+    return next(new NotAllowedError(undefined, req.lang));
+  }
+
+  const s3 = new Bucket();
+
+  // Upload new files if they exist
+  if (attachments?.length || cover?.length) {
+    await s3.saveBucketFiles(
+      FOLDERS.studio_booking,
+      ...(attachments || []),
+      ...(cover || [])
+    );
+  }
+
+  // Prepare update data
   if (attachments) {
-    uploadPromises.push(s3.saveBucketFiles(FOLDERS.studio_booking, ...attachments));
-    req.body.attachments = attachments.map((el) => `${FOLDERS.studio_booking}/${el.filename}`);
-    Files.removeFiles(...(req.body as any).attachments);
+    req.body.attachments = attachments.map(
+      (file) => `${FOLDERS.studio_booking}/${file.filename}`
+    );
   }
   
   if (cover) {
-    uploadPromises.push(s3.saveBucketFiles(FOLDERS.studio_booking, ...cover));
     req.body.cover = `${FOLDERS.studio_booking}/${cover[0].filename}`;
-    Files.removeFiles(req.body.cover);
   }
 
-  // Execute all uploads in parallel
-  if (uploadPromises.length > 0) {
-    await Promise.all(uploadPromises);
-  }
-
+  // Update the project
   const project = await Rentals.findOneAndUpdate(
     { _id: req.params.projectId, user: req.loggedUser.id },
     req.body,
   );
 
-  if (!project) return next(new NotAllowedError(undefined, req.lang));
+  if (!project) {
+    return next(new NotAllowedError(undefined, req.lang));
+  }
 
-  // Remove old files in parallel
+  // Remove old files if they were replaced
   const removePromises: Promise<any>[] = [];
-  if (attachments) removePromises.push(s3.removeBucketFiles(...project.attachments));
-  if (cover) removePromises.push(s3.removeBucketFiles(project.cover));
+  
+  if (attachments?.length) {
+    removePromises.push(s3.removeBucketFiles(...project.attachments));
+  }
+  
+  if (cover?.length) {
+    removePromises.push(s3.removeBucketFiles(project.cover));
+  }
   
   if (removePromises.length > 0) {
     await Promise.all(removePromises);

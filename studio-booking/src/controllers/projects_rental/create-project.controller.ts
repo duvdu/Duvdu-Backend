@@ -2,7 +2,6 @@ import {
   Bucket,
   Rentals,
   CYCLES,
-  Files,
   filterTagsForCategory,
   FOLDERS,
   Project,
@@ -13,6 +12,7 @@ export const createProjectHandler: RequestHandler = async (req, res) => {
   const attachments = <Express.Multer.File[]>(req.files as any).attachments;
   const cover = <Express.Multer.File[]>(req.files as any).cover;
 
+
   const [{ filteredTags, subCategoryTitle }] = await Promise.all([
     filterTagsForCategory(
       req.body.category.toString(),
@@ -21,7 +21,11 @@ export const createProjectHandler: RequestHandler = async (req, res) => {
       CYCLES.studioBooking,
       req.lang,
     ),
-    new Bucket().saveBucketFiles(FOLDERS.studio_booking, ...attachments, ...cover)
+    new Bucket().saveBucketFiles(
+      FOLDERS.studio_booking,
+      ...attachments,
+      ...cover
+    )
   ]);
 
   const projectData = {
@@ -29,7 +33,7 @@ export const createProjectHandler: RequestHandler = async (req, res) => {
     tags: filteredTags,
     subCategory: { ...subCategoryTitle, _id: req.body.subCategory },
     cover: `${FOLDERS.studio_booking}/${cover[0].filename}`,
-    attachments: attachments.map((el) => `${FOLDERS.studio_booking}/${el.filename}`),
+    attachments: attachments?.map((file) => `${FOLDERS.studio_booking}/${file.filename}`) || [],
     user: req.loggedUser.id,
   };
 
@@ -42,7 +46,6 @@ export const createProjectHandler: RequestHandler = async (req, res) => {
 
   const [project] = await Promise.all([
     Rentals.create(projectData),
-    Files.removeFiles(...projectData.attachments, projectData.cover)
   ]);
 
   await Project.create({
