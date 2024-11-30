@@ -85,13 +85,15 @@ export const createContractHandler: RequestHandler<
       stageExpiration,
       status: CopyrightContractStatus.pending,
     }),
-    Contracts.create({
-      customer: req.loggedUser.id,
-      sp: project.user,
-      ref: MODELS.copyrightContract,
-      cycle: CYCLES.copyRights,
-    })
   ]);
+
+  await Contracts.create({
+    customer: req.loggedUser.id,
+    contract: contract._id,
+    sp: project.user,
+    ref: MODELS.copyrightContract,
+    cycle: CYCLES.copyRights,
+  });
 
   // Send notifications in parallel with response
   Promise.all([

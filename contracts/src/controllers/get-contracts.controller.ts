@@ -19,6 +19,8 @@ export const getContracts: RequestHandler<
       { sp: new mongoose.Types.ObjectId(req.loggedUser.id) },
     ];
 
+  console.log(await Contracts.aggregate([{ $match: filter }]));
+    
   const contracts = await Contracts.aggregate([
     { $match: filter },
     { $sort: { createdAt: -1 } },
