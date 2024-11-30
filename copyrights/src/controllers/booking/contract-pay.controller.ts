@@ -25,6 +25,10 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
   const contract = await CopyrightContracts.findOne({ paymentLink: req.params.paymentSession });
   if (!contract) return next(new NotFound(undefined, req.lang));
 
+  if (contract.customer.toString() !== req.loggedUser.id) 
+    return next(new NotAllowedError({ en: 'you are not allowed to pay this contract', ar: 'ليس لديك الصلاحية لإتمام هذا العقد' }, req.lang));
+  
+
   if (
     new Date(contract.actionAt).getTime() + contract.stageExpiration * 60 * 60 * 1000 <
     new Date().getTime()
@@ -65,12 +69,12 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
       );
     }
 
-    await Users.findByIdAndUpdate(req.loggedUser.id, {
+    await Users.findByIdAndUpdate(user?._id, {
       $inc: { avaliableContracts: -1 },
     });
 
     await CopyrightContracts.updateOne(
-      { paymentLink: req.params.paymentSession },
+      { _id: contract._id },
       {
         status: CopyrightContractStatus.updateAfterFirstPayment,
         firstCheckoutAt: new Date(),
@@ -110,7 +114,7 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
     ]);
   } else if (contract.status === CopyrightContractStatus.waitingForTotalPayment) {
     await CopyrightContracts.updateOne(
-      { paymentLink: req.params.paymentSession },
+      { _id: contract._id },
       {
         status: CopyrightContractStatus.ongoing,
         totalCheckoutAt: new Date(),
