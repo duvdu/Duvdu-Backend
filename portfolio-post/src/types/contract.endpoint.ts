@@ -24,22 +24,6 @@ export interface CreateContractHandler
     unknown
   > {}
 
-export interface UpdateContractHandler
-  extends RequestHandler<
-    { contractId: string },
-    SuccessResponse<{ data: IprojectContract }>,
-    Partial<
-      Pick<IprojectContract, 'duration'> & {
-        equipment: {
-          tools: { id: string; units: number }[];
-          functions: { id: string; units: number }[];
-        };
-        unitPrice: number;
-        numberOfUnits: number;
-      }
-    >,
-    unknown
-  > {}
 
 export interface ContractActionHandler
   extends RequestHandler<

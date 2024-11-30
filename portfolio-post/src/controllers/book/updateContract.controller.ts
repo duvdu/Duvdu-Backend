@@ -1,11 +1,25 @@
 import 'express-async-errors';
 
-import { BadRequestError, NotAllowedError, NotFound, ProjectContract, ProjectContractStatus } from '@duvdu-v1/duvdu';
+import { BadRequestError, IprojectContract, NotAllowedError, NotFound, ProjectContract, ProjectContractStatus, SuccessResponse } from '@duvdu-v1/duvdu';
+import { RequestHandler } from 'express';
 
 import { calculateTotalPrice } from '../../services/checkToolsAndFunctions.service';
-import { UpdateContractHandler } from '../../types/contract.endpoint';
 
-export const updateContractHandler: UpdateContractHandler = async (req, res, next) => {
+export const updateContractHandler: RequestHandler<
+  { contractId: string },
+  SuccessResponse<{ data: IprojectContract }>,
+Partial<
+  Pick<IprojectContract, 'duration'> & {
+    equipment: {
+      tools: { id: string; unitPrice: number; units: number }[];
+      functions: { id: string; unitPrice: number; units: number }[];
+    };
+    unitPrice: number;
+    numberOfUnits: number;
+  }
+>,
+unknown
+>  = async (req, res, next) => {
   const contract = await ProjectContract.findById(req.params.contractId);
   if (!contract)
     return next(new NotFound({ en: 'contract notfound', ar: 'العقد غير موجود' }, req.lang));
@@ -49,7 +63,7 @@ export const updateContractHandler: UpdateContractHandler = async (req, res, nex
   if (req.body.unitPrice) contract.projectScale.unitPrice = req.body.unitPrice;
 
   contract.totalPrice =
-    contract.equipmentPrice + contract.projectScale.unitPrice * contract.projectScale.numberOfUnits;
+    (contract.equipmentPrice + contract.projectScale.unitPrice )* contract.projectScale.numberOfUnits;
   contract.secondPaymentAmount = contract.totalPrice - contract.firstPaymentAmount;
   await contract.save();
 
