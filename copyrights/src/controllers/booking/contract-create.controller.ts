@@ -88,6 +88,7 @@ export const createContractHandler: RequestHandler<
   ]);
 
   await Contracts.create({
+    _id: contract._id,
     customer: req.loggedUser.id,
     contract: contract._id,
     sp: project.user,
