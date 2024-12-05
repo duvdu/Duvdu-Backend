@@ -86,3 +86,9 @@ export const deleteCategory = [
   param('teamId').isMongoId().withMessage('teamId'),
   param('categoryId').isMongoId().withMessage('category'),
 ];
+
+export const submitFiles = [
+  param('contractId').isMongoId().withMessage('contractId'),
+  body('link').isString().withMessage('link'),
+  body('notes').isString().withMessage('notes'),
+];

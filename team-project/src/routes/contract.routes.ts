@@ -10,3 +10,4 @@ router.use(isauthenticated);
 
 router.route('/:contractId').post(val.action, controllers.contractAction);
 router.post('/pay/:paymentSession', val.pay, controllers.payContract);
+router.route('/:contractId/submit').patch(val.submitFiles, controllers.submitFilesHandler);
