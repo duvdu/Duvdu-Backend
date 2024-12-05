@@ -138,6 +138,8 @@ export interface ITeamContract {
   createdAt: Date;
   paymentAmount: number;
   totalCheckoutAt: Date;
+  submitFiles: { link: string; notes: string };
+
 }
 
 export const TeamContract = model<ITeamContract>(
@@ -164,6 +166,7 @@ export const TeamContract = model<ITeamContract>(
       paymentAmount: { type: Number, default: 0 },
       attachments: [String],
       totalCheckoutAt: Date,
+      submitFiles: { link: { type: String, default: null }, notes: { type: String, default: null } },
     },
     { timestamps: true, collection: MODELS.teamContract },
   ),
