@@ -20,6 +20,7 @@ export const getContract = [
 ];
 
 export const acceptFiles = [
+  param('contractId').isMongoId(),
   body('reference')
     .isIn([
       MODELS.projectContract,
