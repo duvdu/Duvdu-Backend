@@ -38,6 +38,11 @@ export const acceptFilesController: RequestHandler<
   if (!contract)
     return next(new NotFound({ en: 'Contract not found', ar: 'العقد غير موجود' }, req.lang));
 
+  if (contract.customer.toString() !== req.loggedUser.id)
+    return next(
+      new BadRequestError({ en: 'You are not the customer of this contract', ar: 'أنت لست عميلا لهذا العقد' }, req.lang),
+    );
+
   if (contract.status !== CopyrightContractStatus.ongoing)
     return next(
       new BadRequestError({ en: 'Contract is not ongoing', ar: 'العقد غير مفعل' }, req.lang),
