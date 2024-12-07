@@ -9,6 +9,7 @@ export enum ContractStatus {
   accepted = 'accepted',
   rejected = 'rejected',
   acceptedWithUpdate = 'accepted with update',
+  complaint = 'complaint',
 }
 
 export interface IproducerContarct {

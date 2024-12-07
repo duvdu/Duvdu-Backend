@@ -114,6 +114,7 @@ export enum TeamContractStatus {
   ongoing = 'ongoing',
   completed = 'completed',
   rejected = 'rejected',
+  complaint = 'complaint',
 }
 
 export interface ITeamContract {

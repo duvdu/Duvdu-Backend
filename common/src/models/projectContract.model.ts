@@ -13,6 +13,8 @@ export enum ProjectContractStatus {
   ongoing = 'ongoing',
   completed = 'completed',
   rejected = 'rejected',
+  complaint = 'complaint',
+
 }
 
 export interface IprojectContract {
