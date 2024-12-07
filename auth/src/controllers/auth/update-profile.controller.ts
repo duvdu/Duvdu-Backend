@@ -48,14 +48,6 @@ export const updateProfileHandler: RequestHandler<
     await s3.saveBucketFiles(FOLDERS.auth, ...profileImage);
     const imageKey = `${FOLDERS.auth}/${profileImage[0].filename}`;
 
-    // Validate face in the uploaded image
-    const faceValidation = await s3.validateFace(imageKey);
-    if (!faceValidation.isValid) {
-      // Clean up the uploaded file if validation fails
-      await s3.removeBucketFiles(imageKey);
-      return next(new BadRequestError(faceValidation.error!, req.lang));
-    }
-
     req.body.profileImage = imageKey;
     if (profile.profileImage && !profile.profileImage.startsWith('defaults')) {
       await s3.removeBucketFiles(profile.profileImage);
