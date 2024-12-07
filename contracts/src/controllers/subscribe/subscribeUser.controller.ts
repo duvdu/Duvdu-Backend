@@ -1,14 +1,11 @@
-import {  Notification, Users } from '@duvdu-v1/duvdu';
+import { Notification, Users } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 import 'express-async-errors';
 import { NewNotificationPublisher } from '../../event/publisher/newNotification.publisher';
 import { natsWrapper } from '../../nats-wrapper';
 
-
-
 export const subscribeUserController: RequestHandler = async (req, res) => {
-
   //   const setting = await Setting.findOne();
   //   if (!setting)
   //     return next(new NotFound({ en: 'setting not found ', ar: 'الإعدادات غير موجودة' }, req.lang));
@@ -17,11 +14,10 @@ export const subscribeUserController: RequestHandler = async (req, res) => {
   //     .sort({ createdAt: -1 })
   //     .limit(5)
   //     .populate('contract');
-  
+
   //   const highestPrice = Math.max(...lastContracts.map((contract:any) => contract.totalPrice || 0));
 
   await Users.findByIdAndUpdate(req.loggedUser.id, { $inc: { avaliableContracts: 5 } });
-
 
   const currentUserNotification = await Notification.create({
     sourceUser: req.loggedUser.id,
@@ -37,7 +33,6 @@ export const subscribeUserController: RequestHandler = async (req, res) => {
   ).populate('sourceUser', 'isOnline profileImage username');
 
   Promise.all([
-
     new NewNotificationPublisher(natsWrapper.client).publish({
       notificationDetails: {
         message: currentUserNotification.message,
@@ -48,7 +43,6 @@ export const subscribeUserController: RequestHandler = async (req, res) => {
       targetUser: currentUserNotification.targetUser.toString(),
     }),
   ]);
-
 
   return res.status(200).json(<any>{ message: 'success' });
 };

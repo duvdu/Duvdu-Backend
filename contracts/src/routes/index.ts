@@ -15,6 +15,9 @@ router.route('/').get(isauthenticated, val.getContracts, controllers.getContract
 router.use('/complaints', complaintRoutes);
 router.use('/coupons', couponRoutes);
 
-router.route('/:contractId').get(isauthenticated, val.getContract, controllers.getContract);
+router
+  .route('/:contractId')
+  .get(isauthenticated, val.getContract, controllers.getContract)
+  .patch(isauthenticated, val.acceptFiles, controllers.acceptFilesController);
 
 export const apiRoutes = router;

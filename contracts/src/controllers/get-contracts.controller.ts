@@ -20,7 +20,7 @@ export const getContracts: RequestHandler<
     ];
 
   console.log(await Contracts.aggregate([{ $match: filter }]));
-    
+
   const contracts = await Contracts.aggregate([
     { $match: filter },
     { $sort: { createdAt: -1 } },

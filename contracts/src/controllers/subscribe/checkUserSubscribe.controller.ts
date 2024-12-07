@@ -2,7 +2,6 @@ import 'express-async-errors';
 import { Contracts, NotFound, Setting, SuccessResponse, Users } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-
 export const checkUserSubscribeController: RequestHandler<
   unknown,
   SuccessResponse,
@@ -11,7 +10,8 @@ export const checkUserSubscribeController: RequestHandler<
 > = async (req, res, next) => {
   // const user = await Users.findById(req.loggedUser.id);
   const user = await Users.findById(req.loggedUser.id);
-  if (!user) return next(new NotFound({ en: 'user not found', ar: 'المستخدم غير موجود' } , req.lang));
+  if (!user)
+    return next(new NotFound({ en: 'user not found', ar: 'المستخدم غير موجود' }, req.lang));
 
   if (user.avaliableContracts > 0)
     return res.status(400).json(<any>{ data: { avaliableContracts: user.avaliableContracts } });
@@ -24,9 +24,10 @@ export const checkUserSubscribeController: RequestHandler<
     .sort({ createdAt: -1 })
     .limit(5)
     .populate('contract');
-    
 
-  const highestPrice = Math.max(...lastContracts.map((contract:any) => contract.contract.totalPrice || 0));
+  const highestPrice = Math.max(
+    ...lastContracts.map((contract: any) => contract.contract.totalPrice || 0),
+  );
   const total = (highestPrice * setting.contractSubscriptionPercentage) / 100;
   return res.status(200).json(<any>{ message: 'success', data: { newFiveContractsPrice: total } });
 };

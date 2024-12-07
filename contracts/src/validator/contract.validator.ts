@@ -1,5 +1,5 @@
-import { globalValidatorMiddleware } from '@duvdu-v1/duvdu';
-import { param, query } from 'express-validator';
+import { MODELS, globalValidatorMiddleware } from '@duvdu-v1/duvdu';
+import { body, param, query } from 'express-validator';
 
 export const getContracts = [
   query('filter')
@@ -16,6 +16,18 @@ export const getContracts = [
 
 export const getContract = [
   param('contractId').isMongoId().withMessage('invalidContractId'),
+  globalValidatorMiddleware,
+];
+
+export const acceptFiles = [
+  body('reference')
+    .isIn([
+      MODELS.projectContract,
+      MODELS.teamContract,
+      MODELS.copyrightContract,
+      MODELS.rentalContract,
+    ])
+    .withMessage('invalidReference'),
   globalValidatorMiddleware,
 ];
 
