@@ -6,11 +6,11 @@ import {
   ProjectContract,
   SuccessResponse,
   TeamContract,
+  CopyrightContracts,
+  RentalContracts,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-import { CopyrightContracts } from './../../../common/src/models/copyright-contract.model';
-import { RentalContracts } from './../../../common/src/models/rental-contracts.model';
 import 'express-async-errors';
 
 export const acceptFilesController: RequestHandler<
