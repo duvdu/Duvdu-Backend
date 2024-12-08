@@ -43,7 +43,7 @@ unknown
 
     contract.tools = tools;
     contract.functions = functions;
-    contract.equipmentPrice = +totalPrice;
+    contract.equipmentPrice = totalPrice;
   }
 
   // update duration and deadline
