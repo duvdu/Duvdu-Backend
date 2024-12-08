@@ -12,6 +12,7 @@ export const getCategoriesAdminPagination: RequestHandler<
     title?: string;
     cycle?: string;
     status?: boolean;
+    isRelated?: boolean;
   }
 > = async (req, res, next) => {
   req.pagination.filter = {};
@@ -40,6 +41,9 @@ export const getCategoriesAdminPagination: RequestHandler<
   }
   if (req.query.status !== undefined) {
     req.pagination.filter.status = req.query.status;
+  }
+  if (req.query.isRelated !== undefined) {
+    req.pagination.filter.isRelated = req.query.isRelated;
   }
   next();
 };

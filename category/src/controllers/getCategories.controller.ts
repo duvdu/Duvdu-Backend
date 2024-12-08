@@ -45,7 +45,7 @@ export const getCategoriesPagination: RequestHandler<unknown, unknown, unknown, 
 export const getCategoriesHandler: GetCategoriesHandler = async (req, res) => {  
   
   const category = await Categories.aggregate([
-    { $match: req.pagination.filter },
+    { $match: {...req.pagination.filter , isRelated:false} },
     { $skip: req.pagination.skip },
     { $limit: req.pagination.limit },
     {
