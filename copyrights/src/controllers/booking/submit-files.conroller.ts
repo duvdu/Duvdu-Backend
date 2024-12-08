@@ -19,7 +19,7 @@ export const submitFilesHandler: RequestHandler<
 
   await CopyrightContracts.updateOne(
     { _id: req.params.contractId },
-    { submitFiles: { link: req.body.notes, notes: req.body.notes } },
+    { submitFiles: { link: req.body.link, notes: req.body.notes } },
   );
 
   res.json({ message: 'success' });
