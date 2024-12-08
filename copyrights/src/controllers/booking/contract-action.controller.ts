@@ -425,6 +425,7 @@ const handleSpAction = async (contract: any, action: string, userId: string, sp:
       {
         status: newStatus,
         actionAt: new Date(),
+        firstPaymentAmount: ((10 * contract.totalPrice) / 100).toFixed(2),
         paymentLink: paymentSession,
       },
     );
