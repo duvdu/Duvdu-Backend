@@ -56,6 +56,7 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
         status: ProjectContractStatus.updateAfterFirstPayment,
         firstCheckoutAt: new Date(),
         firstPaymentAmount: ((10 * contract.totalPrice) / 100).toFixed(2),
+        secondPaymentAmount: contract.totalPrice - ((10 * contract.totalPrice) / 100),
       },
     );
 

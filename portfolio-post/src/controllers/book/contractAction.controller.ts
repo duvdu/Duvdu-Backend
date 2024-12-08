@@ -83,6 +83,7 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
           status: ProjectContractStatus.waitingForFirstPayment,
           actionAt: new Date(),
           paymentLink: paymentSession,
+          firstPaymentAmount: ((10 * contract.totalPrice) / 100).toFixed(2),
         },
       );
 
