@@ -12,4 +12,6 @@ export interface Icategory {
   status: boolean;
   trend: boolean;
   media: 'image' | 'video' | 'audio';
+  isRelated: boolean;
+  relatedCategory?: Icategory[];
 }
