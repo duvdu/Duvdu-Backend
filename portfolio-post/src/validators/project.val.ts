@@ -7,6 +7,12 @@ import { body, param, query } from 'express-validator';
 import mongoose from 'mongoose';
 
 export const create = [
+  body('relatedCategory').optional().isArray().withMessage('relatedCategory'),
+  body('relatedCategory.*.category').isMongoId().withMessage('relatedCategory'),
+  body('relatedCategory.*.subCategories').optional().isArray().withMessage('relatedCategory'),
+  body('relatedCategory.*.subCategories.*.subCategory').isMongoId().withMessage('relatedCategory'),
+  body('relatedCategory.*.subCategories.*.tags').optional().isArray().withMessage('relatedCategory'),
+  body('relatedCategory.*.subCategories.*.tags.*.tag').isMongoId().withMessage('relatedCategory'),
   body('address').isString().exists().withMessage('address'),
   body('name').isString().exists().withMessage('name'),
   body('description').isString().exists().withMessage('description'),

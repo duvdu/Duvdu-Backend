@@ -69,6 +69,14 @@ export const getCategoriesHandler: GetCategoriesHandler = async (req, res) => {
       },
     },
     {
+      $lookup: {
+        from: MODELS.category,
+        localField: 'relatedCategory',
+        foreignField: '_id',
+        as: 'relatedCategory'
+      }
+    },
+    {
       $project: {
         title: {
           $cond: {
@@ -113,12 +121,6 @@ export const getCategoriesHandler: GetCategoriesHandler = async (req, res) => {
             },
           },
         },
-        status: 1,
-        createdAt: 1,
-        updatedAt: 1,
-        __v: 1,
-        image: 1,
-        media: 1,
         jobTitles: {
           $map: {
             input: '$jobTitles',
@@ -132,13 +134,85 @@ export const getCategoriesHandler: GetCategoriesHandler = async (req, res) => {
             },
           },
         },
-      },
-    },
-    {
-      $addFields: {
-        image: {
-          $concat: [process.env.BUCKET_HOST, '/', '$image'],
-        },
+        status: 1,
+        createdAt: 1,
+        updatedAt: 1,
+        media: 1,
+        __v: 1,
+        image: { $concat: [process.env.BUCKET_HOST, '/', '$image'] },
+        relatedCategory: {
+          $cond: {
+            if: { $isArray: '$relatedCategory' },
+            then: {
+              $map: {
+                input: { $ifNull: ['$relatedCategory', []] },
+                as: 'related',
+                in: {
+                  _id: '$$related._id',
+                  title: {
+                    $cond: {
+                      if: { $eq: ['ar', req.lang] },
+                      then: '$$related.title.ar',
+                      else: '$$related.title.en'
+                    }
+                  },
+                  image: { 
+                    $cond: {
+                      if: '$$related.image',
+                      then: { $concat: [process.env.BUCKET_HOST, '/', '$$related.image'] },
+                      else: null
+                    }
+                  },
+                  subCategories: {
+                    $cond: {
+                      if: { $isArray: '$$related.subCategories' },
+                      then: {
+                        $map: {
+                          input: { $ifNull: ['$$related.subCategories', []] },
+                          as: 'subCat',
+                          in: {
+                            _id: '$$subCat._id',
+                            title: {
+                              $cond: {
+                                if: { $eq: ['ar', req.lang] },
+                                then: '$$subCat.title.ar',
+                                else: '$$subCat.title.en'
+                              }
+                            },
+                            tags: {
+                              $cond: {
+                                if: { $isArray: '$$subCat.tags' },
+                                then: {
+                                  $map: {
+                                    input: { $ifNull: ['$$subCat.tags', []] },
+                                    as: 'tag',
+                                    in: {
+                                      _id: '$$tag._id',
+                                      title: {
+                                        $cond: {
+                                          if: { $eq: ['ar', req.lang] },
+                                          then: '$$tag.ar',
+                                          else: '$$tag.en'
+                                        }
+                                      }
+                                    }
+                                  }
+                                },
+                                else: []
+                              }
+                            }
+                          }
+                        }
+                      },
+                      else: []
+                    }
+                  }
+                }
+              }
+            },
+            else: []
+          }
+        }
       },
     },
   ]);

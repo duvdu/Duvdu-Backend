@@ -4,6 +4,7 @@ import {
   Bucket,
   CategoryMedia,
   CYCLES,
+  filterRelatedCategoryForCategory,
   filterTagsForCategory,
   FOLDERS,
   IprojectCycle,
@@ -38,6 +39,7 @@ interface ProjectRequestBody extends Pick<
   | 'tags'
   | 'audioCover'
   | 'creatives'
+  | 'relatedCategory'
 > {
   subCategoryId: string;
   tagsId: string[];
@@ -81,6 +83,17 @@ export const createProjectHandler: RequestHandler<
 
     req.body.subCategory = { ...subCategoryTitle!, _id: req.body.subCategoryId };
     req.body.tags = filteredTags;
+    if(req.body.relatedCategory) {
+      const convertedRelatedCategory = req.body.relatedCategory.map(cat => ({
+        category: cat.category.toString(),
+        subCategories: cat.subCategories?.map(sub => ({
+          subCategory: sub.subCategory.toString(),
+          tags: sub.tags?.map(t => ({ tag: t.tag.toString() }))
+        }))
+      }));
+      await filterRelatedCategoryForCategory(req.body.category.toString(), convertedRelatedCategory, req.lang);
+    }
+    
 
     // Validate media requirements
     await validateMediaRequirements(

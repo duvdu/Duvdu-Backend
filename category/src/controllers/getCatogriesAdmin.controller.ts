@@ -94,6 +94,8 @@ export const getCatogriesAdminHandler: GetCatogriesAdminHandler = async (req, re
         __v: 1,
         image: 1,
         jobTitles: 1,
+        isRelated: 1,
+        relatedCategory: 1,
         creativesCounter: { $arrayElemAt: ['$creativesCount.creativesCounter', 0] },
       },
     },
