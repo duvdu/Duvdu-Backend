@@ -15,6 +15,5 @@ export const Favourites = model<Ifavourite>(
       user: { type: Schema.Types.ObjectId, ref: MODELS.user },
     },
     { timestamps: true, collection: MODELS.favourites },
-  )
-    .index({ project: 1, user: 1 }, { unique: true }),
+  ).index({ project: 1, user: 1 }, { unique: true }),
 );

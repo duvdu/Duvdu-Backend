@@ -4,14 +4,11 @@ import { Icategory } from '../types/Category';
 import { CYCLES } from '../types/cycles';
 import { MODELS } from '../types/model-names';
 
-
-
 export enum CategoryMedia {
   image = 'image',
   video = 'video',
-  audio = 'audio'
+  audio = 'audio',
 }
-
 
 const categorySchema = new mongoose.Schema<Icategory>(
   {

@@ -62,7 +62,7 @@ const userSchema = new Schema<Iuser>(
       color: { type: String, default: null },
     },
     projectsView: { type: Number, default: 0 },
-    haveInvitation:{type:Boolean , default:false},
+    haveInvitation: { type: Boolean, default: false },
     faceRecognition: { type: String, default: null },
   },
   {
@@ -72,7 +72,8 @@ const userSchema = new Schema<Iuser>(
       transform(doc, ret) {
         if (ret.coverImage) ret.coverImage = process.env.BUCKET_HOST + '/' + ret.coverImage;
         if (ret.profileImage) ret.profileImage = process.env.BUCKET_HOST + '/' + ret.profileImage;
-        if (ret.faceRecognition) ret.faceRecognition = process.env.BUCKET_HOST + '/' + ret.faceRecognition;
+        if (ret.faceRecognition)
+          ret.faceRecognition = process.env.BUCKET_HOST + '/' + ret.faceRecognition;
       },
     },
   },

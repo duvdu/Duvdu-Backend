@@ -14,6 +14,10 @@ export interface IprojectCycle {
   category: Types.ObjectId | Iuser;
   subCategory: { ar: string; en: string; _id: string };
   tags: { ar: string; en: string }[];
+  relatedCategory: {
+    category: Types.ObjectId;
+    subCategories: { subCategory: Types.ObjectId; tags: { tag: Types.ObjectId }[] }[];
+  }[];
   cover: string;
   audioCover: string;
   attachments: string[];
@@ -56,6 +60,17 @@ export const ProjectCycle = model<IprojectCycle>(
         _id: String,
       },
       tags: [{ ar: { type: String, default: null }, en: { type: String, default: null } }],
+      relatedCategory: [
+        {
+          category: { type: Schema.Types.ObjectId, ref: MODELS.category },
+          subCategories: [
+            {
+              subCategory: { type: Schema.Types.ObjectId },
+              tags: [{ tag: { type: Schema.Types.ObjectId } }],
+            },
+          ],
+        },
+      ],
       cover: { type: String, default: null },
       audioCover: { type: String, default: null },
       attachments: [{ type: String, default: null }],

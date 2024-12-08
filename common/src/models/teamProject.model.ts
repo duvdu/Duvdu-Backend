@@ -12,7 +12,6 @@ export enum UserStatus {
   canceled = 'canceled',
 }
 
-
 export interface ITeamProject {
   user: Types.ObjectId | Iuser;
   cover: string;
@@ -36,7 +35,7 @@ export interface ITeamProject {
           deadLine: Date;
           totalAmount: number;
           status: UserStatus;
-          contract:Types.ObjectId
+          contract: Types.ObjectId;
         },
       ];
     },
@@ -140,7 +139,6 @@ export interface ITeamContract {
   paymentAmount: number;
   totalCheckoutAt: Date;
   submitFiles: { link: string; notes: string };
-
 }
 
 export const TeamContract = model<ITeamContract>(
@@ -167,7 +165,10 @@ export const TeamContract = model<ITeamContract>(
       paymentAmount: { type: Number, default: 0 },
       attachments: [String],
       totalCheckoutAt: Date,
-      submitFiles: { link: { type: String, default: null }, notes: { type: String, default: null } },
+      submitFiles: {
+        link: { type: String, default: null },
+        notes: { type: String, default: null },
+      },
     },
     { timestamps: true, collection: MODELS.teamContract },
   ),
