@@ -5,7 +5,7 @@ import { CreateCategoryHandler } from '../types/endpoints/endpoints';
 export const createCategoryHandler: CreateCategoryHandler = async (req, res, next) => {
   const cover = <Express.Multer.File[]>(req.files as any).cover;
 
-  if(req.body.isRelated && req.body.relatedCategory)
+  if(req.body.isRelated === true && req.body.relatedCategory)
     return next(new BadRequestError({en:'can not add related category to related category' , ar:'لا يمكن إضافة فئة مرتبطة إلى فئة مرتبطة'} , req.lang));
   
   if(req.body.relatedCategory && req.body.cycle != CYCLES.portfolioPost)
