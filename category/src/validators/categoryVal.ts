@@ -136,6 +136,7 @@ export const getCategoryVal = [
 
 // Validation for getting categories for CRM
 export const getCategoriesForCrmVal = [
+  check('isRelated').optional().isBoolean().toBoolean().withMessage('isRelatedMustBeBoolean'),
   check('search').optional().isString().notEmpty().withMessage('searchMustBeNonEmptyString'),
   check('title').optional().isString().notEmpty().withMessage('titleMustBeNonEmptyString'),
   check('cycle').optional().isString().notEmpty().withMessage('cycleMustBeNonEmptyString'),

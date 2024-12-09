@@ -9,6 +9,7 @@ export const getCategoriesPagination: RequestHandler<unknown, unknown, unknown, 
   title?: string;
   cycle?: string;
   status?: boolean;
+  isRelated?: boolean;
 }> = async (req, res, next) => {
   
   req.pagination.filter = {status:true};
@@ -17,6 +18,9 @@ export const getCategoriesPagination: RequestHandler<unknown, unknown, unknown, 
   if (req.query.search) {
     const searchRegex = new RegExp(req.query.search, 'i');
 
+    if(req.query.isRelated !== undefined)
+      req.pagination.filter.isRelated = req.query.isRelated;
+    
     req.pagination.filter.$or = [
       { 'title.ar': searchRegex }, 
       { 'title.en': searchRegex }, 
