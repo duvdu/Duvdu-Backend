@@ -37,6 +37,7 @@ export const createReviewHandler: CreateReviewHandler = async (req, res, next) =
 
   const newReview = await ContractReview.create({
     ...req.body,
+    cycle: contract.cycle,
     sp: contract.sp,
     customer: req.loggedUser.id,
   });

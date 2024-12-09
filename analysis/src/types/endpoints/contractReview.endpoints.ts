@@ -5,7 +5,7 @@ export interface CreateReviewHandler
   extends RequestHandler<
     unknown,
     SuccessResponse<{ data: IContractReview }>,
-    Pick<IContractReview, 'comment' | 'rate' | 'contract' | 'cycle'>,
+    Pick<IContractReview, 'comment' | 'rate' | 'contract'>,
     unknown
   > {}
 

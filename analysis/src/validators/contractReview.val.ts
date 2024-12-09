@@ -1,17 +1,10 @@
-import { CYCLES, globalValidatorMiddleware } from '@duvdu-v1/duvdu';
+import { globalValidatorMiddleware } from '@duvdu-v1/duvdu';
 import { body, param, query } from 'express-validator';
 
 export const create = [
   body('comment').exists().withMessage('comment').isString().withMessage('comment'),
   body('rate').isFloat({ min: 1, max: 5 }).withMessage('rate'),
   body('contract').isMongoId().withMessage('contract'),
-  body('cycle')
-    .isString()
-    .withMessage('cycle')
-    .custom((val) => {
-      if (Object.values(CYCLES).includes(val)) return true;
-      throw new Error('cycle');
-    }),
   globalValidatorMiddleware,
 ];
 
