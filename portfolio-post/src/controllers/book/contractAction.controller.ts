@@ -193,10 +193,9 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
         ),
       );
   } else {
-
     if (req.body.action === 'cancel' && contract.status === ProjectContractStatus.pending) {
       await ProjectContract.updateOne(
-        { _id: req.params.contractId , status:ProjectContractStatus.pending },
+        { _id: req.params.contractId, status: ProjectContractStatus.pending },
         { status: ProjectContractStatus.canceled, rejectedBy: 'customer', actionAt: new Date() },
       );
 
@@ -220,8 +219,10 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
           Channels.update_contract,
         ),
       ]);
-    }
-    else if (req.body.action === 'reject' && contract.status === ProjectContractStatus.waitingForFirstPayment){
+    } else if (
+      req.body.action === 'reject' &&
+      contract.status === ProjectContractStatus.waitingForFirstPayment
+    ) {
       await ProjectContract.updateOne(
         { _id: req.params.contractId },
         { status: ProjectContractStatus.rejected, rejectedBy: 'customer', actionAt: new Date() },

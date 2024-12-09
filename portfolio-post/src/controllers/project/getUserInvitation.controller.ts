@@ -1,14 +1,20 @@
-import { InviteStatus, IprojectCycle, MODELS, ProjectCycle, SuccessResponse } from '@duvdu-v1/duvdu';
+import {
+  InviteStatus,
+  IprojectCycle,
+  MODELS,
+  ProjectCycle,
+  SuccessResponse,
+} from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import 'express-async-errors';
 import mongoose from 'mongoose';
 
-
-
-
-
-export const getUserInvitationHandler:RequestHandler<unknown , SuccessResponse<{data:IprojectCycle[]}> , unknown , unknown> = async (req , res)=>{
-
+export const getUserInvitationHandler: RequestHandler<
+  unknown,
+  SuccessResponse<{ data: IprojectCycle[] }>,
+  unknown,
+  unknown
+> = async (req, res) => {
   const projects = await ProjectCycle.aggregate([
     {
       $match: {
@@ -41,10 +47,10 @@ export const getUserInvitationHandler:RequestHandler<unknown , SuccessResponse<{
       },
     },
     { $unwind: '$category' },
-  
+
     // Unwind creatives array to handle each creative individually
     { $unwind: { path: '$creatives', preserveNullAndEmptyArrays: true } },
-  
+
     // Populate the creative field within each creative object in the array
     {
       $lookup: {
@@ -55,7 +61,7 @@ export const getUserInvitationHandler:RequestHandler<unknown , SuccessResponse<{
       },
     },
     { $unwind: { path: '$creativeDetails', preserveNullAndEmptyArrays: true } },
-  
+
     {
       $group: {
         _id: '$_id',
@@ -88,7 +94,7 @@ export const getUserInvitationHandler:RequestHandler<unknown , SuccessResponse<{
                 address: '$creativeDetails.address',
                 inviteStatus: '$creatives.inviteStatus',
               },
-              null, 
+              null,
             ],
           },
         },
@@ -204,6 +210,5 @@ export const getUserInvitationHandler:RequestHandler<unknown , SuccessResponse<{
     },
   ]);
 
-  res.status(200).json({message:'success' , data:projects});
-
+  res.status(200).json({ message: 'success', data: projects });
 };

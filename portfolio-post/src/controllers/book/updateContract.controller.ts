@@ -1,6 +1,14 @@
 import 'express-async-errors';
 
-import { BadRequestError, IprojectContract, NotAllowedError, NotFound, ProjectContract, ProjectContractStatus, SuccessResponse } from '@duvdu-v1/duvdu';
+import {
+  BadRequestError,
+  IprojectContract,
+  NotAllowedError,
+  NotFound,
+  ProjectContract,
+  ProjectContractStatus,
+  SuccessResponse,
+} from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 import { calculateTotalPrice } from '../../services/checkToolsAndFunctions.service';
@@ -8,18 +16,18 @@ import { calculateTotalPrice } from '../../services/checkToolsAndFunctions.servi
 export const updateContractHandler: RequestHandler<
   { contractId: string },
   SuccessResponse<{ data: IprojectContract }>,
-Partial<
-  Pick<IprojectContract, 'duration'> & {
-    equipment: {
-      tools: { id: string; unitPrice: number; units: number }[];
-      functions: { id: string; unitPrice: number; units: number }[];
-    };
-    unitPrice: number;
-    numberOfUnits: number;
-  }
->,
-unknown
->  = async (req, res, next) => {
+  Partial<
+    Pick<IprojectContract, 'duration'> & {
+      equipment: {
+        tools: { id: string; unitPrice: number; units: number }[];
+        functions: { id: string; unitPrice: number; units: number }[];
+      };
+      unitPrice: number;
+      numberOfUnits: number;
+    }
+  >,
+  unknown
+> = async (req, res, next) => {
   const contract = await ProjectContract.findById(req.params.contractId);
   if (!contract)
     return next(new NotFound({ en: 'contract notfound', ar: 'العقد غير موجود' }, req.lang));
@@ -63,10 +71,10 @@ unknown
   if (req.body.unitPrice) contract.projectScale.unitPrice = req.body.unitPrice;
 
   contract.totalPrice =
-    (contract.equipmentPrice + contract.projectScale.unitPrice )* contract.projectScale.numberOfUnits;
+    (contract.equipmentPrice + contract.projectScale.unitPrice) *
+    contract.projectScale.numberOfUnits;
   contract.secondPaymentAmount = contract.totalPrice - contract.firstPaymentAmount;
   await contract.save();
-
 
   res.status(200).json({ message: 'success', data: contract });
 };

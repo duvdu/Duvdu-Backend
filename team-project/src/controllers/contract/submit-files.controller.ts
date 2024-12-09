@@ -1,5 +1,7 @@
-import { BadRequestError, NotFound, SuccessResponse, TeamContract, TeamContractStatus } from '@duvdu-v1/duvdu';
+import { BadRequestError, Channels, NotFound, SuccessResponse, TeamContract, TeamContractStatus, Users } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
+
+import { sendNotification } from '../project/sendNotification';
 
 
 export const submitFilesHandler: RequestHandler<
@@ -23,5 +25,26 @@ export const submitFilesHandler: RequestHandler<
     { submitFiles: { link: req.body.link, notes: req.body.notes } },
   );
 
+  const sp = await Users.findById(contract.sp);
+  if (sp) {
+    await sendNotification(
+      req.loggedUser.id,
+      contract.customer.toString(),
+      contract._id.toString(),
+      'contract',
+      'team contract updates',
+      `${sp?.name} submitted files for the project`,
+      Channels.update_contract,
+    );
+    await sendNotification(
+      req.loggedUser.id,
+      req.loggedUser.id,
+      contract._id.toString(),
+      'contract',
+      'team contract updates',
+      'you submitted files for the project successfully',
+      Channels.update_contract,
+    );
+  }
   res.json({ message: 'success' });
 };

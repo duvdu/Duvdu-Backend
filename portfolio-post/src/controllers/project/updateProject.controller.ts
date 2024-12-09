@@ -28,23 +28,23 @@ interface FileValidations {
 }
 
 const fileValidations: FileValidations = {
-  image: { 
-    type: 'image/', 
-    count: 1, 
+  image: {
+    type: 'image/',
+    count: 1,
     message: 'exactly one image file',
-    arMessage: 'ملف صورة واحد'
+    arMessage: 'ملف صورة واحد',
   },
-  audio: { 
-    type: 'audio/', 
-    count: 1, 
+  audio: {
+    type: 'audio/',
+    count: 1,
     message: 'exactly one audio file',
-    arMessage: 'ملف صوتي واحد'
+    arMessage: 'ملف صوتي واحد',
   },
-  video: { 
-    type: 'video/', 
-    count: 1, 
+  video: {
+    type: 'video/',
+    count: 1,
     message: 'exactly one video file',
-    arMessage: 'ملف فيديو واحد'
+    arMessage: 'ملف فيديو واحد',
   },
 };
 
@@ -82,10 +82,7 @@ export const updateProjectHandler: RequestHandler<
     // Find and validate category
     const category = await Categories.findById(project.category);
     if (!category) {
-      throw new NotFound(
-        { en: 'category not found', ar: 'الفئة غير موجودة' },
-        req.lang
-      );
+      throw new NotFound({ en: 'category not found', ar: 'الفئة غير موجودة' }, req.lang);
     }
 
     const media = category.media;
@@ -123,15 +120,15 @@ export const updateProjectHandler: RequestHandler<
         uploadTasks.push(
           s3.saveBucketFiles(FOLDERS.portfolio_post, ...attachments).then(() => {
             req.body.attachments = attachments.map(
-              (el) => `${FOLDERS.portfolio_post}/${el.filename}`
+              (el) => `${FOLDERS.portfolio_post}/${el.filename}`,
             );
-          })
+          }),
         );
       }
 
       if (cover) {
         const isCoverValid =
-          (media === 'image' || media === 'audio')
+          media === 'image' || media === 'audio'
             ? cover[0].mimetype.startsWith('image/')
             : media === 'video'
               ? cover[0].mimetype.startsWith('video/')
@@ -143,14 +140,14 @@ export const updateProjectHandler: RequestHandler<
               en: `Cover must be ${media === 'video' ? 'a video' : 'an image'}`,
               ar: `يجب أن يكون الغلاف ${media === 'video' ? 'فيديو' : 'صورة'}`,
             },
-            req.lang
+            req.lang,
           );
         }
 
         uploadTasks.push(
           s3.saveBucketFiles(FOLDERS.portfolio_post, ...cover).then(() => {
             req.body.cover = `${FOLDERS.portfolio_post}/${cover[0].filename}`;
-          })
+          }),
         );
       }
 
@@ -161,14 +158,14 @@ export const updateProjectHandler: RequestHandler<
               en: 'Audio cover must be an audio file',
               ar: 'يجب أن يكون الغلاف الصوتي صوتيًا',
             },
-            req.lang
+            req.lang,
           );
         }
 
         uploadTasks.push(
           s3.saveBucketFiles(FOLDERS.portfolio_post, ...audioCover).then(() => {
             req.body.audioCover = `${FOLDERS.portfolio_post}/${audioCover[0].filename}`;
-          })
+          }),
         );
       }
 
@@ -179,14 +176,12 @@ export const updateProjectHandler: RequestHandler<
     await validateFiles();
     await handleFileUploads();
 
-
-
     // Update project and clean up old files in parallel
     const [updatedProject] = await Promise.all([
       ProjectCycle.findOneAndUpdate(
         { _id: req.params.projectId, user: req.loggedUser.id },
         req.body,
-        { new: true }
+        { new: true },
       ),
       project.attachments && attachments && s3.removeBucketFiles(...project.attachments),
       project.cover && cover && s3.removeBucketFiles(project.cover),
@@ -196,20 +191,26 @@ export const updateProjectHandler: RequestHandler<
     if (!updatedProject) {
       throw new BadRequestError(
         { en: 'failed to update project', ar: 'فشل في تحديث المشروع' },
-        req.lang
+        req.lang,
       );
     }
 
     // Calculate total project price
     const totalProjectPrice =
-      updatedProject.tools.reduce((acc: number, tool: { unitPrice: number }) => acc + tool.unitPrice, 0) +
-      updatedProject.functions.reduce((acc: number, func: { unitPrice: number }) => acc + func.unitPrice, 0) +
+      updatedProject.tools.reduce(
+        (acc: number, tool: { unitPrice: number }) => acc + tool.unitPrice,
+        0,
+      ) +
+      updatedProject.functions.reduce(
+        (acc: number, func: { unitPrice: number }) => acc + func.unitPrice,
+        0,
+      ) +
       updatedProject.projectScale.pricerPerUnit * updatedProject.projectScale.current;
 
     // Update project price
     await ProjectCycle.updateOne(
       { _id: updatedProject._id },
-      { minBudget: totalProjectPrice, maxBudget: totalProjectPrice }
+      { minBudget: totalProjectPrice, maxBudget: totalProjectPrice },
     );
 
     res.status(200).json({ message: 'success', data: updatedProject });

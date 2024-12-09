@@ -44,6 +44,7 @@ export const getCategoriesPagination: RequestHandler<unknown, unknown, unknown, 
 
 export const getCategoriesHandler: GetCategoriesHandler = async (req, res) => {  
   
+
   const category = await Categories.aggregate([
     { $match: {...req.pagination.filter , isRelated:false} },
     { $skip: req.pagination.skip },
@@ -137,6 +138,7 @@ export const getCategoriesHandler: GetCategoriesHandler = async (req, res) => {
         status: 1,
         createdAt: 1,
         updatedAt: 1,
+        isRelated:1,
         media: 1,
         __v: 1,
         image: { $concat: [process.env.BUCKET_HOST, '/', '$image'] },
@@ -218,7 +220,7 @@ export const getCategoriesHandler: GetCategoriesHandler = async (req, res) => {
   ]);
   
   
-  const resultCount = await Categories.find(req.pagination.filter).countDocuments();
+  const resultCount = await Categories.find({...req.pagination.filter , isRelated:false}).countDocuments();
 
   res.status(200).json({ 
     message: 'success',

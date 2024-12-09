@@ -26,6 +26,9 @@ export const getProjectsPagination: RequestHandler<
     maxBudget?: number;
     minBudget?: number;
     maxDistance?: number;
+    relatedCategory?: Types.ObjectId[];
+    relatedSubCategory?: Types.ObjectId[];
+    relatedTags?: Types.ObjectId[];
   }
 > = async (req, res, next) => {
   req.query.maxDistance = +(req.query.maxDistance || 1000);
@@ -115,6 +118,57 @@ export const getProjectsPagination: RequestHandler<
     req.pagination.filter.minBudget = { $gte: req.query.minBudget };
   }
 
+  if (req.query.relatedCategory && req.query.relatedCategory.length > 0) {
+    if (!req.pagination.filter.$and) {
+      req.pagination.filter.$and = [];
+    }
+
+    const categoryIds = req.query.relatedCategory.map((id) => new mongoose.Types.ObjectId(id));
+    req.pagination.filter.$and.push({
+      relatedCategory: {
+        $elemMatch: {
+          category: { $in: categoryIds },
+        },
+      },
+    });
+
+    if (req.query.relatedSubCategory && req.query.relatedSubCategory.length > 0) {
+      const subCategoryIds = req.query.relatedSubCategory.map(
+        (id) => new mongoose.Types.ObjectId(id),
+      );
+      req.pagination.filter.$and.push({
+        relatedCategory: {
+          $elemMatch: {
+            subCategories: {
+              $elemMatch: {
+                subCategory: { $in: subCategoryIds },
+              },
+            },
+          },
+        },
+      });
+    }
+
+    if (req.query.relatedTags && req.query.relatedTags.length > 0) {
+      const tagIds = req.query.relatedTags.map((id) => new mongoose.Types.ObjectId(id));
+      req.pagination.filter.$and.push({
+        relatedCategory: {
+          $elemMatch: {
+            subCategories: {
+              $elemMatch: {
+                tags: {
+                  $elemMatch: {
+                    tag: { $in: tagIds },
+                  },
+                },
+              },
+            },
+          },
+        },
+      });
+    }
+  }
+
   next();
 };
 
@@ -141,12 +195,12 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
     { $unwind: '$user' },
     ...(isInstant !== undefined
       ? [
-        {
-          $match: {
-            'user.isAvaliableToInstantProjects': isInstant,
+          {
+            $match: {
+              'user.isAvaliableToInstantProjects': isInstant,
+            },
           },
-        },
-      ]
+        ]
       : []),
     {
       $count: 'totalCount',
@@ -157,19 +211,6 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
   const resultCount = countResult.length > 0 ? countResult[0].totalCount : 0;
 
   const pipelines: PipelineStage[] = [];
-  // if (currentUser?.location?.coordinates) {
-  //   pipelines.push({
-  //     $geoNear: {
-  //       near: {
-  //         type: 'Point',
-  //         coordinates: currentUser.location.coordinates,
-  //       },
-  //       distanceField: 'distance', // Rename 'string' to 'distance'
-  //       maxDistance: ((req as any).query.maxDistance as unknown as number) * 1000, // Convert km to meters
-  //       spherical: true,
-  //     },
-  //   });
-  // }
 
   pipelines.push(
     {
@@ -201,7 +242,6 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
   }
 
   pipelines.push(
-    // Existing category lookup and unwind stages
     {
       $lookup: {
         from: MODELS.category,
@@ -212,10 +252,8 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
     },
     { $unwind: '$category' },
 
-    // Unwind creatives array to handle each creative individually
     { $unwind: { path: '$creatives', preserveNullAndEmptyArrays: true } },
 
-    // Populate the creative field within each creative object in the array
     {
       $lookup: {
         from: MODELS.user,
@@ -226,14 +264,13 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
     },
     { $unwind: { path: '$creativeDetails', preserveNullAndEmptyArrays: true } },
 
-    // Reassemble the creatives array
     {
       $group: {
         _id: '$_id',
         creatives: {
           $push: {
             $cond: [
-              { $eq: ['$creatives.inviteStatus', InviteStatus.accepted] }, // Condition to check if inviteStatus is 'accepted'
+              { $eq: ['$creatives.inviteStatus', InviteStatus.accepted] },
               {
                 _id: '$creativeDetails._id',
                 profileImage: {
@@ -257,25 +294,22 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
                 likes: '$creativeDetails.likes',
                 followCount: '$creativeDetails.followCount',
                 address: '$creativeDetails.address',
-                inviteStatus: '$creatives.inviteStatus', // Include original inviteStatus field
+                inviteStatus: '$creatives.inviteStatus',
               },
-              null, // If the condition is not met, push null
+              null,
             ],
           },
         },
-        // Retain other fields
         doc: { $first: '$$ROOT' },
       },
     },
 
-    // Restore root document structure
     {
       $replaceRoot: {
         newRoot: { $mergeObjects: ['$doc', { creatives: '$creatives' }] },
       },
     },
 
-    // Continue with the favourite lookup and project stages
     {
       $lookup: {
         from: MODELS.favourites,
@@ -286,15 +320,30 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
               $expr: {
                 $and: [
                   { $eq: ['$project', '$$projectId'] },
-                  { $eq: ['$user', req.loggedUser?.id ? new Types.ObjectId(req.loggedUser.id) : null] }
-                ]
-              }
-            }
-          }
+                  {
+                    $eq: [
+                      '$user',
+                      req.loggedUser?.id ? new Types.ObjectId(req.loggedUser.id) : null,
+                    ],
+                  },
+                ],
+              },
+            },
+          },
         ],
-        as: 'userFavourite'
-      }
+        as: 'userFavourite',
+      },
     },
+
+    {
+      $lookup: {
+        from: MODELS.category,
+        localField: 'relatedCategory.category',
+        foreignField: '_id',
+        as: 'relatedCategoryData',
+      },
+    },
+
     {
       $project: {
         _id: 1,
@@ -359,7 +408,7 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
           $filter: {
             input: '$creatives',
             as: 'creative',
-            cond: { $ne: ['$$creative', null] }, // Filter out null values
+            cond: { $ne: ['$$creative', null] },
           },
         },
         location: {
@@ -378,15 +427,167 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
           $cond: {
             if: { $gt: [{ $size: '$userFavourite' }, 0] },
             then: true,
-            else: false
-          }
+            else: false,
+          },
         },
         favouriteCount: 1,
-      }
+        relatedCategory: {
+          $cond: {
+            if: { $eq: [{ $ifNull: ['$relatedCategory', []] }, []] },
+            then: [],
+            else: {
+              $filter: {
+                input: {
+                  $map: {
+                    input: { $ifNull: ['$relatedCategory', []] },
+                    as: 'related',
+                    in: {
+                      $let: {
+                        vars: {
+                          categoryData: {
+                            $arrayElemAt: [
+                              {
+                                $filter: {
+                                  input: '$relatedCategoryData',
+                                  cond: { $eq: ['$$this._id', '$$related.category'] },
+                                },
+                              },
+                              0,
+                            ],
+                          },
+                        },
+                        in: {
+                          $cond: {
+                            if: { $eq: ['$$categoryData', null] },
+                            then: null,
+                            else: {
+                              category: {
+                                _id: '$$categoryData._id',
+                                title: '$$categoryData.title.' + req.lang,
+                                image: {
+                                  $cond: {
+                                    if: { $eq: ['$$categoryData.image', null] },
+                                    then: null,
+                                    else: {
+                                      $concat: [
+                                        process.env.BUCKET_HOST,
+                                        '/',
+                                        '$$categoryData.image',
+                                      ],
+                                    },
+                                  },
+                                },
+                                subCategories: {
+                                  $filter: {
+                                    input: {
+                                      $map: {
+                                        input: { $ifNull: ['$$related.subCategories', []] },
+                                        as: 'sub',
+                                        in: {
+                                          $let: {
+                                            vars: {
+                                              subCatData: {
+                                                $arrayElemAt: [
+                                                  {
+                                                    $filter: {
+                                                      input: {
+                                                        $ifNull: [
+                                                          '$$categoryData.subCategories',
+                                                          [],
+                                                        ],
+                                                      },
+                                                      cond: {
+                                                        $eq: ['$$this._id', '$$sub.subCategory'],
+                                                      },
+                                                    },
+                                                  },
+                                                  0,
+                                                ],
+                                              },
+                                            },
+                                            in: {
+                                              $cond: {
+                                                if: { $eq: ['$$subCatData', null] },
+                                                then: null,
+                                                else: {
+                                                  _id: '$$sub.subCategory',
+                                                  title: '$$subCatData.title.' + req.lang,
+                                                  tags: {
+                                                    $filter: {
+                                                      input: {
+                                                        $map: {
+                                                          input: { $ifNull: ['$$sub.tags', []] },
+                                                          as: 'tagItem',
+                                                          in: {
+                                                            $let: {
+                                                              vars: {
+                                                                tagData: {
+                                                                  $arrayElemAt: [
+                                                                    {
+                                                                      $filter: {
+                                                                        input: {
+                                                                          $ifNull: [
+                                                                            '$$subCatData.tags',
+                                                                            [],
+                                                                          ],
+                                                                        },
+                                                                        cond: {
+                                                                          $eq: [
+                                                                            '$$this._id',
+                                                                            '$$tagItem.tag',
+                                                                          ],
+                                                                        },
+                                                                      },
+                                                                    },
+                                                                    0,
+                                                                  ],
+                                                                },
+                                                              },
+                                                              in: {
+                                                                $cond: {
+                                                                  if: { $eq: ['$$tagData', null] },
+                                                                  then: null,
+                                                                  else: {
+                                                                    _id: '$$tagItem.tag',
+                                                                    title:
+                                                                      '$$tagItem.title.' + req.lang,
+                                                                  },
+                                                                },
+                                                              },
+                                                            },
+                                                          },
+                                                        },
+                                                      },
+                                                      cond: { $ne: ['$$this', null] },
+                                                    },
+                                                  },
+                                                },
+                                              },
+                                            },
+                                          },
+                                        },
+                                      },
+                                    },
+                                    cond: { $ne: ['$$this', null] },
+                                  },
+                                },
+                              },
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+                cond: { $ne: ['$$this', null] },
+              },
+            },
+          },
+        },
+      },
     },
   );
 
-  // Execute the aggregation pipeline
   const projects = await ProjectCycle.aggregate(pipelines);
 
   res.status(200).json({

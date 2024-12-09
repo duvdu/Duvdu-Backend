@@ -1,6 +1,15 @@
-import { BadRequestError, NotFound, SuccessResponse, ProjectContract, ProjectContractStatus } from '@duvdu-v1/duvdu';
+import {
+  BadRequestError,
+  NotFound,
+  SuccessResponse,
+  ProjectContract,
+  ProjectContractStatus,
+  Channels,
+  Users,
+} from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
+import { sendNotification } from './sendNotification';
 
 export const submitFilesHandler: RequestHandler<
   { contractId: string },
@@ -22,6 +31,30 @@ export const submitFilesHandler: RequestHandler<
     { _id: req.params.contractId },
     { submitFiles: { link: req.body.link, notes: req.body.notes } },
   );
+
+  const sp = await Users.findById(contract.sp);
+  if (sp) {
+    await Promise.all([
+      sendNotification(
+        req.loggedUser.id,
+        contract.customer.toString(),
+        contract._id.toString(),
+        'contract',
+        'project contract updates',
+        `${sp?.name} submitted files for the project`,
+        Channels.update_contract,
+      ),
+      sendNotification(
+        req.loggedUser.id,
+        req.loggedUser.id,
+        contract._id.toString(),
+        'contract',
+        'project contract updates',
+        'you submitted files for the project successfully',
+        Channels.update_contract,
+      ),
+    ]);
+  }
 
   res.json({ message: 'success' });
 };

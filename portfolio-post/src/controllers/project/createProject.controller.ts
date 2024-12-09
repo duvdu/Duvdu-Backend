@@ -20,32 +20,32 @@ import { Document } from 'mongoose';
 import { inviteCreatives } from '../../services/inviteCreative.service';
 import { sendNotification } from '../book/sendNotification';
 
-interface ProjectRequestBody extends Pick<
-  IprojectCycle,
-  | 'address'
-  | 'attachments'
-  | 'category'
-  | 'cover'
-  | 'description'
-  | 'functions'
-  | 'duration'
-  | 'location'
-  | 'name'
-  | 'projectScale'
-  | 'searchKeyWords'
-  | 'showOnHome'
-  | 'tools'
-  | 'subCategory'
-  | 'tags'
-  | 'audioCover'
-  | 'creatives'
-  | 'relatedCategory'
-> {
+interface ProjectRequestBody
+  extends Pick<
+    IprojectCycle,
+    | 'address'
+    | 'attachments'
+    | 'category'
+    | 'cover'
+    | 'description'
+    | 'functions'
+    | 'duration'
+    | 'location'
+    | 'name'
+    | 'projectScale'
+    | 'searchKeyWords'
+    | 'showOnHome'
+    | 'tools'
+    | 'subCategory'
+    | 'tags'
+    | 'audioCover'
+    | 'creatives'
+    | 'relatedCategory'
+  > {
   subCategoryId: string;
   tagsId: string[];
   invitedCreatives: { number: string }[];
 }
-
 
 export const createProjectHandler: RequestHandler<
   unknown,
@@ -55,17 +55,18 @@ export const createProjectHandler: RequestHandler<
 > = async (req, res, next) => {
   try {
     // Extract files from request with type checking
-    const files = req.files as { 
-      attachments?: Express.Multer.File[];
-      cover?: Express.Multer.File[];
-      audioCover?: Express.Multer.File[];
-    } | undefined;
+    const files = req.files as
+      | {
+          attachments?: Express.Multer.File[];
+          cover?: Express.Multer.File[];
+          audioCover?: Express.Multer.File[];
+        }
+      | undefined;
 
     if (!files) {
-      return next(new BadRequestError(
-        { en: 'No files uploaded', ar: 'لم يتم تحميل أي ملفات' },
-        req.lang
-      ));
+      return next(
+        new BadRequestError({ en: 'No files uploaded', ar: 'لم يتم تحميل أي ملفات' }, req.lang),
+      );
     }
 
     const attachments = files.attachments || [];
@@ -83,17 +84,20 @@ export const createProjectHandler: RequestHandler<
 
     req.body.subCategory = { ...subCategoryTitle!, _id: req.body.subCategoryId };
     req.body.tags = filteredTags;
-    if(req.body.relatedCategory) {
-      const convertedRelatedCategory = req.body.relatedCategory.map(cat => ({
+    if (req.body.relatedCategory) {
+      const convertedRelatedCategory = req.body.relatedCategory.map((cat) => ({
         category: cat.category.toString(),
-        subCategories: cat.subCategories?.map(sub => ({
+        subCategories: cat.subCategories?.map((sub) => ({
           subCategory: sub.subCategory.toString(),
-          tags: sub.tags?.map(t => ({ tag: t.tag.toString() }))
-        }))
+          tags: sub.tags?.map((t) => ({ tag: t.tag.toString() })),
+        })),
       }));
-      await filterRelatedCategoryForCategory(req.body.category.toString(), convertedRelatedCategory, req.lang);
+      await filterRelatedCategoryForCategory(
+        req.body.category.toString(),
+        convertedRelatedCategory,
+        req.lang,
+      );
     }
-    
 
     // Validate media requirements
     await validateMediaRequirements(
@@ -109,7 +113,7 @@ export const createProjectHandler: RequestHandler<
       const creativeCount = await Users.countDocuments({
         _id: { $in: req.body.creatives.map((el) => el.creative) },
       });
-      
+
       if (creativeCount !== req.body.creatives.length) {
         return next(
           new BadRequestError(
@@ -121,9 +125,9 @@ export const createProjectHandler: RequestHandler<
     }
 
     // Handle invited creatives
-    let invitedCreative:any = [];
+    let invitedCreative: any = [];
     if (req.body.invitedCreatives) {
-      invitedCreative = await inviteCreatives(req.body.invitedCreatives) || [];
+      invitedCreative = (await inviteCreatives(req.body.invitedCreatives)) || [];
     }
 
     // Initialize S3 bucket and handle file uploads
@@ -133,32 +137,27 @@ export const createProjectHandler: RequestHandler<
     // Handle cover upload
     if (cover.length > 0) {
       uploadTasks.push(
-        s3.saveBucketFiles(FOLDERS.portfolio_post, cover[0])
-          .then(() => {
-            req.body.cover = `${FOLDERS.portfolio_post}/${cover[0].filename}`;
-          })
+        s3.saveBucketFiles(FOLDERS.portfolio_post, cover[0]).then(() => {
+          req.body.cover = `${FOLDERS.portfolio_post}/${cover[0].filename}`;
+        }),
       );
     }
 
     // Handle attachments upload
     if (attachments.length > 0) {
       uploadTasks.push(
-        s3.saveBucketFiles(FOLDERS.portfolio_post, ...attachments)
-          .then(() => {
-            req.body.attachments = attachments.map(
-              (f) => `${FOLDERS.portfolio_post}/${f.filename}`
-            );
-          })
+        s3.saveBucketFiles(FOLDERS.portfolio_post, ...attachments).then(() => {
+          req.body.attachments = attachments.map((f) => `${FOLDERS.portfolio_post}/${f.filename}`);
+        }),
       );
     }
 
     // Handle audioCover upload
     if (audioCover.length > 0) {
       uploadTasks.push(
-        s3.saveBucketFiles(FOLDERS.portfolio_post, audioCover[0])
-          .then(() => {
-            req.body.audioCover = `${FOLDERS.portfolio_post}/${audioCover[0].filename}`;
-          })
+        s3.saveBucketFiles(FOLDERS.portfolio_post, audioCover[0]).then(() => {
+          req.body.audioCover = `${FOLDERS.portfolio_post}/${audioCover[0].filename}`;
+        }),
       );
     }
 
@@ -167,7 +166,7 @@ export const createProjectHandler: RequestHandler<
       console.error('Upload error:', error);
       throw new BadRequestError(
         { en: 'Error uploading files', ar: 'خطأ في تحميل الملفات' },
-        req.lang
+        req.lang,
       );
     });
 
@@ -183,10 +182,7 @@ export const createProjectHandler: RequestHandler<
     const projectCycle = await ProjectCycle.create({
       ...req.body,
       user: req.loggedUser.id,
-      creatives: [
-        ...(req.body.creatives || []),
-        ...invitedCreative,
-      ],
+      creatives: [...(req.body.creatives || []), ...invitedCreative],
     });
 
     // Create project record
@@ -246,7 +242,7 @@ async function validateMediaRequirements(
             ar: 'يجب أن يكون هناك ملف صوتي واحد كمرفق',
           },
           lang,
-        );  
+        );
       }
     },
     [CategoryMedia.video]: () => {
@@ -267,8 +263,10 @@ async function validateMediaRequirements(
   mediaValidators[media]?.();
 
   // Validate cover based on media type
-  if ((media === CategoryMedia.image || media === CategoryMedia.audio) && 
-      (!cover[0]?.mimetype.startsWith('image/'))) {
+  if (
+    (media === CategoryMedia.image || media === CategoryMedia.audio) &&
+    !cover[0]?.mimetype.startsWith('image/')
+  ) {
     throw new BadRequestError(
       { en: 'Cover must be an image', ar: 'يجب أن يكون الغلاف صورة' },
       lang,
@@ -297,7 +295,7 @@ async function validateMediaRequirements(
   }
 }
 
-async function handleProjectNotifications(projectCycle: (IprojectCycle & Document), userId: string) {
+async function handleProjectNotifications(projectCycle: IprojectCycle & Document, userId: string) {
   if (projectCycle.creatives.length === 0) return;
 
   const loggedUser = await Users.findById(userId);
@@ -328,9 +326,11 @@ async function handleProjectNotifications(projectCycle: (IprojectCycle & Documen
 }
 
 function calculateProjectPrice(projectCycle: IprojectCycle): number {
-  return projectCycle.tools.reduce((acc, tool) => acc + tool.unitPrice, 0) +
+  return (
+    projectCycle.tools.reduce((acc, tool) => acc + tool.unitPrice, 0) +
     projectCycle.functions.reduce((acc, func) => acc + func.unitPrice, 0) +
-    projectCycle.projectScale.pricerPerUnit * projectCycle.projectScale.current;
+    projectCycle.projectScale.pricerPerUnit * projectCycle.projectScale.current
+  );
 }
 
 export const filterFilesByType = (

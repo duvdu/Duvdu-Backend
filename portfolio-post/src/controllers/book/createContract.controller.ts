@@ -15,7 +15,6 @@ import {
   MODELS,
 } from '@duvdu-v1/duvdu';
 
-
 import { sendNotification } from './sendNotification';
 import { calculateTotalPrice } from '../../services/checkToolsAndFunctions.service';
 import { getBestExpirationTime } from '../../services/getBestExpirationTime.service';
@@ -64,30 +63,31 @@ export const createContractHandler: CreateContractHandler = async (req, res, nex
     if (attachments && attachments.length > 0) {
       const bucket = new Bucket();
       req.body.attachments = attachments.map((el) => FOLDERS.portfolio_post + '/' + el.filename);
-      
+
       // Process file upload in parallel
       uploadPromise = Promise.all([
         bucket.saveBucketFiles(FOLDERS.portfolio_post, ...attachments),
-      ]).then(()=>{});
+      ]).then(() => {});
     }
 
     // Parallel processing of deadline, expiration, and price calculations
     const [deadline, stageExpiration, priceData] = await Promise.all([
-      Promise.resolve(new Date(
-        new Date(req.body.startDate).setDate(
-          new Date(req.body.startDate).getDate() + project.duration,
-        ),
-      ).toISOString()),
+      Promise.resolve(
+        new Date(
+          new Date(req.body.startDate).setDate(
+            new Date(req.body.startDate).getDate() + project.duration,
+          ),
+        ).toISOString(),
+      ),
       getBestExpirationTime(req.body.appointmentDate.toString(), req.lang),
-      calculateTotalPrice(project._id.toString(), req.body.equipment, req.lang)
+      calculateTotalPrice(project._id.toString(), req.body.equipment, req.lang),
     ]);
 
-    
     const { functions, tools, totalPrice } = priceData;
 
     // Price calculations
     const unitPriceTotal = project.projectScale.pricerPerUnit * req.body.projectScale.numberOfUnits;
-    const allPrice = (totalPrice * req.body.projectScale.numberOfUnits) + unitPriceTotal;
+    const allPrice = totalPrice * req.body.projectScale.numberOfUnits + unitPriceTotal;
 
     // Create contract and wait for file upload in parallel
     const [contract] = await Promise.all([
@@ -110,7 +110,7 @@ export const createContractHandler: CreateContractHandler = async (req, res, nex
         duration: project.duration,
         equipmentPrice: totalPrice,
       }),
-      uploadPromise
+      uploadPromise,
     ]);
 
     // Parallel processing of contract record creation and notifications

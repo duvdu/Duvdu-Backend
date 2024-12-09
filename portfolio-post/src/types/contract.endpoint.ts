@@ -1,6 +1,5 @@
-import { SuccessResponse , IprojectContract } from '@duvdu-v1/duvdu';
+import { SuccessResponse, IprojectContract } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
-
 
 export interface CreateContractHandler
   extends RequestHandler<
@@ -23,7 +22,6 @@ export interface CreateContractHandler
     },
     unknown
   > {}
-
 
 export interface ContractActionHandler
   extends RequestHandler<

@@ -1,5 +1,5 @@
 import 'express-async-errors';
-import { Message, MODELS } from '@duvdu-v1/duvdu';
+import { Message, MODELS , Contracts } from '@duvdu-v1/duvdu';
 import { Types } from 'mongoose';
 
 import { GetLoggedUserChatsHandler } from '../../types/endpoints/mesage.endpoints';
@@ -183,6 +183,25 @@ export const getLoggedUserChatsHandler: GetLoggedUserChatsHandler = async (req, 
 
   const totalCount = await Message.aggregate(countPipeline);
   const resultCount = totalCount.length > 0 ? totalCount[0].totalCount : 0;
+
+  const chatsWithCanChat = await Promise.all(
+    allChats.map(async (chat) => {
+      const canChat = !!(await Contracts.findOne({
+        $or: [
+          { sp: req.loggedUser?.id, customer: chat._id },
+          { customer: req.loggedUser?.id, sp: chat._id },
+        ],
+      }).populate({
+        path: 'contract',
+        match: {
+          status: { $nin: ['canceled', 'pending', 'rejected', 'reject', 'cancel'] }
+        }
+      }));
+
+      return { ...chat, canChat };
+    })
+  );
+
   res.status(200).json({
     message: 'success',
     pagination: {
@@ -190,6 +209,6 @@ export const getLoggedUserChatsHandler: GetLoggedUserChatsHandler = async (req, 
       resultCount,
       totalPages: Math.ceil(resultCount / req.pagination.limit),
     },
-    data: allChats,
+    data: chatsWithCanChat,
   });
 };

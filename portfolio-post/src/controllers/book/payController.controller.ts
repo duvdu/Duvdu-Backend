@@ -1,4 +1,13 @@
-import { BadRequestError, Channels, NotAllowedError, NotFound, SuccessResponse, Users, ProjectContract, ProjectContractStatus } from '@duvdu-v1/duvdu';
+import {
+  BadRequestError,
+  Channels,
+  NotAllowedError,
+  NotFound,
+  SuccessResponse,
+  Users,
+  ProjectContract,
+  ProjectContractStatus,
+} from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 import { sendNotification } from './sendNotification';
@@ -24,12 +33,12 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
 
   const user = await Users.findById(req.loggedUser.id);
   if (!user) return next(new NotFound(undefined, req.lang));
-  
+
   // TODO: record the transaction from payment gateway webhook
 
-  if (contract.status === ProjectContractStatus.waitingForFirstPayment){
+  if (contract.status === ProjectContractStatus.waitingForFirstPayment) {
     const user = await Users.findById(contract.sp);
-    if (user && user.avaliableContracts === 0){
+    if (user && user.avaliableContracts === 0) {
       await sendNotification(
         req.loggedUser.id,
         contract.sp.toString(),
@@ -56,7 +65,7 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
         status: ProjectContractStatus.updateAfterFirstPayment,
         firstCheckoutAt: new Date(),
         firstPaymentAmount: ((10 * contract.totalPrice) / 100).toFixed(2),
-        secondPaymentAmount: contract.totalPrice - ((10 * contract.totalPrice) / 100),
+        secondPaymentAmount: contract.totalPrice - (10 * contract.totalPrice) / 100,
       },
     );
 
@@ -80,8 +89,7 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
         Channels.update_contract,
       ),
     ]);
-  }
-  else if (contract.status === ProjectContractStatus.waitingForTotalPayment){
+  } else if (contract.status === ProjectContractStatus.waitingForTotalPayment) {
     await ProjectContract.updateOne(
       { paymentLink: req.params.paymentSession },
       {
@@ -111,8 +119,7 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
         Channels.update_contract,
       ),
     ]);
-  }
-  else
+  } else
     return next(
       new NotAllowedError(
         {
