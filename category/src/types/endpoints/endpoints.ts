@@ -31,7 +31,7 @@ export interface CreateCategoryHandler
   extends RequestHandler<
     unknown,
     successResponse<{data:Icategory}>,
-    Pick<Icategory, 'title'  | 'cycle' | 'tags' | 'jobTitles' | 'status' | 'trend' | 'media' | 'isRelated' >& {cover:string},
+    Pick<Icategory, 'title'  | 'cycle' | 'tags' | 'jobTitles' | 'status' | 'trend' | 'media' | 'isRelated' | 'relatedCategory' >& {cover:string},
     unknown
   > {}
 

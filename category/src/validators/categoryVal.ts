@@ -5,6 +5,8 @@ import { body, check, param } from 'express-validator';
 
 // Validation for creating a category
 export const createCategoryVal = [
+  body('relatedCategory').optional().isArray().withMessage('relatedCategoryMustBeArray'),
+  body('relatedCategory.*').optional().isMongoId().withMessage('relatedCategoryItemMustBeMongoId'),
   body('isRelated').optional().isBoolean().withMessage('isRelatedMustBeBoolean'),
   body('title').isObject().withMessage('titleObjectRequired'),
   body('title.ar').isString().withMessage('titleArabicRequired'),
