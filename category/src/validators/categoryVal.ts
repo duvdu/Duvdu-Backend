@@ -7,7 +7,7 @@ import { body, check, param } from 'express-validator';
 export const createCategoryVal = [
   body('relatedCategory').optional().isArray().withMessage('relatedCategoryMustBeArray'),
   body('relatedCategory.*').optional().isMongoId().withMessage('relatedCategoryItemMustBeMongoId'),
-  body('isRelated').optional().isBoolean().withMessage('isRelatedMustBeBoolean'),
+  body('isRelated').optional().isBoolean().toBoolean().withMessage('isRelatedMustBeBoolean'),
   body('title').isObject().withMessage('titleObjectRequired'),
   body('title.ar').isString().withMessage('titleArabicRequired'),
   body('title.en').isString().withMessage('titleEnglishRequired'),
