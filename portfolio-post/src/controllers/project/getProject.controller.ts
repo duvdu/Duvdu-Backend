@@ -66,7 +66,7 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
                 {
                   _id: '$creativeDetails._id',
                   profileImage: {
-                    $concat: [process.env.BUCKET_HOST, '/', '$creativeDetails.profileImage'],
+                    $concat: [process.env.BUCKET_HOST, '/', { $trim: { input: '$creativeDetails.profileImage' } }],
                   },
                   isOnline: '$creativeDetails.isOnline',
                   username: '$creativeDetails.username',
@@ -74,7 +74,7 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
                   rank: '$creativeDetails.rank',
                   projectsView: '$creativeDetails.projectsView',
                   coverImage: {
-                    $concat: [process.env.BUCKET_HOST, '/', '$creativeDetails.coverImage'],
+                    $concat: [process.env.BUCKET_HOST, '/', { $trim: { input: '$creativeDetails.coverImage' } }],
                   },
                   acceptedProjectsCounter: '$creativeDetails.acceptedProjectsCounter',
                   rate: '$creativeDetails.rate',
@@ -143,13 +143,13 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
           _id: 1,
           user: {
             _id: '$user._id',
-            profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$user.profileImage'] },
+            profileImage: { $concat: [process.env.BUCKET_HOST, '/', { $trim: { input: '$user.profileImage' } }] },
             isOnline: '$user.isOnline',
             username: '$user.username',
             name: '$user.name',
             rank: '$user.rank',
             projectsView: '$user.projectsView',
-            coverImage: { $concat: [process.env.BUCKET_HOST, '/', '$user.coverImage'] },
+            coverImage: { $concat: [process.env.BUCKET_HOST, '/', { $trim: { input: '$user.coverImage' } }] },
             acceptedProjectsCounter: '$user.acceptedProjectsCounter',
             rate: '$user.rate',
             profileViews: '$user.profileViews',
@@ -185,13 +185,19 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
               },
             },
           },
-          cover: { $concat: [process.env.BUCKET_HOST, '/', '$cover'] },
-          audioCover: { $concat: [process.env.BUCKET_HOST, '/', '$audioCover'] },
+          cover: { $concat: [process.env.BUCKET_HOST, '/', { $trim: { input: '$cover' } }] },
+          audioCover: { 
+            $cond: {
+              if: { $eq: ['$audioCover', null] },
+              then: null,
+              else: { $concat: [process.env.BUCKET_HOST, '/', { $trim: { input: '$audioCover' } }] }
+            }
+          },
           attachments: {
             $map: {
               input: '$attachments',
               as: 'attachment',
-              in: { $concat: [process.env.BUCKET_HOST, '/', '$$attachment'] },
+              in: { $concat: [process.env.BUCKET_HOST, '/', { $trim: { input: '$$attachment' } }] },
             },
           },
           name: 1,
@@ -238,13 +244,13 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
           _id: 1,
           user: {
             _id: '$user._id',
-            profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$user.profileImage'] },
+            profileImage: { $concat: [process.env.BUCKET_HOST, '/', { $trim: { input: '$user.profileImage' } }] },
             isOnline: '$user.isOnline',
             username: '$user.username',
             name: '$user.name',
             rank: '$user.rank',
             projectsView: '$user.projectsView',
-            coverImage: { $concat: [process.env.BUCKET_HOST, '/', '$user.coverImage'] },
+            coverImage: { $concat: [process.env.BUCKET_HOST, '/', { $trim: { input: '$user.coverImage' } }] },
             acceptedProjectsCounter: '$user.acceptedProjectsCounter',
             rate: '$user.rate',
             profileViews: '$user.profileViews',
@@ -280,13 +286,19 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
               },
             },
           },
-          cover: { $concat: [process.env.BUCKET_HOST, '/', '$cover'] },
-          audioCover: { $concat: [process.env.BUCKET_HOST, '/', '$audioCover'] },
+          cover: { $concat: [process.env.BUCKET_HOST, '/', { $trim: { input: '$cover' } }] },
+          audioCover: { 
+            $cond: {
+              if: { $eq: ['$audioCover', null] },
+              then: null,
+              else: { $concat: [process.env.BUCKET_HOST, '/', { $trim: { input: '$audioCover' } }] }
+            }
+          },
           attachments: {
             $map: {
               input: '$attachments',
               as: 'attachment',
-              in: { $concat: [process.env.BUCKET_HOST, '/', '$$attachment'] },
+              in: { $concat: [process.env.BUCKET_HOST, '/', { $trim: { input: '$$attachment' } }] },
             },
           },
           name: 1,
