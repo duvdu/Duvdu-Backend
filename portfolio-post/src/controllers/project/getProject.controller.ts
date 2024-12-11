@@ -62,7 +62,7 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
           creatives: {
             $push: {
               $cond: [
-                { $eq: ['$creatives.inviteStatus', InviteStatus.accepted] }, // Condition to check if inviteStatus is 'accepted'
+                { $eq: ['$creatives.inviteStatus', InviteStatus.accepted] },
                 {
                   _id: '$creativeDetails._id',
                   profileImage: {
@@ -86,25 +86,22 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
                   likes: '$creativeDetails.likes',
                   followCount: '$creativeDetails.followCount',
                   address: '$creativeDetails.address',
-                  inviteStatus: '$creatives.inviteStatus', // Include original inviteStatus field
+                  inviteStatus: '$creatives.inviteStatus',
                 },
-                null, // If the condition is not met, push null
+                null,
               ],
             },
           },
-          // Retain other fields
           doc: { $first: '$$ROOT' },
         },
       },
 
-      // Restore root document structure
       {
         $replaceRoot: {
           newRoot: { $mergeObjects: ['$doc', { creatives: '$creatives' }] },
         },
       },
 
-      // Update the favourite lookup
       {
         $lookup: {
           from: MODELS.favourites,
@@ -131,6 +128,7 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
           as: 'favourite',
         },
       },
+
       {
         $addFields: {
           isFavourite: { $gt: [{ $size: '$favourite' }, 0] },
@@ -138,97 +136,6 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
         },
       },
 
-      {
-        $project: {
-          _id: 1,
-          user: {
-            _id: '$user._id',
-            profileImage: { $concat: [process.env.BUCKET_HOST, '/', { $trim: { input: '$user.profileImage' } }] },
-            isOnline: '$user.isOnline',
-            username: '$user.username',
-            name: '$user.name',
-            rank: '$user.rank',
-            projectsView: '$user.projectsView',
-            coverImage: { $concat: [process.env.BUCKET_HOST, '/', { $trim: { input: '$user.coverImage' } }] },
-            acceptedProjectsCounter: '$user.acceptedProjectsCounter',
-            rate: '$user.rate',
-            profileViews: '$user.profileViews',
-            about: '$user.about',
-            isAvaliableToInstantProjects: '$user.isAvaliableToInstantProjects',
-            pricePerHour: '$user.pricePerHour',
-            hasVerificationBadge: '$user.hasVerificationBadge',
-            likes: '$user.likes',
-            followCount: '$user.followCount',
-            address: '$user.address',
-          },
-          category: {
-            title: '$category.title.' + req.lang,
-            _id: '$category._id',
-          },
-          subCategory: {
-            title: '$subCategory.' + req.lang,
-            _id: '$subCategory._id',
-          },
-          tags: {
-            $map: {
-              input: '$tags',
-              as: 'tag',
-              in: {
-                title: {
-                  $cond: {
-                    if: { $eq: [req.lang, 'en'] },
-                    then: '$$tag.en',
-                    else: '$$tag.ar',
-                  },
-                },
-                _id: '$$tag._id',
-              },
-            },
-          },
-          cover: { $concat: [process.env.BUCKET_HOST, '/', { $trim: { input: '$cover' } }] },
-          audioCover: { 
-            $cond: {
-              if: { $eq: ['$audioCover', null] },
-              then: null,
-              else: { $concat: [process.env.BUCKET_HOST, '/', { $trim: { input: '$audioCover' } }] }
-            }
-          },
-          attachments: {
-            $map: {
-              input: '$attachments',
-              as: 'attachment',
-              in: { $concat: [process.env.BUCKET_HOST, '/', { $trim: { input: '$$attachment' } }] },
-            },
-          },
-          name: 1,
-          description: 1,
-          tools: 1,
-          functions: 1,
-          creatives: {
-            $filter: {
-              input: '$creatives',
-              as: 'creative',
-              cond: { $ne: ['$$creative', null] }, // Filter out null values
-            },
-          }, // Include the populated creatives array
-          location: {
-            lng: { $arrayElemAt: ['$location.coordinates', 0] },
-            lat: { $arrayElemAt: ['$location.coordinates', 1] },
-          },
-          address: 1,
-          searchKeyWords: 1,
-          duration: 1,
-          showOnHome: 1,
-          projectScale: 1,
-          rate: 1,
-          updatedAt: 1,
-          createdAt: 1,
-          isFavourite: 1,
-          favouriteCount: 1,
-        },
-      },
-
-      // After the existing category lookup and before the project stage
       {
         $lookup: {
           from: MODELS.category,
@@ -238,7 +145,7 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
         },
       },
 
-      // Update the project stage to include related category data
+      // Single consolidated $project stage
       {
         $project: {
           _id: 1,
@@ -309,9 +216,9 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
             $filter: {
               input: '$creatives',
               as: 'creative',
-              cond: { $ne: ['$$creative', null] }, // Filter out null values
+              cond: { $ne: ['$$creative', null] },
             },
-          }, // Include the populated creatives array
+          },
           location: {
             lng: { $arrayElemAt: ['$location.coordinates', 0] },
             lat: { $arrayElemAt: ['$location.coordinates', 1] },
@@ -363,13 +270,7 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
                                     $cond: {
                                       if: { $eq: ['$$categoryData.image', null] },
                                       then: null,
-                                      else: {
-                                        $concat: [
-                                          process.env.BUCKET_HOST,
-                                          '/',
-                                          '$$categoryData.image',
-                                        ],
-                                      },
+                                      else: { $concat: [process.env.BUCKET_HOST, '/', '$$categoryData.image'] },
                                     },
                                   },
                                   subCategories: {
@@ -385,15 +286,8 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
                                                   $arrayElemAt: [
                                                     {
                                                       $filter: {
-                                                        input: {
-                                                          $ifNull: [
-                                                            '$$categoryData.subCategories',
-                                                            [],
-                                                          ],
-                                                        },
-                                                        cond: {
-                                                          $eq: ['$$this._id', '$$sub.subCategory'],
-                                                        },
+                                                        input: { $ifNull: ['$$categoryData.subCategories', []] },
+                                                        cond: { $eq: ['$$this._id', '$$sub.subCategory'] },
                                                       },
                                                     },
                                                     0,
@@ -420,18 +314,8 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
                                                                     $arrayElemAt: [
                                                                       {
                                                                         $filter: {
-                                                                          input: {
-                                                                            $ifNull: [
-                                                                              '$$subCatData.tags',
-                                                                              [],
-                                                                            ],
-                                                                          },
-                                                                          cond: {
-                                                                            $eq: [
-                                                                              '$$this._id',
-                                                                              '$$tagItem.tag',
-                                                                            ],
-                                                                          },
+                                                                          input: { $ifNull: ['$$subCatData.tags', []] },
+                                                                          cond: { $eq: ['$$this._id', '$$tagItem.tag'] },
                                                                         },
                                                                       },
                                                                       0,
@@ -440,15 +324,11 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
                                                                 },
                                                                 in: {
                                                                   $cond: {
-                                                                    if: {
-                                                                      $eq: ['$$tagData', null],
-                                                                    },
+                                                                    if: { $eq: ['$$tagData', null] },
                                                                     then: null,
                                                                     else: {
                                                                       _id: '$$tagItem.tag',
-                                                                      title:
-                                                                        '$$tagItem.title.' +
-                                                                        req.lang,
+                                                                      title: '$$tagItem.title.' + req.lang,
                                                                     },
                                                                   },
                                                                 },
@@ -486,8 +366,9 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
       },
     ]);
 
-    if (!projects[0])
+    if (!projects[0]) {
       return next(new NotFound({ en: 'project not found', ar: 'المشروع غير موجود' }, req.lang));
+    }
 
     await incrementProjectsView(
       projects[0].user._id,
@@ -507,6 +388,7 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
         status: { $nin: ['canceled', 'pending', 'rejected', 'reject', 'cancel'] },
       },
     }));
+    
     projects[0].user.canChat = canChat;
     res.status(200).json({ message: 'success', data: projects[0] });
   } catch (error) {
