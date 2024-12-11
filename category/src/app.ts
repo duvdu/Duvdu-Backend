@@ -20,12 +20,18 @@ app.set('trust proxy', true);
 
 app.use(
   cors({
-    origin: ['*','http://localhost:3000', 'http://localhost:3001' , 'https://duvdu.com' , 'https://www.duvdu.com' , 'https://dashboard.duvdu.com'],
+    origin: [
+      '*',
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'https://duvdu.com',
+      'https://www.duvdu.com',
+      'https://dashboard.duvdu.com',
+    ],
     credentials: true,
     exposedHeaders: ['set-cookie'],
   }),
 );
-
 
 (async () => {
   const store = await sessionStore(env.redis.uri, env.redis.pass);
@@ -41,20 +47,12 @@ app.use(
         secure: env.environment === 'production',
         httpOnly: true,
       },
-    })
+    }),
   );
-
 
   app.use(languageHeaderMiddleware);
 
   app.use('/api/category', categoryRoutes);
-    
+
   app.use(globalErrorHandlingMiddleware);
-  
 })();
-
-
-
-
-
-

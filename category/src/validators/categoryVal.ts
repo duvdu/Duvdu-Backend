@@ -3,6 +3,10 @@ import { body, check, param } from 'express-validator';
 
 
 
+export const getCategoryAdminVal = [
+  param('categoryId').isMongoId().withMessage('invalidCategoryId'),
+  globalValidatorMiddleware,
+];
 // Validation for creating a category
 export const createCategoryVal = [
   body('relatedCategory').optional().isArray().withMessage('relatedCategoryMustBeArray'),
@@ -15,7 +19,7 @@ export const createCategoryVal = [
     .isString()
     .withMessage('cycleStringRequired')
     .bail()
-    .custom((val , {req}) => {
+    .custom((val, { req }) => {
       if (!Object.values(CYCLES).includes(val)) {
         throw new Error('invalidCycle');
       }
@@ -24,36 +28,22 @@ export const createCategoryVal = [
       }
       return true;
     }),
-  body('jobTitles')
-    .isArray()
-    .withMessage('jobTitlesMustBeArray')
-    .bail(),
+  body('jobTitles').isArray().withMessage('jobTitlesMustBeArray').bail(),
   body('jobTitles.*').isObject().withMessage('jobTitlesItemMustBeObject'),
   body('jobTitles.*.ar').isString().withMessage('jobTitlesArabicRequired'),
   body('jobTitles.*.en').isString().withMessage('jobTitlesEnglishRequired'),
-  body('subCategories')
-    .isArray()
-    .withMessage('subCategoriesMustBeArray')
-    .bail(),
+  body('subCategories').isArray().withMessage('subCategoriesMustBeArray').bail(),
   body('subCategories.*').isObject().withMessage('subCategoriesItemMustBeObject'),
   body('subCategories.*.title').isObject().withMessage('subCategoriesTitleObjectRequired'),
   body('subCategories.*.title.ar').isString().withMessage('subCategoriesArabicTitleRequired'),
   body('subCategories.*.title.en').isString().withMessage('subCategoriesEnglishTitleRequired'),
-  body('subCategories.*.tags')
-    .isArray()
-    .withMessage('subCategoriesTagsMustBeArray')
-    .bail(),
+  body('subCategories.*.tags').isArray().withMessage('subCategoriesTagsMustBeArray').bail(),
   body('subCategories.*.tags.*').isObject().withMessage('subCategoriesTagsItemMustBeObject'),
   body('subCategories.*.tags.*.ar').isString().withMessage('subCategoriesArabicTagRequired'),
   body('subCategories.*.tags.*.en').isString().withMessage('subCategoriesEnglishTagRequired'),
-  body('status')
-    .optional()
-    .isBoolean()
-    .withMessage('statusMustBeBoolean')
-    .bail()
-    .toBoolean(),
+  body('status').optional().isBoolean().withMessage('statusMustBeBoolean').bail().toBoolean(),
   body('trend').optional().isBoolean().withMessage('statusMustBeBoolean'),
-  body('media').optional().isIn(['video' , 'image' , 'audio']).withMessage('invalidmedia'),
+  body('media').optional().isIn(['video', 'image', 'audio']).withMessage('invalidmedia'),
   globalValidatorMiddleware,
 ];
 
@@ -78,7 +68,7 @@ export const updateCategoryVal = [
     .isString()
     .withMessage('cycleStringRequired')
     .bail()
-    .custom((val , {req}) => {
+    .custom((val, { req }) => {
       if (!Object.values(CYCLES).includes(val)) {
         throw new Error('invalidCycle');
       }
@@ -87,38 +77,22 @@ export const updateCategoryVal = [
       }
       return true;
     }),
-  body('jobTitles')
-    .optional()
-    .isArray()
-    .withMessage('jobTitlesMustBeArray')
-    .bail(),
+  body('jobTitles').optional().isArray().withMessage('jobTitlesMustBeArray').bail(),
   body('jobTitles.*').isObject().withMessage('jobTitlesItemMustBeObject'),
   body('jobTitles.*.ar').isString().withMessage('jobTitlesArabicRequired'),
   body('jobTitles.*.en').isString().withMessage('jobTitlesEnglishRequired'),
-  body('subCategories')
-    .optional()
-    .isArray()
-    .withMessage('subCategoriesMustBeArray')
-    .bail(),
+  body('subCategories').optional().isArray().withMessage('subCategoriesMustBeArray').bail(),
   body('subCategories.*').isObject().withMessage('subCategoriesItemMustBeObject'),
   body('subCategories.*.title').isObject().withMessage('subCategoriesTitleObjectRequired'),
   body('subCategories.*.title.ar').isString().withMessage('subCategoriesArabicTitleRequired'),
   body('subCategories.*.title.en').isString().withMessage('subCategoriesEnglishTitleRequired'),
-  body('subCategories.*.tags')
-    .isArray()
-    .withMessage('subCategoriesTagsMustBeArray')
-    .bail(),
+  body('subCategories.*.tags').isArray().withMessage('subCategoriesTagsMustBeArray').bail(),
   body('subCategories.*.tags.*').isObject().withMessage('subCategoriesTagsItemMustBeObject'),
   body('subCategories.*.tags.*.ar').isString().withMessage('subCategoriesArabicTagRequired'),
   body('subCategories.*.tags.*.en').isString().withMessage('subCategoriesEnglishTagRequired'),
-  body('status')
-    .optional()
-    .isBoolean()
-    .withMessage('statusMustBeBoolean')
-    .bail()
-    .toBoolean(),
+  body('status').optional().isBoolean().withMessage('statusMustBeBoolean').bail().toBoolean(),
   body('trend').optional().isBoolean().withMessage('statusMustBeBoolean'),
-  body('media').optional().isIn(['video' , 'image' , 'audio']).withMessage('invalidmedia'),
+  body('media').optional().isIn(['video', 'image', 'audio']).withMessage('invalidmedia'),
   globalValidatorMiddleware,
 ];
 
@@ -154,8 +128,5 @@ export const getCategoriesVal = [
   check('limit').optional().isInt({ min: 1 }).withMessage('limitMustBePositiveInteger'),
   check('isRelated').optional().isBoolean().toBoolean().withMessage('isRelatedMustBeBoolean'),
   check('page').optional().isInt({ min: 1 }).withMessage('pageMustBePositiveInteger'),
-  globalValidatorMiddleware
+  globalValidatorMiddleware,
 ];
-
-
-

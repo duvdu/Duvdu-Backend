@@ -4,38 +4,39 @@ import { RequestHandler } from 'express';
 import { GetCategoriesHandler } from '../types/endpoints/endpoints';
 
 // get categories
-export const getCategoriesPagination: RequestHandler<unknown, unknown, unknown, {
-  search?: string;
-  title?: string;
-  cycle?: string;
-  status?: boolean;
-  isRelated?: boolean;
-}> = async (req, res, next) => {
-  
-  req.pagination.filter = {status:true};
+export const getCategoriesPagination: RequestHandler<
+  unknown,
+  unknown,
+  unknown,
+  {
+    search?: string;
+    title?: string;
+    cycle?: string;
+    status?: boolean;
+    isRelated?: boolean;
+  }
+> = async (req, res, next) => {
+  req.pagination.filter = { status: true };
 
-  
   if (req.query.search) {
     const searchRegex = new RegExp(req.query.search, 'i');
 
-    if(req.query.isRelated !== undefined)
-      req.pagination.filter.isRelated = req.query.isRelated;
-    
+    if (req.query.isRelated !== undefined) req.pagination.filter.isRelated = req.query.isRelated;
+
     req.pagination.filter.$or = [
-      { 'title.ar': searchRegex }, 
-      { 'title.en': searchRegex }, 
-      { 'jobTitles.ar': searchRegex }, 
-      { 'jobTitles.en': searchRegex }, 
-      { 'subCategories.title.ar': searchRegex }, 
-      { 'subCategories.title.en': searchRegex }, 
-      { 'tags.ar': searchRegex }, 
-      { 'tags.en': searchRegex }, 
-      { 'cycle': searchRegex },
+      { 'title.ar': searchRegex },
+      { 'title.en': searchRegex },
+      { 'jobTitles.ar': searchRegex },
+      { 'jobTitles.en': searchRegex },
+      { 'subCategories.title.ar': searchRegex },
+      { 'subCategories.title.en': searchRegex },
+      { 'tags.ar': searchRegex },
+      { 'tags.en': searchRegex },
+      { cycle: searchRegex },
     ];
   }
   if (req.query.title) {
-    
-    const titleField = `title.${req.lang || 'en'}`; 
+    const titleField = `title.${req.lang || 'en'}`;
     req.pagination.filter[titleField] = req.query.title;
   }
   if (req.query.cycle) {
@@ -44,13 +45,9 @@ export const getCategoriesPagination: RequestHandler<unknown, unknown, unknown, 
   next();
 };
 
-
-
-export const getCategoriesHandler: GetCategoriesHandler = async (req, res) => {  
-  
-
+export const getCategoriesHandler: GetCategoriesHandler = async (req, res) => {
   const category = await Categories.aggregate([
-    { $match: {...req.pagination.filter , isRelated:false} },
+    { $match: { ...req.pagination.filter, isRelated: false } },
     { $skip: req.pagination.skip },
     { $limit: req.pagination.limit },
     {
@@ -78,8 +75,8 @@ export const getCategoriesHandler: GetCategoriesHandler = async (req, res) => {
         from: MODELS.category,
         localField: 'relatedCategory',
         foreignField: '_id',
-        as: 'relatedCategory'
-      }
+        as: 'relatedCategory',
+      },
     },
     {
       $project: {
@@ -142,7 +139,7 @@ export const getCategoriesHandler: GetCategoriesHandler = async (req, res) => {
         status: 1,
         createdAt: 1,
         updatedAt: 1,
-        isRelated:1,
+        isRelated: 1,
         media: 1,
         __v: 1,
         image: { $concat: [process.env.BUCKET_HOST, '/', '$image'] },
@@ -159,15 +156,15 @@ export const getCategoriesHandler: GetCategoriesHandler = async (req, res) => {
                     $cond: {
                       if: { $eq: ['ar', req.lang] },
                       then: '$$related.title.ar',
-                      else: '$$related.title.en'
-                    }
+                      else: '$$related.title.en',
+                    },
                   },
-                  image: { 
+                  image: {
                     $cond: {
                       if: '$$related.image',
                       then: { $concat: [process.env.BUCKET_HOST, '/', '$$related.image'] },
-                      else: null
-                    }
+                      else: null,
+                    },
                   },
                   subCategories: {
                     $cond: {
@@ -182,8 +179,8 @@ export const getCategoriesHandler: GetCategoriesHandler = async (req, res) => {
                               $cond: {
                                 if: { $eq: ['ar', req.lang] },
                                 then: '$$subCat.title.ar',
-                                else: '$$subCat.title.en'
-                              }
+                                else: '$$subCat.title.en',
+                              },
                             },
                             tags: {
                               $cond: {
@@ -198,41 +195,43 @@ export const getCategoriesHandler: GetCategoriesHandler = async (req, res) => {
                                         $cond: {
                                           if: { $eq: ['ar', req.lang] },
                                           then: '$$tag.ar',
-                                          else: '$$tag.en'
-                                        }
-                                      }
-                                    }
-                                  }
+                                          else: '$$tag.en',
+                                        },
+                                      },
+                                    },
+                                  },
                                 },
-                                else: []
-                              }
-                            }
-                          }
-                        }
+                                else: [],
+                              },
+                            },
+                          },
+                        },
                       },
-                      else: []
-                    }
-                  }
-                }
-              }
+                      else: [],
+                    },
+                  },
+                },
+              },
             },
-            else: []
-          }
-        }
+            else: [],
+          },
+        },
       },
     },
   ]);
-  
-  
-  const resultCount = await Categories.find({...req.pagination.filter , isRelated:false}).countDocuments();
 
-  res.status(200).json({ 
+  const resultCount = await Categories.find({
+    ...req.pagination.filter,
+    isRelated: false,
+  }).countDocuments();
+
+  res.status(200).json({
     message: 'success',
-    pagination:{
-      currentPage:req.pagination.page,
+    pagination: {
+      currentPage: req.pagination.page,
       resultCount,
-      totalPages:Math.ceil(resultCount/req.pagination.limit)
+      totalPages: Math.ceil(resultCount / req.pagination.limit),
     },
-    data: category
+    data: category,
   });
 };

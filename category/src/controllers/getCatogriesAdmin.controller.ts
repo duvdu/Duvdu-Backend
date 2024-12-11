@@ -21,15 +21,15 @@ export const getCategoriesAdminPagination: RequestHandler<
     const searchRegex = new RegExp(req.query.search, 'i');
 
     req.pagination.filter.$or = [
-      { 'title.ar': searchRegex }, 
-      { 'title.en': searchRegex }, 
-      { 'jobTitles.ar': searchRegex }, 
-      { 'jobTitles.en': searchRegex }, 
-      { 'subCategories.title.ar': searchRegex }, 
-      { 'subCategories.title.en': searchRegex }, 
-      { 'tags.ar': searchRegex }, 
-      { 'tags.en': searchRegex }, 
-      { 'cycle': searchRegex },
+      { 'title.ar': searchRegex },
+      { 'title.en': searchRegex },
+      { 'jobTitles.ar': searchRegex },
+      { 'jobTitles.en': searchRegex },
+      { 'subCategories.title.ar': searchRegex },
+      { 'subCategories.title.en': searchRegex },
+      { 'tags.ar': searchRegex },
+      { 'tags.en': searchRegex },
+      { cycle: searchRegex },
     ];
   }
   if (req.query.title) {
@@ -49,16 +49,15 @@ export const getCategoriesAdminPagination: RequestHandler<
 };
 
 export const getCatogriesAdminHandler: GetCatogriesAdminHandler = async (req, res) => {
-
   const category = await Categories.aggregate([
-    { 
-      $match: req.pagination.filter
+    {
+      $match: req.pagination.filter,
     },
-    { 
-      $skip: req.pagination.skip
+    {
+      $skip: req.pagination.skip,
     },
-    { 
-      $limit: req.pagination.limit
+    {
+      $limit: req.pagination.limit,
     },
     {
       $lookup: {
@@ -109,12 +108,13 @@ export const getCatogriesAdminHandler: GetCatogriesAdminHandler = async (req, re
   ]);
 
   const resultCount = await Categories.find(req.pagination.filter).countDocuments();
-  res.status(200).json({ 
+  res.status(200).json({
     message: 'success',
-    pagination:{
-      currentPage:req.pagination.page,
+    pagination: {
+      currentPage: req.pagination.page,
       resultCount,
-      totalPages:Math.ceil(resultCount/req.pagination.limit)
+      totalPages: Math.ceil(resultCount / req.pagination.limit),
     },
-    data: category });
+    data: category,
+  });
 };

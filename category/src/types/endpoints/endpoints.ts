@@ -2,9 +2,6 @@
 import { Icategory, IjwtPayload, Ipagination, PaginationResponse } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-
-
-
 declare module 'express-session' {
   interface SessionData {
     access: string;
@@ -22,7 +19,6 @@ declare global {
   }
 }
 
-
 type successResponse<T> = T & {
   message: 'success';
 };
@@ -30,16 +26,40 @@ type successResponse<T> = T & {
 export interface CreateCategoryHandler
   extends RequestHandler<
     unknown,
-    successResponse<{data:Icategory}>,
-    Pick<Icategory, 'title'  | 'cycle' | 'tags' | 'jobTitles' | 'status' | 'trend' | 'media' | 'isRelated' | 'relatedCategory' >& {cover:string},
+    successResponse<{ data: Icategory }>,
+    Pick<
+      Icategory,
+      | 'title'
+      | 'cycle'
+      | 'tags'
+      | 'jobTitles'
+      | 'status'
+      | 'trend'
+      | 'media'
+      | 'isRelated'
+      | 'relatedCategory'
+    > & { cover: string },
     unknown
   > {}
 
 export interface UpdateCategoryHandler
   extends RequestHandler<
     { categoryId: string },
-    successResponse<{data:Icategory}>,
-    Partial<Pick<Icategory, 'image'|'cycle' | 'tags' | 'title' | 'jobTitles' | 'status' |'trend' | 'media' | 'relatedCategory'>& {cover?:string}>,
+    successResponse<{ data: Icategory }>,
+    Partial<
+      Pick<
+        Icategory,
+        | 'image'
+        | 'cycle'
+        | 'tags'
+        | 'title'
+        | 'jobTitles'
+        | 'status'
+        | 'trend'
+        | 'media'
+        | 'relatedCategory'
+      > & { cover?: string }
+    >,
     unknown
   > {}
 

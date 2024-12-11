@@ -4,10 +4,9 @@ import mongoose from 'mongoose';
 import { GetCategoryHandler } from '../types/endpoints/endpoints';
 
 export const getCategoryHandler: GetCategoryHandler = async (req, res, next) => {
-  
   const category = await Categories.aggregate([
-    { 
-      $match: { status: true, _id: new mongoose.Types.ObjectId(req.params.categoryId) } 
+    {
+      $match: { status: true, _id: new mongoose.Types.ObjectId(req.params.categoryId) },
     },
     { $limit: 1 },
     {
@@ -35,8 +34,8 @@ export const getCategoryHandler: GetCategoryHandler = async (req, res, next) => 
         from: MODELS.category,
         localField: 'relatedCategory',
         foreignField: '_id',
-        as: 'relatedCategory'
-      }
+        as: 'relatedCategory',
+      },
     },
     {
       $project: {
@@ -115,15 +114,15 @@ export const getCategoryHandler: GetCategoryHandler = async (req, res, next) => 
                     $cond: {
                       if: { $eq: ['ar', req.lang] },
                       then: '$$related.title.ar',
-                      else: '$$related.title.en'
-                    }
+                      else: '$$related.title.en',
+                    },
                   },
-                  image: { 
+                  image: {
                     $cond: {
                       if: '$$related.image',
                       then: { $concat: [process.env.BUCKET_HOST, '/', '$$related.image'] },
-                      else: null
-                    }
+                      else: null,
+                    },
                   },
                   subCategories: {
                     $cond: {
@@ -138,8 +137,8 @@ export const getCategoryHandler: GetCategoryHandler = async (req, res, next) => 
                               $cond: {
                                 if: { $eq: ['ar', req.lang] },
                                 then: '$$subCat.title.ar',
-                                else: '$$subCat.title.en'
-                              }
+                                else: '$$subCat.title.en',
+                              },
                             },
                             tags: {
                               $cond: {
@@ -154,32 +153,32 @@ export const getCategoryHandler: GetCategoryHandler = async (req, res, next) => 
                                         $cond: {
                                           if: { $eq: ['ar', req.lang] },
                                           then: '$$tag.ar',
-                                          else: '$$tag.en'
-                                        }
-                                      }
-                                    }
-                                  }
+                                          else: '$$tag.en',
+                                        },
+                                      },
+                                    },
+                                  },
                                 },
-                                else: []
-                              }
-                            }
-                          }
-                        }
+                                else: [],
+                              },
+                            },
+                          },
+                        },
                       },
-                      else: []
-                    }
-                  }
-                }
-              }
+                      else: [],
+                    },
+                  },
+                },
+              },
             },
-            else: []
-          }
-        }
+            else: [],
+          },
+        },
       },
     },
   ]);
-  
-  
-  if (category.length === 0) return next(new NotFound({en:'category not found' , ar:'الفئة غير موجودة'} , req.lang));
+
+  if (category.length === 0)
+    return next(new NotFound({ en: 'category not found', ar: 'الفئة غير موجودة' }, req.lang));
   res.status(200).json({ message: 'success', data: category[0] });
 };

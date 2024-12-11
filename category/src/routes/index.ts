@@ -5,7 +5,7 @@ import {
   FOLDERS,
   checkRequiredFields,
   globalPaginationMiddleware,
-  globalUploadMiddleware
+  globalUploadMiddleware,
 } from '@duvdu-v1/duvdu';
 import express from 'express';
 
@@ -21,6 +21,13 @@ router.get(
   globalPaginationMiddleware,
   handler.getCategoriesAdminPagination,
   handler.getCatogriesAdminHandler,
+);
+router.get(
+  '/crm/:categoryId',
+  isauthenticated,
+  isauthorized(PERMISSIONS.getAdminCategories),
+  val.getCategoryAdminVal,
+  handler.getCategoryAdminController,
 );
 
 router
