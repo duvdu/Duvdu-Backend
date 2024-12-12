@@ -1,6 +1,6 @@
 import 'express-async-errors';
 
-import { Message, Users } from '@duvdu-v1/duvdu';
+import { Contracts, Message, Users } from '@duvdu-v1/duvdu';
 import { Types } from 'mongoose';
 
 import { GetSpecificChatHandler } from '../../types/endpoints/mesage.endpoints';
@@ -164,6 +164,8 @@ export const getSpecificChatHandler: GetSpecificChatHandler = async (req, res) =
     ],
   });
 
+
+
   await Message.updateMany(
     {
       sender: userOne,
@@ -179,6 +181,18 @@ export const getSpecificChatHandler: GetSpecificChatHandler = async (req, res) =
     },
   );
 
+  const canChat = !!(await Contracts.findOne({
+    $or: [
+      { sp: userTwo, customer: userOne },
+      { customer: userTwo, sp: userOne },
+    ],
+  }).populate({
+    path: 'contract',
+    match: {
+      status: { $nin: ['canceled', 'pending', 'rejected', 'reject', 'cancel'] }
+    }
+  }));
+
   const user = await Users.findById(userOne).select(
     'name projectsView rank username isOnline profileImage',
   );
@@ -192,5 +206,6 @@ export const getSpecificChatHandler: GetSpecificChatHandler = async (req, res) =
     },
     data: chat,
     user,
+    canChat,
   });
 };
