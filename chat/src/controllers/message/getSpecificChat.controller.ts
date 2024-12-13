@@ -205,7 +205,6 @@ export const getSpecificChatHandler: GetSpecificChatHandler = async (req, res) =
       totalPages: Math.ceil(resultCount / req.pagination.limit),
     },
     data: chat,
-    user,
-    canChat,
+    user:{...user , canChat},
   });
 };
