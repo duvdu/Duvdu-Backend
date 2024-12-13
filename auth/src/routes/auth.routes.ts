@@ -42,8 +42,8 @@ router
     isauthenticated,
     isauthorized(PERMISSIONS.updateUser),
     globalUploadMiddleware(FOLDERS.auth).fields([
-      { name: 'profile', maxCount: 1 },
-      { name: 'cover', maxCount: 1 },
+      { name: 'profileImage', maxCount: 1 },
+      { name: 'coverImage', maxCount: 1 },
     ]),
     val.updateUser,
     handlers.updateUserHandler,
@@ -112,8 +112,8 @@ router
   .patch(
     isauthorized(PERMISSIONS.updateProfile),
     globalUploadMiddleware(FOLDERS.auth).fields([
-      { name: 'profile', maxCount: 1 },
-      { name: 'cover', maxCount: 1 },
+      { name: 'profileImage', maxCount: 1 },
+      { name: 'coverImage', maxCount: 1 },
     ]),
     val.updateProfileVal,
     handlers.updateProfileHandler,
@@ -121,8 +121,8 @@ router
   // TODO: add authorization
   .put(
     globalUploadMiddleware('defaults' as any).fields([
-      { name: 'profile', maxCount: 1 },
-      { name: 'cover', maxCount: 1 },
+      { name: 'profileImage', maxCount: 1 },
+      { name: 'coverImage', maxCount: 1 },
     ]),
     handlers.updateDefaultImagesCrm,
   );

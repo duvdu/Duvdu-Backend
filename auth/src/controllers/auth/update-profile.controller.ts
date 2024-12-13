@@ -34,8 +34,8 @@ export const updateProfileHandler: RequestHandler<
   if (!profile)
     return next(new NotFound({ en: 'no user found', ar: 'المستخدم غير موجود' }, req.lang));
 
-  const coverImage = <Express.Multer.File[] | undefined>(req.files as any).cover || [];
-  const profileImage = <Express.Multer.File[] | undefined>(req.files as any).profile || [];
+  const coverImage = <Express.Multer.File[] | undefined>(req.files as any).coverImage || [];
+  const profileImage = <Express.Multer.File[] | undefined>(req.files as any).profileImage || [];
 
   const s3 = new Bucket();
   if (coverImage?.length) {

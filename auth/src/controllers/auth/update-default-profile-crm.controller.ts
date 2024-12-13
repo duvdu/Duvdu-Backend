@@ -13,8 +13,8 @@ export const updateDefaultImagesCrm: RequestHandler<
   SuccessResponse<{ data: { url: string } }>
 > = async (req, res, next) => {
   if (!req.files) return next(new BadRequestError(undefined, req.lang));
-  const profileImage: Express.Multer.File | undefined = (req.files as any).profile?.[0];
-  const coverImage: Express.Multer.File | undefined = (req.files as any).cover?.[0];
+  const profileImage: Express.Multer.File | undefined = (req.files as any).profileImage?.[0];
+  const coverImage: Express.Multer.File | undefined = (req.files as any).coverImage?.[0];
 
   const bucket = new Bucket();
 
