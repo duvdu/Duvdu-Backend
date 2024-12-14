@@ -40,7 +40,7 @@ export const createProjectHandler: RequestHandler = async (req, res) => {
   if (req.body.location) {
     projectData.location = {
       type: 'Point',
-      coordinates: [(req as any).location.lng, (req as any).location.lat],
+      coordinates: [req.body.location.lng, req.body.location.lat],
     };
   }
 
