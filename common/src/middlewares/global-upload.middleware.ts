@@ -37,24 +37,8 @@ export const globalUploadMiddleware = (folder: string, options?: UploadOptions) 
     fileFilter: options?.fileFilter
       ? (options.fileFilter as any)
       : function fileFilter(req, file, callback) {
-          if (!options?.fileTypes) {
-            if (!file.mimetype.startsWith('image')) {
-              return callback(
-                new BadRequestError(
-                  {
-                    en: 'Invalid file format',
-                    ar: 'صيغة الملف غير صالحة',
-                  },
-                  'en',
-                ),
-              );
-            }
-            return callback(null, true);
-          }
-
-          if (options?.fileTypes?.some((type) => file.mimetype.startsWith(type))) {
-            return callback(null, true);
-          } else {
+        if (!options?.fileTypes) {
+          if (!file.mimetype.startsWith('image')) {
             return callback(
               new BadRequestError(
                 {
@@ -65,7 +49,30 @@ export const globalUploadMiddleware = (folder: string, options?: UploadOptions) 
               ),
             );
           }
-        },
+          return callback(null, true);
+        }
+
+        const isValidType = options.fileTypes.some((type) => {
+          const [category, subtype] = type.split('/');
+          const [fileCategory, fileSubtype] = file.mimetype.split('/');
+            
+          return category === fileCategory && (subtype === '*' || subtype === fileSubtype);
+        });
+
+        if (isValidType) {
+          return callback(null, true);
+        } else {
+          return callback(
+            new BadRequestError(
+              {
+                en: 'Invalid file format',
+                ar: 'صيغة الملف غير صالحة',
+              },
+              'en',
+            ),
+          );
+        }
+      },
   });
 
   return {
