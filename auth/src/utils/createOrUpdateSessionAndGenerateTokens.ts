@@ -36,7 +36,9 @@ export const createOrUpdateSessionAndGenerateTokens = async (
     user.refreshTokens.push({ token: refreshToken, deviceId });
   }
 
-  user.notificationToken = notificationToken ? notificationToken : null;
+  if (notificationToken) 
+    user.notificationToken = notificationToken;
+  
   await user.save();
 
   return { refreshToken, accessToken };

@@ -15,9 +15,9 @@ export const updateProjectHandler: RequestHandler<{ projectId: string }, Success
     user: req.loggedUser.id 
   });
 
-  if (!existingProject) {
+  if (!existingProject) 
     return next(new NotAllowedError(undefined, req.lang));
-  }
+  
 
   const s3 = new Bucket();
 
