@@ -41,7 +41,7 @@ router
     isauthorized(PERMISSIONS.createPlatform),
     globalUploadMiddleware(FOLDERS.producer, {
       maxSize: 400 * 1024 * 1024,
-      fileTypes: ['image'],
+      fileTypes: ['image/*'],
     }).fields([{ name: 'image', maxCount: 1 }]),
     val.create,
     checkRequiredFields({ fields: ['image'] }),
@@ -61,7 +61,7 @@ router
     isauthorized(PERMISSIONS.updatePlatform),
     globalUploadMiddleware(FOLDERS.producer, {
       maxSize: 400 * 1024 * 1024,
-      fileTypes: ['image'],
+      fileTypes: ['image/*'],
     }).fields([{ name: 'image', maxCount: 1 }]),
     val.update,
     controllers.updatePlatformHandler,

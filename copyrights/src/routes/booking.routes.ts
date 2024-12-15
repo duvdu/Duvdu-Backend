@@ -17,7 +17,7 @@ router.post(
   isauthenticated,
   globalUploadMiddleware(FOLDERS.copyrights, {
     maxSize: 50 * 1024 * 1024,
-    fileTypes: ['image', 'video', 'application/pdf', 'text/plain'],
+    fileTypes: ['image/*', 'video/*', 'application/*', 'text/*'],
   }).array('attachments', 10),
   val.bookProject,
   createContractHandler,

@@ -18,7 +18,7 @@ router
   .route('/')
   .post(
     globalUploadMiddleware(FOLDERS.producer, {
-      fileTypes: ['image', 'application/pdf', 'video'],
+      fileTypes: ['image/*', 'application/*', 'video/*'],
     }).fields([{ name: 'attachments', maxCount: 10 }]),
     val.createContractVal,
     checkRequiredFields({ fields: ['attachments'] }),

@@ -11,7 +11,7 @@ router.use(isauthenticated);
 router.route('/:projectId').post(
   globalUploadMiddleware(FOLDERS.portfolio_post, {
     maxSize: 100 * 1024 * 1024,
-    fileTypes: ['video', 'image'],
+    fileTypes: ['video/*', 'image/*'],
   }).fields([{ name: 'attachments', maxCount: 10 }]),
   val.create,
   handler.createContractHandler,

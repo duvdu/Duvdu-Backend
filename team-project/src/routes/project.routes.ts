@@ -40,7 +40,7 @@ router
     isauthorized(PERMISSIONS.createTeamProjectHandler),
     globalUploadMiddleware(FOLDERS.team_project, {
       maxSize: 100 * 1024 * 1024,
-      fileTypes: ['video', 'image'],
+      fileTypes: ['video/*', 'image/*'],
     }).fields([
       { name: 'creatives[0][users][0][attachments]', maxCount: 10 },
       { name: 'creatives[0][users][1][attachments]', maxCount: 10 },
@@ -73,7 +73,7 @@ router
     isauthenticated,
     globalUploadMiddleware(FOLDERS.team_project, {
       maxSize: 100 * 1024 * 1024,
-      fileTypes: ['video', 'image'],
+      fileTypes: ['video/*', 'image/*'],
     }).fields([{ name: 'attachments', maxCount: 10 }]),
     val.addCreative,
     controllers.addCreativeHandler,

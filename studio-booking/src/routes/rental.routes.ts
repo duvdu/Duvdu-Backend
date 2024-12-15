@@ -25,7 +25,7 @@ router
     isauthenticated,
     globalUploadMiddleware(FOLDERS.studio_booking , {
       maxSize: 400 * 1024 * 1024,
-      fileTypes: ['video', 'image', 'audio', 'application/pdf' ],
+      fileTypes: ['video/*', 'image/*', 'audio/*', 'application/*' ],
     }).fields([
       { name: 'attachments', maxCount: 10 },
       { name: 'cover', maxCount: 1 },
@@ -73,7 +73,7 @@ router
     isauthenticated,
     globalUploadMiddleware(FOLDERS.studio_booking , {
       maxSize: 400 * 1024 * 1024,
-      fileTypes: ['video', 'image', 'audio', 'application/pdf' ],
+      fileTypes: ['video/*', 'image/*', 'audio/*', 'application/*' ],
     }).fields([
       { name: 'attachments', maxCount: 10 },
       { name: 'cover', maxCount: 1 },
