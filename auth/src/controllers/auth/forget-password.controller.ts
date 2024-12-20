@@ -131,10 +131,8 @@ export const updateForgetenPasswordHandler: RequestHandler<
 
   const role = <Irole>user.role;
 
-  const userAgent = req.headers['user-agent'];
-
   const { accessToken, refreshToken } = await createOrUpdateSessionAndGenerateTokens(
-    userAgent!,
+    req.headers,
     user,
     role,
     null,

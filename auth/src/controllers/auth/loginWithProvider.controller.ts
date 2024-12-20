@@ -17,7 +17,9 @@ export const loginWithProviderHandler: RequestHandler<
   unknown,
   SuccessResponse,
   Partial<
-    Pick<Iuser, 'googleId' | 'appleId' | 'username' | 'notificationToken' | 'name' | 'email'>
+    Pick<Iuser, 'googleId' | 'appleId' | 'username' | 'name' | 'email'> & {
+      notificationToken?: string;
+    }
   >,
   unknown
 > = async (req, res, next) => {
@@ -86,10 +88,9 @@ export const loginWithProviderHandler: RequestHandler<
       ),
     );
 
-  const userAgent = req.headers['user-agent'];
 
   const { accessToken, refreshToken } = await createOrUpdateSessionAndGenerateTokens(
-    userAgent!,
+    req.headers,
     user,
     role,
     req.body.notificationToken ? req.body.notificationToken : null,

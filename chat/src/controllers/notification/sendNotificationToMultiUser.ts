@@ -11,7 +11,7 @@ export const sendNotificationToMultiUserHandler: SendNotificationMultiUserHandle
   next,
 ) => {
   try {
-    const users = await Users.find({ _id: { $in: req.body.users } }).select('notificationToken');
+    const users = await Users.find({ _id: { $in: req.body.users } }).select('fcmTokens');
 
     if (users.length !== req.body.users.length)
       return next(
@@ -19,8 +19,8 @@ export const sendNotificationToMultiUserHandler: SendNotificationMultiUserHandle
       );
 
     const notificationTokens = users
-      .map((user) => user.notificationToken)
-      .filter((token) => token !== null);
+      .flatMap(user => user.fcmTokens.map(token => token.fcmToken))
+      .filter(token => token !== null && token !== undefined);
 
     if (notificationTokens.length > 0)
       await sendFcmToMultipleUsers(notificationTokens, req.body.title, req.body.message);

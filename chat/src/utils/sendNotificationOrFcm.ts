@@ -4,7 +4,7 @@ import SocketIO from 'socket.io';
 import admin from './fireBaseConfig';
 
 export async function sendFCMNotification(
-  token: string,
+  token: string [],
   title: string,
   message: string,
   data: Inotification,
@@ -41,11 +41,11 @@ export async function sendFCMNotification(
       },
     },
     data: transformedData,
-    token: token,
+    tokens: token,
   };
 
   try {
-    const response = await admin.messaging().send(messagePayload);
+    const response = await admin.messaging().sendEachForMulticast(messagePayload);
     console.log('Successfully sent FCM notification:', response);
   } catch (error) {
     console.error('Error sending FCM notification:', error);
@@ -74,11 +74,13 @@ export async function sendNotificationOrFCM(
   console.log('iam here');
 
   if (!user) throw new NotFound(`Target user not found ${targetUserId}`);
-  if (user.notificationToken)
+  if (user.fcmTokens) {
+    const fcmTokens = user.fcmTokens.map((el) => el.fcmToken);
     await sendFCMNotification(
-      user.notificationToken,
+      fcmTokens,
       notificationDetails.title,
       notificationDetails.message,
       populatedNotification,
     );
+  }
 }
