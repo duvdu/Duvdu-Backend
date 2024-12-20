@@ -45,10 +45,7 @@ const userSchema = new Schema<Iuser>(
       value: { type: Boolean, default: false },
       reason: { type: String, default: null },
     },
-    notificationToken: {
-      type: String,
-      default: null,
-    },
+    fcmTokens: [{ fcmToken: String, deviceId: String }],
     followCount: {
       followers: { type: Number, default: 0 },
       following: { type: Number, default: 0 },

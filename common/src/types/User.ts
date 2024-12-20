@@ -46,7 +46,7 @@ export interface Iuser {
   currentRank: string;
   isBlocked: { value: boolean; reason: string };
   followCount: { following: number; followers: number };
-  notificationToken: string | null;
+  fcmTokens: { fcmToken: string; deviceId: string }[];
   isFollow?: boolean;
   favourites: { project: Types.ObjectId; cycle: string }[];
   address: string;
