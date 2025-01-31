@@ -26,16 +26,16 @@ export interface IprojectCycle {
   tools: { name: string; unitPrice: number }[];
   functions: { name: string; unitPrice: number }[];
   creatives: {
-    creative: Types.ObjectId[] | Iuser[];
+    creative: Types.ObjectId | Iuser;
     inviteStatus: InviteStatus;
     mainCategory: {
       category: Types.ObjectId;
       subCategories: { subCategory: Types.ObjectId; tags: Types.ObjectId[] }[];
+      relatedCategory?: {
+        category: Types.ObjectId;
+        subCategories: { subCategory: Types.ObjectId; tags: Types.ObjectId[] }[];
+      };
     };
-    relatedCategory: {
-      category: Types.ObjectId;
-      subCategories: { subCategory: Types.ObjectId; tags: Types.ObjectId[] }[];
-    }[];
   }[];
 
   location: {
