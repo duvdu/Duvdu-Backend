@@ -25,7 +25,19 @@ export interface IprojectCycle {
   description: string;
   tools: { name: string; unitPrice: number }[];
   functions: { name: string; unitPrice: number }[];
-  creatives: { creative: Types.ObjectId[] | Iuser[]; inviteStatus: InviteStatus }[];
+  creatives: {
+    creative: Types.ObjectId[] | Iuser[];
+    inviteStatus: InviteStatus;
+    mainCategory: {
+      category: Types.ObjectId;
+      subCategories: { subCategory: Types.ObjectId; tags: Types.ObjectId[] }[];
+    };
+    relatedCategory: {
+      category: Types.ObjectId;
+      subCategories: { subCategory: Types.ObjectId; tags: Types.ObjectId[] }[];
+    }[];
+  }[];
+
   location: {
     type: 'Point';
     coordinates: [number, number];
@@ -84,6 +96,14 @@ export const ProjectCycle = model<IprojectCycle>(
         {
           creative: { type: Schema.Types.ObjectId, ref: MODELS.user },
           inviteStatus: { type: String, enum: InviteStatus, default: InviteStatus.pending },
+          mainCategory: {
+            category: { type: Schema.Types.ObjectId, ref: MODELS.category },
+            subCategories: [{ subCategory: { type: Schema.Types.ObjectId }, tags: [{ tag: { type: Schema.Types.ObjectId } }] }],
+          },
+          relatedCategory: {
+            category: { type: Schema.Types.ObjectId, ref: MODELS.category },
+            subCategories: [{ subCategory: { type: Schema.Types.ObjectId }, tags: [{ tag: { type: Schema.Types.ObjectId } }] }],
+          },
         },
       ],
       location: {
