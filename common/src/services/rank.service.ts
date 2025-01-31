@@ -1,8 +1,6 @@
 /* eslint-disable no-constant-condition */
 import { Document } from 'mongoose';
 
-import { Project } from '../models/allProjects.model';
-import { Favourites } from '../models/favourites.model';
 import { Rank } from '../models/ranks.model';
 import { Users } from '../models/User.model';
 import { Iuser } from '../types/User';
@@ -11,8 +9,8 @@ export type UserDocument = Document & Iuser;
 
 export const updateRankForUser = async (user: UserDocument) => {
   // get all user stats
-  const projectsCount = await Project.countDocuments({ user: user._id });
-  const favoriteCount = await Favourites.countDocuments({ user: user._id });
+  const projectsCount = user.projectsCount;
+  const favoriteCount = user.favoriteCount;
   const projectsLiked = user.likes;
   const acceptedProjectsCounter = user.acceptedProjectsCounter;
 

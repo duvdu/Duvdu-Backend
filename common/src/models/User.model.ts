@@ -61,6 +61,8 @@ const userSchema = new Schema<Iuser>(
     projectsView: { type: Number, default: 0 },
     haveInvitation: { type: Boolean, default: false },
     faceRecognition: { type: String, default: null },
+    projectsCount: { type: Number, default: 0 },
+    favoriteCount: { type: Number, default: 0 },
   },
   {
     timestamps: true,
@@ -81,7 +83,9 @@ const userSchema = new Schema<Iuser>(
 userSchema.pre('save', async function (next) {
   if (
     this.isModified('acceptedProjectsCounter') ||
-    this.isModified('likes')
+    this.isModified('likes') ||
+    this.isModified('projectsCount') ||
+    this.isModified('favoriteCount')
   ) {
     await updateRankForUser(this as UserDocument);
   }

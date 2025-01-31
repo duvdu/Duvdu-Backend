@@ -60,4 +60,6 @@ export interface Iuser {
   projectsView: number;
   haveInvitation: boolean;
   faceRecognition: string | null;
+  projectsCount: number;
+  favoriteCount: number;
 }
