@@ -79,7 +79,12 @@ const userSchema = new Schema<Iuser>(
   .index({ location: '2dsphere' });
 
 userSchema.pre('save', async function (next) {
-  if (this.isModified('acceptedProjectsCounter')) await updateRankForUser(this as UserDocument);
+  if (
+    this.isModified('acceptedProjectsCounter') ||
+    this.isModified('likes')
+  ) {
+    await updateRankForUser(this as UserDocument);
+  }
   next();
 });
 
