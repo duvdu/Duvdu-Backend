@@ -10,14 +10,12 @@ export type UserDocument = Document & Iuser;
 export const updateRankForUser = async (user: UserDocument) => {
   // get all user stats
   const projectsCount = user.projectsCount;
-  const favoriteCount = user.favoriteCount;
   const projectsLiked = user.likes;
   const acceptedProjectsCounter = user.acceptedProjectsCounter;
 
   // Find current rank that matches ALL criteria
   const currentRank = await Rank.findOne({
     actionCount: { $lte: acceptedProjectsCounter },
-    favoriteCount: { $lte: favoriteCount },
     projectsLiked: { $lte: projectsLiked },
     projectsCount: { $lte: projectsCount }
   })
@@ -33,7 +31,6 @@ export const updateRankForUser = async (user: UserDocument) => {
   const nextRank = await Rank.findOne({
     $or: [
       { actionCount: { $gt: acceptedProjectsCounter } },
-      { favoriteCount: { $gt: favoriteCount } },
       { projectsLiked: { $gt: projectsLiked } },
       { projectsCount: { $gt: projectsCount } }
     ]
@@ -56,10 +53,6 @@ export const updateRankForUser = async (user: UserDocument) => {
         {
           completed: acceptedProjectsCounter - currentRank.actionCount,
           needed: nextRank.actionCount - currentRank.actionCount
-        },
-        {
-          completed: favoriteCount - currentRank.favoriteCount,
-          needed: nextRank.favoriteCount - currentRank.favoriteCount
         },
         {
           completed: projectsLiked - currentRank.projectsLiked,
