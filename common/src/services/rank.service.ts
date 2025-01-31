@@ -1,8 +1,10 @@
+/* eslint-disable no-constant-condition */
 import { Document } from 'mongoose';
 
 import { Project } from '../models/allProjects.model';
 import { Favourites } from '../models/favourites.model';
 import { Rank } from '../models/ranks.model';
+import { Users } from '../models/User.model';
 import { Iuser } from '../types/User';
 
 export type UserDocument = Document & Iuser;
@@ -89,4 +91,37 @@ export const updateRankForUser = async (user: UserDocument) => {
   }
 
   return user.save();
+};
+
+export const recalculateAllUsersRanks = async () => {
+  const BATCH_SIZE = 100;
+  let processedCount = 0;
+  
+  try {
+    // Process users in batches
+    while (true) {
+      const users = await Users.find({})
+        .skip(processedCount)
+        .limit(BATCH_SIZE)
+        .lean();
+
+      if (users.length === 0) break;
+
+      // Update rank for each user in the batch
+      await Promise.all(
+        users.map(async user => {
+          try {
+            await updateRankForUser(user as UserDocument);
+          } catch (error) {
+            console.error(`Failed to update rank for user ${user._id}:`, error);
+          }
+        })
+      );
+
+      processedCount += users.length;
+    }
+  } catch (error) {
+    console.error('Failed to recalculate user ranks:', error);
+    throw error;
+  }
 };
