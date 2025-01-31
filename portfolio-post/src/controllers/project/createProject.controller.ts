@@ -120,7 +120,7 @@ export const createProjectHandler: RequestHandler<
 
     // Validate creatives if present
     if (req.body.creatives) {
-      await validateCreative(req.body.creatives as any, req.lang);
+      await validateCreative(req.body.creatives, req.lang);
     }
 
     // Handle invited creatives
