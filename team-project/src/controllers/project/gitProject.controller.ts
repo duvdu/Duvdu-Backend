@@ -1,6 +1,6 @@
 import 'express-async-errors';
 
-import { Icategory, NotFound, TeamProject } from '@duvdu-v1/duvdu';
+import { Icategory, NotFound, TeamProject, Users } from '@duvdu-v1/duvdu';
 
 import { GetProjectHandler } from '../../types/project.endpoints';
 
@@ -58,7 +58,7 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
   }
 
   // increment the user projects view count
-  await Users.updateOne({ _id: projectObject.user._id }, { $inc: { projectsView: 1 } });
+  await Users.updateOne({ _id: projectObject.user.id }, { $inc: { projectsView: 1 } });
 
   res.status(200).json({ message: 'success', data: projectObject });
 };

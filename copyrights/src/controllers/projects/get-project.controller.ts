@@ -53,7 +53,7 @@ export const getProjectHandler: RequestHandler<
     lat: (project.location as any).coordinates?.[1],
   };
 
-  await Users.updateOne({ _id: project.user._id }, { $inc: { projectsView: 1 } });
+  await Users.updateOne({ _id: project.user.id }, { $inc: { projectsView: 1 } });
 
   res.status(200).json(<any>{ message: 'success', data: project });
 };
