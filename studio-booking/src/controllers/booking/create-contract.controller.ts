@@ -3,10 +3,10 @@ import {
   NotFound,
   NotAllowedError,
   BadRequestError,
-  addToDate,
   ContractStatus,
   Contracts,
   CYCLES,
+  addToDate,
   Setting,
   Rentals,
   Bucket,
@@ -68,8 +68,8 @@ export const createContractHandler: RequestHandler<
     new Date(req.body.startDate),
     project.projectScale.unit,
     req.body.projectScale.numberOfUnits,
-  ).toISOString();
-  
+  );
+
   const stageExpiration = await getStageExpiration(
     new Date(req.body.startDate).toString(),
     req.lang,

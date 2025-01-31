@@ -4,7 +4,7 @@ import { body, param } from 'express-validator';
 export const create = [
   param('projectId').isMongoId(),
   body('details').optional().isString(),
-  body('projectScale.numberOfUnits').isInt({ min: 1 }),
+  body('projectScale.numberOfUnits').isInt({ min: 1 }).toInt(),
   body('startDate')
     .isString()
     .bail()
