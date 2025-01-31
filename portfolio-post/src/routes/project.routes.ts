@@ -84,3 +84,7 @@ router
     handler.deleteProjectHandler,
   )
   .post(isauthenticated, val.acceptAction, handler.invitationActionHandler);
+
+router
+  .route('/tagged')
+  .get(isauthenticated, globalPaginationMiddleware, handler.getUserTaggedProjectsHandler);

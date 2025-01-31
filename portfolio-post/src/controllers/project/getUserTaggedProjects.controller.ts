@@ -1,187 +1,31 @@
 import 'express-async-errors';
 
-import { Categories, InviteStatus, MODELS, ProjectCycle } from '@duvdu-v1/duvdu';
+import {
+  InviteStatus,
+  IprojectCycle,
+  MODELS,
+  PaginationResponse,
+  ProjectCycle,
+} from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
-import mongoose, { PipelineStage, Types } from 'mongoose';
+import { PipelineStage, Types } from 'mongoose';
 
 import { GetProjectsHandler } from '../../types/project.endoints';
 
-export const getProjectsPagination: RequestHandler<
+export const getUserTaggedProjectsHandler: RequestHandler<
   unknown,
-  unknown,
-  unknown,
-  {
-    search?: string;
-    location?: { lat: number; lng: number };
-    category?: Types.ObjectId[];
-    subCategory?: Types.ObjectId[];
-    tags?: Types.ObjectId[];
-    showOnHome?: boolean;
-    startDate?: Date;
-    endDate?: Date;
-    projectScaleMin?: number;
-    projectScaleMax?: number;
-    instant?: boolean;
-    duration?: number;
-    maxBudget?: number;
-    minBudget?: number;
-    maxDistance?: number;
-    relatedCategory?: Types.ObjectId[];
-    relatedSubCategory?: Types.ObjectId[];
-    relatedTags?: Types.ObjectId[];
-  }
-> = async (req, res, next) => {
-  req.query.maxDistance = +(req.query.maxDistance || 1000);
-  if (req.query.duration) req.pagination.filter.duration = { $eq: req.query.duration };
-  if (req.query.instant != undefined) req.pagination.filter.instant = req.query.instant;
-  if (req.query.search) {
-    req.pagination.filter = {
-      $or: [
-        { name: { $regex: req.query.search, $options: 'i' } },
-        { description: { $regex: req.query.search, $options: 'i' } },
-        { 'tools.name': { $regex: req.query.search, $options: 'i' } },
-        { 'functions.name': { $regex: req.query.search, $options: 'i' } },
-        { address: { $regex: req.query.search, $options: 'i' } },
-      ],
-    };
-  }
-
-  if (req.query.location) {
-    req.pagination.filter['location.lat'] = req.query.location.lat;
-    req.pagination.filter['location.lng'] = req.query.location.lng;
-  }
-
-  if (req.query.category) {
-    req.pagination.filter.category = { $in: req.query.category };
-  }
-
-  if (req.query.subCategory) {
-    const subCategoryIds = req.query.subCategory.map((id) => new mongoose.Types.ObjectId(id));
-    // Step 1: Retrieve the subcategory titles from the Category model
-    const subCategories = await Categories.aggregate([
-      { $unwind: '$subCategories' },
-      { $match: { 'subCategories._id': { $in: subCategoryIds } } },
-      {
-        $project: {
-          _id: 0,
-          'title.ar': '$subCategories.title.ar',
-          'title.en': '$subCategories.title.en',
-        },
-      },
-    ]);
-
-    // Construct the filter for the subCategory titles in both Arabic and English
-    const arabicTitles = subCategories.map((subCat) => subCat.title.ar);
-    const englishTitles = subCategories.map((subCat) => subCat.title.en);
-
-    req.pagination.filter['$or'] = [
-      { 'subCategory.ar': { $in: arabicTitles } },
-      { 'subCategory.en': { $in: englishTitles } },
-    ];
-  }
-
-  if (req.query.tags) {
-    req.pagination.filter['tags'] = {
-      $elemMatch: { _id: { $in: req.query.tags.map((el) => new mongoose.Types.ObjectId(el)) } },
-    };
-  }
-
-  if (req.query.showOnHome !== undefined) {
-    req.pagination.filter.showOnHome = req.query.showOnHome;
-  }
-
-  if (req.query.startDate || req.query.endDate) {
-    req.pagination.filter['projectScale'] = {};
-    if (req.query.startDate) {
-      req.pagination.filter['projectScale.minimum'] = { $gte: req.query.startDate };
-    }
-    if (req.query.endDate) {
-      req.pagination.filter['projectScale.maximum'] = { $lte: req.query.endDate };
-    }
-  }
-
-  if (req.query.projectScaleMin || req.query.projectScaleMax) {
-    req.pagination.filter['projectScale'] = {};
-    if (req.query.projectScaleMin) {
-      req.pagination.filter['projectScale.minimum'] = { $gte: req.query.projectScaleMin };
-    }
-    if (req.query.projectScaleMax) {
-      req.pagination.filter['projectScale.maximum'] = { $lte: req.query.projectScaleMax };
-    }
-  }
-
-  if (req.query.maxBudget !== undefined) {
-    req.pagination.filter.maxBudget = { $lte: req.query.maxBudget };
-  }
-
-  if (req.query.minBudget !== undefined) {
-    req.pagination.filter.minBudget = { $gte: req.query.minBudget };
-  }
-
-  if (req.query.relatedCategory && req.query.relatedCategory.length > 0) {
-    if (!req.pagination.filter.$and) {
-      req.pagination.filter.$and = [];
-    }
-
-    const categoryIds = req.query.relatedCategory.map((id) => new mongoose.Types.ObjectId(id));
-    req.pagination.filter.$and.push({
-      relatedCategory: {
-        $elemMatch: {
-          category: { $in: categoryIds },
-        },
-      },
-    });
-
-    if (req.query.relatedSubCategory && req.query.relatedSubCategory.length > 0) {
-      const subCategoryIds = req.query.relatedSubCategory.map(
-        (id) => new mongoose.Types.ObjectId(id),
-      );
-      req.pagination.filter.$and.push({
-        relatedCategory: {
-          $elemMatch: {
-            subCategories: {
-              $elemMatch: {
-                subCategory: { $in: subCategoryIds },
-              },
-            },
-          },
-        },
-      });
-    }
-
-    if (req.query.relatedTags && req.query.relatedTags.length > 0) {
-      const tagIds = req.query.relatedTags.map((id) => new mongoose.Types.ObjectId(id));
-      req.pagination.filter.$and.push({
-        relatedCategory: {
-          $elemMatch: {
-            subCategories: {
-              $elemMatch: {
-                tags: {
-                  $elemMatch: {
-                    tag: { $in: tagIds },
-                  },
-                },
-              },
-            },
-          },
-        },
-      });
-    }
-  }
-
-  next();
-};
-
-export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
-  let isInstant = undefined;
-  if (req.pagination.filter.instant != undefined) isInstant = req.pagination.filter.instant;
-  delete req.pagination.filter.instant;
-
+  PaginationResponse<{ data: IprojectCycle[] }>,
+  GetProjectsHandler,
+  unknown
+> = async (req, res) => {
   const countPipeline = [
     {
       $match: {
-        ...req.pagination.filter,
-        isDeleted: { $ne: true },
+        creatives: {
+          $elemMatch: {
+            creative: new Types.ObjectId(req.loggedUser?.id),
+          },
+        },
       },
     },
     {
@@ -193,15 +37,6 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
       },
     },
     { $unwind: '$user' },
-    ...(isInstant !== undefined
-      ? [
-          {
-            $match: {
-              'user.isAvaliableToInstantProjects': isInstant,
-            },
-          },
-        ]
-      : []),
     {
       $count: 'totalCount',
     },
@@ -215,8 +50,11 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
   pipelines.push(
     {
       $match: {
-        ...req.pagination.filter,
-        isDeleted: { $ne: true },
+        creatives: {
+          $elemMatch: {
+            creative: new Types.ObjectId(req.loggedUser?.id),
+          },
+        },
       },
     },
     { $sort: { createdAt: -1 } },
@@ -232,14 +70,6 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
     },
     { $unwind: '$user' },
   );
-
-  if (isInstant !== undefined) {
-    pipelines.push({
-      $match: {
-        'user.isAvaliableToInstantProjects': isInstant,
-      },
-    });
-  }
 
   pipelines.push(
     {
@@ -295,6 +125,93 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
                 followCount: '$creativeDetails.followCount',
                 address: '$creativeDetails.address',
                 inviteStatus: '$creatives.inviteStatus',
+                mainCategory: {
+                  category: {
+                    $let: {
+                      vars: {
+                        filteredCategories: {
+                          $filter: {
+                            input: '$$creative.mainCategory.category',
+                            as: 'cat',
+                            cond: { $ne: ['$$cat', null] },
+                          },
+                        },
+                      },
+                      in: {
+                        $cond: {
+                          if: { $gt: [{ $size: '$$filteredCategories' }, 0] },
+                          then: {
+                            _id: { $arrayElemAt: ['$$filteredCategories._id', 0] },
+                            title: { $arrayElemAt: ['$$filteredCategories.title', 0] },
+                          },
+                          else: null,
+                        },
+                      },
+                    },
+                  },
+                  subCategories: {
+                    $map: {
+                      input: '$creatives.mainCategory.subCategories',
+                      as: 'subCategory',
+                      in: {
+                        subCategory: {
+                          $lookup: {
+                            from: MODELS.category,
+                            localField: 'subCategory.subCategory',
+                            foreignField: '_id',
+                            as: 'subCategoryData',
+                          },
+                        },
+                        tags: {
+                          $filter: {
+                            input: '$subCategory.tags',
+                            as: 'tag',
+                            cond: { $ne: ['$$tag', null] },
+                          },
+                        },
+                      },
+                    },
+                  },
+                  relatedCategory: {
+                    $cond: {
+                      if: { $ne: ['$creatives.mainCategory.relatedCategory', null] },
+                      then: {
+                        category: {
+                          $lookup: {
+                            from: MODELS.category,
+                            localField: 'creatives.mainCategory.relatedCategory.category',
+                            foreignField: '_id',
+                            as: 'relatedCategoryData',
+                          },
+                        },
+                        subCategories: {
+                          $map: {
+                            input: '$creatives.mainCategory.relatedCategory.subCategories',
+                            as: 'relatedSubCategory',
+                            in: {
+                              subCategory: {
+                                $lookup: {
+                                  from: MODELS.category,
+                                  localField: 'relatedSubCategory.subCategory',
+                                  foreignField: '_id',
+                                  as: 'relatedSubCategoryData',
+                                },
+                              },
+                              tags: {
+                                $filter: {
+                                  input: '$relatedSubCategory.tags',
+                                  as: 'tag',
+                                  cond: { $ne: ['$$tag', null] },
+                                },
+                              },
+                            },
+                          },
+                        },
+                      },
+                      else: null,
+                    },
+                  },
+                },
               },
               null,
             ],
@@ -405,10 +322,111 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
         tools: 1,
         functions: 1,
         creatives: {
-          $filter: {
+          $map: {
             input: '$creatives',
             as: 'creative',
-            cond: { $ne: ['$$creative', null] },
+            in: {
+              _id: '$$creative._id',
+              profileImage: '$$creative.profileImage',
+              isOnline: '$$creative.isOnline',
+              username: '$$creative.username',
+              name: '$$creative.name',
+              rank: '$$creative.rank',
+              projectsView: '$$creative.projectsView',
+              coverImage: '$$creative.coverImage',
+              acceptedProjectsCounter: '$$creative.acceptedProjectsCounter',
+              rate: '$$creative.rate',
+              profileViews: '$$creative.profileViews',
+              about: '$$creative.about',
+              isAvaliableToInstantProjects: '$$creative.isAvaliableToInstantProjects',
+              pricePerHour: '$$creative.pricePerHour',
+              hasVerificationBadge: '$$creative.hasVerificationBadge',
+              likes: '$$creative.likes',
+              followCount: '$$creative.followCount',
+              address: '$$creative.address',
+              inviteStatus: '$$creative.inviteStatus',
+              mainCategory: {
+                category: {
+                  $let: {
+                    vars: {
+                      filteredCategories: {
+                        $filter: {
+                          input: '$$creative.mainCategory.category',
+                          as: 'cat',
+                          cond: { $ne: ['$$cat', null] },
+                        },
+                      },
+                    },
+                    in: {
+                      $cond: {
+                        if: { $gt: [{ $size: '$$filteredCategories' }, 0] },
+                        then: {
+                          _id: { $arrayElemAt: ['$$filteredCategories._id', 0] },
+                          title: { $arrayElemAt: ['$$filteredCategories.title', 0] },
+                        },
+                        else: null,
+                      },
+                    },
+                  },
+                },
+                subCategories: {
+                  $map: {
+                    input: '$$creative.mainCategory.subCategories',
+                    as: 'subCategory',
+                    in: {
+                      subCategory: {
+                        _id: '$$subCategory.subCategory._id',
+                        title: `$$subCategory.subCategory.title.${req.lang}`,
+                        tags: {
+                          $map: {
+                            input: '$$subCategory.tags',
+                            as: 'tag',
+                            in: {
+                              title: `$$tag.title.${req.lang}`,
+                              _id: '$$tag._id',
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+                relatedCategory: {
+                  $cond: {
+                    if: { $ne: ['$creatives.mainCategory.relatedCategory', null] },
+                    then: {
+                      category: {
+                        title: `$$creative.mainCategory.relatedCategory.category.title.${req.lang}`,
+                        _id: '$$creative.mainCategory.relatedCategory.category._id',
+                      },
+                      subCategories: {
+                        $map: {
+                          input: '$$creative.mainCategory.relatedCategory.subCategories',
+                          as: 'relatedSubCategory',
+                          in: {
+                            subCategory: {
+                              _id: '$$relatedSubCategory.subCategory._id',
+                              title: `$$relatedSubCategory.subCategory.title.${req.lang}`,
+                              tags: {
+                                $map: {
+                                  input: '$$relatedSubCategory.tags',
+                                  as: 'tag',
+                                  in: {
+                                    _id: '$$tag._id',
+                                    title: `$$tag.title.${req.lang}`,
+                                  },
+                                },
+                              },
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                  else: null,
+                },
+              },
+            },
           },
         },
         location: {

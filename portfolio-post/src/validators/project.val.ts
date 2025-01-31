@@ -20,10 +20,77 @@ export const create = [
   body('name').isString().exists().withMessage('name'),
   body('description').isString().exists().withMessage('description'),
   body('category').isMongoId().withMessage('category'),
+  // creatives
   body('creatives').optional().isArray({ min: 1 }).withMessage('creatives'),
   body('creatives.*.creative').isMongoId().withMessage('creatives'),
+  body('creatives.*.mainCategory').isObject().withMessage('creatives'),
+  body('creatives.*.mainCategory.category').isMongoId().withMessage('creatives'),
+  body('creatives.*.mainCategory.subCategories').isObject().withMessage('creatives'),
+  body('creatives.*.mainCategory.subCategories.*.subCategory').isMongoId().withMessage('creatives'),
+  body('creatives.*.mainCategory.subCategories.*.tags').isArray().withMessage('creatives'),
+  body('creatives.*.mainCategory.subCategories.*.tags.*.tag').isMongoId().withMessage('creatives'),
+  body('creatives.*.mainCategory.relatedCategory').optional().isObject().withMessage('creatives'),
+  body('creatives.*.mainCategory.relatedCategory.category')
+    .optional()
+    .isMongoId()
+    .withMessage('creatives'),
+  body('creatives.*.mainCategory.relatedCategory.subCategories')
+    .optional()
+    .isObject()
+    .withMessage('creatives'),
+  body('creatives.*.mainCategory.relatedCategory.subCategories.*.subCategory')
+    .optional()
+    .isMongoId()
+    .withMessage('creatives'),
+  body('creatives.*.mainCategory.relatedCategory.subCategories.*.tags')
+    .optional()
+    .isArray()
+    .withMessage('creatives'),
+  body('creatives.*.mainCategory.relatedCategory.subCategories.*.tags.*.tag')
+    .optional()
+    .isMongoId()
+    .withMessage('creatives'),
+
+  // invitedCreatives
   body('invitedCreatives').optional().isArray({ min: 1 }),
   body('invitedCreatives.*.number').exists().isString().isMobilePhone('ar-EG'),
+  body('invitedCreatives.*.mainCategory').isObject().withMessage('invitedCreatives'),
+  body('invitedCreatives.*.mainCategory.category').isMongoId().withMessage('invitedCreatives'),
+  body('invitedCreatives.*.mainCategory.subCategories').isObject().withMessage('invitedCreatives'),
+  body('invitedCreatives.*.mainCategory.subCategories.*.subCategory')
+    .isMongoId()
+    .withMessage('invitedCreatives'),
+  body('invitedCreatives.*.mainCategory.subCategories.*.tags')
+    .isArray()
+    .withMessage('invitedCreatives'),
+  body('invitedCreatives.*.mainCategory.subCategories.*.tags.*.tag')
+    .isMongoId()
+    .withMessage('invitedCreatives'),
+  body('invitedCreatives.*.mainCategory.relatedCategory')
+    .optional()
+    .isObject()
+    .withMessage('invitedCreatives'),
+  body('invitedCreatives.*.mainCategory.relatedCategory.category')
+    .optional()
+    .isMongoId()
+    .withMessage('invitedCreatives'),
+  body('invitedCreatives.*.mainCategory.relatedCategory.subCategories')
+    .optional()
+    .isObject()
+    .withMessage('invitedCreatives'),
+  body('invitedCreatives.*.mainCategory.relatedCategory.subCategories.*.subCategory')
+    .optional()
+    .isMongoId()
+    .withMessage('invitedCreatives'),
+  body('invitedCreatives.*.mainCategory.relatedCategory.subCategories.*.tags')
+    .optional()
+    .isArray()
+    .withMessage('invitedCreatives'),
+  body('invitedCreatives.*.mainCategory.relatedCategory.subCategories.*.tags.*.tag')
+    .optional()
+    .isMongoId()
+    .withMessage('invitedCreatives'),
+
   body('functions').optional().isArray({ min: 1 }).withMessage('functions'),
   body('functions.*').isObject().withMessage('functions'),
   body('functions.*.name').isString().exists().withMessage('functions'),

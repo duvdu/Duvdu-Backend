@@ -2,6 +2,7 @@ import { globalValidatorMiddleware } from '@duvdu-v1/duvdu';
 import { body } from 'express-validator';
 
 export const updateProfileVal = [
+  body('email').optional().isEmail().withMessage('emailInvalid'),
   body('name')
     .optional()
     .isString()

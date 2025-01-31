@@ -15,9 +15,9 @@ import {
   Users,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
-import { inviteCreatives } from '../../services/inviteCreative.service';
+import { inviteCreatives, validateCreative } from '../../services/inviteCreative.service';
 import { sendNotification } from '../book/sendNotification';
 
 interface ProjectRequestBody
@@ -44,7 +44,17 @@ interface ProjectRequestBody
   > {
   subCategoryId: string;
   tagsId: string[];
-  invitedCreatives: { number: string }[];
+  invitedCreatives: {
+    number: string;
+    mainCategory: {
+      category: Types.ObjectId;
+      subCategories: { subCategory: Types.ObjectId; tags: Types.ObjectId[] };
+      relatedCategory: {
+        category: Types.ObjectId;
+        subCategories: { subCategory: Types.ObjectId; tags: Types.ObjectId[] };
+      };
+    };
+  }[];
 }
 
 export const createProjectHandler: RequestHandler<
@@ -110,24 +120,13 @@ export const createProjectHandler: RequestHandler<
 
     // Validate creatives if present
     if (req.body.creatives) {
-      const creativeCount = await Users.countDocuments({
-        _id: { $in: req.body.creatives.map((el) => el.creative) },
-      });
-
-      if (creativeCount !== req.body.creatives.length) {
-        return next(
-          new BadRequestError(
-            { en: 'Invalid creatives', ar: 'مستخدمو المحتويات الإبداعية غير صالحين' },
-            req.lang,
-          ),
-        );
-      }
+      await validateCreative(req.body.creatives as any, req.lang);
     }
 
     // Handle invited creatives
     let invitedCreative: any = [];
     if (req.body.invitedCreatives) {
-      invitedCreative = (await inviteCreatives(req.body.invitedCreatives)) || [];
+      invitedCreative = (await inviteCreatives(req.body.invitedCreatives, req.lang)) || [];
     }
 
     // Initialize S3 bucket and handle file uploads

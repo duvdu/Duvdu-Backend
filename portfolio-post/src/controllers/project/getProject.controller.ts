@@ -67,7 +67,11 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
                 {
                   _id: '$creativeDetails._id',
                   profileImage: {
-                    $concat: [process.env.BUCKET_HOST, '/', { $trim: { input: '$creativeDetails.profileImage' } }],
+                    $concat: [
+                      process.env.BUCKET_HOST,
+                      '/',
+                      { $trim: { input: '$creativeDetails.profileImage' } },
+                    ],
                   },
                   isOnline: '$creativeDetails.isOnline',
                   username: '$creativeDetails.username',
@@ -75,7 +79,11 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
                   rank: '$creativeDetails.rank',
                   projectsView: '$creativeDetails.projectsView',
                   coverImage: {
-                    $concat: [process.env.BUCKET_HOST, '/', { $trim: { input: '$creativeDetails.coverImage' } }],
+                    $concat: [
+                      process.env.BUCKET_HOST,
+                      '/',
+                      { $trim: { input: '$creativeDetails.coverImage' } },
+                    ],
                   },
                   acceptedProjectsCounter: '$creativeDetails.acceptedProjectsCounter',
                   rate: '$creativeDetails.rate',
@@ -152,13 +160,17 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
           _id: 1,
           user: {
             _id: '$user._id',
-            profileImage: { $concat: [process.env.BUCKET_HOST, '/', { $trim: { input: '$user.profileImage' } }] },
+            profileImage: {
+              $concat: [process.env.BUCKET_HOST, '/', { $trim: { input: '$user.profileImage' } }],
+            },
             isOnline: '$user.isOnline',
             username: '$user.username',
             name: '$user.name',
             rank: '$user.rank',
             projectsView: '$user.projectsView',
-            coverImage: { $concat: [process.env.BUCKET_HOST, '/', { $trim: { input: '$user.coverImage' } }] },
+            coverImage: {
+              $concat: [process.env.BUCKET_HOST, '/', { $trim: { input: '$user.coverImage' } }],
+            },
             acceptedProjectsCounter: '$user.acceptedProjectsCounter',
             rate: '$user.rate',
             profileViews: '$user.profileViews',
@@ -195,12 +207,14 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
             },
           },
           cover: { $concat: [process.env.BUCKET_HOST, '/', { $trim: { input: '$cover' } }] },
-          audioCover: { 
+          audioCover: {
             $cond: {
               if: { $eq: ['$audioCover', null] },
               then: null,
-              else: { $concat: [process.env.BUCKET_HOST, '/', { $trim: { input: '$audioCover' } }] }
-            }
+              else: {
+                $concat: [process.env.BUCKET_HOST, '/', { $trim: { input: '$audioCover' } }],
+              },
+            },
           },
           attachments: {
             $map: {
@@ -271,7 +285,13 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
                                     $cond: {
                                       if: { $eq: ['$$categoryData.image', null] },
                                       then: null,
-                                      else: { $concat: [process.env.BUCKET_HOST, '/', '$$categoryData.image'] },
+                                      else: {
+                                        $concat: [
+                                          process.env.BUCKET_HOST,
+                                          '/',
+                                          '$$categoryData.image',
+                                        ],
+                                      },
                                     },
                                   },
                                   subCategories: {
@@ -287,8 +307,15 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
                                                   $arrayElemAt: [
                                                     {
                                                       $filter: {
-                                                        input: { $ifNull: ['$$categoryData.subCategories', []] },
-                                                        cond: { $eq: ['$$this._id', '$$sub.subCategory'] },
+                                                        input: {
+                                                          $ifNull: [
+                                                            '$$categoryData.subCategories',
+                                                            [],
+                                                          ],
+                                                        },
+                                                        cond: {
+                                                          $eq: ['$$this._id', '$$sub.subCategory'],
+                                                        },
                                                       },
                                                     },
                                                     0,
@@ -315,8 +342,18 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
                                                                     $arrayElemAt: [
                                                                       {
                                                                         $filter: {
-                                                                          input: { $ifNull: ['$$subCatData.tags', []] },
-                                                                          cond: { $eq: ['$$this._id', '$$tagItem.tag'] },
+                                                                          input: {
+                                                                            $ifNull: [
+                                                                              '$$subCatData.tags',
+                                                                              [],
+                                                                            ],
+                                                                          },
+                                                                          cond: {
+                                                                            $eq: [
+                                                                              '$$this._id',
+                                                                              '$$tagItem.tag',
+                                                                            ],
+                                                                          },
                                                                         },
                                                                       },
                                                                       0,
@@ -325,11 +362,15 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
                                                                 },
                                                                 in: {
                                                                   $cond: {
-                                                                    if: { $eq: ['$$tagData', null] },
+                                                                    if: {
+                                                                      $eq: ['$$tagData', null],
+                                                                    },
                                                                     then: null,
                                                                     else: {
                                                                       _id: '$$tagItem.tag',
-                                                                      title: '$$tagItem.title.' + req.lang,
+                                                                      title:
+                                                                        '$$tagItem.title.' +
+                                                                        req.lang,
                                                                     },
                                                                   },
                                                                 },
@@ -389,7 +430,7 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
         status: { $nin: ['canceled', 'pending', 'rejected', 'reject', 'cancel'] },
       },
     }));
-    
+
     projects[0].user.canChat = canChat;
 
     // increment the user projects view count

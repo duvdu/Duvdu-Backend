@@ -26,6 +26,7 @@ export const updateProfileHandler: RequestHandler<
       | 'name'
       | 'coverImage'
       | 'profileImage'
+      | 'email'
     >
   >,
   unknown

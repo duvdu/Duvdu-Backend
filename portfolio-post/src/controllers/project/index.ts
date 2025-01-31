@@ -7,3 +7,4 @@ export * from './getProjectAnalysis.controller';
 export * from './getProjectsForCrm.controllers';
 export * from './invitationAction.controller';
 export * from './getUserInvitation.controller';
+export * from './getUserTaggedProjects.controller';

@@ -60,7 +60,10 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
     }
 
     // increment the user contracts count
-    const updatedUser = await Users.findOneAndUpdate({ _id: contract.sp }, { $inc: { avaliableContracts: -1 } });
+    const updatedUser = await Users.findOneAndUpdate(
+      { _id: contract.sp },
+      { $inc: { avaliableContracts: -1 } },
+    );
 
     await ProjectContract.updateOne(
       { paymentLink: req.params.paymentSession },
