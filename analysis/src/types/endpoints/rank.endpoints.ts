@@ -1,11 +1,4 @@
-import {
-  Irank,
-  PaginationResponse,
-  SuccessResponse,
-  IjwtPayload,
-  Ipagination,
-} from '@duvdu-v1/duvdu';
-import { RequestHandler } from 'express';
+import { IjwtPayload, Ipagination } from '@duvdu-v1/duvdu';
 
 /* eslint-disable @typescript-eslint/no-namespace */
 
@@ -25,28 +18,3 @@ declare global {
     }
   }
 }
-
-export interface CreateRankHandler
-  extends RequestHandler<
-    unknown,
-    SuccessResponse<{ data: Irank }>,
-    Pick<Irank, 'actionCount' | 'rank' | 'color'>,
-    unknown
-  > {}
-
-export interface UpdateRankHandler
-  extends RequestHandler<
-    { rankId: string },
-    SuccessResponse<{ data: Irank }>,
-    Partial<Pick<Irank, 'actionCount' | 'rank' | 'color'>>,
-    unknown
-  > {}
-
-export interface GetRankHandler
-  extends RequestHandler<{ rankId: string }, SuccessResponse<{ data: Irank }>, unknown, unknown> {}
-
-export interface GetRanksHandler
-  extends RequestHandler<unknown, PaginationResponse<{ data: Irank[] }>, unknown, unknown> {}
-
-export interface DeleteRankHandler
-  extends RequestHandler<{ rankId: string }, SuccessResponse, unknown, unknown> {}

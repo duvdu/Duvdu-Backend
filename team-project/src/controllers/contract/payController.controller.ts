@@ -1,12 +1,16 @@
 import {
   BadRequestError,
+  Channels,
   NotAllowedError,
   NotFound,
   SuccessResponse,
   TeamContract,
   TeamContractStatus,
+  Users,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
+
+import { sendNotification } from '../project/sendNotification';
 
 export const payContract: RequestHandler<{ paymentSession: string }, SuccessResponse> = async (
   req,
@@ -48,6 +52,32 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
         req.lang,
       ),
     );
+
+  // increment the user contracts count
+  const updatedUser = await Users.findOneAndUpdate({ _id: contract.sp }, { $inc: { avaliableContracts: -1 } });
+  const user = await Users.findById(contract.customer);
+
+  // send notification to the service provider
+  await Promise.all([
+    sendNotification(
+      req.loggedUser.id,
+      contract.sp.toString(),
+      contract._id.toString(),
+      'contract',
+      'available contracts',
+      `${user?.name} your available contracts is ${updatedUser?.avaliableContracts}`,
+      Channels.update_contract,
+    ),
+    sendNotification(
+      req.loggedUser.id,
+      contract.sp.toString(),
+      contract._id.toString(),
+      'contract',
+      'team contract updates',
+      `${user?.name} paid 10% of the amount`,
+      Channels.update_contract,
+    ),
+  ]);
 
   //  TODO: ongoing expiration
 

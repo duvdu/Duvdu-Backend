@@ -1,5 +1,7 @@
-import { addToDate, BadRequestError, NotFound, SuccessResponse, CopyrightContracts, CopyrightContractStatus } from '@duvdu-v1/duvdu';
+import { addToDate, BadRequestError, NotFound, SuccessResponse, CopyrightContracts, CopyrightContractStatus, Channels, Users } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
+
+import { sendNotification } from './contract-notification.controller';
 
 // import { contractNotification } from './contract-notification.controller';
 
@@ -45,11 +47,28 @@ export const updateContractHandler: RequestHandler<
 
   await CopyrightContracts.updateOne({ _id: req.params.contractId }, req.body);
 
-  // await contractNotification(
-  //   contract.id,
-  //   contract.sp.toString(),
-  //   `copyright contract, customer updated the contract, please take action within ${contract.stageExpiration}h or ask customer for another update`,
-  // );
+  const user = await Users.findOne({ _id: req.loggedUser.id });
+
+  await Promise.all([
+    sendNotification(
+      req.loggedUser.id,
+      contract.sp.toString(),
+      contract._id.toString(),
+      'contract',
+      'copyright contract updates',
+      `${user?.name} updated the contract`,
+      Channels.update_contract,
+    ),
+    sendNotification(
+      req.loggedUser.id,
+      contract.customer.toString(),
+      contract._id.toString(),
+      'contract',
+      'copyright contract updates',
+      `${user?.name} updated the contract`,
+      Channels.update_contract,
+    ),
+  ]);
   res.status(200).json({ message: 'success' });
 };
 

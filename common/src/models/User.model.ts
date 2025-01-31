@@ -32,7 +32,6 @@ const userSchema = new Schema<Iuser>(
     },
     categories: [{ type: Schema.Types.ObjectId, ref: MODELS.category, default: null }],
     acceptedProjectsCounter: { type: Number, default: 0 },
-    profileViews: { type: Number, default: 0 },
     about: { type: String, default: null },
     isOnline: { type: Boolean, default: false },
     isAvaliableToInstantProjects: { type: Boolean, default: false },
@@ -58,6 +57,7 @@ const userSchema = new Schema<Iuser>(
       nextRankTitle: { type: String, default: null },
       color: { type: String, default: null },
     },
+    profileViews: { type: Number, default: 0 },
     projectsView: { type: Number, default: 0 },
     haveInvitation: { type: Boolean, default: false },
     faceRecognition: { type: String, default: null },
@@ -74,7 +74,7 @@ const userSchema = new Schema<Iuser>(
           ret.faceRecognition = process.env.BUCKET_HOST + '/' + ret.faceRecognition;
       },
     },
-  },
+  }
 )
   .index({ name: 'text' })
   .index({ location: '2dsphere' });

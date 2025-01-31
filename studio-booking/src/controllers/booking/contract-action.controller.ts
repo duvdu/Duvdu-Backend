@@ -86,7 +86,6 @@ export const contractAction: RequestHandler<
           ),
         );
 
-      await Users.updateOne({ _id: req.loggedUser.id }, { $inc: { avaliableContracts: -1 } });
       // update project state to await payment
       // create payment link and send it to customer
       const paymentSession = crypto.randomBytes(16).toString('hex');

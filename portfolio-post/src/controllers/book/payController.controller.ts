@@ -59,6 +59,9 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
       );
     }
 
+    // increment the user contracts count
+    const updatedUser = await Users.findOneAndUpdate({ _id: contract.sp }, { $inc: { avaliableContracts: -1 } });
+
     await ProjectContract.updateOne(
       { paymentLink: req.params.paymentSession },
       {
@@ -70,6 +73,15 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
     );
 
     await Promise.all([
+      sendNotification(
+        req.loggedUser.id,
+        contract.sp.toString(),
+        contract._id.toString(),
+        'contract',
+        'available contracts',
+        `${user?.name} your available contracts is ${updatedUser?.avaliableContracts}`,
+        Channels.update_contract,
+      ),
       sendNotification(
         req.loggedUser.id,
         contract.sp.toString(),

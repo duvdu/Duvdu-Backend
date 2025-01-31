@@ -4,7 +4,6 @@ import {
   IcopyRights,
   MODELS,
   Categories,
-  Users,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import mongoose, { PipelineStage } from 'mongoose';
@@ -136,7 +135,6 @@ export const getProjectsHandler: RequestHandler<
   const countResult = await CopyRights.aggregate(countPipeline);
   const resultCount = countResult.length > 0 ? countResult[0].totalCount : 0;
 
-  const currentUser = await Users.findById(req.loggedUser?.id, { location: 1 });
   const pipelines: PipelineStage[] = [];
 
   // // Add $geoNear if user location exists

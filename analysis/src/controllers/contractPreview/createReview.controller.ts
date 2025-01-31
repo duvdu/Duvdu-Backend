@@ -6,6 +6,7 @@ import {
   Contracts,
   NotAllowedError,
   NotFound,
+  Users,
 } from '@duvdu-v1/duvdu';
 
 import { CreateReviewHandler } from '../../types/endpoints/contractReview.endpoints';
@@ -42,5 +43,45 @@ export const createReviewHandler: CreateReviewHandler = async (req, res, next) =
     customer: req.loggedUser.id,
   });
 
+  await updateUserRate(contract.sp.toString(), req.body.rate, true, req.lang);
+
   res.status(201).json({ message: 'success', data: newReview });
 };
+
+
+export async function updateUserRate(
+  userId: string,
+  rateChange: number,
+  isAdd: boolean = true,
+  lang: string,
+) {
+  const user = await Users.findById(userId);
+  if (!user) throw new NotFound({ en: 'user not found', ar: 'لم يتم العثور على المستخدم' }, lang);
+
+  const currentRaters = user.rate.ratersCounter;
+  const currentTotalRates = user.rate.totalRates;
+  
+  let newAverage: number;
+  const ratersDelta = isAdd ? 1 : -1;
+  const projectsDelta = isAdd ? 1 : -1;
+
+  if (isAdd) {
+    // Adding a new review
+    newAverage = ((currentTotalRates * currentRaters) + rateChange) / (currentRaters + 1);
+  } else {
+    // Removing a review
+    newAverage = currentRaters > 1
+      ? ((currentTotalRates * currentRaters) - rateChange) / (currentRaters - 1)
+      : 0;
+  }
+
+  await Users.findByIdAndUpdate(userId, {
+    $inc: {
+      acceptedProjectsCounter: projectsDelta,
+      'rate.ratersCounter': ratersDelta,
+    },
+    $set: {
+      'rate.totalRates': Number(newAverage.toFixed(1)),
+    }
+  });
+}

@@ -69,9 +69,10 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
       );
     }
 
-    await Users.findByIdAndUpdate(user?._id, {
+    const updatedUser = await Users.findByIdAndUpdate(user?._id, {
       $inc: { avaliableContracts: -1 },
     });
+    
 
     await CopyrightContracts.updateOne(
       { _id: contract._id },
@@ -94,6 +95,16 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
     // );
 
     await Promise.all([
+      // send notification to the service provider
+      sendNotification(
+        req.loggedUser.id,
+        contract.sp.toString(),
+        contract._id.toString(),
+        'contract',
+        'available contracts',
+        `${user?.name} your available contracts is ${updatedUser?.avaliableContracts}`,
+        Channels.update_contract,
+      ),
       sendNotification(
         req.loggedUser.id,
         contract.sp.toString(),

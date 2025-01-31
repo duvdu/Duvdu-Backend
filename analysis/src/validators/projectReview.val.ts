@@ -37,8 +37,4 @@ export const getAll = [
   globalValidatorMiddleware,
 ];
 
-
-export const globalSearch = [
-  query('search').isString().exists(),
-  globalValidatorMiddleware
-];
+export const globalSearch = [query('search').isString().exists(), globalValidatorMiddleware];

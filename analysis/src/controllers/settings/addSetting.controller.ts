@@ -5,7 +5,6 @@ import { NotFound, Setting } from '@duvdu-v1/duvdu';
 import { AddSettingHandler } from '../../types/endpoints/setting.endpoint';
 
 export const addSettingHandler: AddSettingHandler = async (req, res, next) => {
-  
   const setting = await Setting.findByIdAndUpdate(
     req.params.settingId,
     { $push: { expirationTime: { time: req.body.time } } },

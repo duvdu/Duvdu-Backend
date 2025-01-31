@@ -15,7 +15,7 @@ export const create = [
       return true;
     }),
   body('tags.*').isMongoId(),
-  body('title').isString().bail().trim().isLength({ min: 5 }),
+  body('title').isString().bail().trim(),
   body('phoneNumber').isMobilePhone(['ar-EG']),
   body('email').isEmail(),
   body('description').isString().bail().trim(),
@@ -53,7 +53,7 @@ export const create = [
 
 export const update = [
   param('projectId').isMongoId(),
-  body('title').optional().isString().bail().trim().isLength({ min: 5 }),
+  body('title').optional().isString().bail().trim(),
   body('phoneNumber').optional().isMobilePhone(['ar-EG']),
   body('email').optional().isEmail(),
   body('description').optional().isString().bail().trim(),

@@ -1,4 +1,4 @@
-import { incrementProjectsView, MODELS, NotFound, Rentals, Contracts } from '@duvdu-v1/duvdu';
+import { incrementProjectsView, MODELS, NotFound, Rentals, Contracts, Users } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import { Types } from 'mongoose';
 
@@ -171,6 +171,10 @@ export const getProjectHandler: RequestHandler = async (req, res, next) => {
   );
   
   project.user.canChat = canChat;
+
+  // increment the user projects view count
+  await Users.updateOne({ _id: project.user._id }, { $inc: { projectsView: 1 } });
+
   res.status(200).json({
     message: 'success',
     data: project,

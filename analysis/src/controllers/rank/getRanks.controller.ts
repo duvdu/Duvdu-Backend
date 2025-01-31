@@ -1,9 +1,7 @@
 import 'express-async-errors';
 
-import { Rank } from '@duvdu-v1/duvdu';
+import { Irank, PaginationResponse, Rank } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
-
-import { GetRanksHandler } from '../../types/endpoints/rank.endpoints';
 
 export const getRanksPagination: RequestHandler<
   unknown,
@@ -12,6 +10,10 @@ export const getRanksPagination: RequestHandler<
   {
     actionCountFrom?: number;
     actionCountTo?: number;
+    projectsCountFrom?: number;
+    projectsCountTo?: number;
+    projectsLikedFrom?: number;
+    projectsLikedTo?: number;
     rank?: string;
     startDate?: Date;
     endDate?: Date;
@@ -26,6 +28,26 @@ export const getRanksPagination: RequestHandler<
     }
     if (req.query.actionCountTo) {
       req.pagination.filter.actionCount.$lte = req.query.actionCountTo;
+    }
+  }
+
+  if (req.query.projectsCountFrom || req.query.projectsCountTo) {
+    req.pagination.filter.projectsCount = {};
+    if (req.query.projectsCountFrom) {
+      req.pagination.filter.projectsCount.$gte = req.query.projectsCountFrom;
+    }
+    if (req.query.projectsCountTo) {
+      req.pagination.filter.projectsCount.$lte = req.query.projectsCountTo;
+    }
+  }
+
+  if (req.query.projectsLikedFrom || req.query.projectsLikedTo) {
+    req.pagination.filter.projectsLiked = {};
+    if (req.query.projectsLikedFrom) {
+      req.pagination.filter.projectsLiked.$gte = req.query.projectsLikedFrom;
+    }
+    if (req.query.projectsLikedTo) {
+      req.pagination.filter.projectsLiked.$lte = req.query.projectsLikedTo;
     }
   }
 
@@ -46,7 +68,12 @@ export const getRanksPagination: RequestHandler<
   next();
 };
 
-export const getRanksHandler: GetRanksHandler = async (req, res) => {
+export const getRanksHandler: RequestHandler<
+  unknown,
+  PaginationResponse<{ data: Irank[] }>,
+  unknown,
+  unknown
+> = async (req, res) => {
   const ranks = await Rank.find(req.pagination.filter)
     .skip(req.pagination.skip)
     .limit(req.pagination.limit);

@@ -75,7 +75,6 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
           ),
         );
 
-      await Users.updateOne({ _id: req.loggedUser.id }, { $inc: { avaliableContracts: -1 } });
       const paymentSession = crypto.randomBytes(16).toString('hex');
       await ProjectContract.updateOne(
         { _id: req.params.contractId },
@@ -120,6 +119,17 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
       await ProjectContract.updateOne(
         { _id: req.params.contractId },
         { status: ProjectContractStatus.rejected, rejectedBy: 'sp', actionAt: new Date() },
+      );
+
+      const user = await Users.findOneAndUpdate({ _id: req.loggedUser.id }, { $inc: { avaliableContracts: 1 } });
+      await sendNotification(
+        req.loggedUser.id,
+        contract.sp.toString(),
+        contract._id.toString(),
+        'contract',
+        'available contracts',
+        `${user?.name} available contracts is ${user?.avaliableContracts}`,
+        Channels.update_contract,
       );
 
       // send notification from sp

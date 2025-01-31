@@ -1,10 +1,17 @@
 import 'express-async-errors';
 
-import { Rank } from '@duvdu-v1/duvdu';
+import { Irank, Rank, SuccessResponse } from '@duvdu-v1/duvdu';
+import { RequestHandler } from 'express';
 
-import { CreateRankHandler } from '../../types/endpoints/rank.endpoints';
-
-export const createRankHandler: CreateRankHandler = async (req, res) => {
+export const createRankHandler: RequestHandler<
+  unknown,
+  SuccessResponse<{ data: Irank }>,
+  Pick<
+    Irank,
+    'actionCount' | 'rank' | 'color' | 'projectsLiked' | 'projectsCount'
+  >,
+  unknown
+> = async (req, res) => {
   const rank = await Rank.create(req.body);
   res.status(201).json({ message: 'success', data: rank });
 };

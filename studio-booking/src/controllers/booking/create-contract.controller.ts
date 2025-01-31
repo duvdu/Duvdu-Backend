@@ -64,11 +64,11 @@ export const createContractHandler: RequestHandler<
     }
   }
 
-  const deadline: Date = addToDate(
+  const deadline = addToDate(
     new Date(req.body.startDate),
     project.projectScale.unit,
     req.body.projectScale.numberOfUnits,
-  );
+  ).toISOString();
   
   const stageExpiration = await getStageExpiration(
     new Date(req.body.startDate).toString(),

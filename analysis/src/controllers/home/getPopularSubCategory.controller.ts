@@ -33,15 +33,14 @@ export const getPopularSubCategoriesHandler: GetPopularSubCategoriesHandler = as
             input: '$subCategories.tags',
             as: 'tag',
             in: {
-              name:{
+              name: {
                 $cond: {
                   if: { $eq: ['ar', req.lang] },
                   then: '$$tag.ar',
                   else: '$$tag.en',
                 },
               },
-              _id:'$$tag._id'
-             
+              _id: '$$tag._id',
             },
           },
         },

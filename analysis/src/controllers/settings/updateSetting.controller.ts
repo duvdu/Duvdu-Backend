@@ -3,7 +3,6 @@ import 'express-async-errors';
 import { Isetting, NotFound, Setting } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-
 export const updateSettingHandler: RequestHandler<
   { settingId: string },
   unknown,

@@ -8,7 +8,6 @@ const start = async () => {
   await redisConnection('', ' ');
   await dbConnection(env.mongoDb.uri);
   app.listen(3000, () => {
-    
     console.log('app listen on port 3000');
   });
 };

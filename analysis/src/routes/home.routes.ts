@@ -10,4 +10,4 @@ router.get('/discovertags', handler.getDiscoverTagsHandler);
 router.get('/popularsubcategory', handler.getPopularSubCategoriesHandler);
 router.get('/minutes-per-visit', handler.getMinutesPerVisitByDayAndLocation);
 router.get('/projects', handler.getTopProjectsViewsHandler);
-router.get('/search'  , optionalAuthenticated, globalSearch , handler.globalSearchHandler);
+router.get('/search', optionalAuthenticated, globalSearch, handler.globalSearchHandler);

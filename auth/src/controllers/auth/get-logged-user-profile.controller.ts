@@ -1,11 +1,9 @@
 import { MODELS, UnauthenticatedError, Users } from '@duvdu-v1/duvdu';
 import mongoose from 'mongoose';
 
-import { updateRankForUser } from '../../services/rank.service';
 import { GetLoggedUserProfileHandler } from '../../types/endpoints/user.endpoints';
 
 export const getLoggedUserProfileHandler: GetLoggedUserProfileHandler = async (req, res, next) => {
-  await updateRankForUser(req.loggedUser.id, req.lang);
 
   const user = await Users.aggregate([
     { $match: { _id: new mongoose.Types.ObjectId(req.loggedUser.id) } },

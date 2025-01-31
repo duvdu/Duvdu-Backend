@@ -1,5 +1,5 @@
 import 'express-async-errors';
-import { SuccessResponse, Favourites } from '@duvdu-v1/duvdu';
+import { SuccessResponse, Favourites, Users } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import mongoose, { PipelineStage } from 'mongoose';
 
@@ -12,8 +12,12 @@ export const addToFavourite: RequestHandler<
     project: req.params.projectId,
     user: req.loggedUser.id,
   });
-  res.json({ message: 'success', data: post });
 
+  await Users.findByIdAndUpdate(req.loggedUser.id, {
+    $inc: { likes: 1 },
+  });
+
+  res.json({ message: 'success', data: post });
 };
 
 export const removeFromFavourite: RequestHandler<
@@ -24,6 +28,11 @@ export const removeFromFavourite: RequestHandler<
     project: req.params.projectId,
     user: req.loggedUser.id,
   });
+
+  await Users.findOneAndUpdate({_id:req.loggedUser.id , likes: {$gt: 0}}, {
+    $inc: { likes: -1 },
+  });
+
   res.json({ message: 'success', data: post });
 };
 

@@ -5,7 +5,6 @@ import { MODELS } from '../types/model-names';
 export interface Irank {
   actionCount: number;
   rank: string;
-  favoriteCount: number;
   projectsLiked: number;
   projectsCount: number;
   color: string;

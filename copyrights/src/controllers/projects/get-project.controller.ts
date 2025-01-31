@@ -1,4 +1,4 @@
-import { SuccessResponse, CopyRights, IcopyRights, NotFound, Icategory } from '@duvdu-v1/duvdu';
+import { SuccessResponse, CopyRights, IcopyRights, NotFound, Icategory, Users } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 export const getProjectHandler: RequestHandler<
@@ -29,6 +29,7 @@ export const getProjectHandler: RequestHandler<
       },
     ])
     .lean();
+
   if (!project)
     return next(new NotFound({ en: 'project not found', ar: 'المشروع غير موجود' }, req.lang));
   const localizedTags = project.tags.map((tag) => tag[req.lang]) as string[];
@@ -51,6 +52,8 @@ export const getProjectHandler: RequestHandler<
     lng: (project.location as any).coordinates?.[0],
     lat: (project.location as any).coordinates?.[1],
   };
+
+  await Users.updateOne({ _id: project.user._id }, { $inc: { projectsView: 1 } });
 
   res.status(200).json(<any>{ message: 'success', data: project });
 };

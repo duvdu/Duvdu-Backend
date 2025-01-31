@@ -8,23 +8,25 @@ export const globalSearchHandler: RequestHandler<
   unknown,
   SuccessResponse,
   unknown,
-  {search:string}
+  { search: string }
 > = async (req, res) => {
-  const searchKeyword = req.query.search || '';  
-  
+  const searchKeyword = req.query.search || '';
 
   const category = await Categories.aggregate([
-    { $match: {$or:[
-      { 'title.ar': { $regex: searchKeyword, $options: 'i' } }, 
-      { 'title.en': { $regex: searchKeyword, $options: 'i' } }, 
-      { 'jobTitles.ar': { $regex: searchKeyword, $options: 'i' } }, 
-      { 'jobTitles.en': { $regex: searchKeyword, $options: 'i' } }, 
-      { 'subCategories.title.ar': { $regex: searchKeyword, $options: 'i' } }, 
-      { 'subCategories.title.en': { $regex: searchKeyword, $options: 'i' } }, 
-      { 'tags.ar': { $regex: searchKeyword, $options: 'i' } }, 
-      { 'tags.en': { $regex: searchKeyword, $options: 'i' } }, 
-      { 'cycle': { $regex: searchKeyword, $options: 'i' } },
-    ]} 
+    {
+      $match: {
+        $or: [
+          { 'title.ar': { $regex: searchKeyword, $options: 'i' } },
+          { 'title.en': { $regex: searchKeyword, $options: 'i' } },
+          { 'jobTitles.ar': { $regex: searchKeyword, $options: 'i' } },
+          { 'jobTitles.en': { $regex: searchKeyword, $options: 'i' } },
+          { 'subCategories.title.ar': { $regex: searchKeyword, $options: 'i' } },
+          { 'subCategories.title.en': { $regex: searchKeyword, $options: 'i' } },
+          { 'tags.ar': { $regex: searchKeyword, $options: 'i' } },
+          { 'tags.en': { $regex: searchKeyword, $options: 'i' } },
+          { cycle: { $regex: searchKeyword, $options: 'i' } },
+        ],
+      },
     },
     {
       $lookup: {
@@ -121,14 +123,13 @@ export const globalSearchHandler: RequestHandler<
     },
   ]);
 
-
   const aggregationPipeline = [
     {
       $match: {
         $or: [
-          { name: { $regex: searchKeyword, $options: 'i' } }, 
-          { about: { $regex: searchKeyword, $options: 'i' } },      
-          { username: { $regex: searchKeyword, $options: 'i' } },  
+          { name: { $regex: searchKeyword, $options: 'i' } },
+          { about: { $regex: searchKeyword, $options: 'i' } },
+          { username: { $regex: searchKeyword, $options: 'i' } },
         ],
       },
     },
@@ -236,23 +237,22 @@ export const globalSearchHandler: RequestHandler<
       $project: {
         canChatDetails: 0, // Exclude the canChatDetails field
       },
-    }
+    },
   ] as PipelineStage[];
   const users = await Users.aggregate(aggregationPipeline);
-
 
   const projects = await ProjectCycle.aggregate([
     {
       $match: {
-        isDeleted: false, 
+        isDeleted: false,
         $or: [
-          { name: { $regex: searchKeyword, $options: 'i' } }, 
-          { description: { $regex: searchKeyword, $options: 'i' } }, 
-          { searchKeyWords: { $regex: searchKeyword, $options: 'i' } }, 
-          { 'subCategory.ar': { $regex: searchKeyword, $options: 'i' } }, 
-          { 'subCategory.en': { $regex: searchKeyword, $options: 'i' } }, 
-          { 'tags.ar': { $regex: searchKeyword, $options: 'i' } }, 
-          { 'tags.en': { $regex: searchKeyword, $options: 'i' } }, 
+          { name: { $regex: searchKeyword, $options: 'i' } },
+          { description: { $regex: searchKeyword, $options: 'i' } },
+          { searchKeyWords: { $regex: searchKeyword, $options: 'i' } },
+          { 'subCategory.ar': { $regex: searchKeyword, $options: 'i' } },
+          { 'subCategory.en': { $regex: searchKeyword, $options: 'i' } },
+          { 'tags.ar': { $regex: searchKeyword, $options: 'i' } },
+          { 'tags.en': { $regex: searchKeyword, $options: 'i' } },
         ],
       },
     },
@@ -481,26 +481,28 @@ export const globalSearchHandler: RequestHandler<
   const rentals = await Rentals.aggregate([
     {
       $match: {
-        isDeleted: false, 
+        isDeleted: false,
         $or: [
-          { name: { $regex: searchKeyword, $options: 'i' } }, 
-          { description: { $regex: searchKeyword, $options: 'i' } }, 
-          { searchKeyWords: { $regex: searchKeyword, $options: 'i' } }, 
-          { 'subCategory.ar': { $regex: searchKeyword, $options: 'i' } }, 
-          { 'subCategory.en': { $regex: searchKeyword, $options: 'i' } }, 
-          { 'tags.ar': { $regex: searchKeyword, $options: 'i' } }, 
-          { 'tags.en': { $regex: searchKeyword, $options: 'i' } }, 
+          { name: { $regex: searchKeyword, $options: 'i' } },
+          { description: { $regex: searchKeyword, $options: 'i' } },
+          { searchKeyWords: { $regex: searchKeyword, $options: 'i' } },
+          { 'subCategory.ar': { $regex: searchKeyword, $options: 'i' } },
+          { 'subCategory.en': { $regex: searchKeyword, $options: 'i' } },
+          { 'tags.ar': { $regex: searchKeyword, $options: 'i' } },
+          { 'tags.en': { $regex: searchKeyword, $options: 'i' } },
         ],
       },
     },
     ...pipelines,
   ]);
 
-
-  res.status(200).json(<any>{message:'success' , data:{
-    users,
-    rentals,
-    projects,
-    category
-  }});
+  res.status(200).json(<any>{
+    message: 'success',
+    data: {
+      users,
+      rentals,
+      projects,
+      category,
+    },
+  });
 };

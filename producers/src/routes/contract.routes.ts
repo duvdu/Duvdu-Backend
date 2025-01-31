@@ -1,5 +1,4 @@
 import {
-  checkRequiredFields,
   FOLDERS,
   globalPaginationMiddleware,
   globalUploadMiddleware,
@@ -21,7 +20,6 @@ router
       fileTypes: ['image/*', 'application/*', 'video/*'],
     }).fields([{ name: 'attachments', maxCount: 10 }]),
     val.createContractVal,
-    checkRequiredFields({ fields: ['attachments'] }),
     handler.createContractHandler,
   )
   .get(globalPaginationMiddleware, handler.getContractsPagination, handler.getContractsHandler);

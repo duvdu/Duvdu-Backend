@@ -57,5 +57,8 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
     }
   }
 
+  // increment the user projects view count
+  await Users.updateOne({ _id: projectObject.user._id }, { $inc: { projectsView: 1 } });
+
   res.status(200).json({ message: 'success', data: projectObject });
 };

@@ -26,7 +26,7 @@ export const createContractHandler: CreateContractHandler = async (req, res, nex
     // Run producer validation and file upload in parallel
     const [producer] = await Promise.all([
       Producer.findById(req.body.producer),
-      attachments?.length && new Bucket().saveBucketFiles(FOLDERS.producer, ...attachments)
+      (attachments && attachments.length > 0) && new Bucket().saveBucketFiles(FOLDERS.producer, ...attachments)
     ]);
 
     if (!producer) {
@@ -72,7 +72,7 @@ export const createContractHandler: CreateContractHandler = async (req, res, nex
       sp: producer.user,
     };
 
-    if (attachments?.length) {
+    if (attachments && attachments.length > 0) {
       contractData.attachments = attachments.map(
         (file) => `${FOLDERS.producer}/${file.filename}`
       );

@@ -2,15 +2,18 @@ import 'express-async-errors';
 
 import {
   BadRequestError,
+  Channels,
   IprojectContract,
   NotAllowedError,
   NotFound,
   ProjectContract,
   ProjectContractStatus,
   SuccessResponse,
+  Users,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
+import { sendNotification } from './sendNotification';
 import { calculateTotalPrice } from '../../services/checkToolsAndFunctions.service';
 
 export const updateContractHandler: RequestHandler<
@@ -75,6 +78,28 @@ export const updateContractHandler: RequestHandler<
     contract.projectScale.numberOfUnits;
   contract.secondPaymentAmount = contract.totalPrice - contract.firstPaymentAmount;
   await contract.save();
+
+  const user = await Users.findOne({ _id: req.loggedUser.id });
+  await Promise.all([
+    sendNotification(
+      req.loggedUser.id,
+      contract.sp.toString(),
+      contract._id.toString(),
+      'contract',
+      'copyright contract updates',
+      `${user?.name} updated the contract`,
+      Channels.update_contract,
+    ),
+    sendNotification(
+      req.loggedUser.id,
+      contract.customer.toString(),
+      contract._id.toString(),
+      'contract',
+      'copyright contract updates',
+      `${user?.name} updated the contract`,
+      Channels.update_contract,
+    ),
+  ]);
 
   res.status(200).json({ message: 'success', data: contract });
 };

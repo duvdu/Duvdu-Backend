@@ -52,6 +52,7 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
     user: req.loggedUser.id,
     isDeleted: { $ne: true },
   })
+    .sort({ createdAt: -1 })
     .skip(req.pagination.skip)
     .limit(req.pagination.limit)
     .populate([
