@@ -99,10 +99,10 @@ export const ProjectCycle = model<IprojectCycle>(
           mainCategory: {
             category: { type: Schema.Types.ObjectId, ref: MODELS.category },
             subCategories: [{ subCategory: { type: Schema.Types.ObjectId }, tags: [{ tag: { type: Schema.Types.ObjectId } }] }],
-          },
-          relatedCategory: {
-            category: { type: Schema.Types.ObjectId, ref: MODELS.category },
-            subCategories: [{ subCategory: { type: Schema.Types.ObjectId }, tags: [{ tag: { type: Schema.Types.ObjectId } }] }],
+            relatedCategory: {
+              category: { type: Schema.Types.ObjectId, ref: MODELS.category },
+              subCategories: [{ subCategory: { type: Schema.Types.ObjectId }, tags: [{ tag: { type: Schema.Types.ObjectId } }] }],
+            },
           },
         },
       ],
