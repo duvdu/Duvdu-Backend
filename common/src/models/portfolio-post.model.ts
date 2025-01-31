@@ -26,7 +26,7 @@ export interface IprojectCycle {
   tools: { name: string; unitPrice: number }[];
   functions: { name: string; unitPrice: number }[];
   creatives: {
-    creative: Types.ObjectId | Iuser;
+    creative: Types.ObjectId;
     inviteStatus: InviteStatus;
     mainCategory: {
       category: Types.ObjectId;
