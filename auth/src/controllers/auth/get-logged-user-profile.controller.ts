@@ -4,7 +4,6 @@ import mongoose from 'mongoose';
 import { GetLoggedUserProfileHandler } from '../../types/endpoints/user.endpoints';
 
 export const getLoggedUserProfileHandler: GetLoggedUserProfileHandler = async (req, res, next) => {
-
   const user = await Users.aggregate([
     { $match: { _id: new mongoose.Types.ObjectId(req.loggedUser.id) } },
     {

@@ -10,7 +10,7 @@ export const createOrUpdateSessionAndGenerateTokens = async (
   role: Irole,
   fcmToken: string | null,
 ): Promise<{ refreshToken: string; accessToken: string }> => {
-  const {deviceId} = generateUniqueDeviceId(headers);
+  const { deviceId } = generateUniqueDeviceId(headers);
 
   // Ensure user.refreshTokens and fcmTokens are initialized
   if (!user.refreshTokens) {

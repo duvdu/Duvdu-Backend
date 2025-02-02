@@ -1,4 +1,12 @@
-import { NotFound, SystemRoles, Roles, Users, VerificationReason, Sessions, Setting } from '@duvdu-v1/duvdu';
+import {
+  NotFound,
+  SystemRoles,
+  Roles,
+  Users,
+  VerificationReason,
+  Sessions,
+  Setting,
+} from '@duvdu-v1/duvdu';
 
 import { SignupHandler } from '../../types/endpoints/user.endpoints';
 import { hashPassword } from '../../utils/bcrypt';

@@ -75,11 +75,11 @@ export const getUserProfileHandler: GetUserProfileHandler = async (req, res, nex
       },
     },
   ]);
-  
+
   if (!user[0]) return next(new NotFound(undefined, req.lang));
   if (user[0].isBlocked.value === true)
     return next(new BadRequestError({ en: 'User is blocked: ', ar: 'المستخدم محظور: ' }, req.lang));
-  await Users.updateOne({ _id: user[0]._id }, { $inc: { profileViews:1 } });
+  await Users.updateOne({ _id: user[0]._id }, { $inc: { profileViews: 1 } });
 
   // isFollow
   const isFollow = await Follow.findOne({ follower: req.loggedUser?.id, following: user[0]._id });

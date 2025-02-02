@@ -36,18 +36,16 @@ router
     val.createUser,
     handlers.createUserHandler,
   );
-router
-  .route('/crm/:userId')
-  .patch(
-    isauthenticated,
-    isauthorized(PERMISSIONS.updateUser),
-    globalUploadMiddleware(FOLDERS.auth).fields([
-      { name: 'profileImage', maxCount: 1 },
-      { name: 'coverImage', maxCount: 1 },
-    ]),
-    val.updateUser,
-    handlers.updateUserHandler,
-  );
+router.route('/crm/:userId').patch(
+  isauthenticated,
+  isauthorized(PERMISSIONS.updateUser),
+  globalUploadMiddleware(FOLDERS.auth).fields([
+    { name: 'profileImage', maxCount: 1 },
+    { name: 'coverImage', maxCount: 1 },
+  ]),
+  val.updateUser,
+  handlers.updateUserHandler,
+);
 router
   .route('/crm/:userId/block')
   .post(
@@ -133,6 +131,5 @@ router.get('/profile/projects/:username', handlers.getUserProjectsByUsername);
 router.route('/profile/:username').get(optionalAuthenticated, handlers.getUserProfileHandler);
 
 router.route('/verify').post(val.verify, handlers.verifyHandler);
-
 
 export const authRoutes = router;

@@ -3,6 +3,8 @@ import { SuccessResponse, Favourites, Users } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import mongoose, { PipelineStage } from 'mongoose';
 
+import { sendNotification } from './sendNotification';
+
 export const addToFavourite: RequestHandler<
   { projectId: string },
   SuccessResponse<{ data: any }>
@@ -16,6 +18,21 @@ export const addToFavourite: RequestHandler<
   await Users.findByIdAndUpdate(req.loggedUser.id, {
     $inc: { likes: 1 },
   });
+
+  const projectFavourite = await Favourites.findOne({project: req.params.projectId} ).populate('project');
+
+
+  if ((projectFavourite?.project as any).user) {
+    await sendNotification(
+      req.loggedUser.id,
+      (projectFavourite?.project as any).user.toString(),
+      req.params.projectId,
+      'newFavorite',
+      'New Favorite Project',
+      'New Favorite Project Added from your projects',
+      'favorites',
+    );
+  }
 
   res.json({ message: 'success', data: post });
 };

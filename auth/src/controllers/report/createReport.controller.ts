@@ -19,6 +19,5 @@ export const createReportHandler: CreateReportHandler = async (req, res, next) =
     sourceUser: req.loggedUser.id,
   });
 
-  
   res.status(201).json({ message: 'success', data: report });
 };

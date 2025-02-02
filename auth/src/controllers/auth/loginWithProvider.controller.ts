@@ -88,7 +88,6 @@ export const loginWithProviderHandler: RequestHandler<
       ),
     );
 
-
   const { accessToken, refreshToken } = await createOrUpdateSessionAndGenerateTokens(
     req.headers,
     user,

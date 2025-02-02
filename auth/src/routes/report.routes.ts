@@ -17,9 +17,7 @@ router
   .route('/')
   .post(
     isauthenticated,
-    globalUploadMiddleware(FOLDERS.studio_booking).fields([
-      { name: 'attachments', maxCount: 10 },
-    ]),
+    globalUploadMiddleware(FOLDERS.studio_booking).fields([{ name: 'attachments', maxCount: 10 }]),
     val.createReportVal,
     handler.createReportHandler,
   )

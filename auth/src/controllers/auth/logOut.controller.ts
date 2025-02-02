@@ -8,7 +8,7 @@ import { generateUniqueDeviceId } from '../../utils/generateUniqueDeviceId';
 export const logoutHandler: LogoutHandler = async (req, res) => {
   const userAgent = req.headers['user-agent'];
 
-  const {deviceId} = generateUniqueDeviceId(userAgent!);
+  const { deviceId } = generateUniqueDeviceId(userAgent!);
   await userSession.deleteOne({
     user: req.loggedUser.id,
     refreshToken: req.session.refresh,
@@ -17,7 +17,7 @@ export const logoutHandler: LogoutHandler = async (req, res) => {
 
   await Users.findByIdAndUpdate(
     { _id: req.loggedUser.id },
-    { $pull: { refreshTokens: { token: req.session.refresh } , fcmTokens: { deviceId  } } },
+    { $pull: { refreshTokens: { token: req.session.refresh }, fcmTokens: { deviceId } } },
   );
 
   // 2. Clear current session
