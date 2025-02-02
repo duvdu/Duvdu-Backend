@@ -68,6 +68,7 @@ export const addContractFileController: RequestHandler<
     link,
     status: SubmitFilesStatus.pending,
     notes,
+    dateOfSubmission: new Date(),
   });
   await contract.save();
 
