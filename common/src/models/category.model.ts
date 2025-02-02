@@ -44,6 +44,7 @@ const categorySchema = new mongoose.Schema<Icategory>(
     },
     trend: { type: Boolean, default: false },
     media: { type: String, enum: CategoryMedia },
+    insurance: { type: Boolean, default: false },
     isRelated: { type: Boolean, default: false },
     relatedCategory: [{ type: mongoose.Schema.Types.ObjectId, ref: MODELS.category }],
   },

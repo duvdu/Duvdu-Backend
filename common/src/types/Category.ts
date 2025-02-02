@@ -13,5 +13,6 @@ export interface Icategory {
   trend: boolean;
   media: 'image' | 'video' | 'audio';
   isRelated: boolean;
+  insurance: boolean;
   relatedCategory?: Icategory[];
 }
