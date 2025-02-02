@@ -38,6 +38,7 @@ export interface CreateCategoryHandler
       | 'media'
       | 'isRelated'
       | 'relatedCategory'
+      | 'insurance'
     > & { cover: string },
     unknown
   > {}
@@ -58,6 +59,7 @@ export interface UpdateCategoryHandler
         | 'trend'
         | 'media'
         | 'relatedCategory'
+        | 'insurance'
       > & { cover?: string }
     >,
     unknown

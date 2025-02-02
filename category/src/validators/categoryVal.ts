@@ -9,6 +9,7 @@ export const getCategoryAdminVal = [
 ];
 // Validation for creating a category
 export const createCategoryVal = [
+  body('insurance').optional().isBoolean().toBoolean().withMessage('insuranceMustBeBoolean'),
   body('relatedCategory').optional().isArray().withMessage('relatedCategoryMustBeArray'),
   body('relatedCategory.*').optional().isMongoId().withMessage('relatedCategoryItemMustBeMongoId'),
   body('isRelated').optional().isBoolean().toBoolean().withMessage('isRelatedMustBeBoolean'),
@@ -63,6 +64,7 @@ export const updateCategoryVal = [
   body('title.en').optional().isString().withMessage('titleEnglishRequired'),
   body('relatedCategory').optional().isArray().withMessage('relatedCategoryMustBeArray'),
   body('relatedCategory.*').optional().isMongoId().withMessage('relatedCategoryItemMustBeMongoId'),
+  body('insurance').optional().isBoolean().toBoolean().withMessage('insuranceMustBeBoolean'),
   body('cycle')
     .optional()
     .isString()
