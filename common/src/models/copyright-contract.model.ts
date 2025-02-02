@@ -45,7 +45,7 @@ export interface IcopyrightContract {
   status: CopyrightContractStatus;
   rejectedBy?: 'customer' | 'sp';
   paymentLink: string;
-  submitFiles: { link: string; notes: string  , status: SubmitFilesStatus}[];
+  submitFiles: { link: string; notes?: string  , status: SubmitFilesStatus , reason?: string}[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -76,6 +76,7 @@ export const CopyrightContracts = model<IcopyrightContract>(
       submitFiles: [{
         link: { type: String, default: null },
         notes: { type: String, default: null },
+        reason: { type: String, default: null },
         status: { type: String, enum: SubmitFilesStatus, default: SubmitFilesStatus.pending },
       }],
       rejectedBy: { type: String, enum: ['sp', 'customer'], default: null },
@@ -84,4 +85,3 @@ export const CopyrightContracts = model<IcopyrightContract>(
     { collection: MODELS.copyrightContract, timestamps: true },
   ),
 );
-  
