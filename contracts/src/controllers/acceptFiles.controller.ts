@@ -40,7 +40,10 @@ export const acceptFilesController: RequestHandler<
 
   if (contract.customer.toString() !== req.loggedUser.id)
     return next(
-      new BadRequestError({ en: 'You are not the customer of this contract', ar: 'أنت لست عميلا لهذا العقد' }, req.lang),
+      new BadRequestError(
+        { en: 'You are not the customer of this contract', ar: 'أنت لست عميلا لهذا العقد' },
+        req.lang,
+      ),
     );
 
   if (contract.status !== CopyrightContractStatus.ongoing)

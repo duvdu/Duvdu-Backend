@@ -28,12 +28,12 @@ export const createComplaintHandler: RequestHandler<unknown, SuccessResponse> = 
     contract: req.body.contractId,
     $or: [{ sp: req.loggedUser.id }, { customer: req.loggedUser.id }],
   });
-  
+
   if (!contract) return next(new NotFound(undefined, req.lang));
 
   const populatedContract = await contract.populate({
     path: 'contract',
-    model: contract.ref
+    model: contract.ref,
   });
 
   const s3 = new Bucket();
@@ -57,13 +57,13 @@ export const createComplaintHandler: RequestHandler<unknown, SuccessResponse> = 
   // Update using the model instead of the populated field
   await ContractModel.updateOne(
     { _id: populatedContract.contract._id },
-    { status: CopyrightContractStatus.complaint }
+    { status: CopyrightContractStatus.complaint },
   );
-  
+
   // TODO: send event for admin about new complaint
 
   const user = await Users.findById(req.loggedUser.id);
-  const role = await Roles.findOne({ key:SystemRoles.admin });
+  const role = await Roles.findOne({ key: SystemRoles.admin });
   const admins = await Users.findOne({ role: role?._id });
   if (user && admins) {
     const notification = await Notification.create({
@@ -74,11 +74,11 @@ export const createComplaintHandler: RequestHandler<unknown, SuccessResponse> = 
       message: 'new complaint',
       title: `${user.name} has reported a complaint`,
     });
-  
+
     const populatedNotification = await (
       await notification.save()
     ).populate('sourceUser', 'isOnline profileImage username faceRecognition');
-  
+
     await new NewNotificationPublisher(natsWrapper.client).publish({
       notificationDetails: { message: notification.message, title: notification.title },
       populatedNotification,

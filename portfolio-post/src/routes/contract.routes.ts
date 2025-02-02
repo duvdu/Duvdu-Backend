@@ -20,4 +20,3 @@ router.post('/pay/:paymentSession', val.pay, handler.payContract);
 
 router.route('/:contractId/contract').patch(val.update, handler.updateContractHandler);
 router.route('/:contractId/action').post(val.action, handler.contractActionHandler);
-router.route('/:contractId/submit').patch(val.submitFiles, handler.submitFilesHandler);
