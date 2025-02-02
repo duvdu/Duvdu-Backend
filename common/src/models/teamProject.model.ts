@@ -139,7 +139,7 @@ export interface ITeamContract {
   createdAt: Date;
   paymentAmount: number;
   totalCheckoutAt: Date;
-  submitFiles: { link: string; notes: string  , status: SubmitFilesStatus , reason?: string}[];
+  submitFiles: { link: string; notes: string  , status: SubmitFilesStatus , reason?: string, dateOfSubmission: Date}[];
 }
 
 export const TeamContract = model<ITeamContract>(
@@ -170,6 +170,7 @@ export const TeamContract = model<ITeamContract>(
         link: { type: String, default: null },
         notes: { type: String, default: null },
         reason: { type: String, default: null },
+        dateOfSubmission: { type: Date, default: null },
         status: { type: String, enum: SubmitFilesStatus, default: SubmitFilesStatus.pending },
       }],
     },

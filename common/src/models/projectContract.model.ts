@@ -44,7 +44,7 @@ export interface IprojectContract {
   paymentLink: string;
   duration: number;
   createdAt: Date;
-  submitFiles: { link: string; notes: string  , status: SubmitFilesStatus , reason?: string}[];
+  submitFiles: { link: string; notes: string  , status: SubmitFilesStatus , reason?: string, dateOfSubmission: Date}[];
 }
 
 export const ProjectContract = model<IprojectContract>(
@@ -96,6 +96,7 @@ export const ProjectContract = model<IprojectContract>(
         link: { type: String, default: null },
         notes: { type: String, default: null },
         reason: { type: String, default: null },
+        dateOfSubmission: { type: Date, default: null },
         status: { type: String, enum: SubmitFilesStatus, default: SubmitFilesStatus.pending },
       }],
     },
