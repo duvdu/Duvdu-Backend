@@ -1,5 +1,6 @@
 import { model, Schema, Types } from 'mongoose';
 
+import { SubmitFilesStatus } from './copyright-contract.model';
 import { Icategory } from '../types/Category';
 import { CYCLES } from '../types/cycles';
 import { MODELS } from '../types/model-names';
@@ -138,7 +139,7 @@ export interface ITeamContract {
   createdAt: Date;
   paymentAmount: number;
   totalCheckoutAt: Date;
-  submitFiles: { link: string; notes: string };
+  submitFiles: { link: string; notes: string  , status: SubmitFilesStatus}[];
 }
 
 export const TeamContract = model<ITeamContract>(
@@ -165,10 +166,11 @@ export const TeamContract = model<ITeamContract>(
       paymentAmount: { type: Number, default: 0 },
       attachments: [String],
       totalCheckoutAt: Date,
-      submitFiles: {
+      submitFiles: [{
         link: { type: String, default: null },
         notes: { type: String, default: null },
-      },
+        status: { type: String, enum: SubmitFilesStatus, default: SubmitFilesStatus.pending },
+      }],
     },
     { timestamps: true, collection: MODELS.teamContract },
   ),

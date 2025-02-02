@@ -55,7 +55,6 @@ export interface IprojectCycle {
   isDeleted: boolean;
   rate: { ratersCounter: number; totalRates: number };
   duration: number;
-  submitFiles: { files: string[]; url: string; note: string };
   minBudget: number;
   maxBudget: number;
 }
@@ -129,11 +128,6 @@ export const ProjectCycle = model<IprojectCycle>(
       isDeleted: { type: Boolean, default: false },
       rate: { ratersCounter: Number, totalRates: Number },
       duration: { type: Number, default: 0 },
-      submitFiles: {
-        files: [String],
-        url: { type: String, default: null },
-        note: { type: String, default: null },
-      },
       minBudget: { type: Number, default: null },
       maxBudget: { type: Number, default: null },
     },

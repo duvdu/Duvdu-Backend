@@ -16,6 +16,12 @@ export enum CopyrightContractStatus {
   complaint = 'complaint',
 }
 
+export enum SubmitFilesStatus {
+  pending = 'pending',
+  approved = 'approved',
+  rejected = 'rejected',
+}
+
 export interface IcopyrightContract {
   id: string;
   customer: Types.ObjectId | Iuser;
@@ -39,7 +45,7 @@ export interface IcopyrightContract {
   status: CopyrightContractStatus;
   rejectedBy?: 'customer' | 'sp';
   paymentLink: string;
-  submitFiles: { link: string; notes: string };
+  submitFiles: { link: string; notes: string  , status: SubmitFilesStatus}[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -67,13 +73,15 @@ export const CopyrightContracts = model<IcopyrightContract>(
       firstPaymentAmount: { type: Number, default: null },
       secondPaymentAmount: { type: Number, default: null },
       status: { type: String, enum: CopyrightContractStatus },
-      submitFiles: {
+      submitFiles: [{
         link: { type: String, default: null },
         notes: { type: String, default: null },
-      },
+        status: { type: String, enum: SubmitFilesStatus, default: SubmitFilesStatus.pending },
+      }],
       rejectedBy: { type: String, enum: ['sp', 'customer'], default: null },
       paymentLink: { type: String, default: null },
     },
     { collection: MODELS.copyrightContract, timestamps: true },
   ),
 );
+  

@@ -1,5 +1,6 @@
 import { model, Schema, Types } from 'mongoose';
 
+import { SubmitFilesStatus } from './copyright-contract.model';
 import { IprojectCycle } from './portfolio-post.model';
 import { MODELS } from '../types/model-names';
 import { Iuser } from '../types/User';
@@ -43,7 +44,7 @@ export interface IprojectContract {
   paymentLink: string;
   duration: number;
   createdAt: Date;
-  submitFiles: { link: string; notes: string };
+  submitFiles: { link: string; notes: string  , status: SubmitFilesStatus}[];
 }
 
 export const ProjectContract = model<IprojectContract>(
@@ -91,10 +92,11 @@ export const ProjectContract = model<IprojectContract>(
       paymentLink: String,
       duration: { type: Number, default: 0 },
       equipmentPrice: { type: Number, default: 0 },
-      submitFiles: {
+      submitFiles: [{
         link: { type: String, default: null },
         notes: { type: String, default: null },
-      },
+        status: { type: String, enum: SubmitFilesStatus, default: SubmitFilesStatus.pending },
+      }],
     },
     { timestamps: true, collection: MODELS.projectContract },
   ),
