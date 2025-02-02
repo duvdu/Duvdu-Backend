@@ -18,12 +18,15 @@ export const getUserTaggedProjectsHandler: RequestHandler<
   GetProjectsHandler,
   unknown
 > = async (req, res) => {
+  const userId = req.loggedUser?.id;
+
   const countPipeline = [
     {
       $match: {
         creatives: {
           $elemMatch: {
-            creative: new Types.ObjectId(req.loggedUser?.id),
+            creative: new Types.ObjectId(userId),
+            inviteStatus: InviteStatus.accepted,
           },
         },
       },
@@ -52,7 +55,8 @@ export const getUserTaggedProjectsHandler: RequestHandler<
       $match: {
         creatives: {
           $elemMatch: {
-            creative: new Types.ObjectId(req.loggedUser?.id),
+            creative: new Types.ObjectId(userId),
+            inviteStatus: InviteStatus.accepted,
           },
         },
       },
@@ -95,6 +99,26 @@ export const getUserTaggedProjectsHandler: RequestHandler<
     { $unwind: { path: '$creativeDetails', preserveNullAndEmptyArrays: true } },
 
     {
+      $lookup: {
+        from: MODELS.category,
+        localField: 'creatives.mainCategory.category',
+        foreignField: '_id',
+        as: 'mainCategoryDetails',
+      },
+    },
+    { $unwind: { path: '$mainCategoryDetails', preserveNullAndEmptyArrays: true } },
+
+    {
+      $lookup: {
+        from: MODELS.category,
+        localField: 'creatives.mainCategory.relatedCategory.category',
+        foreignField: '_id',
+        as: 'relatedCategoryDetails',
+      },
+    },
+    { $unwind: { path: '$relatedCategoryDetails', preserveNullAndEmptyArrays: true } },
+
+    {
       $group: {
         _id: '$_id',
         creatives: {
@@ -127,88 +151,181 @@ export const getUserTaggedProjectsHandler: RequestHandler<
                 inviteStatus: '$creatives.inviteStatus',
                 mainCategory: {
                   category: {
-                    $let: {
-                      vars: {
-                        filteredCategories: {
-                          $filter: {
-                            input: '$$creative.mainCategory.category',
-                            as: 'cat',
-                            cond: { $ne: ['$$cat', null] },
-                          },
-                        },
+                    $cond: {
+                      if: {
+                        $or: [
+                          { $eq: ['$mainCategoryDetails', null] },
+                          { $eq: [{ $type: '$mainCategoryDetails' }, 'missing'] },
+                          { $eq: [{ $objectToArray: '$mainCategoryDetails' }, []] },
+                        ],
                       },
-                      in: {
-                        $cond: {
-                          if: { $gt: [{ $size: '$$filteredCategories' }, 0] },
-                          then: {
-                            _id: { $arrayElemAt: ['$$filteredCategories._id', 0] },
-                            title: { $arrayElemAt: ['$$filteredCategories.title', 0] },
-                          },
-                          else: null,
-                        },
+                      then: null,
+                      else: {
+                        _id: '$mainCategoryDetails._id',
+                        title: '$mainCategoryDetails.title.' + req.lang,
                       },
                     },
                   },
                   subCategories: {
-                    $map: {
-                      input: '$creatives.mainCategory.subCategories',
-                      as: 'subCategory',
-                      in: {
-                        subCategory: {
-                          $lookup: {
-                            from: MODELS.category,
-                            localField: 'subCategory.subCategory',
-                            foreignField: '_id',
-                            as: 'subCategoryData',
-                          },
-                        },
-                        tags: {
-                          $filter: {
-                            input: '$subCategory.tags',
-                            as: 'tag',
-                            cond: { $ne: ['$$tag', null] },
-                          },
-                        },
-                      },
-                    },
-                  },
-                  relatedCategory: {
-                    $cond: {
-                      if: { $ne: ['$creatives.mainCategory.relatedCategory', null] },
-                      then: {
-                        category: {
-                          $lookup: {
-                            from: MODELS.category,
-                            localField: 'creatives.mainCategory.relatedCategory.category',
-                            foreignField: '_id',
-                            as: 'relatedCategoryData',
-                          },
-                        },
-                        subCategories: {
-                          $map: {
-                            input: '$creatives.mainCategory.relatedCategory.subCategories',
-                            as: 'relatedSubCategory',
-                            in: {
-                              subCategory: {
-                                $lookup: {
-                                  from: MODELS.category,
-                                  localField: 'relatedSubCategory.subCategory',
-                                  foreignField: '_id',
-                                  as: 'relatedSubCategoryData',
+                    $let: {
+                      vars: {
+                        subCat: {
+                          $arrayElemAt: [
+                            {
+                              $filter: {
+                                input: '$mainCategoryDetails.subCategories',
+                                cond: {
+                                  $eq: [
+                                    '$$this._id',
+                                    '$creatives.mainCategory.subCategories.subCategory',
+                                  ],
                                 },
                               },
-                              tags: {
-                                $filter: {
-                                  input: '$relatedSubCategory.tags',
-                                  as: 'tag',
-                                  cond: { $ne: ['$$tag', null] },
+                            },
+                            0,
+                          ],
+                        },
+                      },
+                      in: {
+                        $cond: {
+                          if: { $eq: ['$$subCat', null] },
+                          then: null,
+                          else: {
+                            subCategory: {
+                              _id: '$$subCat._id',
+                              title: { $getField: { field: req.lang, input: '$$subCat.title' } },
+                            },
+                            tags: {
+                              $cond: {
+                                if: { $eq: ['$creatives.mainCategory.subCategories.tags', null] },
+                                then: null,
+                                else: {
+                                  $map: {
+                                    input: '$creatives.mainCategory.subCategories.tags',
+                                    as: 'tag',
+                                    in: {
+                                      $let: {
+                                        vars: {
+                                          tagData: {
+                                            $arrayElemAt: [
+                                              {
+                                                $filter: {
+                                                  input: '$$subCat.tags',
+                                                  cond: { $eq: ['$$this._id', '$$tag.tag'] },
+                                                },
+                                              },
+                                              0,
+                                            ],
+                                          },
+                                        },
+                                        in: {
+                                          _id: '$$tag.tag',
+                                          title: {
+                                            $getField: { field: req.lang, input: '$$tagData' },
+                                          },
+                                        },
+                                      },
+                                    },
+                                  },
                                 },
                               },
                             },
                           },
                         },
                       },
-                      else: null,
+                    },
+                  },
+                  relatedCategory: {
+                    category: {
+                      $cond: {
+                        if: {
+                          $or: [
+                            { $eq: ['$relatedCategoryDetails', null] },
+                            { $eq: [{ $type: '$relatedCategoryDetails' }, 'missing'] },
+                            { $eq: [{ $objectToArray: '$relatedCategoryDetails' }, []] },
+                          ],
+                        },
+                        then: null,
+                        else: {
+                          _id: '$relatedCategoryDetails._id',
+                          title: '$relatedCategoryDetails.title.' + req.lang,
+                        },
+                      },
+                    },
+                    subCategories: {
+                      $let: {
+                        vars: {
+                          subCat: {
+                            $arrayElemAt: [
+                              {
+                                $filter: {
+                                  input: '$relatedCategoryDetails.subCategories',
+                                  cond: {
+                                    $eq: [
+                                      '$$this._id',
+                                      '$creatives.mainCategory.relatedCategory.subCategories.subCategory',
+                                    ],
+                                  },
+                                },
+                              },
+                              0,
+                            ],
+                          },
+                        },
+                        in: {
+                          $cond: {
+                            if: { $eq: ['$$subCat', null] },
+                            then: null,
+                            else: {
+                              subCategory: {
+                                _id: '$$subCat._id',
+                                title: { $getField: { field: req.lang, input: '$$subCat.title' } },
+                              },
+                              tags: {
+                                $cond: {
+                                  if: {
+                                    $eq: [
+                                      '$creatives.mainCategory.relatedCategory.subCategories.tags',
+                                      null,
+                                    ],
+                                  },
+                                  then: null,
+                                  else: {
+                                    $map: {
+                                      input:
+                                        '$creatives.mainCategory.relatedCategory.subCategories.tags',
+                                      as: 'tag',
+                                      in: {
+                                        $let: {
+                                          vars: {
+                                            tagData: {
+                                              $arrayElemAt: [
+                                                {
+                                                  $filter: {
+                                                    input: '$$subCat.tags',
+                                                    cond: { $eq: ['$$this._id', '$$tag.tag'] },
+                                                  },
+                                                },
+                                                0,
+                                              ],
+                                            },
+                                          },
+                                          in: {
+                                            _id: '$$tag.tag',
+                                            title: {
+                                              $getField: { field: req.lang, input: '$$tagData' },
+                                            },
+                                          },
+                                        },
+                                      },
+                                    },
+                                  },
+                                },
+                              },
+                            },
+                          },
+                        },
+                      },
                     },
                   },
                 },
@@ -238,10 +355,7 @@ export const getUserTaggedProjectsHandler: RequestHandler<
                 $and: [
                   { $eq: ['$project', '$$projectId'] },
                   {
-                    $eq: [
-                      '$user',
-                      req.loggedUser?.id ? new Types.ObjectId(req.loggedUser.id) : null,
-                    ],
+                    $eq: ['$user', userId ? new Types.ObjectId(userId) : null],
                   },
                 ],
               },
@@ -322,111 +436,10 @@ export const getUserTaggedProjectsHandler: RequestHandler<
         tools: 1,
         functions: 1,
         creatives: {
-          $map: {
+          $filter: {
             input: '$creatives',
             as: 'creative',
-            in: {
-              _id: '$$creative._id',
-              profileImage: '$$creative.profileImage',
-              isOnline: '$$creative.isOnline',
-              username: '$$creative.username',
-              name: '$$creative.name',
-              rank: '$$creative.rank',
-              projectsView: '$$creative.projectsView',
-              coverImage: '$$creative.coverImage',
-              acceptedProjectsCounter: '$$creative.acceptedProjectsCounter',
-              rate: '$$creative.rate',
-              profileViews: '$$creative.profileViews',
-              about: '$$creative.about',
-              isAvaliableToInstantProjects: '$$creative.isAvaliableToInstantProjects',
-              pricePerHour: '$$creative.pricePerHour',
-              hasVerificationBadge: '$$creative.hasVerificationBadge',
-              likes: '$$creative.likes',
-              followCount: '$$creative.followCount',
-              address: '$$creative.address',
-              inviteStatus: '$$creative.inviteStatus',
-              mainCategory: {
-                category: {
-                  $let: {
-                    vars: {
-                      filteredCategories: {
-                        $filter: {
-                          input: '$$creative.mainCategory.category',
-                          as: 'cat',
-                          cond: { $ne: ['$$cat', null] },
-                        },
-                      },
-                    },
-                    in: {
-                      $cond: {
-                        if: { $gt: [{ $size: '$$filteredCategories' }, 0] },
-                        then: {
-                          _id: { $arrayElemAt: ['$$filteredCategories._id', 0] },
-                          title: { $arrayElemAt: ['$$filteredCategories.title', 0] },
-                        },
-                        else: null,
-                      },
-                    },
-                  },
-                },
-                subCategories: {
-                  $map: {
-                    input: '$$creative.mainCategory.subCategories',
-                    as: 'subCategory',
-                    in: {
-                      subCategory: {
-                        _id: '$$subCategory.subCategory._id',
-                        title: `$$subCategory.subCategory.title.${req.lang}`,
-                        tags: {
-                          $map: {
-                            input: '$$subCategory.tags',
-                            as: 'tag',
-                            in: {
-                              title: `$$tag.title.${req.lang}`,
-                              _id: '$$tag._id',
-                            },
-                          },
-                        },
-                      },
-                    },
-                  },
-                },
-                relatedCategory: {
-                  $cond: {
-                    if: { $ne: ['$creatives.mainCategory.relatedCategory', null] },
-                    then: {
-                      category: {
-                        title: `$$creative.mainCategory.relatedCategory.category.title.${req.lang}`,
-                        _id: '$$creative.mainCategory.relatedCategory.category._id',
-                      },
-                      subCategories: {
-                        $map: {
-                          input: '$$creative.mainCategory.relatedCategory.subCategories',
-                          as: 'relatedSubCategory',
-                          in: {
-                            subCategory: {
-                              _id: '$$relatedSubCategory.subCategory._id',
-                              title: `$$relatedSubCategory.subCategory.title.${req.lang}`,
-                              tags: {
-                                $map: {
-                                  input: '$$relatedSubCategory.tags',
-                                  as: 'tag',
-                                  in: {
-                                    _id: '$$tag._id',
-                                    title: `$$tag.title.${req.lang}`,
-                                  },
-                                },
-                              },
-                            },
-                          },
-                        },
-                      },
-                    },
-                  },
-                  else: null,
-                },
-              },
-            },
+            cond: { $ne: ['$$creative', null] },
           },
         },
         location: {

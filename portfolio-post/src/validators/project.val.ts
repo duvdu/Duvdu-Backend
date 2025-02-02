@@ -26,9 +26,9 @@ export const create = [
   body('creatives.*.mainCategory').isObject().withMessage('creatives'),
   body('creatives.*.mainCategory.category').isMongoId().withMessage('creatives'),
   body('creatives.*.mainCategory.subCategories').isObject().withMessage('creatives'),
-  body('creatives.*.mainCategory.subCategories.*.subCategory').isMongoId().withMessage('creatives'),
-  body('creatives.*.mainCategory.subCategories.*.tags').isArray().withMessage('creatives'),
-  body('creatives.*.mainCategory.subCategories.*.tags.*.tag').isMongoId().withMessage('creatives'),
+  body('creatives.*.mainCategory.subCategories.subCategory').isMongoId().withMessage('creatives'),
+  body('creatives.*.mainCategory.subCategories.tags').isArray().withMessage('creatives'),
+  body('creatives.*.mainCategory.subCategories.tags.*.tag').isMongoId().withMessage('creatives'),
   body('creatives.*.mainCategory.relatedCategory').optional().isObject().withMessage('creatives'),
   body('creatives.*.mainCategory.relatedCategory.category')
     .optional()
@@ -57,13 +57,13 @@ export const create = [
   body('invitedCreatives.*.mainCategory').isObject().withMessage('invitedCreatives'),
   body('invitedCreatives.*.mainCategory.category').isMongoId().withMessage('invitedCreatives'),
   body('invitedCreatives.*.mainCategory.subCategories').isObject().withMessage('invitedCreatives'),
-  body('invitedCreatives.*.mainCategory.subCategories.*.subCategory')
+  body('invitedCreatives.*.mainCategory.subCategories.subCategory')
     .isMongoId()
     .withMessage('invitedCreatives'),
-  body('invitedCreatives.*.mainCategory.subCategories.*.tags')
+  body('invitedCreatives.*.mainCategory.subCategories.tags')
     .isArray()
     .withMessage('invitedCreatives'),
-  body('invitedCreatives.*.mainCategory.subCategories.*.tags.*.tag')
+  body('invitedCreatives.*.mainCategory.subCategories.tags.*.tag')
     .isMongoId()
     .withMessage('invitedCreatives'),
   body('invitedCreatives.*.mainCategory.relatedCategory')
@@ -78,15 +78,15 @@ export const create = [
     .optional()
     .isObject()
     .withMessage('invitedCreatives'),
-  body('invitedCreatives.*.mainCategory.relatedCategory.subCategories.*.subCategory')
+  body('invitedCreatives.*.mainCategory.relatedCategory.subCategories.subCategory')
     .optional()
     .isMongoId()
     .withMessage('invitedCreatives'),
-  body('invitedCreatives.*.mainCategory.relatedCategory.subCategories.*.tags')
+  body('invitedCreatives.*.mainCategory.relatedCategory.subCategories.tags')
     .optional()
     .isArray()
     .withMessage('invitedCreatives'),
-  body('invitedCreatives.*.mainCategory.relatedCategory.subCategories.*.tags.*.tag')
+  body('invitedCreatives.*.mainCategory.relatedCategory.subCategories.tags.tag')
     .optional()
     .isMongoId()
     .withMessage('invitedCreatives'),
@@ -275,3 +275,11 @@ export const acceptAction = [
   body('status').isIn([InviteStatus.accepted, InviteStatus.rejected]),
   globalPaginationMiddleware,
 ];
+
+
+export const removeTaggedCreative = [
+  param('projectId').isMongoId().withMessage('projectId'),
+  param('creativeId').isMongoId().withMessage('creativeId'),
+  globalValidatorMiddleware,
+];
+

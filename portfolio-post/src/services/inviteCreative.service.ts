@@ -93,9 +93,9 @@ export const inviteCreatives = async (
       subCategories: invitedUsers[index].mainCategory.subCategories,
       relatedCategory: invitedUsers[index].mainCategory.relatedCategory
         ? {
-          category: invitedUsers[index].mainCategory.relatedCategory.category,
-          subCategories: invitedUsers[index].mainCategory.relatedCategory.subCategories,
-        }
+            category: invitedUsers[index].mainCategory.relatedCategory?.category,
+            subCategories: invitedUsers[index].mainCategory.relatedCategory?.subCategories,
+          }
         : null,
     },
   }));
@@ -142,8 +142,11 @@ export const validateCreative = async (
         subCategory._id.toString() == creative.mainCategory.subCategories.subCategory.toString()
       ) {
         // check tags
-        creative.mainCategory.subCategories.tags.forEach((tag: any) => {
-          if (!subCategory.tags.some((subTag: any) => subTag._id.toString() === tag.toString())) {
+        creative.mainCategory.subCategories.tags.forEach((tags: any) => {
+          console.log(tags);
+          if (
+            !subCategory.tags.some((subTag: any) => subTag._id.toString() === tags.tag.toString())
+          ) {
             throw new BadRequestError(
               { en: 'tag is not in the sub category', ar: 'التصنيف غير موجود في الفئة الفرعية' },
               lang,
@@ -169,8 +172,10 @@ export const validateCreative = async (
           creative.mainCategory.relatedCategory?.subCategories.subCategory.toString()
         ) {
           // check tags
-          creative.mainCategory.relatedCategory?.subCategories.tags.forEach((tag: any) => {
-            if (!subCategory.tags.some((subTag: any) => subTag._id.toString() === tag.toString())) {
+          creative.mainCategory.relatedCategory?.subCategories.tags.forEach((tags: any) => {
+            if (
+              !subCategory.tags.some((subTag: any) => subTag._id.toString() === tags.tag.toString())
+            ) {
               throw new BadRequestError(
                 { en: 'tag is not in the sub category', ar: 'التصنيف غير موجود في الفئة الفرعية' },
                 lang,

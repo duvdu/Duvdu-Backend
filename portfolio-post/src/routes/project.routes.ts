@@ -15,6 +15,14 @@ import * as val from '../validators/project.val';
 
 export const router = express.Router();
 
+router
+  .route('/tagged')
+  .get(isauthenticated, globalPaginationMiddleware, handler.getUserTaggedProjectsHandler);
+
+router
+  .route('/:projectId/tagged-creative/:creativeId')
+  .delete(isauthenticated , val.removeTaggedCreative, handler.removeTaggedCreative);
+
 router.route('/invitation').get(isauthenticated, handler.getUserInvitationHandler);
 router
   .route('/analysis')
@@ -84,7 +92,3 @@ router
     handler.deleteProjectHandler,
   )
   .post(isauthenticated, val.acceptAction, handler.invitationActionHandler);
-
-router
-  .route('/tagged')
-  .get(isauthenticated, globalPaginationMiddleware, handler.getUserTaggedProjectsHandler);

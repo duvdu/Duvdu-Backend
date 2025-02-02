@@ -51,14 +51,43 @@ export const getProjetcsCrm: GetProjectsForCrmHandler = async (req, res) => {
     },
     { $unwind: { path: '$creativeDetails', preserveNullAndEmptyArrays: true } },
 
-    // Reassemble the creatives array
+    {
+      $lookup: {
+        from: MODELS.user,
+        localField: 'creatives.creative',
+        foreignField: '_id',
+        as: 'creativeDetails',
+      },
+    },
+    { $unwind: { path: '$creativeDetails', preserveNullAndEmptyArrays: true } },
+
+    {
+      $lookup: {
+        from: MODELS.category,
+        localField: 'creatives.mainCategory.category',
+        foreignField: '_id',
+        as: 'mainCategoryDetails',
+      },
+    },
+    { $unwind: { path: '$mainCategoryDetails', preserveNullAndEmptyArrays: true } },
+
+    {
+      $lookup: {
+        from: MODELS.category,
+        localField: 'creatives.mainCategory.relatedCategory.category',
+        foreignField: '_id',
+        as: 'relatedCategoryDetails',
+      },
+    },
+    { $unwind: { path: '$relatedCategoryDetails', preserveNullAndEmptyArrays: true } },
+
     {
       $group: {
         _id: '$_id',
         creatives: {
           $push: {
             $cond: [
-              { $eq: ['$creatives.inviteStatus', InviteStatus.accepted] }, // Condition to check if inviteStatus is 'accepted'
+              { $eq: ['$creatives.inviteStatus', InviteStatus.accepted] },
               {
                 _id: '$creativeDetails._id',
                 profileImage: {
@@ -82,18 +111,196 @@ export const getProjetcsCrm: GetProjectsForCrmHandler = async (req, res) => {
                 likes: '$creativeDetails.likes',
                 followCount: '$creativeDetails.followCount',
                 address: '$creativeDetails.address',
-                inviteStatus: '$creatives.inviteStatus', // Include original inviteStatus field
+                inviteStatus: '$creatives.inviteStatus',
+                mainCategory: {
+                  category: {
+                    $cond: {
+                      if: {
+                        $or: [
+                          { $eq: ['$mainCategoryDetails', null] },
+                          { $eq: [{ $type: '$mainCategoryDetails' }, 'missing'] },
+                          { $eq: [{ $objectToArray: '$mainCategoryDetails' }, []] },
+                        ],
+                      },
+                      then: null,
+                      else: {
+                        _id: '$mainCategoryDetails._id',
+                        title: '$mainCategoryDetails.title.' + req.lang,
+                      },
+                    },
+                  },
+                  subCategories: {
+                    $let: {
+                      vars: {
+                        subCat: {
+                          $arrayElemAt: [
+                            {
+                              $filter: {
+                                input: '$mainCategoryDetails.subCategories',
+                                cond: {
+                                  $eq: [
+                                    '$$this._id',
+                                    '$creatives.mainCategory.subCategories.subCategory',
+                                  ],
+                                },
+                              },
+                            },
+                            0,
+                          ],
+                        },
+                      },
+                      in: {
+                        $cond: {
+                          if: { $eq: ['$$subCat', null] },
+                          then: null,
+                          else: {
+                            subCategory: {
+                              _id: '$$subCat._id',
+                              title: { $getField: { field: req.lang, input: '$$subCat.title' } },
+                            },
+                            tags: {
+                              $cond: {
+                                if: { $eq: ['$creatives.mainCategory.subCategories.tags', null] },
+                                then: null,
+                                else: {
+                                  $map: {
+                                    input: '$creatives.mainCategory.subCategories.tags',
+                                    as: 'tag',
+                                    in: {
+                                      $let: {
+                                        vars: {
+                                          tagData: {
+                                            $arrayElemAt: [
+                                              {
+                                                $filter: {
+                                                  input: '$$subCat.tags',
+                                                  cond: { $eq: ['$$this._id', '$$tag.tag'] },
+                                                },
+                                              },
+                                              0,
+                                            ],
+                                          },
+                                        },
+                                        in: {
+                                          _id: '$$tag.tag',
+                                          title: {
+                                            $getField: { field: req.lang, input: '$$tagData' },
+                                          },
+                                        },
+                                      },
+                                    },
+                                  },
+                                },
+                              },
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                  relatedCategory: {
+                    category: {
+                      $cond: {
+                        if: {
+                          $or: [
+                            { $eq: ['$relatedCategoryDetails', null] },
+                            { $eq: [{ $type: '$relatedCategoryDetails' }, 'missing'] },
+                            { $eq: [{ $objectToArray: '$relatedCategoryDetails' }, []] },
+                          ],
+                        },
+                        then: null,
+                        else: {
+                          _id: '$relatedCategoryDetails._id',
+                          title: '$relatedCategoryDetails.title.' + req.lang,
+                        },
+                      },
+                    },
+                    subCategories: {
+                      $let: {
+                        vars: {
+                          subCat: {
+                            $arrayElemAt: [
+                              {
+                                $filter: {
+                                  input: '$relatedCategoryDetails.subCategories',
+                                  cond: {
+                                    $eq: [
+                                      '$$this._id',
+                                      '$creatives.mainCategory.relatedCategory.subCategories.subCategory',
+                                    ],
+                                  },
+                                },
+                              },
+                              0,
+                            ],
+                          },
+                        },
+                        in: {
+                          $cond: {
+                            if: { $eq: ['$$subCat', null] },
+                            then: null,
+                            else: {
+                              subCategory: {
+                                _id: '$$subCat._id',
+                                title: { $getField: { field: req.lang, input: '$$subCat.title' } },
+                              },
+                              tags: {
+                                $cond: {
+                                  if: {
+                                    $eq: [
+                                      '$creatives.mainCategory.relatedCategory.subCategories.tags',
+                                      null,
+                                    ],
+                                  },
+                                  then: null,
+                                  else: {
+                                    $map: {
+                                      input:
+                                        '$creatives.mainCategory.relatedCategory.subCategories.tags',
+                                      as: 'tag',
+                                      in: {
+                                        $let: {
+                                          vars: {
+                                            tagData: {
+                                              $arrayElemAt: [
+                                                {
+                                                  $filter: {
+                                                    input: '$$subCat.tags',
+                                                    cond: { $eq: ['$$this._id', '$$tag.tag'] },
+                                                  },
+                                                },
+                                                0,
+                                              ],
+                                            },
+                                          },
+                                          in: {
+                                            _id: '$$tag.tag',
+                                            title: {
+                                              $getField: { field: req.lang, input: '$$tagData' },
+                                            },
+                                          },
+                                        },
+                                      },
+                                    },
+                                  },
+                                },
+                              },
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
               },
-              null, // If the condition is not met, push null
+              null,
             ],
           },
         },
-        // Retain other fields
         doc: { $first: '$$ROOT' },
       },
     },
 
-    // Restore root document structure
     {
       $replaceRoot: {
         newRoot: { $mergeObjects: ['$doc', { creatives: '$creatives' }] },
