@@ -42,9 +42,13 @@ export const getProjectHandler: RequestHandler = async (req, res, next) => {
         category: {
           _id: '$categoryDetails._id',
           image: { $concat: [process.env.BUCKET_HOST, '/', '$categoryDetails.image'] },
+          insurance: { 
+            $ifNull: ['$categoryDetails.insurance', false]
+          },
           title: {
             $cond: {
               if: { $eq: [req.lang, 'ar'] },
+
               then: '$categoryDetails.title.ar',
               else: '$categoryDetails.title.en',
             },

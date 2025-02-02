@@ -49,6 +49,9 @@ export const getProjectCrmHandler: RequestHandler = async (req, res, next) => {
         category: {
           _id: '$categoryDetails._id',
           image: { $concat: [process.env.BUCKET_HOST, '/', '$categoryDetails.image'] },
+          insurance: { 
+            $ifNull: ['$categoryDetails.insurance', false]
+          },  
           title: {
             $cond: {
               if: { $eq: [req.lang, 'ar'] },

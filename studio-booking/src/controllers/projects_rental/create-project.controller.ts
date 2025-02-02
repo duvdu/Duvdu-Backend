@@ -5,6 +5,8 @@ import {
   filterTagsForCategory,
   FOLDERS,
   Project,
+  Categories,
+  NotFound,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
@@ -12,6 +14,9 @@ export const createProjectHandler: RequestHandler = async (req, res) => {
   const attachments = <Express.Multer.File[]>(req.files as any).attachments;
   const cover = <Express.Multer.File[]>(req.files as any).cover;
 
+  const category = await Categories.findById(req.body.category);
+
+  if (!category) throw new NotFound({ar:'الفئة غير موجودة',en:'Category not found'},req.lang);
 
   const [{ filteredTags, subCategoryTitle }] = await Promise.all([
     filterTagsForCategory(
