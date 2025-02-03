@@ -63,8 +63,8 @@ export interface SignupHandler
 export interface RetreiveUsernameHandler
   extends RequestHandler<
     unknown,
-    successResponse<{ isUsernameExists: boolean }>,
-    Pick<Iuser, 'username'>,
+    successResponse<{ isExists: boolean }>,
+    Partial<Pick<Iuser, 'username' | 'email' | 'phoneNumber'>>,
     unknown
   > {}
 
