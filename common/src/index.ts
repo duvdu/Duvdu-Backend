@@ -89,6 +89,7 @@ export * from './models/Bookmark-projects.model';
 export * from './services/category.service';
 export * from './services/projectView.service';
 export * from './services/rank.service';
+export * from './services/checkUserFaceVerification';
 export * from './types/notification.type';
 export * from './types/notification_details';
 
