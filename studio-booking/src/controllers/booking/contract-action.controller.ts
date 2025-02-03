@@ -9,6 +9,7 @@ import {
   Channels,
   RentalContractStatus,
   RentalContracts,
+  checkUserFaceVerification,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
@@ -31,9 +32,15 @@ export const contractAction: RequestHandler<
   const customer = await Users.findById(contract.customer);
 
   if (isSp) {
+    const isVerified = await checkUserFaceVerification(req.loggedUser.id);
+
+    if (!isVerified)
+      return next(new BadRequestError({ en: 'provider not verified with face recognition', ar: 'المزود غير موثوق بالوجه' }, req.lang));
+
     // throw if actionAt not undefiend or current state not pending
     if (contract.actionAt || contract.status !== RentalContractStatus.pending)
       return next(
+
         new BadRequestError(
           { en: 'action is already taken', ar: 'action is already taken' },
           req.lang,

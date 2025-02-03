@@ -9,6 +9,7 @@ import {
   Channels,
   CopyrightContracts,
   CopyrightContractStatus,
+  checkUserFaceVerification,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
@@ -58,11 +59,25 @@ const sendContractNotifications = async ({
   ]);
 };
 
-const handleSpAction = async (contract: any, action: string, userId: string, sp: any, lang: string) => {
+const handleSpAction = async (
+  contract: any,
+  action: string,
+  userId: string,
+  sp: any,
+  lang: string,
+) => {
   const validStatuses = {
     reject: [CopyrightContractStatus.pending, CopyrightContractStatus.updateAfterFirstPayment],
     accept: [CopyrightContractStatus.pending, CopyrightContractStatus.updateAfterFirstPayment],
   };
+
+  const isVerified = await checkUserFaceVerification(userId);
+
+  if (!isVerified)
+    throw new BadRequestError(
+      { en: 'provider not verified with face recognition', ar: 'المزود غير موثوق بالوجه' },
+      lang,
+    );
 
   if (!validStatuses[action as keyof typeof validStatuses]?.includes(contract.status)) {
     throw new NotAllowedError(
@@ -82,7 +97,10 @@ const handleSpAction = async (contract: any, action: string, userId: string, sp:
 
     // if status after first payment
     if (contract.status === CopyrightContractStatus.updateAfterFirstPayment) {
-      const user = await Users.findOneAndUpdate({ _id: userId }, { $inc: { avaliableContracts: 1 } });
+      const user = await Users.findOneAndUpdate(
+        { _id: userId },
+        { $inc: { avaliableContracts: 1 } },
+      );
       await sendNotification(
         userId,
         contract.sp.toString(),
@@ -152,7 +170,10 @@ const handleCustomerAction = async (
 ) => {
   const validStatuses = {
     cancel: [CopyrightContractStatus.pending],
-    reject: [CopyrightContractStatus.waitingForFirstPayment, CopyrightContractStatus.waitingForTotalPayment],
+    reject: [
+      CopyrightContractStatus.waitingForFirstPayment,
+      CopyrightContractStatus.waitingForTotalPayment,
+    ],
   } as const;
 
   if (!validStatuses[action]?.includes(contract.status as never)) {
@@ -165,7 +186,8 @@ const handleCustomerAction = async (
     );
   }
 
-  const status = action === 'cancel' ? CopyrightContractStatus.canceled : CopyrightContractStatus.rejected;
+  const status =
+    action === 'cancel' ? CopyrightContractStatus.canceled : CopyrightContractStatus.rejected;
 
   await CopyrightContracts.updateOne(
     { _id: contract._id },
@@ -210,20 +232,38 @@ export const contractAction: RequestHandler<
 
     if (isSp) {
       if (req.body.action === 'cancel') {
-        throw new NotAllowedError({ 
-          en: 'SP cannot cancel contract', 
-          ar: 'لا يمكن للمزود إلغاء العقد' 
-        }, req.lang);
+        throw new NotAllowedError(
+          {
+            en: 'SP cannot cancel contract',
+            ar: 'لا يمكن للمزود إلغاء العقد',
+          },
+          req.lang,
+        );
       }
-      await handleSpAction(contract, req.body.action as 'reject' | 'accept', req.loggedUser.id, actor, req.lang);
+      await handleSpAction(
+        contract,
+        req.body.action as 'reject' | 'accept',
+        req.loggedUser.id,
+        actor,
+        req.lang,
+      );
     } else {
       if (req.body.action === 'accept') {
-        throw new NotAllowedError({ 
-          en: 'Customer cannot accept contract', 
-          ar: 'لا يمكن للعميل قبول العقد' 
-        }, req.lang);
+        throw new NotAllowedError(
+          {
+            en: 'Customer cannot accept contract',
+            ar: 'لا يمكن للعميل قبول العقد',
+          },
+          req.lang,
+        );
       }
-      await handleCustomerAction(contract, req.body.action as 'reject' | 'cancel', req.loggedUser.id, actor, req.lang);
+      await handleCustomerAction(
+        contract,
+        req.body.action as 'reject' | 'cancel',
+        req.loggedUser.id,
+        actor,
+        req.lang,
+      );
     }
 
     res.status(200).json({ message: 'success' });

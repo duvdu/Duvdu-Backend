@@ -15,8 +15,10 @@ import {
   Channels,
   RentalContracts,
   MODELS,
+  checkUserFaceVerification,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
+
 
 import { sendNotification } from './contract-notification.controller';
 
@@ -30,7 +32,15 @@ export const createContractHandler: RequestHandler<
     attachments: string[];
   }
 > = async (req, res, next) => {
+
+
+  const isVerified = await checkUserFaceVerification(req.loggedUser.id);
+
+  if (!isVerified)
+    return next(new BadRequestError({ en: 'user not verified with face recognition', ar: 'المستخدم غير موثوق بالوجه' }, req.lang));
+
   const files = req.files as Express.Multer.File[] | undefined;
+
 
   // Validate project and other checks first
   const project = await Rentals.findOne({ _id: req.params.projectId, isDeleted: { $ne: true } });

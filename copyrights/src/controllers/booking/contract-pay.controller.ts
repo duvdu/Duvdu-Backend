@@ -25,9 +25,16 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
   const contract = await CopyrightContracts.findOne({ paymentLink: req.params.paymentSession });
   if (!contract) return next(new NotFound(undefined, req.lang));
 
-  if (contract.customer.toString() !== req.loggedUser.id) 
-    return next(new NotAllowedError({ en: 'you are not allowed to pay this contract', ar: 'ليس لديك الصلاحية لإتمام هذا العقد' }, req.lang));
-  
+  if (contract.customer.toString() !== req.loggedUser.id)
+    return next(
+      new NotAllowedError(
+        {
+          en: 'you are not allowed to pay this contract',
+          ar: 'ليس لديك الصلاحية لإتمام هذا العقد',
+        },
+        req.lang,
+      ),
+    );
 
   if (
     new Date(contract.actionAt).getTime() + contract.stageExpiration * 60 * 60 * 1000 <
@@ -42,11 +49,9 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
 
   const user = await Users.findById(req.loggedUser.id);
   if (!user) return next(new NotFound(undefined, req.lang));
-  
 
   // TODO: record the transaction from payment gateway webhook
   if (contract.status === CopyrightContractStatus.waitingForFirstPayment) {
-
     const user = await Users.findById(contract.sp);
     if (user && user.avaliableContracts === 0) {
       await sendNotification(
@@ -72,7 +77,6 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
     const updatedUser = await Users.findByIdAndUpdate(user?._id, {
       $inc: { avaliableContracts: -1 },
     });
-    
 
     await CopyrightContracts.updateOne(
       { _id: contract._id },
@@ -80,7 +84,7 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
         status: CopyrightContractStatus.updateAfterFirstPayment,
         firstCheckoutAt: new Date(),
         firstPaymentAmount: ((10 * contract.totalPrice) / 100).toFixed(2),
-        secondPaymentAmount: contract.totalPrice - ((10 * contract.totalPrice) / 100),
+        secondPaymentAmount: contract.totalPrice - (10 * contract.totalPrice) / 100,
       },
     );
 

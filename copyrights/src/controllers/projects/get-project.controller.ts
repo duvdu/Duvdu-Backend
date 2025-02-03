@@ -1,4 +1,11 @@
-import { SuccessResponse, CopyRights, IcopyRights, NotFound, Icategory, Users } from '@duvdu-v1/duvdu';
+import {
+  SuccessResponse,
+  CopyRights,
+  IcopyRights,
+  NotFound,
+  Icategory,
+  Users,
+} from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 export const getProjectHandler: RequestHandler<

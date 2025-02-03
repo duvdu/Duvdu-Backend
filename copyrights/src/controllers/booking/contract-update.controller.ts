@@ -1,4 +1,13 @@
-import { addToDate, BadRequestError, NotFound, SuccessResponse, CopyrightContracts, CopyrightContractStatus, Channels, Users } from '@duvdu-v1/duvdu';
+import {
+  addToDate,
+  BadRequestError,
+  NotFound,
+  SuccessResponse,
+  CopyrightContracts,
+  CopyrightContractStatus,
+  Channels,
+  Users,
+} from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 import { sendNotification } from './contract-notification.controller';

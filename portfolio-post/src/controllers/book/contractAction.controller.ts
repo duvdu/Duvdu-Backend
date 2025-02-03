@@ -10,6 +10,7 @@ import {
   Users,
   ProjectContract,
   ProjectContractStatus,
+  checkUserFaceVerification,
 } from '@duvdu-v1/duvdu';
 
 import { sendNotification } from './sendNotification';
@@ -37,6 +38,12 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
   const customer = await Users.findById(contract.customer);
 
   if (isSp) {
+
+    const isVerified = await checkUserFaceVerification(req.loggedUser.id);
+
+    if (!isVerified)
+      throw new BadRequestError({ en: 'provider not verified with face recognition', ar: 'المزود غير موثوق بالوجه' }, req.lang);
+
     if (req.body.action === 'reject' && contract.status === ProjectContractStatus.pending) {
       await ProjectContract.updateOne(
         { _id: req.params.contractId },

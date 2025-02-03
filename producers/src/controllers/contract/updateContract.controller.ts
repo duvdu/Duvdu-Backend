@@ -3,6 +3,7 @@ import 'express-async-errors';
 import {
   BadRequestError,
   Channels,
+  checkUserFaceVerification,
   ContractStatus,
   NotAllowedError,
   NotFound,
@@ -45,6 +46,13 @@ export const updateContractHandler: UpdateContractHandler = async (req, res, nex
 
   const sp = await Users.findById(producer.user);
   const user = await Users.findById(contract.user);
+
+  if (producer.user.toString() != req.loggedUser.id) {
+    const isVerified = await checkUserFaceVerification(req.loggedUser.id);
+
+    if (!isVerified)
+      return next(new BadRequestError({ en: 'producer not verified with face recognition', ar: 'المزود غير موثوق بالوجه' }, req.lang));
+  }
 
 
   if (req.body.appointmentDate) {

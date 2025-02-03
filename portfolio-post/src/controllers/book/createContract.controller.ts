@@ -13,6 +13,7 @@ import {
   ProjectContract,
   ProjectContractStatus,
   MODELS,
+  checkUserFaceVerification,
 } from '@duvdu-v1/duvdu';
 
 import { sendNotification } from './sendNotification';
@@ -22,6 +23,13 @@ import { CreateContractHandler } from '../../types/contract.endpoint';
 
 export const createContractHandler: CreateContractHandler = async (req, res, next) => {
   try {
+    const isVerified = await checkUserFaceVerification(req.loggedUser.id);
+
+    if (!isVerified)
+      return next(
+        new BadRequestError({ en: 'user not verified with face recognition', ar: 'المستخدم غير موثوق بالوجه' }, req.lang),
+      );
+
     // Project validation
     const project = await ProjectCycle.findOne({
       _id: req.params.projectId,

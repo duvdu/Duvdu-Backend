@@ -1,10 +1,4 @@
-import {
-  PaginationResponse,
-  CopyRights,
-  IcopyRights,
-  MODELS,
-  Categories,
-} from '@duvdu-v1/duvdu';
+import { PaginationResponse, CopyRights, IcopyRights, MODELS, Categories } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import mongoose, { PipelineStage } from 'mongoose';
 

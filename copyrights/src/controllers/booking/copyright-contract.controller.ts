@@ -20,7 +20,6 @@ import {
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-
 export const createContractHandler: RequestHandler<
   { projectId: string },
   SuccessResponse,
@@ -251,7 +250,10 @@ export const contractAction: RequestHandler<
       if action = reject && contract.status = waiting for total payment
         - project rejected & done
     */
-    if (req.body.action === 'reject' && contract.status === CopyrightContractStatus.waitingForFirstPayment)
+    if (
+      req.body.action === 'reject' &&
+      contract.status === CopyrightContractStatus.waitingForFirstPayment
+    )
       await CopyrightContracts.updateOne(
         { _id: req.params.contractId },
         { status: CopyrightContractStatus.rejected, rejectedBy: 'customer', actionAt: new Date() },

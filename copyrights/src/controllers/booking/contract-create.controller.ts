@@ -14,7 +14,8 @@ import {
   Channels,
   CopyrightContractStatus,
   CopyrightContracts,
-  MODELS
+  MODELS,
+  checkUserFaceVerification,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
@@ -22,15 +23,13 @@ import { sendNotification } from './contract-notification.controller';
 
 async function handleAttachments(attachments: Express.Multer.File[]) {
   if (!attachments.length) return [];
-  
-  const fileNames = attachments.map(el => `${FOLDERS.copyrights}/${el.filename}`);
+
+  const fileNames = attachments.map((el) => `${FOLDERS.copyrights}/${el.filename}`);
   const bucket = new Bucket();
-  
+
   // Run file operations in parallel
-  await Promise.all([
-    bucket.saveBucketFiles(FOLDERS.copyrights, ...attachments),
-  ]);
-  
+  await Promise.all([bucket.saveBucketFiles(FOLDERS.copyrights, ...attachments)]);
+
   return fileNames;
 }
 
@@ -46,6 +45,16 @@ export const createContractHandler: RequestHandler<
     attachments: string[];
   }
 > = async (req, res, next) => {
+  const isVerified = await checkUserFaceVerification(req.loggedUser.id);
+
+  if (!isVerified)
+    return next(
+      new BadRequestError(
+        { en: 'user not verified with face recognition', ar: 'المستخدم غير موثوق بالوجه' },
+        req.lang,
+      ),
+    );
+
   // assert project
   const project = await CopyRights.findOne({
     _id: req.params.projectId,
@@ -65,11 +74,11 @@ export const createContractHandler: RequestHandler<
     project.duration.unit as any,
     project.duration.value,
   ).toISOString();
-  
+
   // Run these operations in parallel
   const [stageExpiration, user] = await Promise.all([
     getStageExpiration(new Date(deadline).toString(), req.lang),
-    Users.findById(req.loggedUser.id)
+    Users.findById(req.loggedUser.id),
   ]);
 
   // Create both contracts in parallel
@@ -115,7 +124,7 @@ export const createContractHandler: RequestHandler<
       'new contract',
       'contract created successfully',
       Channels.new_contract,
-    )
+    ),
   ]);
 
   res.status(201).json({ message: 'success', data: { contractId: contract.id } });

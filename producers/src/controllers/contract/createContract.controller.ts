@@ -4,6 +4,7 @@ import {
   BadRequestError,
   Bucket,
   Channels,
+  checkUserFaceVerification,
   Contracts,
   CYCLES,
   FOLDERS,
@@ -21,9 +22,18 @@ import { CreateContractHandler } from '../../types/endpoints';
 
 export const createContractHandler: CreateContractHandler = async (req, res, next) => {
   try {
+
+    const isVerified = await checkUserFaceVerification(req.loggedUser.id);
+
+    if (!isVerified)
+      return next(
+        new BadRequestError({ en: 'user not verified with face recognition', ar: 'المستخدم غير موثوق بالوجه' }, req.lang),
+      );
+
     const attachments = <Express.Multer.File[]>(req.files as any).attachments;
     
     // Run producer validation and file upload in parallel
+
     const [producer] = await Promise.all([
       Producer.findById(req.body.producer),
       (attachments && attachments.length > 0) && new Bucket().saveBucketFiles(FOLDERS.producer, ...attachments)

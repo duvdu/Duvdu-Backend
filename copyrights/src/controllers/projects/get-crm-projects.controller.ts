@@ -31,8 +31,8 @@ export const getCrmProjectsHandler: RequestHandler<
           },
         },
         subCategory: {
-          title:`$subCategory.${req.lang}`,
-          _id:'$subCategory._id'
+          title: `$subCategory.${req.lang}`,
+          _id: '$subCategory._id',
         },
       },
     },

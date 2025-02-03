@@ -10,6 +10,7 @@ import {
   TeamContractStatus,
   TeamContract,
   UserStatus,
+  checkUserFaceVerification,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
@@ -28,6 +29,11 @@ export const contractAction: RequestHandler<
       $or: [{ sp: req.loggedUser.id }, { customer: req.loggedUser.id }],
     });
     if (!contract) return next(new NotFound(undefined, req.lang));
+
+    const isVerified = await checkUserFaceVerification(req.loggedUser.id);
+
+    if (!isVerified)
+      return next(new BadRequestError({ en: 'user not verified with face recognition', ar: 'المستخدم غير موثوق بالوجه' }, req.lang));
 
     const isSp = contract.sp.toString() === req.loggedUser.id;
 

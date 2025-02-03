@@ -1,4 +1,9 @@
-import { Channels, ContractReports, CopyrightContracts  , CopyrightContractStatus} from '@duvdu-v1/duvdu';
+import {
+  Channels,
+  ContractReports,
+  CopyrightContracts,
+  CopyrightContractStatus,
+} from '@duvdu-v1/duvdu';
 import Queue from 'bull';
 
 import { env } from './env';
@@ -61,7 +66,6 @@ firstPaymentExpiration.process(async (job) => {
       'contract canceled by system',
       Channels.update_contract,
     );
-
 });
 
 updateAfterFirstPaymentExpiration.process(async (job) => {
@@ -80,7 +84,6 @@ updateAfterFirstPaymentExpiration.process(async (job) => {
       'contract canceled by system',
       Channels.update_contract,
     );
-
 });
 
 totalPaymentExpiration.process(async (job) => {
@@ -108,7 +111,9 @@ onGoingExpiration.process(async (job) => {
   await CopyrightContracts.findOneAndUpdate(
     { _id: job.data.contractId, status: CopyrightContractStatus.ongoing },
     {
-      status: contractComplain ? CopyrightContractStatus.complaint : CopyrightContractStatus.completed,
+      status: contractComplain
+        ? CopyrightContractStatus.complaint
+        : CopyrightContractStatus.completed,
       actionAt: new Date(),
     },
   );
