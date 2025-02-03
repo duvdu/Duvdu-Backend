@@ -73,10 +73,11 @@ export const updateContractHandler: RequestHandler<
   // update unit price
   if (req.body.unitPrice) contract.projectScale.unitPrice = req.body.unitPrice;
 
-  contract.totalPrice =
-    (contract.equipmentPrice + contract.projectScale.unitPrice) *
-    contract.projectScale.numberOfUnits;
+  const unitPriceTotal = contract.projectScale.unitPrice * contract.projectScale.numberOfUnits;
+  const allPrice = contract.equipmentPrice + unitPriceTotal;
+  contract.totalPrice = allPrice;
   contract.secondPaymentAmount = contract.totalPrice - contract.firstPaymentAmount;
+
   await contract.save();
 
   const user = await Users.findOne({ _id: req.loggedUser.id });

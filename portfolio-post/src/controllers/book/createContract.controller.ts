@@ -87,7 +87,7 @@ export const createContractHandler: CreateContractHandler = async (req, res, nex
 
     // Price calculations
     const unitPriceTotal = project.projectScale.pricerPerUnit * req.body.projectScale.numberOfUnits;
-    const allPrice = totalPrice * req.body.projectScale.numberOfUnits + unitPriceTotal;
+    const allPrice = totalPrice + unitPriceTotal;
 
     // Create contract and wait for file upload in parallel
     const [contract] = await Promise.all([
