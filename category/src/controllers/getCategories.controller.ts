@@ -140,6 +140,7 @@ export const getCategoriesHandler: GetCategoriesHandler = async (req, res) => {
         createdAt: 1,
         updatedAt: 1,
         isRelated: 1,
+        insurance: { $ifNull: ['$insurance', false] },
         media: 1,
         __v: 1,
         image: { $concat: [process.env.BUCKET_HOST, '/', '$image'] },

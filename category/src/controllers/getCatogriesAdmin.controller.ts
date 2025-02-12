@@ -90,6 +90,7 @@ export const getCatogriesAdminHandler: GetCatogriesAdminHandler = async (req, re
         trend: 1,
         createdAt: 1,
         updatedAt: 1,
+        insurance: { $ifNull: ['$insurance', false] },
         __v: 1,
         image: 1,
         jobTitles: 1,
