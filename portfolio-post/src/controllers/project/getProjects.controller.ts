@@ -1,6 +1,6 @@
 import 'express-async-errors';
 
-import { Categories, InviteStatus, MODELS, ProjectCycle } from '@duvdu-v1/duvdu';
+import { Categories, InviteStatus, MODELS, ProjectContractStatus, ProjectCycle } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import mongoose, { PipelineStage, Types } from 'mongoose';
 
@@ -182,6 +182,7 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
       $match: {
         ...req.pagination.filter,
         isDeleted: { $ne: true },
+        showOnHome: { $ne: false },
       },
     },
     {
@@ -195,12 +196,12 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
     { $unwind: '$user' },
     ...(isInstant !== undefined
       ? [
-          {
-            $match: {
-              'user.isAvaliableToInstantProjects': isInstant,
-            },
+        {
+          $match: {
+            'user.isAvaliableToInstantProjects': isInstant,
           },
-        ]
+        },
+      ]
       : []),
     {
       $count: 'totalCount',
@@ -217,6 +218,7 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
       $match: {
         ...req.pagination.filter,
         isDeleted: { $ne: true },
+        showOnHome: { $ne: false },
       },
     },
     { $sort: { createdAt: -1 } },
@@ -545,6 +547,26 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
     },
 
     {
+      $lookup: {
+        from: MODELS.projectContract,
+        let: { projectId: '$_id' },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ['$project', '$$projectId'] },
+                  { $not: { $in: ['$status', [ProjectContractStatus.rejected, ProjectContractStatus.completed, ProjectContractStatus.canceled] ] } }
+                ]
+              }
+            }
+          }
+        ],
+        as: 'activeContract'
+      }
+    },
+
+    {
       $project: {
         _id: 1,
         user: {
@@ -784,6 +806,7 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
             },
           },
         },
+        canEdit: { $eq: [{ $size: '$activeContract' }, 0] },
       },
     },
   );

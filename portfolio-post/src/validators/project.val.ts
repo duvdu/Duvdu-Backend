@@ -130,6 +130,7 @@ export const create = [
 ];
 
 export const update = [
+  body('isDeleted').optional().isBoolean().bail().toBoolean().withMessage('isDeleted'),
   param('projectId').isMongoId().withMessage('projectId'),
   body('address').optional().isString().exists().withMessage('address'),
   body('name').optional().isString().exists().withMessage('name'),

@@ -9,6 +9,8 @@ import {
   IprojectCycle,
   NotAllowedError,
   NotFound,
+  ProjectContract,
+  ProjectContractStatus,
   ProjectCycle,
   SuccessResponse,
 } from '@duvdu-v1/duvdu';
@@ -66,6 +68,7 @@ export const updateProjectHandler: RequestHandler<
     | 'audioCover'
     | 'functions'
     | 'tools'
+    | 'isDeleted'
   >,
   unknown
 > = async (req, res, next) => {
@@ -77,6 +80,25 @@ export const updateProjectHandler: RequestHandler<
     });
     if (!project) {
       throw new NotAllowedError(undefined, req.lang);
+    }
+
+    if (Object.keys(req.body).some(key => key !== 'showOnHome' && key !== 'isDeleted')) {
+      // Check for active contracts
+      const activeContract = await ProjectContract.findOne({
+        project: req.params.projectId,
+        status: { $nin: [ProjectContractStatus.rejected, ProjectContractStatus.completed, ProjectContractStatus.canceled] }
+      });
+    
+      if (activeContract) 
+        throw new NotAllowedError(
+          {
+            en: 'Cannot update project with active contract',
+            ar: 'لا يمكن تحديث المشروع مع وجود عقد نشط'
+          },
+          req.lang
+        );
+    
+
     }
 
     // Find and validate category

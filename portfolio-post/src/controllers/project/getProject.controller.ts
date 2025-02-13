@@ -6,6 +6,7 @@ import {
   InviteStatus,
   MODELS,
   NotFound,
+  ProjectContractStatus,
   ProjectCycle,
   Users,
 } from '@duvdu-v1/duvdu';
@@ -20,6 +21,7 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
         $match: {
           _id: new mongoose.Types.ObjectId(req.params.projectId),
           isDeleted: { $ne: true },
+          showOnHome: { $ne: false },
         },
       },
       {
@@ -358,6 +360,26 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
         },
       },
 
+      {
+        $lookup: {
+          from: MODELS.projectContract,
+          let: { projectId: '$_id' },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ['$project', '$$projectId'] },
+                    { $not: { $in: ['$status', [ProjectContractStatus.rejected, ProjectContractStatus.completed, ProjectContractStatus.canceled] ] } }
+                  ]
+                }
+              }
+            }
+          ],
+          as: 'activeContract'
+        }
+      },
+
       // Single consolidated $project stage
       {
         $project: {
@@ -608,6 +630,7 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
               },
             },
           },
+          canEdit: { $eq: [{ $size: '$activeContract' }, 0] },
         },
       },
     ]);
