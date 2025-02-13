@@ -7,7 +7,7 @@ import { DeleteProducerHandler } from '../../types/endpoints';
 export const deleteProducerHandler: DeleteProducerHandler = async (req, res, next) => {
   const contract = await ProducerContract.findOne({
     producer: req.params.producerId,
-    status: { $ne: ContractStatus.canceled },
+    status: { $nin: [ContractStatus.rejected, ContractStatus.accepted, ContractStatus.canceled] },
   });
   if (contract)
     return next(

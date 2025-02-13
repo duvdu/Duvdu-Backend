@@ -2,9 +2,11 @@ import 'express-async-errors';
 import {
   BadRequestError,
   Categories,
+  ContractStatus,
   CYCLES,
   NotFound,
   Producer,
+  ProducerContract,
   ProducerPlatform,
 } from '@duvdu-v1/duvdu';
 
@@ -27,6 +29,14 @@ export const updateProducerHandler: UpdateProducerHandler = async (req, res, nex
           req.lang,
         ),
       );
+
+    const activeContract = await ProducerContract.findOne({
+      producer: producer._id,
+      status: { $nin: [ContractStatus.rejected, ContractStatus.accepted, ContractStatus.canceled] },
+    });
+
+    if (activeContract)
+      return next(new BadRequestError({ en: 'can not update producer with has active contract', ar: 'لا يمكن تحديث المنتج الذي لديه عقد مفعل' }, req.lang));
 
     if (req.body.platforms) {
       const platforms = await ProducerPlatform.countDocuments({

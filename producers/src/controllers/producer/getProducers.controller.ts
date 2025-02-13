@@ -1,6 +1,6 @@
 import 'express-async-errors';
 
-import { MODELS, Producer } from '@duvdu-v1/duvdu';
+import { ContractStatus, MODELS, Producer } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import mongoose, { PipelineStage, Types } from 'mongoose';
 
@@ -164,6 +164,23 @@ export const getProducersHandler: GetProducersHandler = async (req, res, next) =
         },
       },
       {
+        $lookup: {
+          from: MODELS.producerContract,
+          let: { producerId: '$user._id' },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ['$producer', '$$producerId'] },
+                status: {
+                  $nin: [ContractStatus.rejected, ContractStatus.accepted, ContractStatus.canceled]
+                }
+              }
+            }
+          ],
+          as: 'activeContracts'
+        }
+      },
+      {
         $project: {
           _id: 1,
           subCategories: {
@@ -210,6 +227,7 @@ export const getProducersHandler: GetProducersHandler = async (req, res, next) =
               else: [],
             },
           },
+          canEdit: { $eq: [{ $size: '$activeContracts' }, 0] },
           platforms: {
             $map: {
               input: '$platforms',

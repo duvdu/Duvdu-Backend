@@ -1,6 +1,6 @@
 import 'express-async-errors';
 
-import { MODELS, NotFound, Producer } from '@duvdu-v1/duvdu';
+import { ContractStatus, MODELS, NotFound, Producer } from '@duvdu-v1/duvdu';
 import mongoose from 'mongoose';
 
 import { GetLoggedProducerHandler } from '../../types/endpoints';
@@ -56,6 +56,23 @@ export const getLoggedProducerHandler: GetLoggedProducerHandler = async (req, re
       },
     },
     {
+      $lookup: {
+        from: MODELS.producerContract,
+        let: { producerId: '$user._id' },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ['$producer', '$$producerId'] },
+              status: {
+                $nin: [ContractStatus.rejected, ContractStatus.accepted, ContractStatus.canceled]
+              }
+            }
+          }
+        ],
+        as: 'activeContracts'
+      }
+    },
+    {
       $project: {
         _id: 1,
         subCategories: {
@@ -102,6 +119,7 @@ export const getLoggedProducerHandler: GetLoggedProducerHandler = async (req, re
             else: [],
           },
         },
+        canEdit: { $eq: [{ $size: '$activeContracts' }, 0] },
         platforms: {
           $map: {
             input: '$platforms',

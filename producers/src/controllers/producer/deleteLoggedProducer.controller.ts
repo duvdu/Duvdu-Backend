@@ -19,7 +19,7 @@ export const deleteLoggedProducerHandler: DeleteLoggedProducerHandler = async (r
 
   const contract = await ProducerContract.findOne({
     producer: producer._id,
-    status: { $ne: ContractStatus.canceled },
+    status: { $nin: [ContractStatus.rejected, ContractStatus.accepted, ContractStatus.canceled] },
   });
   if (contract)
     return next(
