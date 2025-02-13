@@ -53,9 +53,9 @@ export const loginWithProviderHandler: RequestHandler<
   let role;
   let user = await Users.findOne({
     $or: [
-      { appleId: req.body.appleId },
-      { googleId: req.body.googleId },
-      { email: req.body.email },
+      ...(req.body.appleId ? [{ appleId: { $eq: req.body.appleId, $ne: null } }] : []),
+      ...(req.body.googleId ? [{ googleId: { $eq: req.body.googleId, $ne: null } }] : []),
+      { email: {$eq: req.body.email }},
     ],
   });
 
