@@ -23,21 +23,31 @@ export const loginWithProviderHandler: RequestHandler<
   >,
   unknown
 > = async (req, res, next) => {
-  if (req.body.username!.length < 6 || /\s/.test(req.body.username!)) {
-    let username = req.body.username!.replace(/\s/g, '').toLowerCase();
-
-    if (username.length <= 6) {
+  // Refactored username validation and generation
+  if (req.body.username) {
+    let username = req.body.username.replace(/\s/g, '').toLowerCase();
+    
+    // Ensure minimum length and generate unique username if needed
+    while (username.length < 7) {
       const randomChar = String.fromCharCode(97 + Math.floor(Math.random() * 26));
       const randomNumber = Math.floor(Math.random() * 10);
-
-      username = `${username}${randomChar}${randomNumber}`;
-
-      if (username.length <= 6) {
-        username = username.padEnd(7, randomChar);
-      }
+      username += randomChar + randomNumber;
     }
 
-    req.body.username = username.toLowerCase();
+    req.body.username = username;
+  } else {
+    // Generate username from email if no username provided
+    const emailPrefix = req.body.email?.split('@')[0] || '';
+    let username = emailPrefix.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+    
+    // Add random chars if username is too short
+    while (username.length < 7) {
+      const randomChar = String.fromCharCode(97 + Math.floor(Math.random() * 26));
+      const randomNumber = Math.floor(Math.random() * 10);
+      username += randomChar + randomNumber;
+    }
+
+    req.body.username = username;
   }
 
   let role;
@@ -49,14 +59,45 @@ export const loginWithProviderHandler: RequestHandler<
     ],
   });
 
-  if (!user) {
-    user = await Users.findOne({ username: req.body.username });
-    if (user) {
-      req.body.username = `${req.body.username}${Math.floor(100000 + Math.random() * 900000)}`;
+  // Handle existing user
+  if (user) {
+    // Update provider IDs if they're new
+    if (req.body.googleId && !user.googleId) {
+      user.googleId = req.body.googleId;
+    }
+    if (req.body.appleId && !user.appleId) {
+      user.appleId = req.body.appleId;
+    }
+    
+    // Update email if not present
+    if (req.body.email && !user.email) {
+      user.email = req.body.email;
     }
 
+    // Update name if not present
+    if (req.body.name && !user.name) {
+      user.name = req.body.name;
+    }
+
+    role = await Roles.findById(user.role);
+    if (!role) {
+      return next(
+        new UnauthenticatedError(
+          { en: 'User role not found', ar: 'دور المستخدم غير موجود' },
+          req.lang,
+        ),
+      );
+    }
+  } else {
+    // Create new user
     role = await Roles.findOne({ key: SystemRoles.verified });
     if (!role) return next(new NotFound(undefined, req.lang));
+
+    // Ensure username is unique
+    const usernameExists = await Users.findOne({ username: req.body.username });
+    if (usernameExists) {
+      req.body.username = `${req.body.username}${Math.floor(100000 + Math.random() * 900000)}`;
+    }
 
     user = await Users.create({
       appleId: req.body.appleId,
@@ -67,19 +108,9 @@ export const loginWithProviderHandler: RequestHandler<
       email: req.body.email,
       name: req.body.name,
     });
-  } else {
-    role = await Roles.findById(user.role);
-    if (!role) {
-      return next(
-        new UnauthenticatedError(
-          { en: 'User role not found', ar: 'دور المستخدم غير موجود' },
-          req.lang,
-        ),
-      );
-    }
   }
 
-  if (!user.isVerified)
+  if (!user.isVerified) {
     return next(
       new BadRequestError(
         {
@@ -89,16 +120,13 @@ export const loginWithProviderHandler: RequestHandler<
         req.lang,
       ),
     );
-
-  // update user with new provider id
-  if (req.body.googleId) user.googleId = req.body.googleId;
-  if (req.body.appleId) user.appleId = req.body.appleId;
+  }
 
   const { accessToken, refreshToken } = await createOrUpdateSessionAndGenerateTokens(
     req.headers,
     user,
     role,
-    req.body.notificationToken ? req.body.notificationToken : null,
+    req.body.notificationToken || null,
   );
 
   req.session.access = accessToken;
