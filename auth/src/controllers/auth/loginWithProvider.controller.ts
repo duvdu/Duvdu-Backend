@@ -23,8 +23,6 @@ export const loginWithProviderHandler: RequestHandler<
   >,
   unknown
 > = async (req, res, next) => {
-  console.log(/\s/.test(req.body.username!));
-
   if (req.body.username!.length < 6 || /\s/.test(req.body.username!)) {
     let username = req.body.username!.replace(/\s/g, '').toLowerCase();
 
@@ -44,7 +42,7 @@ export const loginWithProviderHandler: RequestHandler<
 
   let role;
   let user = await Users.findOne({
-    $or: [{ appleId: req.body.appleId, googleId: req.body.googleId }],
+    $or: [{ appleId: req.body.appleId, googleId: req.body.googleId, email: req.body.email }],
   });
 
   if (!user) {
@@ -87,6 +85,10 @@ export const loginWithProviderHandler: RequestHandler<
         req.lang,
       ),
     );
+
+  // update user with new provider id
+  if (req.body.googleId) user.googleId = req.body.googleId;
+  if (req.body.appleId) user.appleId = req.body.appleId;
 
   const { accessToken, refreshToken } = await createOrUpdateSessionAndGenerateTokens(
     req.headers,
