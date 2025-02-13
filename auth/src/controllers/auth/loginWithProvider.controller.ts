@@ -42,7 +42,11 @@ export const loginWithProviderHandler: RequestHandler<
 
   let role;
   let user = await Users.findOne({
-    $or: [{ appleId: req.body.appleId, googleId: req.body.googleId, email: req.body.email }],
+    $or: [
+      { appleId: req.body.appleId },
+      { googleId: req.body.googleId },
+      { email: req.body.email },
+    ],
   });
 
   if (!user) {
@@ -99,6 +103,7 @@ export const loginWithProviderHandler: RequestHandler<
 
   req.session.access = accessToken;
   req.session.refresh = refreshToken;
+  await user.save();
 
   return res.status(200).json({ message: 'success' });
 };
