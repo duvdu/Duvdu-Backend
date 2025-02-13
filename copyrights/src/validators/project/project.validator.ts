@@ -61,6 +61,11 @@ export const update = [
   body('showOnHome').optional().isBoolean().toBoolean().withMessage('showOnHomeBoolean'),
   body('location.lat').optional().isFloat({ min: -90, max: 90 }).withMessage('latInvalid'),
   body('location.lng').optional().isFloat({ min: -180, max: 180 }).withMessage('lngInvalid'),
+  body('tags').optional().isArray().withMessage('tagsArray'),
+  body('tags.*').isMongoId().withMessage('tagLength'),
+  body('subCategory').optional().isMongoId().withMessage('subCategoryInvalid'),
+  body('category').optional().isMongoId().withMessage('categoryInvalid'),
+  body('isDeleted').optional().isBoolean({ strict: true }).toBoolean().withMessage('isDeletedBoolean'),
   globalValidatorMiddleware,
 ];
 

@@ -1,4 +1,4 @@
-import { PaginationResponse, CopyRights, IcopyRights, MODELS, Categories } from '@duvdu-v1/duvdu';
+import { PaginationResponse, CopyRights, IcopyRights, MODELS, Categories, CopyrightContractStatus } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import mongoose, { PipelineStage } from 'mongoose';
 
@@ -94,11 +94,13 @@ export const getProjectsHandler: RequestHandler<
   if (req.pagination.filter.instant != undefined) isInstant = req.pagination.filter.instant;
   delete req.pagination.filter.instant;
 
+
   const countPipeline: PipelineStage[] = [
     {
       $match: {
         ...req.pagination.filter,
         isDeleted: { $ne: true },
+        showOnHome: { $ne: false },
       },
     },
   ];
@@ -222,6 +224,47 @@ export const getProjectsHandler: RequestHandler<
       },
     },
     {
+      $lookup: {
+        from: MODELS.copyrightContract,
+        localField: '_id',
+        foreignField: 'project',
+        as: 'contracts'
+      },
+    },
+    {
+      $addFields: {
+        latestContract: { $arrayElemAt: ['$contracts', -1] },
+      }
+    },
+    {
+      $addFields: {
+        canEdit: {
+          $cond: {
+            if: { $eq: [{ $size: '$contracts' }, 0] },
+            then: true,
+            else: {
+              $not: {
+                $in: [
+                  '$latestContract.status',
+                  [
+                    CopyrightContractStatus.rejected,
+                    CopyrightContractStatus.completed,
+                    CopyrightContractStatus.canceled
+                  ]
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      $project: {
+        contracts: 0,
+        latestContract: 0
+      }
+    },
+    {
       $project: {
         _id: 1,
         user: {
@@ -251,6 +294,7 @@ export const getProjectsHandler: RequestHandler<
         rate: 1,
         tags: 1,
         subCategory: 1,
+        canEdit: 1,
       },
     },
   );

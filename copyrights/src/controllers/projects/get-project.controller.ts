@@ -5,6 +5,8 @@ import {
   NotFound,
   Icategory,
   Users,
+  CopyrightContractStatus,
+  CopyrightContracts,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
@@ -15,6 +17,7 @@ export const getProjectHandler: RequestHandler<
   const project = await CopyRights.findOne({
     _id: req.params.projectId,
     isDeleted: { $ne: true },
+    showOnHome: { $ne: false },
   })
     .populate([
       {
@@ -59,6 +62,19 @@ export const getProjectHandler: RequestHandler<
     lng: (project.location as any).coordinates?.[0],
     lat: (project.location as any).coordinates?.[1],
   };
+
+  const contract = await CopyrightContracts.findOne({
+    project: req.params.projectId,
+  }).sort({ createdAt: -1 });
+
+  const nonEditableStatuses = [
+    CopyrightContractStatus.rejected,
+    CopyrightContractStatus.completed,
+    CopyrightContractStatus.canceled
+  ];
+
+  (project as any).canEdit = !contract || !nonEditableStatuses.includes(contract.status);
+
 
   await Users.updateOne({ _id: project.user.id }, { $inc: { projectsView: 1 } });
 
