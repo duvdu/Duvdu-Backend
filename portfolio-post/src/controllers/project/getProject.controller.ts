@@ -128,6 +128,7 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
                   hasVerificationBadge: '$creativeDetails.hasVerificationBadge',
                   likes: '$creativeDetails.likes',
                   followCount: '$creativeDetails.followCount',
+                  haveInvitation: '$creativeDetails.haveInvitation',
                   address: '$creativeDetails.address',
                   inviteStatus: '$creatives.inviteStatus',
                   mainCategory: {

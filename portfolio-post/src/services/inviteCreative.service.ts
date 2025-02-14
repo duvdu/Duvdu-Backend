@@ -4,6 +4,7 @@ import {
   CYCLES,
   InviteStatus,
   NotFound,
+  Setting,
   Users,
 } from '@duvdu-v1/duvdu';
 import { Types } from 'mongoose';
@@ -32,28 +33,6 @@ export const inviteCreatives = async (
         lang,
       );
     }
-
-    // check sub category
-    // category.subCategories?.forEach((subCategory: any) => {
-    //   console.log(subCategory._id.toString());
-    //   console.log(user.mainCategory.subCategories.subCategory.toString());
-    //   if (subCategory._id.toString() == user.mainCategory.subCategories.subCategory.toString()) {
-    //     // check tags
-    //     user.mainCategory.subCategories.tags.forEach((tag: any) => {
-    //       if (!subCategory.tags.some((subTag: any) => subTag._id.toString() === tag.tag.toString())) {
-    //         throw new BadRequestError(
-    //           { en: 'tag is not in the sub category', ar: 'التصنيف غير موجود في الفئة الفرعية' },
-    //           lang,
-    //         );
-    //       }
-    //     });
-    //   } else {
-    //     throw new BadRequestError(
-    //       { en: 'sub category not found', ar: 'الفئة الفرعية غير موجودة' },
-    //       lang,
-    //     );
-    //   }
-    // });
 
     const subCategoryExists = category.subCategories?.some((subCategory: any) => {
       if (subCategory._id.toString() === user.mainCategory.subCategories.subCategory.toString()) {
@@ -115,8 +94,10 @@ export const inviteCreatives = async (
     }
   }
 
+  const appSettings = await Setting.findOne();
+
   const createdUsers = await Users.create(
-    invitedUsers.map((user) => ({ phoneNumber: { number: user.number }, haveInvitation: true })),
+    invitedUsers.map((user) => ({ phoneNumber: { number: user.number }, haveInvitation: true , profileImage: appSettings?.default_profile , coverImage: appSettings?.default_cover })),
   );
 
   // Update return structure to match IprojectCycle

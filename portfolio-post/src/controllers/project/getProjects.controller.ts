@@ -313,6 +313,7 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
                 isAvaliableToInstantProjects: '$creativeDetails.isAvaliableToInstantProjects',
                 pricePerHour: '$creativeDetails.pricePerHour',
                 hasVerificationBadge: '$creativeDetails.hasVerificationBadge',
+                haveInvitation: '$creativeDetails.haveInvitation',
                 likes: '$creativeDetails.likes',
                 followCount: '$creativeDetails.followCount',
                 address: '$creativeDetails.address',
