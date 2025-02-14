@@ -45,8 +45,8 @@ router
 router
   .route('/')
   .post(
-    // isauthenticated,
-    // isauthorized(PERMISSIONS.createProjectHandler),
+    isauthenticated,
+    isauthorized(PERMISSIONS.createProjectHandler),
     globalUploadMiddleware(FOLDERS.portfolio_post, {
       maxSize: 400 * 1024 * 1024,
       fileTypes: ['video/*', 'image/*', 'audio/*', 'application/*'],
