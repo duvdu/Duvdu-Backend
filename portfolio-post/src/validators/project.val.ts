@@ -201,6 +201,7 @@ export const getProject = [
 ];
 
 export const getAll = [
+  query('inviteStatus').optional().isIn([InviteStatus.accepted, InviteStatus.pending]).withMessage('inviteStatus'),
   query('relatedCategory').optional().isArray().withMessage('relatedCategory'),
   query('relatedCategory.*').isMongoId().withMessage('relatedCategory'),
   query('relatedSubCategory').optional().isArray().withMessage('relatedSubCategory'),

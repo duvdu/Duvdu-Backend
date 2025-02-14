@@ -95,7 +95,17 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
           creatives: {
             $push: {
               $cond: [
-                { $eq: ['$creatives.inviteStatus', InviteStatus.accepted] },
+                {
+                  $and: [
+                    { $eq: ['$creatives.inviteStatus', InviteStatus.accepted] },
+                    {
+                      $ne: [
+                        new mongoose.Types.ObjectId(req.loggedUser?.id || '000000000000000000000000'),
+                        '$user._id'
+                      ]
+                    }
+                  ]
+                },
                 {
                   _id: '$creativeDetails._id',
                   profileImage: {

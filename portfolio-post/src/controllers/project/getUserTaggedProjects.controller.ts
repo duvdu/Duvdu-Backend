@@ -16,7 +16,7 @@ export const getUserTaggedProjectsHandler: RequestHandler<
   unknown,
   PaginationResponse<{ data: IprojectCycle[] }>,
   GetProjectsHandler,
-  unknown
+  { inviteStatus: InviteStatus }
 > = async (req, res) => {
   const userId = req.loggedUser?.id;
 
@@ -26,7 +26,7 @@ export const getUserTaggedProjectsHandler: RequestHandler<
         creatives: {
           $elemMatch: {
             creative: new Types.ObjectId(userId),
-            inviteStatus: InviteStatus.accepted,
+            inviteStatus: req.query.inviteStatus,
           },
         },
       },
@@ -56,7 +56,7 @@ export const getUserTaggedProjectsHandler: RequestHandler<
         creatives: {
           $elemMatch: {
             creative: new Types.ObjectId(userId),
-            inviteStatus: InviteStatus.accepted,
+            inviteStatus: req.query.inviteStatus,
           },
         },
       },
@@ -124,7 +124,7 @@ export const getUserTaggedProjectsHandler: RequestHandler<
         creatives: {
           $push: {
             $cond: [
-              { $eq: ['$creatives.inviteStatus', InviteStatus.accepted] },
+              { $eq: ['$creatives.inviteStatus', req.query.inviteStatus] },
               {
                 _id: '$creativeDetails._id',
                 profileImage: {
