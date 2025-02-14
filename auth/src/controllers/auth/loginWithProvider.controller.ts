@@ -66,9 +66,16 @@ export const loginWithProviderHandler: RequestHandler<
   // Second check: Find user with matching email and null provider ID
   if (!user && req.body.email) {
     user = await Users.findOne({
-      email: req.body.email,
-      [providerId]: null
+      email: req.body.email
     });
+
+    if (user && user[providerId]) 
+      return next(
+        new UnauthenticatedError(
+          { en: 'invalidProvider', ar: 'الموفر غير صالح' },
+          req.lang,
+        ),
+      );
   }
 
   // Handle existing user
