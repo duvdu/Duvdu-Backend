@@ -78,6 +78,21 @@ export const loginWithProviderHandler: RequestHandler<
       );
   }
 
+  if (!user && providerId) {
+    const user = await Users.findOne({
+      [providerId]: providerValue
+    });
+
+    if (user) 
+      return next(
+        new UnauthenticatedError(
+          { en: 'invalidProvider', ar: 'الموفر غير صالح' },
+          req.lang,
+        ),
+      );
+  }
+
+
   // Handle existing user
   if (user) {
     // Update provider ID if it was null
