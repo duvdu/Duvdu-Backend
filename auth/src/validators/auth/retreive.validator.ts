@@ -11,5 +11,14 @@ export const retreiveUsernameVal = [
       if (val.match(/^[a-z0-9_]+$/)) return true;
       throw new Error('usernameFormat');
     }),
+  body('email')
+    .optional()
+    .isEmail()
+    .withMessage('emailFormat'),
+  body('phoneNumber').optional().isMobilePhone(['ar-EG']).withMessage('phoneNumberInvalid').custom((val , { req }) => {
+    if (!req.body.username && !req.body.email && !val) {
+      throw new Error('atLeastOneRequired');
+    }
+  }),
   globalValidatorMiddleware,
 ];

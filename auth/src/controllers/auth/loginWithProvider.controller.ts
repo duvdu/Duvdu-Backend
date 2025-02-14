@@ -1,6 +1,5 @@
 import 'express-async-errors';
 import {
-  BadRequestError,
   Iuser,
   NotFound,
   Roles,
@@ -8,10 +7,13 @@ import {
   SystemRoles,
   UnauthenticatedError,
   Users,
+  VerificationReason,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 import { createOrUpdateSessionAndGenerateTokens } from '../../utils/createOrUpdateSessionAndGenerateTokens';
+import { hashVerificationCode } from '../../utils/crypto';
+import { generateRandom6Digit } from '../../utils/gitRandom6Dugut';
 
 export const loginWithProviderHandler: RequestHandler<
   unknown,
@@ -51,29 +53,31 @@ export const loginWithProviderHandler: RequestHandler<
   }
 
   let role;
-  let user = await Users.findOne({
-    $or: [
-      ...(req.body.appleId ? [{ appleId: { $eq: req.body.appleId, $ne: null } }] : []),
-      ...(req.body.googleId ? [{ googleId: { $eq: req.body.googleId, $ne: null } }] : []),
-      { email: {$eq: req.body.email }},
-    ],
+  let user;
+  const providerId = req.body.appleId ? 'appleId' : 'googleId';
+  const providerValue = req.body.appleId || req.body.googleId;
+
+  // First check: Find user with matching provider ID and email
+  user = await Users.findOne({
+    [providerId]: providerValue,
+    email: req.body.email
   });
+
+  // Second check: Find user with matching email and null provider ID
+  if (!user && req.body.email) {
+    user = await Users.findOne({
+      email: req.body.email,
+      [providerId]: null
+    });
+  }
 
   // Handle existing user
   if (user) {
-    // Update provider IDs if they're new
-    if (req.body.googleId && !user.googleId) {
-      user.googleId = req.body.googleId;
-    }
-    if (req.body.appleId && !user.appleId) {
-      user.appleId = req.body.appleId;
+    // Update provider ID if it was null
+    if (!user[providerId]) {
+      user[providerId] = providerValue;
     }
     
-    // Update email if not present
-    if (req.body.email && !user.email) {
-      user.email = req.body.email;
-    }
-
     // Update name if not present
     if (req.body.name && !user.name) {
       user.name = req.body.name;
@@ -100,8 +104,7 @@ export const loginWithProviderHandler: RequestHandler<
     }
 
     user = await Users.create({
-      appleId: req.body.appleId,
-      googleId: req.body.googleId,
+      [providerId]: providerValue,
       username: req.body.username,
       isVerified: true,
       role: role._id,
@@ -111,15 +114,17 @@ export const loginWithProviderHandler: RequestHandler<
   }
 
   if (!user.isVerified) {
-    return next(
-      new BadRequestError(
-        {
-          en: `Account not verified reason : ${user.verificationCode?.reason}`,
-          ar: `سبب عدم توثيق الحساب : ${user.verificationCode?.reason}`,
-        },
-        req.lang,
-      ),
-    );
+    const verificationCode = generateRandom6Digit();
+
+    user.verificationCode = {
+      reason: VerificationReason.signup,
+      code: hashVerificationCode(verificationCode),
+      expireAt: new Date(Date.now() + 60 * 1000).toString(),
+    };
+    
+    await user.save();
+
+    return res.status(403).json(<any>{ message: 'success', code: verificationCode });
   }
 
   const { accessToken, refreshToken } = await createOrUpdateSessionAndGenerateTokens(

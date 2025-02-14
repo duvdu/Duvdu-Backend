@@ -9,6 +9,8 @@ import {
 import { SigninHandler } from '../../types/endpoints/user.endpoints';
 import { comparePassword } from '../../utils/bcrypt';
 import { createOrUpdateSessionAndGenerateTokens } from '../../utils/createOrUpdateSessionAndGenerateTokens';
+import { hashVerificationCode } from '../../utils/crypto';
+import { generateRandom6Digit } from '../../utils/gitRandom6Dugut';
 
 export const signinHandler: SigninHandler = async (req, res, next) => {
   const { login, password, notificationToken } = req.body;
@@ -45,16 +47,20 @@ export const signinHandler: SigninHandler = async (req, res, next) => {
       ),
     );
 
-  if (!user.isVerified && (user.verificationCode!.reason = VerificationReason.signup))
-    return next(
-      new BadRequestError(
-        {
-          en: `Account not verified reason : ${VerificationReason.signup}`,
-          ar: `سبب عدم توثيق الحساب : ${VerificationReason.signup}`,
-        },
-        req.lang,
-      ),
-    );
+  if (!user.isVerified && (user.verificationCode!.reason = VerificationReason.signup)){
+    const verificationCode = generateRandom6Digit();
+
+    user.verificationCode = {
+      reason: VerificationReason.signup,
+      code: hashVerificationCode(verificationCode),
+      expireAt: new Date(Date.now() + 60 * 1000).toString(),
+    };
+    
+    await user.save();
+    return res.status(403).json(<any>{ message: 'success', code: verificationCode });
+  }
+    
+
 
   const role = await Roles.findById(user.role);
   if (!role)

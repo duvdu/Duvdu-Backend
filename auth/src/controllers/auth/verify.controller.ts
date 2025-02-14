@@ -10,6 +10,7 @@ import {
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
+import { createOrUpdateSessionAndGenerateTokens } from '../../utils/createOrUpdateSessionAndGenerateTokens';
 import { hashVerificationCode } from '../../utils/crypto';
 
 export const verifyHandler: RequestHandler<
@@ -65,6 +66,16 @@ export const verifyHandler: RequestHandler<
     const role = await Roles.findOne({ key: SystemRoles.verified });
 
     user.role = role?.id;
+
+    
+    const { accessToken, refreshToken } = await createOrUpdateSessionAndGenerateTokens(
+      req.headers,
+      user,
+      role!,
+      null,
+    );
+    req.session.access = accessToken;
+    req.session.refresh = refreshToken;
   }
 
   await user.save();

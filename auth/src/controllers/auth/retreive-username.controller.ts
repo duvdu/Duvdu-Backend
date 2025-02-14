@@ -4,9 +4,27 @@ import { RetreiveUsernameHandler } from '../../types/endpoints/user.endpoints';
 
 export const retreiveUsernameHandler: RetreiveUsernameHandler = async (req, res) => {
   const { username, email, phoneNumber } = req.body;
+  const conditions = [];
+  
+  if (username) {
+    conditions.push({ username });
+  }
+  
+  if (email) {
+    conditions.push({ email });
+  }
+  
+  if (phoneNumber) {
+    conditions.push({ 
+      phoneNumber: {
+        key: 'phoneNumber.key',
+        number: phoneNumber.number,
+      },
+    });
+  }
 
   const user = await Users.findOne({
-    $or: [{ username }, { email }, { phoneNumber: { key: 'phoneNumber.key', number: phoneNumber } }],
+    $or: conditions
   });
   res.status(200).json({ message: 'success', isExists: !!user });
 };
