@@ -34,24 +34,49 @@ export const inviteCreatives = async (
     }
 
     // check sub category
-    category.subCategories?.forEach((subCategory: any) => {
-      if (subCategory._id.toString() == user.mainCategory.subCategories.subCategory.toString()) {
+    // category.subCategories?.forEach((subCategory: any) => {
+    //   console.log(subCategory._id.toString());
+    //   console.log(user.mainCategory.subCategories.subCategory.toString());
+    //   if (subCategory._id.toString() == user.mainCategory.subCategories.subCategory.toString()) {
+    //     // check tags
+    //     user.mainCategory.subCategories.tags.forEach((tag: any) => {
+    //       if (!subCategory.tags.some((subTag: any) => subTag._id.toString() === tag.tag.toString())) {
+    //         throw new BadRequestError(
+    //           { en: 'tag is not in the sub category', ar: 'التصنيف غير موجود في الفئة الفرعية' },
+    //           lang,
+    //         );
+    //       }
+    //     });
+    //   } else {
+    //     throw new BadRequestError(
+    //       { en: 'sub category not found', ar: 'الفئة الفرعية غير موجودة' },
+    //       lang,
+    //     );
+    //   }
+    // });
+
+    const subCategoryExists = category.subCategories?.some((subCategory: any) => {
+      if (subCategory._id.toString() === user.mainCategory.subCategories.subCategory.toString()) {
         // check tags
         user.mainCategory.subCategories.tags.forEach((tag: any) => {
-          if (!subCategory.tags.some((subTag: any) => subTag._id.toString() === tag.toString())) {
+          if (!subCategory.tags.some((subTag: any) => subTag._id.toString() === tag.tag.toString())) {
             throw new BadRequestError(
               { en: 'tag is not in the sub category', ar: 'التصنيف غير موجود في الفئة الفرعية' },
               lang,
             );
           }
         });
-      } else {
-        throw new BadRequestError(
-          { en: 'sub category not found', ar: 'الفئة الفرعية غير موجودة' },
-          lang,
-        );
+        return true;
       }
+      return false;
     });
+
+    if (!subCategoryExists) {
+      throw new BadRequestError(
+        { en: 'sub category not found', ar: 'الفئة الفرعية غير موجودة' },
+        lang,
+      );
+    }
 
     // check related category
     if (user.mainCategory.relatedCategory) {
@@ -61,22 +86,32 @@ export const inviteCreatives = async (
           { en: 'related category not found', ar: 'الفئة المتعلقة غير موجودة' },
           lang,
         );
-      relatedCategory.subCategories?.forEach((subCategory: any) => {
+
+      const relatedSubCategoryExists = relatedCategory.subCategories?.some((subCategory: any) => {
         if (
-          subCategory._id.toString() ==
+          subCategory._id.toString() ===
           user.mainCategory.relatedCategory?.subCategories.subCategory.toString()
         ) {
           // check tags
           user.mainCategory.relatedCategory?.subCategories.tags.forEach((tag: any) => {
-            if (!subCategory.tags.some((subTag: any) => subTag._id.toString() === tag.toString())) {
+            if (!subCategory.tags.some((subTag: any) => subTag._id.toString() === tag.tag.toString())) {
               throw new BadRequestError(
                 { en: 'tag is not in the sub category', ar: 'التصنيف غير موجود في الفئة الفرعية' },
                 lang,
               );
             }
           });
+          return true;
         }
+        return false;
       });
+
+      if (!relatedSubCategoryExists) {
+        throw new BadRequestError(
+          { en: 'related sub category not found', ar: 'الفئة الفرعية المتعلقة غير موجودة' },
+          lang,
+        );
+      }
     }
   }
 
@@ -93,9 +128,9 @@ export const inviteCreatives = async (
       subCategories: invitedUsers[index].mainCategory.subCategories,
       relatedCategory: invitedUsers[index].mainCategory.relatedCategory
         ? {
-            category: invitedUsers[index].mainCategory.relatedCategory?.category,
-            subCategories: invitedUsers[index].mainCategory.relatedCategory?.subCategories,
-          }
+          category: invitedUsers[index].mainCategory.relatedCategory?.category,
+          subCategories: invitedUsers[index].mainCategory.relatedCategory?.subCategories,
+        }
         : null,
     },
   }));

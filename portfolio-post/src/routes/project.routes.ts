@@ -23,7 +23,6 @@ router
   .route('/:projectId/tagged-creative/:creativeId')
   .delete(isauthenticated , val.removeTaggedCreative, handler.removeTaggedCreative);
 
-router.route('/invitation').get(isauthenticated, handler.getUserInvitationHandler);
 router
   .route('/analysis')
   .get(
@@ -46,8 +45,8 @@ router
 router
   .route('/')
   .post(
-    isauthenticated,
-    isauthorized(PERMISSIONS.createProjectHandler),
+    // isauthenticated,
+    // isauthorized(PERMISSIONS.createProjectHandler),
     globalUploadMiddleware(FOLDERS.portfolio_post, {
       maxSize: 400 * 1024 * 1024,
       fileTypes: ['video/*', 'image/*', 'audio/*', 'application/*'],
