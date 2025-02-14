@@ -4,6 +4,11 @@ import { RetreiveUsernameHandler } from '../../types/endpoints/user.endpoints';
 
 export const retreiveUsernameHandler: RetreiveUsernameHandler = async (req, res) => {
   const { username, email, phoneNumber } = req.body;
+
+  if (!username && !email && !phoneNumber) {
+    return res.status(400).json(<any>{ message: 'at Least One Required' });
+  }
+
   const conditions = [];
   
   if (username) {

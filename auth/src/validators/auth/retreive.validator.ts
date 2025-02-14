@@ -15,10 +15,6 @@ export const retreiveUsernameVal = [
     .optional()
     .isEmail()
     .withMessage('emailFormat'),
-  body('phoneNumber').optional().isMobilePhone(['ar-EG']).withMessage('phoneNumberInvalid').custom((val , { req }) => {
-    if (!req.body.username && !req.body.email && !val) {
-      throw new Error('atLeastOneRequired');
-    }
-  }),
+  body('phoneNumber').optional().isMobilePhone(['ar-EG']).withMessage('phoneNumberInvalid'),
   globalValidatorMiddleware,
 ];
