@@ -21,10 +21,7 @@ export const retreiveUsernameHandler: RetreiveUsernameHandler = async (req, res)
   
   if (phoneNumber) {
     conditions.push({ 
-      phoneNumber: {
-        key: 'phoneNumber.key',
-        number: phoneNumber.number,
-      },
+      'phoneNumber.number': phoneNumber
     });
   }
 
