@@ -96,25 +96,30 @@ export const inviteCreatives = async (
 
   const appSettings = await Setting.findOne();
 
-  const createdUsers = await Users.create(
-    invitedUsers.map((user) => ({ phoneNumber: { number: user.number }, haveInvitation: true , profileImage: appSettings?.default_profile , coverImage: appSettings?.default_cover })),
-  );
+  try {
+    const createdUsers = await Users.create(
+      invitedUsers.map((user) => ({ phoneNumber: { number: user.number }, haveInvitation: true , profileImage: appSettings?.default_profile , coverImage: appSettings?.default_cover })),
+    );
 
-  // Update return structure to match IprojectCycle
-  return createdUsers.map((el, index) => ({
-    creative: el._id,
-    inviteStatus: InviteStatus.pending,
-    mainCategory: {
-      category: invitedUsers[index].mainCategory.category,
-      subCategories: invitedUsers[index].mainCategory.subCategories,
-      relatedCategory: invitedUsers[index].mainCategory.relatedCategory
-        ? {
-          category: invitedUsers[index].mainCategory.relatedCategory?.category,
-          subCategories: invitedUsers[index].mainCategory.relatedCategory?.subCategories,
-        }
-        : null,
-    },
-  }));
+
+    // Update return structure to match IprojectCycle
+    return createdUsers.map((el, index) => ({
+      creative: el._id,
+      inviteStatus: InviteStatus.pending,
+      mainCategory: {
+        category: invitedUsers[index].mainCategory.category,
+        subCategories: invitedUsers[index].mainCategory.subCategories,
+        relatedCategory: invitedUsers[index].mainCategory.relatedCategory
+          ? {
+            category: invitedUsers[index].mainCategory.relatedCategory?.category,
+            subCategories: invitedUsers[index].mainCategory.relatedCategory?.subCategories,
+          }
+          : null,
+      },
+    }));
+  } catch (error) {
+    throw new BadRequestError({ en: 'creative already exists', ar: 'المبدع موجود بالفعل' }, lang);
+  }
 };
 
 export const validateCreative = async (
