@@ -1,4 +1,4 @@
-import { MODELS, Rentals, Categories } from '@duvdu-v1/duvdu';
+import { MODELS, Rentals, Categories, RentalContractStatus } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import mongoose, { PipelineStage } from 'mongoose';
 
@@ -149,6 +149,7 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
       $match: {
         ...req.pagination.filter,
         isDeleted: { $ne: true },
+        showOnHome: { $ne: false },
       },
     },
     { $sort: { createdAt: -1 } },
@@ -159,6 +160,36 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
       $limit: req.pagination.limit,
     },
     ...pipelines,
+    // Add lookup for rental contracts
+    {
+      $lookup: {
+        from: MODELS.rentalContract,
+        let: { projectId: '$_id' },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ['$project', '$$projectId'] },
+                  {
+                    $in: ['$status', [RentalContractStatus.rejected, RentalContractStatus.complaint, RentalContractStatus.canceled]]
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        as: 'contracts'
+      }
+    },
+    // Add canEdit field
+    {
+      $addFields: {
+        canEdit: {
+          $eq: [{ $size: '$contracts' }, 0]
+        }
+      }
+    },
     {
       $lookup: {
         from: MODELS.favourites,
@@ -211,6 +242,7 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
       $match: {
         ...req.pagination.filter,
         isDeleted: { $ne: true },
+        showOnHome: { $ne: false },
       },
     },
     ...pipelines,

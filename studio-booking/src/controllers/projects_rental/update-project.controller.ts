@@ -1,4 +1,4 @@
-import { Bucket, FOLDERS, NotAllowedError, SuccessResponse, Rentals } from '@duvdu-v1/duvdu';
+import { Bucket, FOLDERS, NotAllowedError, SuccessResponse, Rentals, BadRequestError, RentalContracts, RentalContractStatus, filterTagsForCategory, CYCLES } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 export const updateProjectHandler: RequestHandler<{ projectId: string }, SuccessResponse> = async (
@@ -17,7 +17,29 @@ export const updateProjectHandler: RequestHandler<{ projectId: string }, Success
 
   if (!existingProject) 
     return next(new NotAllowedError(undefined, req.lang));
-  
+
+  const bodyKeys = Object.keys(req.body);
+  if (!(bodyKeys.length === 1 && bodyKeys[0] === 'showOnHome')) {
+    const activeContract = await RentalContracts.findOne({
+      project: existingProject._id,
+      status: { $nin: [RentalContractStatus.rejected, RentalContractStatus.complaint, RentalContractStatus.canceled] },
+    });
+
+    if (activeContract)
+      return next(new BadRequestError({ en: 'can not update project with has active contract', ar: 'لا يمكن تحديث المشروع الذي لديه عقد مفعل' }, req.lang));
+  }
+
+  if (req.body.category || req.body.subCategory || req.body.tags) {
+    const { filteredTags , subCategoryTitle } = await filterTagsForCategory(
+      req.body.category.toString() || existingProject.category.toString(),
+      req.body.subCategory || existingProject.subCategory,
+      req.body.tags || existingProject.tags,
+      CYCLES.studioBooking,
+      req.lang,
+    );
+    req.body.tags = filteredTags;
+    req.body.subCategory = { ...subCategoryTitle, _id: req.body.subCategory };
+  }
 
   const s3 = new Bucket();
 
@@ -50,6 +72,7 @@ export const updateProjectHandler: RequestHandler<{ projectId: string }, Success
   if (!project) {
     return next(new NotAllowedError(undefined, req.lang));
   }
+
 
   // Remove old files if they were replaced
   const removePromises: Promise<any>[] = [];

@@ -1,4 +1,4 @@
-import { incrementProjectsView, MODELS, NotFound, Rentals, Contracts, Users } from '@duvdu-v1/duvdu';
+import { incrementProjectsView, MODELS, NotFound, Rentals, Contracts, Users, RentalContractStatus } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import { Types } from 'mongoose';
 
@@ -144,6 +144,34 @@ export const getProjectHandler: RequestHandler = async (req, res, next) => {
         },
       },
     },
+    {
+      $lookup: {
+        from: MODELS.rentalContract,
+        let: { projectId: '$_id' },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ['$project', '$$projectId'] },
+                  {
+                    $in: ['$status', ['rejected', 'completed', 'canceled']]
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        as: 'contracts'
+      }
+    },
+    {
+      $addFields: {
+        canEdit: {
+          $eq: [{ $size: '$contracts' }, 0]
+        }
+      }
+    },
   ];
 
   const project = (
@@ -152,6 +180,7 @@ export const getProjectHandler: RequestHandler = async (req, res, next) => {
         $match: {
           _id: new Types.ObjectId(req.params.projectId),
           isDeleted: { $ne: true },
+          showOnHome: { $ne: false },
         },
       },
       ...pipelines,
@@ -169,7 +198,7 @@ export const getProjectHandler: RequestHandler = async (req, res, next) => {
   }).populate({
     path: 'contract',
     match: {
-      status: { $nin: ['canceled', 'pending', 'rejected', 'reject', 'cancel'] }
+      status: { $nin: [RentalContractStatus.rejected, RentalContractStatus.complaint, RentalContractStatus.canceled] }
     }
   })
   );

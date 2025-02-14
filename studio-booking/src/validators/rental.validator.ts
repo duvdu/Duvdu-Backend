@@ -53,6 +53,12 @@ export const create = [
 
 export const update = [
   param('projectId').isMongoId(),
+  body('category').optional().isMongoId(),
+  body('subCategory').optional().isMongoId(),
+  body('tags')
+    .optional()
+    .isArray({ min: 1}),
+  body('tags.*').isMongoId(),
   body('title').optional().isString().bail().trim(),
   body('phoneNumber').optional().isMobilePhone(['ar-EG']),
   body('email').optional().isEmail(),
