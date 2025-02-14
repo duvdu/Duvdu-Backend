@@ -57,7 +57,7 @@ export const signinHandler: SigninHandler = async (req, res, next) => {
     };
     
     await user.save();
-    return res.status(403).json(<any>{ message: 'success', code: verificationCode });
+    return res.status(403).json(<any>{ message: 'success', code: verificationCode , username: user.username });
   }
     
 

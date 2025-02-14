@@ -146,7 +146,7 @@ export const loginWithProviderHandler: RequestHandler<
     
     await user.save();
 
-    return res.status(403).json(<any>{ message: 'success', code: verificationCode });
+    return res.status(403).json(<any>{ message: 'success', code: verificationCode , username: user.username });
   }
 
   const { accessToken, refreshToken } = await createOrUpdateSessionAndGenerateTokens(
