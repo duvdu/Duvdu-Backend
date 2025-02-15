@@ -27,7 +27,7 @@ router
     handlers.getComplaintsHandler,
   );
 
-router.get('/:complaintId', val.getOne, handlers.getComplaintHandler);
-router.post('/:complaintId/close', val.close, handlers.closeComplaintHandler);
+router.get('/:contractId', val.getOne, handlers.getComplaintHandler);
+router.post('/:contractId/close', val.close, handlers.closeComplaintHandler);
 
 export const complaintRoutes = router;

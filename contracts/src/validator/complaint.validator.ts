@@ -7,7 +7,10 @@ export const create = [
   globalValidatorMiddleware,
 ];
 
-export const getOne = [param('complaintId').isMongoId(), globalValidatorMiddleware];
+export const getOne = [
+  param('contractId').isMongoId(),
+  globalValidatorMiddleware,
+];
 
 export const getAll = [
   query('limit').optional().isInt().toInt(),
@@ -16,7 +19,7 @@ export const getAll = [
 ];
 
 export const close = [
-  param('complaintId').isMongoId(),
+  param('contractId').isMongoId(),
   body('feedback').optional().isString(),
   globalValidatorMiddleware,
 ];

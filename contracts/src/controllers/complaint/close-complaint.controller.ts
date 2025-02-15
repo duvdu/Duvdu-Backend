@@ -2,11 +2,11 @@ import { ContractReports, NotFound, SuccessResponse } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 export const closeComplaintHandler: RequestHandler<
-  { complaintId: string },
+  { contractId: string },
   SuccessResponse
 > = async (req, res, next) => {
   const complaint = await ContractReports.updateOne(
-    { _id: req.params.complaintId },
+    { contractId: req.params.contractId },
     {
       state: {
         isClosed: true,

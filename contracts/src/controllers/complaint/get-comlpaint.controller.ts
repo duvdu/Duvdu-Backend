@@ -9,13 +9,13 @@ import {
 import { RequestHandler } from 'express';
 // TODO: test complaint apis
 export const getComplaintHandler: RequestHandler<
-  { complaintId: string },
+  { contractId: string },
   SuccessResponse<{ data: IcontractReport }>
 > = async (req, res, next) => {
   const complaint = await ContractReports.findOne(
     req.loggedUser.role.key === 'admin'
-      ? { _id: req.params.complaintId }
-      : { _id: req.params.complaintId, reporter: req.loggedUser.id },
+      ? { contractId: req.params.contractId }
+      : { contractId: req.params.contractId, reporter: req.loggedUser.id },
   )
     .populate([
       {
