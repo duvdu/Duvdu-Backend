@@ -34,6 +34,7 @@ export interface IrentalContract {
   status: RentalContractStatus;
   rejectedBy?: 'customer' | 'sp';
   paymentLink: string;
+  qrCodeVerification: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -60,7 +61,7 @@ export const RentalContracts = model<IrentalContract>(
       status: { type: String, enum: RentalContractStatus },
       rejectedBy: { type: String, enum: ['sp', 'customer'], default: null },
       paymentLink: { type: String, default: null },
-    },
+      qrCodeVerification: { type: Boolean, default: false },
     { collection: MODELS.rentalContract, timestamps: true },
   ),
 );
