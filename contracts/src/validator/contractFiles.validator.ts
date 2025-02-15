@@ -11,8 +11,6 @@ export const contractFilesValidator = [
 export const updateContractFileValidator = [
   param('contractId').isString().notEmpty(),
   param('fileId').isString().notEmpty(),
-  body('link').optional().isURL(),
-  body('notes').optional().isString(),
   body('reason').if(body('status').equals(SubmitFilesStatus.rejected)).isString(),
   body('status').optional().isIn([SubmitFilesStatus.approved, SubmitFilesStatus.rejected]),
   body('cycle').isIn([CYCLES.copyRights, CYCLES.portfolioPost, CYCLES.teamProject]),

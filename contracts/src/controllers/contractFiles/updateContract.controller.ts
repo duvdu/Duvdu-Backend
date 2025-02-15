@@ -18,14 +18,13 @@ export const updateContractFileController: RequestHandler<
   { contractId: string; fileId: string },
   SuccessResponse,
   {
-    link: string;
-    notes: string;
+    reason: string;
     status: SubmitFilesStatus;
     cycle: CYCLES.copyRights | CYCLES.portfolioPost | CYCLES.teamProject;
   }
 > = async (req, res) => {
   const { contractId, fileId } = req.params;
-  const { link, notes, status, cycle } = req.body;
+  const { reason, status, cycle } = req.body;
 
   let contract;
   if (cycle === CYCLES.copyRights) {
@@ -67,9 +66,9 @@ export const updateContractFileController: RequestHandler<
       req.lang,
     );
 
-  if (status) contract.submitFiles[fileIndex].link = link;
+  if (status) contract.submitFiles[fileIndex].status = status;
 
-  if (notes) contract.submitFiles[fileIndex].notes = notes;
+  if (reason) contract.submitFiles[fileIndex].reason = reason;
 
   let notificationMessage = '';
   let notificationTitle = '';

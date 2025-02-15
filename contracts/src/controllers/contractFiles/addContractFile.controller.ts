@@ -48,21 +48,21 @@ export const addContractFileController: RequestHandler<
       req.lang,
     );
 
-  // Check if all existing files are rejected before adding new one
-  if (contract.submitFiles.length > 0) {
-    const allFilesRejected = contract.submitFiles.every(
-      (file) => file.status === SubmitFilesStatus.rejected,
-    );
-    if (!allFilesRejected) {
-      throw new BadRequestError(
-        {
-          ar: 'لا يمكن إضافة ملف جديد حتى يتم رفض جميع الملفات السابقة',
-          en: 'Cannot add new file until all previous files are rejected',
-        },
-        req.lang,
-      );
-    }
-  }
+  // // Check if all existing files are rejected before adding new one
+  // if (contract.submitFiles.length > 0) {
+  //   const allFilesRejected = contract.submitFiles.every(
+  //     (file) => file.status === SubmitFilesStatus.rejected,
+  //   );
+  //   if (!allFilesRejected) {
+  //     throw new BadRequestError(
+  //       {
+  //         ar: 'لا يمكن إضافة ملف جديد حتى يتم رفض جميع الملفات السابقة',
+  //         en: 'Cannot add new file until all previous files are rejected',
+  //       },
+  //       req.lang,
+  //     );
+  //   }
+  // }
 
   contract.submitFiles.push({
     link,
