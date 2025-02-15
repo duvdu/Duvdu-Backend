@@ -62,6 +62,7 @@ export const RentalContracts = model<IrentalContract>(
       rejectedBy: { type: String, enum: ['sp', 'customer'], default: null },
       paymentLink: { type: String, default: null },
       qrCodeVerification: { type: Boolean, default: false },
+    },
     { collection: MODELS.rentalContract, timestamps: true },
   ),
 );
