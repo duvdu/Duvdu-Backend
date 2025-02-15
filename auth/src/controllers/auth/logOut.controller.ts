@@ -6,9 +6,8 @@ import { LogoutHandler } from '../../types/endpoints/user.endpoints';
 import { generateUniqueDeviceId } from '../../utils/generateUniqueDeviceId';
 
 export const logoutHandler: LogoutHandler = async (req, res) => {
-  const userAgent = req.headers['user-agent'];
 
-  const { deviceId } = generateUniqueDeviceId(userAgent!);
+  const { deviceId } = generateUniqueDeviceId(req.headers);
   await userSession.deleteOne({
     user: req.loggedUser.id,
     refreshToken: req.session.refresh,
