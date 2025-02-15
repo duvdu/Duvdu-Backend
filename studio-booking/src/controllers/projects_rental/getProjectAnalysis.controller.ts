@@ -44,7 +44,7 @@ export const getProjectAnalysis: RequestHandler<
         totalBookings: 1,
         username: '$userDetails.username',
         name: '$userDetails.name',
-        profileImage: { $concat: [process.env.BUCKET_HOST , '/', '$userDetails.profileImage'] },
+        profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$userDetails.profileImage'] },
       },
     },
     { $sort: { totalBookings: -1 } },
@@ -61,17 +61,17 @@ export const getProjectAnalysis: RequestHandler<
   const topAddressesPipeline: PipelineStage[] = [
     { $group: { _id: { location: '$location', address: '$address' }, totalBookings: { $sum: 1 } } },
     { $sort: { totalBookings: -1 } },
-    { 
-      $project: { 
-        _id: 0, 
-        location: '$_id.location', 
-        address: '$_id.address', 
-        totalBookings: 1 
-      } 
+    {
+      $project: {
+        _id: 0,
+        location: '$_id.location',
+        address: '$_id.address',
+        totalBookings: 1,
+      },
     },
-    { $sort: { totalBookings: -1 } }
+    { $sort: { totalBookings: -1 } },
   ];
-  
+
   if (matchedPeriod.createdAt) topAddressesPipeline.unshift({ $match: matchedPeriod });
   const addressStats = await Rentals.aggregate(topAddressesPipeline);
 

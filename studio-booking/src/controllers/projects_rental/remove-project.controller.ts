@@ -10,7 +10,7 @@ export const removeProjectHandler: RequestHandler = async (req, res, next) => {
     {
       isDeleted: true,
     },
-    {new:true}
+    { new: true },
   );
 
   if (!project) return next(new NotAllowedError(undefined, req.lang));

@@ -19,7 +19,6 @@ import {
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-
 import { sendNotification } from './contract-notification.controller';
 
 export const createContractHandler: RequestHandler<
@@ -32,15 +31,17 @@ export const createContractHandler: RequestHandler<
     attachments: string[];
   }
 > = async (req, res, next) => {
-
-
   const isVerified = await checkUserFaceVerification(req.loggedUser.id);
 
   if (!isVerified)
-    return next(new BadRequestError({ en: 'user not verified with face recognition', ar: 'المستخدم غير موثوق بالوجه' }, req.lang));
+    return next(
+      new BadRequestError(
+        { en: 'user not verified with face recognition', ar: 'المستخدم غير موثوق بالوجه' },
+        req.lang,
+      ),
+    );
 
   const files = req.files as Express.Multer.File[] | undefined;
-
 
   // Validate project and other checks first
   const project = await Rentals.findOne({ _id: req.params.projectId, isDeleted: { $ne: true } });
@@ -55,22 +56,18 @@ export const createContractHandler: RequestHandler<
     project.projectScale.maximum < req.body.projectScale.numberOfUnits
   )
     return next(
-      new BadRequestError(
-        { en: 'invalid number of units', ar: 'عدد الوحدات غير صالح' },
-        req.lang,
-      ),
+      new BadRequestError({ en: 'invalid number of units', ar: 'عدد الوحدات غير صالح' }, req.lang),
     );
 
   // Handle file uploads if files exist
   if (files?.length) {
     try {
       await new Bucket().saveBucketFiles(FOLDERS.studio_booking, ...files);
-      req.body.attachments = files.map(file => `${FOLDERS.studio_booking}/${file.filename}`);
+      req.body.attachments = files.map((file) => `${FOLDERS.studio_booking}/${file.filename}`);
     } catch (error) {
-      return next(new BadRequestError(
-        { en: 'File upload failed', ar: 'فشل تحميل الملف' },
-        req.lang
-      ));
+      return next(
+        new BadRequestError({ en: 'File upload failed', ar: 'فشل تحميل الملف' }, req.lang),
+      );
     }
   }
 
@@ -98,7 +95,9 @@ export const createContractHandler: RequestHandler<
     },
     location: { lat: project.location.coordinates[0], lng: project.location.coordinates[1] },
     address: project.address,
-    totalPrice: (req.body.projectScale.numberOfUnits * project.projectScale.pricerPerUnit).toFixed(2),
+    totalPrice: (req.body.projectScale.numberOfUnits * project.projectScale.pricerPerUnit).toFixed(
+      2,
+    ),
     insurance: project.insurance,
     stageExpiration,
     status: ContractStatus.pending,

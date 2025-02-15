@@ -1,6 +1,8 @@
 import { globalValidatorMiddleware } from '@duvdu-v1/duvdu';
 import { body, param } from 'express-validator';
 
+export const qrCodeVerification = [param('contractId').isMongoId(), globalValidatorMiddleware];
+
 export const create = [
   param('projectId').isMongoId(),
   body('details').optional().isString(),
@@ -21,7 +23,7 @@ export const action = [
     .isString()
     .bail()
     .custom((val) => {
-      if (['reject', 'accept' , 'cancel'].includes(val)) return true;
+      if (['reject', 'accept', 'cancel'].includes(val)) return true;
       throw new Error();
     }),
   param('contractId').isMongoId(),

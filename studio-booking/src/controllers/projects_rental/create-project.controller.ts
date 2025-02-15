@@ -16,7 +16,7 @@ export const createProjectHandler: RequestHandler = async (req, res) => {
 
   const category = await Categories.findById(req.body.category);
 
-  if (!category) throw new NotFound({ar:'الفئة غير موجودة',en:'Category not found'},req.lang);
+  if (!category) throw new NotFound({ ar: 'الفئة غير موجودة', en: 'Category not found' }, req.lang);
 
   const [{ filteredTags, subCategoryTitle }] = await Promise.all([
     filterTagsForCategory(
@@ -26,11 +26,7 @@ export const createProjectHandler: RequestHandler = async (req, res) => {
       CYCLES.studioBooking,
       req.lang,
     ),
-    new Bucket().saveBucketFiles(
-      FOLDERS.studio_booking,
-      ...attachments,
-      ...cover
-    )
+    new Bucket().saveBucketFiles(FOLDERS.studio_booking, ...attachments, ...cover),
   ]);
 
   const projectData = {
@@ -49,15 +45,13 @@ export const createProjectHandler: RequestHandler = async (req, res) => {
     };
   }
 
-  const [project] = await Promise.all([
-    Rentals.create(projectData),
-  ]);
+  const [project] = await Promise.all([Rentals.create(projectData)]);
 
   await Project.create({
     _id: project._id,
     project: { type: project.id, ref: 'rentals' },
     user: req.loggedUser.id,
-    ref: 'rentals'
+    ref: 'rentals',
   });
 
   res.status(201).json({ message: 'success', data: project });

@@ -1,4 +1,12 @@
-import { incrementProjectsView, MODELS, NotFound, Rentals, Contracts, Users, RentalContractStatus } from '@duvdu-v1/duvdu';
+import {
+  incrementProjectsView,
+  MODELS,
+  NotFound,
+  Rentals,
+  Contracts,
+  Users,
+  RentalContractStatus,
+} from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import { Types } from 'mongoose';
 
@@ -42,8 +50,8 @@ export const getProjectHandler: RequestHandler = async (req, res, next) => {
         category: {
           _id: '$categoryDetails._id',
           image: { $concat: [process.env.BUCKET_HOST, '/', '$categoryDetails.image'] },
-          insurance: { 
-            $ifNull: ['$categoryDetails.insurance', false]
+          insurance: {
+            $ifNull: ['$categoryDetails.insurance', false],
           },
           title: {
             $cond: {
@@ -116,25 +124,30 @@ export const getProjectHandler: RequestHandler = async (req, res, next) => {
               $expr: {
                 $and: [
                   { $eq: ['$project', '$$projectId'] },
-                  { $eq: ['$user', req.loggedUser?.id ? new Types.ObjectId(req.loggedUser.id) : null] }
-                ]
-              }
-            }
-          }
+                  {
+                    $eq: [
+                      '$user',
+                      req.loggedUser?.id ? new Types.ObjectId(req.loggedUser.id) : null,
+                    ],
+                  },
+                ],
+              },
+            },
+          },
         ],
-        as: 'favourite'
-      }
+        as: 'favourite',
+      },
     },
     {
       $addFields: {
         favouriteCount: { $size: '$favourite' },
-        isFavourite: { $gt: [{ $size: '$favourite' }, 0] }
-      }
+        isFavourite: { $gt: [{ $size: '$favourite' }, 0] },
+      },
     },
     {
       $project: {
-        favourite: 0
-      }
+        favourite: 0,
+      },
     },
     {
       $addFields: {
@@ -155,22 +168,22 @@ export const getProjectHandler: RequestHandler = async (req, res, next) => {
                 $and: [
                   { $eq: ['$project', '$$projectId'] },
                   {
-                    $in: ['$status', ['rejected', 'completed', 'canceled']]
-                  }
-                ]
-              }
-            }
-          }
+                    $in: ['$status', ['rejected', 'completed', 'canceled']],
+                  },
+                ],
+              },
+            },
+          },
         ],
-        as: 'contracts'
-      }
+        as: 'contracts',
+      },
     },
     {
       $addFields: {
         canEdit: {
-          $eq: [{ $size: '$contracts' }, 0]
-        }
-      }
+          $eq: [{ $size: '$contracts' }, 0],
+        },
+      },
     },
   ];
 
@@ -198,11 +211,16 @@ export const getProjectHandler: RequestHandler = async (req, res, next) => {
   }).populate({
     path: 'contract',
     match: {
-      status: { $nin: [RentalContractStatus.rejected, RentalContractStatus.complaint, RentalContractStatus.canceled] }
-    }
-  })
-  );
-  
+      status: {
+        $nin: [
+          RentalContractStatus.rejected,
+          RentalContractStatus.complaint,
+          RentalContractStatus.canceled,
+        ],
+      },
+    },
+  }));
+
   project.user.canChat = canChat;
 
   // increment the user projects view count

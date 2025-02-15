@@ -13,6 +13,7 @@ import { RequestHandler, Router } from 'express';
 import { contractAction } from '../controllers/booking/contract-action.controller';
 import { createContractHandler } from '../controllers/booking/create-contract.controller';
 import { payContract } from '../controllers/booking/pay-contract.controller';
+import { qrCodeVerificationController } from '../controllers/booking/qrCodeVerification.controller';
 import * as handlers from '../controllers/projects_rental';
 import * as contractVal from '../validators/booking/contract.validator';
 import * as val from '../validators/rental.validator';
@@ -23,9 +24,9 @@ router
   .route('/')
   .post(
     isauthenticated,
-    globalUploadMiddleware(FOLDERS.studio_booking , {
+    globalUploadMiddleware(FOLDERS.studio_booking, {
       maxSize: 400 * 1024 * 1024,
-      fileTypes: ['video/*', 'image/*', 'audio/*', 'application/*' ],
+      fileTypes: ['video/*', 'image/*', 'audio/*', 'application/*'],
     }).fields([
       { name: 'attachments', maxCount: 10 },
       { name: 'cover', maxCount: 1 },
@@ -71,9 +72,9 @@ router
   .get(optionalAuthenticated, val.getOne, handlers.getProjectHandler)
   .patch(
     isauthenticated,
-    globalUploadMiddleware(FOLDERS.studio_booking , {
+    globalUploadMiddleware(FOLDERS.studio_booking, {
       maxSize: 400 * 1024 * 1024,
-      fileTypes: ['video/*', 'image/*', 'audio/*', 'application/*' ],
+      fileTypes: ['video/*', 'image/*', 'audio/*', 'application/*'],
     }).fields([
       { name: 'attachments', maxCount: 10 },
       { name: 'cover', maxCount: 1 },
@@ -82,6 +83,14 @@ router
     handlers.updateProjectHandler,
   )
   .delete(isauthenticated, val.getOne, handlers.removeProjectHandler);
+
+//contract routes
+router.post(
+  '/contract/:contractId/qr-code-verification',
+  isauthenticated,
+  contractVal.qrCodeVerification,
+  qrCodeVerificationController,
+);
 
 router.post(
   '/:projectId/contract',

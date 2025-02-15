@@ -18,7 +18,7 @@ import { sendNotification } from './contract-notification.controller';
 export const contractAction: RequestHandler<
   { contractId: string },
   SuccessResponse,
-  { action: 'reject'| 'accept' | 'cancel' }
+  { action: 'reject' | 'accept' | 'cancel' }
 > = async (req, res, next) => {
   const contract = await RentalContracts.findOne({
     _id: req.params.contractId,
@@ -35,12 +35,16 @@ export const contractAction: RequestHandler<
     const isVerified = await checkUserFaceVerification(req.loggedUser.id);
 
     if (!isVerified)
-      return next(new BadRequestError({ en: 'provider not verified with face recognition', ar: 'المزود غير موثوق بالوجه' }, req.lang));
+      return next(
+        new BadRequestError(
+          { en: 'provider not verified with face recognition', ar: 'المزود غير موثوق بالوجه' },
+          req.lang,
+        ),
+      );
 
     // throw if actionAt not undefiend or current state not pending
     if (contract.actionAt || contract.status !== RentalContractStatus.pending)
       return next(
-
         new BadRequestError(
           { en: 'action is already taken', ar: 'action is already taken' },
           req.lang,
@@ -135,13 +139,12 @@ export const contractAction: RequestHandler<
       // );
     }
   } else {
-
     if (req.body.action === 'cancel' && contract.status === RentalContractStatus.pending) {
       await RentalContracts.updateOne(
         { _id: req.params.contractId },
         { status: RentalContractStatus.canceled, rejectedBy: 'customer', actionAt: new Date() },
       );
-  
+
       await Promise.all([
         sendNotification(
           req.loggedUser.id,
@@ -165,7 +168,9 @@ export const contractAction: RequestHandler<
     } else if (
       req.body.action !== 'reject' ||
       !contract.actionAt ||
-      ![RentalContractStatus.pending, RentalContractStatus.waitingForPayment].includes(contract.status)
+      ![RentalContractStatus.pending, RentalContractStatus.waitingForPayment].includes(
+        contract.status,
+      )
     )
       return next(new BadRequestError({ en: 'invalid action', ar: 'invalid action' }, req.lang));
 
@@ -183,7 +188,7 @@ export const contractAction: RequestHandler<
         { _id: req.params.contractId },
         { status: RentalContractStatus.rejected, rejectedBy: 'customer', actionAt: new Date() },
       );
-  
+
       await Promise.all([
         sendNotification(
           req.loggedUser.id,

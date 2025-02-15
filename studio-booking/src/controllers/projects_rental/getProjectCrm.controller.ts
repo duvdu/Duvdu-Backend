@@ -14,8 +14,8 @@ export const getProjectCrmHandler: RequestHandler = async (req, res, next) => {
     {
       $set: {
         subCategory: {
-          title:`$subCategory.${req.lang}`,
-          _id:'$subCategory._id'
+          title: `$subCategory.${req.lang}`,
+          _id: '$subCategory._id',
         },
         tags: {
           $map: {
@@ -49,9 +49,9 @@ export const getProjectCrmHandler: RequestHandler = async (req, res, next) => {
         category: {
           _id: '$categoryDetails._id',
           image: { $concat: [process.env.BUCKET_HOST, '/', '$categoryDetails.image'] },
-          insurance: { 
-            $ifNull: ['$categoryDetails.insurance', false]
-          },  
+          insurance: {
+            $ifNull: ['$categoryDetails.insurance', false],
+          },
           title: {
             $cond: {
               if: { $eq: [req.lang, 'ar'] },
@@ -92,8 +92,8 @@ export const getProjectCrmHandler: RequestHandler = async (req, res, next) => {
           pricePerHour: '$userDetails.pricePerHour',
           hasVerificationBadge: '$userDetails.hasVerificationBadge',
           likes: '$userDetails.likes',
-          followCount:'$userDetails.followCount',
-          address:'$userDetails.address',
+          followCount: '$userDetails.followCount',
+          address: '$userDetails.address',
         },
         attachments: {
           $map: {
@@ -134,7 +134,7 @@ export const getProjectCrmHandler: RequestHandler = async (req, res, next) => {
       (el: any) => el.project.toString() === project._id.toString(),
     );
   }
-  await incrementProjectsView(project.user._id , 'rentals' , project._id , req.lang);
+  await incrementProjectsView(project.user._id, 'rentals', project._id, req.lang);
   const canChat = !!(await Contracts.findOne({
     $or: [
       { sp: req.loggedUser?.id, customer: project.customer },
@@ -143,8 +143,8 @@ export const getProjectCrmHandler: RequestHandler = async (req, res, next) => {
   }).populate({
     path: 'contract',
     match: {
-      status: { $nin: ['canceled', 'pending', 'rejected', 'reject', 'cancel'] }
-    }
+      status: { $nin: ['canceled', 'pending', 'rejected', 'reject', 'cancel'] },
+    },
   }));
   project.user.canChat = canChat;
   res.status(200).json({

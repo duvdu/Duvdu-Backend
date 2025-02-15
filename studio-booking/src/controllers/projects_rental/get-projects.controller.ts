@@ -47,8 +47,8 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
       $set: {
         category: {
           _id: '$categoryDetails._id',
-          insurance: { 
-            $ifNull: ['$categoryDetails.insurance', false]
+          insurance: {
+            $ifNull: ['$categoryDetails.insurance', false],
           },
           image: { $concat: [process.env.BUCKET_HOST, '/', '$categoryDetails.image'] },
 
@@ -172,23 +172,30 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
                 $and: [
                   { $eq: ['$project', '$$projectId'] },
                   {
-                    $in: ['$status', [RentalContractStatus.rejected, RentalContractStatus.complaint, RentalContractStatus.canceled]]
-                  }
-                ]
-              }
-            }
-          }
+                    $in: [
+                      '$status',
+                      [
+                        RentalContractStatus.rejected,
+                        RentalContractStatus.complaint,
+                        RentalContractStatus.canceled,
+                      ],
+                    ],
+                  },
+                ],
+              },
+            },
+          },
         ],
-        as: 'contracts'
-      }
+        as: 'contracts',
+      },
     },
     // Add canEdit field
     {
       $addFields: {
         canEdit: {
-          $eq: [{ $size: '$contracts' }, 0]
-        }
-      }
+          $eq: [{ $size: '$contracts' }, 0],
+        },
+      },
     },
     {
       $lookup: {
@@ -203,18 +210,16 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
                   {
                     $eq: [
                       '$user',
-                      req.loggedUser?.id 
-                        ? new mongoose.Types.ObjectId(req.loggedUser.id)
-                        : null
-                    ]
-                  }
-                ]
-              }
-            }
-          }
+                      req.loggedUser?.id ? new mongoose.Types.ObjectId(req.loggedUser.id) : null,
+                    ],
+                  },
+                ],
+              },
+            },
+          },
         ],
-        as: 'favourite'
-      }
+        as: 'favourite',
+      },
     },
     {
       $addFields: {
@@ -223,16 +228,16 @@ export const getProjectsHandler: RequestHandler = async (req, res) => {
           $cond: {
             if: { $gt: [{ $size: '$favourite' }, 0] },
             then: true,
-            else: false
-          }
-        }
-      }
+            else: false,
+          },
+        },
+      },
     },
     {
       $project: {
-        favourite: 0
-      }
-    }
+        favourite: 0,
+      },
+    },
   );
 
   const projects = await Rentals.aggregate(secondPipelines);

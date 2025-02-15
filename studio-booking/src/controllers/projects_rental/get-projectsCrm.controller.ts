@@ -44,8 +44,8 @@ export const getProjectsCrmHandler: RequestHandler = async (req, res) => {
         category: {
           _id: '$categoryDetails._id',
           image: { $concat: [process.env.BUCKET_HOST, '/', '$categoryDetails.image'] },
-          insurance: { 
-            $ifNull: ['$categoryDetails.insurance', false]
+          insurance: {
+            $ifNull: ['$categoryDetails.insurance', false],
           },
           title: {
             $cond: {
@@ -88,8 +88,8 @@ export const getProjectsCrmHandler: RequestHandler = async (req, res) => {
           pricePerHour: '$userDetails.pricePerHour',
           hasVerificationBadge: '$userDetails.hasVerificationBadge',
           likes: '$userDetails.likes',
-          followCount:'$userDetails.followCount',
-          address:'$userDetails.address',
+          followCount: '$userDetails.followCount',
+          address: '$userDetails.address',
         },
         attachments: {
           $map: {
@@ -117,7 +117,7 @@ export const getProjectsCrmHandler: RequestHandler = async (req, res) => {
 
   const projects = await Rentals.aggregate([
     {
-      $match: req.pagination.filter
+      $match: req.pagination.filter,
     },
     { $sort: { createdAt: -1 } },
     {

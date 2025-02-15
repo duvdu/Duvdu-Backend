@@ -3,7 +3,6 @@ import { Users } from '@duvdu-v1/duvdu';
 export const createInvitedUsers = async (
   users: { phoneNumber: { number: string }; fees: number }[],
 ): Promise<{ creative: string; fees: number }[]> => {
-  
   const createdUsers = await Users.create(
     users.map((user) => ({ phoneNumber: { number: user.phoneNumber.number } })),
   );

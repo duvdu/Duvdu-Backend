@@ -1,4 +1,4 @@
-import { Channels, ContractReports , RentalContracts , RentalContractStatus} from '@duvdu-v1/duvdu';
+import { Channels, ContractReports, RentalContracts, RentalContractStatus } from '@duvdu-v1/duvdu';
 import Queue from 'bull';
 
 import { env } from './env';
@@ -20,7 +20,7 @@ export const onGoingExpiration = new Queue<{ contractId: string }>(
 );
 
 pendingExpiration.process(async (job) => {
-  const contract =await RentalContracts.findOneAndUpdate(
+  const contract = await RentalContracts.findOneAndUpdate(
     { _id: job.data.contractId, status: RentalContractStatus.pending },
     { status: RentalContractStatus.canceled, actionAt: new Date() },
   );
@@ -34,7 +34,6 @@ pendingExpiration.process(async (job) => {
       'contract canceled by system',
       Channels.update_contract,
     );
-
 });
 
 paymentExpiration.process(async (job) => {
@@ -52,7 +51,6 @@ paymentExpiration.process(async (job) => {
       'contract canceled by system',
       Channels.update_contract,
     );
-
 });
 
 onGoingExpiration.process(async (job) => {

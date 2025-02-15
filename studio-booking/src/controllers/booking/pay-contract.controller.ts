@@ -1,4 +1,12 @@
-import { SuccessResponse, NotFound, BadRequestError, Users, Channels, RentalContracts, RentalContractStatus } from '@duvdu-v1/duvdu';
+import {
+  SuccessResponse,
+  NotFound,
+  BadRequestError,
+  Users,
+  Channels,
+  RentalContracts,
+  RentalContractStatus,
+} from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 import { sendNotification } from './contract-notification.controller';
@@ -38,7 +46,10 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
   }
 
   // increment the user contracts count
-  const updatedUser = await Users.findOneAndUpdate({ _id: contract.sp }, { $inc: { avaliableContracts: -1 } });
+  const updatedUser = await Users.findOneAndUpdate(
+    { _id: contract.sp },
+    { $inc: { avaliableContracts: -1 } },
+  );
 
   if (
     new Date(contract.actionAt).getTime() + contract.stageExpiration * 60 * 60 * 1000 <
