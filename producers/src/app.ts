@@ -44,7 +44,10 @@ app.use(
         sameSite: 'none',
         secure: env.environment === 'production',
         httpOnly: true,
+        maxAge: 2073600000, // 24 days
       },
+      proxy: true,
+      rolling: true,
     }),
   );
 
