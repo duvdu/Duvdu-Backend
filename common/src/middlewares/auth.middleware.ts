@@ -74,6 +74,7 @@ export const isauthenticated: RequestHandler = async (req, res, next) => {
       });
 
       (req as any).session.access = accessToken;
+      (req as any).session.refresh = (req as any).session.refresh;
       (req as any).loggedUser = verify(accessToken, process.env.JWT_KEY!) as IjwtPayload;
 
       next();
