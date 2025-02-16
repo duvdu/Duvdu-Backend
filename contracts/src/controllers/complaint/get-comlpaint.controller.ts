@@ -13,9 +13,9 @@ export const getComplaintHandler: RequestHandler<
   SuccessResponse<{ data: IcontractReport }>
 > = async (req, res, next) => {
   const complaint = await ContractReports.findOne(
-    req.loggedUser.role.key === 'admin'
-      ? { contractId: req.params.contractId }
-      : { contractId: req.params.contractId, reporter: req.loggedUser.id },
+    {
+      contractId: req.params.contractId,
+    },
   )
     .populate([
       {
