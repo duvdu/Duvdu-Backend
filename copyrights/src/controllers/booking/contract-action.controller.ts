@@ -138,14 +138,19 @@ const handleSpAction = async (
         ? CopyrightContractStatus.waitingForFirstPayment
         : CopyrightContractStatus.waitingForTotalPayment;
 
+    const firstPaymentAmount = contract.firstPaymentAmount
+      ? contract.firstPaymentAmount
+      : (contract.totalPrice * 0.1).toFixed(2);
+    const secondPaymentAmount =  (contract.totalPrice - firstPaymentAmount).toFixed(2);
+
     await CopyrightContracts.updateOne(
       { _id: contract._id },
       {
         status: newStatus,
         actionAt: new Date(),
         paymentLink: paymentSession,
-        firstPaymentAmount: contract.firstPaymentAmount,
-        secondPaymentAmount: contract.totalPrice - contract.firstPaymentAmount,
+        firstPaymentAmount: firstPaymentAmount,
+        secondPaymentAmount: secondPaymentAmount
       },
     );
 
