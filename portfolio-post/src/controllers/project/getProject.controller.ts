@@ -145,6 +145,7 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
                         else: {
                           _id: '$mainCategoryDetails._id',
                           title: '$mainCategoryDetails.title.' + req.lang,
+                          media: '$mainCategoryDetails.media',
                         },
                       },
                     },
