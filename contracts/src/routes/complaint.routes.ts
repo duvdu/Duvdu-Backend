@@ -20,7 +20,11 @@ router.route('/:contractId').get(val.getOne, handlers.getComplaintHandler);
 router
   .route('/')
   .post(
-    globalUploadMiddleware(FOLDERS.report).array('attachments', 10),
+    globalUploadMiddleware(FOLDERS.report, {
+      maxSize: 1024 * 1024 * 10, // 10MB
+    }).fields([
+      { name: 'attachments', maxCount: 10 },
+    ]),
     val.create,
     handlers.createComplaintHandler,
   )
