@@ -94,7 +94,7 @@ export const update = [
     }),
   body('projectScale.minimum').optional().isInt().bail().toInt(),
   body('projectScale.maximum').optional().isInt().bail().toInt(),
-  body('projectScale.pricerPerUnit').isFloat({ min: 0 }).bail().toFloat(),
+  body('projectScale.pricerPerUnit').optional().isFloat({ min: 0 }).bail().toFloat(),
   globalValidatorMiddleware,
 ];
 

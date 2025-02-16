@@ -55,7 +55,7 @@ export const updateProjectHandler: RequestHandler<{ projectId: string }, Success
 
   if (req.body.category || req.body.subCategory || req.body.tags) {
     const { filteredTags, subCategoryTitle } = await filterTagsForCategory(
-      req.body.category.toString() || existingProject.category.toString(),
+      req.body.category?.toString() || existingProject.category.toString(),
       req.body.subCategory || existingProject.subCategory,
       req.body.tags || existingProject.tags,
       CYCLES.studioBooking,
@@ -83,7 +83,10 @@ export const updateProjectHandler: RequestHandler<{ projectId: string }, Success
 
   // Update the project
   const project = await Rentals.findOneAndUpdate(
-    { _id: req.params.projectId, user: req.loggedUser.id },
+    {
+      _id: req.params.projectId,
+      user: req.loggedUser.id,
+    },
     req.body,
   );
 
