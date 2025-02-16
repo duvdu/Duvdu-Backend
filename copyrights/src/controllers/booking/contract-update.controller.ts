@@ -54,7 +54,11 @@ export const updateContractHandler: RequestHandler<
   if (req.body.deadline)
     assertDeadline(new Date(req.body.deadline), new Date(contract.deadline), req.lang);
 
-  await CopyrightContracts.updateOne({ _id: req.params.contractId }, req.body);
+
+  await CopyrightContracts.updateOne(
+    { _id: req.params.contractId },
+    { ...req.body, secondPaymentAmount: req.body.totalPrice - contract.firstPaymentAmount },
+  );
 
   const user = await Users.findOne({ _id: req.loggedUser.id });
 
