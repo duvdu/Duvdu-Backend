@@ -14,7 +14,7 @@ export const getComplaintHandler: RequestHandler<
 > = async (req, res, next) => {
   const complaint = await ContractReports.findOne(
     {
-      contract:req.params.contractId
+      contract: req.params.contractId,
     },
   )
     .populate([

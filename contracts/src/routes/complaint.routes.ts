@@ -13,6 +13,10 @@ const router = Router();
 
 router.use(isauthenticated);
 
+
+router.route('/:contractId').get(val.getOne, handlers.getComplaintHandler);
+
+
 router
   .route('/')
   .post(
@@ -27,7 +31,6 @@ router
     handlers.getComplaintsHandler,
   );
 
-router.get('/:contractId', val.getOne, handlers.getComplaintHandler);
 router.post('/:contractId/close', val.close, handlers.closeComplaintHandler);
 
 export const complaintRoutes = router;

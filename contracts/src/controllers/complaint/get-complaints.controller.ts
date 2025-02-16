@@ -55,9 +55,6 @@ export const getComplaintsHandler: RequestHandler<
         path: 'reporter',
         select: 'name username profileImage isOnline',
       },
-      //   {
-      //     path: 'contract',
-      //   },
     ])
     .lean();
 
