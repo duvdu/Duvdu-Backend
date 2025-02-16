@@ -174,6 +174,9 @@ export const getContracts: RequestHandler<
           username: '$customer.username',
           isOnline: '$customer.isOnline',
           profileImage: '$customer.profileImage',
+          faceRecognition: '$customer.faceRecognition',
+          email: '$customer.email',
+          phoneNumber: '$customer.phoneNumber',
         },
         sp: {
           _id: '$sp._id',
@@ -182,6 +185,8 @@ export const getContracts: RequestHandler<
           isOnline: '$sp.isOnline',
           profileImage: '$sp.profileImage',
           faceRecognition: '$sp.faceRecognition',
+          email: '$sp.email',
+          phoneNumber: '$sp.phoneNumber',
         },
       },
     },
