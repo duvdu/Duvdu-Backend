@@ -15,3 +15,7 @@ router
 router
   .route('/:contractId/:fileId')
   .patch(validator.updateContractFileValidator, controller.updateContractFileController);
+
+router
+  .route('/:contractId/accept-all')
+  .patch(validator.acceptAllFilesValidator, controller.acceptAllFilesController);

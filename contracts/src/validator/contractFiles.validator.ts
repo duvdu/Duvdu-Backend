@@ -17,3 +17,9 @@ export const updateContractFileValidator = [
   body('cycle').isIn([CYCLES.copyRights, CYCLES.portfolioPost, CYCLES.teamProject]),
   globalValidatorMiddleware,
 ];
+
+export const acceptAllFilesValidator = [
+  param('contractId').isMongoId(),
+  body('cycle').isIn([CYCLES.copyRights, CYCLES.portfolioPost, CYCLES.teamProject]),
+  globalValidatorMiddleware,
+];

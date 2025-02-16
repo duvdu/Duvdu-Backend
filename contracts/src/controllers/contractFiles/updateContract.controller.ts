@@ -76,7 +76,6 @@ export const updateContractFileController: RequestHandler<
   if (status === SubmitFilesStatus.approved) {
     notificationTitle = 'file approved';
     notificationMessage = 'file has been approved and the contract is completed';
-    contract.status = ProjectContractStatus.completed;
   } else if (status === SubmitFilesStatus.rejected) {
     notificationTitle = 'file rejected';
     notificationMessage = 'file has been rejected';
