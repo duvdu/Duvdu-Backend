@@ -2,6 +2,7 @@ import { CYCLES, globalValidatorMiddleware, SubmitFilesStatus } from '@duvdu-v1/
 import { body, param } from 'express-validator';
 
 export const contractFilesValidator = [
+  param('contractId').isString().notEmpty(),
   body('link').isURL().notEmpty(),
   body('cycle').isIn([CYCLES.copyRights, CYCLES.portfolioPost, CYCLES.teamProject]),
   body('notes').optional().isString(),
