@@ -174,7 +174,9 @@ export const getContracts: RequestHandler<
           username: '$customer.username',
           isOnline: '$customer.isOnline',
           profileImage: '$customer.profileImage',
-          faceRecognition: '$customer.faceRecognition',
+          faceRecognition: {
+            $concat: [process.env.BUCKET_HOST, '/', '$customer.faceRecognition'],
+          },
           email: '$customer.email',
           phoneNumber: '$customer.phoneNumber',
         },
@@ -184,7 +186,9 @@ export const getContracts: RequestHandler<
           username: '$sp.username',
           isOnline: '$sp.isOnline',
           profileImage: '$sp.profileImage',
-          faceRecognition: '$sp.faceRecognition',
+          faceRecognition: {
+            $concat: [process.env.BUCKET_HOST, '/', '$sp.faceRecognition'],
+          },
           email: '$sp.email',
           phoneNumber: '$sp.phoneNumber',
         },
