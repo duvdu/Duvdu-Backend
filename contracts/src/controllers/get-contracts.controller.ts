@@ -173,9 +173,19 @@ export const getContracts: RequestHandler<
           name: '$customer.name',
           username: '$customer.username',
           isOnline: '$customer.isOnline',
-          profileImage: '$customer.profileImage',
+          profileImage: {
+            $cond: {
+              if: { $regexMatch: { input: '$customer.profileImage', regex: new RegExp(process.env.BUCKET_HOST || '') } },
+              then: '$customer.profileImage',
+              else: { $concat: [process.env.BUCKET_HOST, '/', '$customer.profileImage'] }
+            }
+          },
           faceRecognition: {
-            $concat: [process.env.BUCKET_HOST, '/', '$customer.faceRecognition'],
+            $cond: {
+              if: { $regexMatch: { input: '$customer.faceRecognition', regex: new RegExp(process.env.BUCKET_HOST || '') } },
+              then: '$customer.faceRecognition',
+              else: { $concat: [process.env.BUCKET_HOST, '/', '$customer.faceRecognition'] }
+            }
           },
           email: '$customer.email',
           phoneNumber: '$customer.phoneNumber',
@@ -185,9 +195,19 @@ export const getContracts: RequestHandler<
           name: '$sp.name',
           username: '$sp.username',
           isOnline: '$sp.isOnline',
-          profileImage: '$sp.profileImage',
+          profileImage: {
+            $cond: {
+              if: { $regexMatch: { input: '$sp.profileImage', regex: new RegExp(process.env.BUCKET_HOST || '') } },
+              then: '$sp.profileImage',
+              else: { $concat: [process.env.BUCKET_HOST, '/', '$sp.profileImage'] }
+            }
+          },
           faceRecognition: {
-            $concat: [process.env.BUCKET_HOST, '/', '$sp.faceRecognition'],
+            $cond: {
+              if: { $regexMatch: { input: '$sp.faceRecognition', regex: new RegExp(process.env.BUCKET_HOST || '') } },
+              then: '$sp.faceRecognition',
+              else: { $concat: [process.env.BUCKET_HOST, '/', '$sp.faceRecognition'] }
+            }
           },
           email: '$sp.email',
           phoneNumber: '$sp.phoneNumber',
