@@ -14,7 +14,7 @@ export const getComplaintHandler: RequestHandler<
 > = async (req, res, next) => {
   const complaint = await ContractReports.findOne(
     {
-      contractId: req.params.contractId,
+      contract:req.params.contractId
     },
   )
     .populate([
@@ -22,9 +22,6 @@ export const getComplaintHandler: RequestHandler<
         path: 'reporter',
         select: 'name username profileImage isOnline',
       },
-      // {
-      //   path: 'contract',
-      // },
     ])
     .lean();
 
