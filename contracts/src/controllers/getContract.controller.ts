@@ -219,7 +219,7 @@ export const getContract: RequestHandler<
       },
     },
   ]);
-  if (!contract) return next(new NotFound(undefined, req.lang));
+  if (contract.length === 0) return next(new NotFound(undefined, req.lang));
 
   res.status(200).json({
     message: 'success',
