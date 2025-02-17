@@ -221,9 +221,9 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
         showOnHome: { $ne: false },
       },
     },
-    { $sort: { createdAt: -1 } },
-    { $skip: req.pagination.skip },
-    { $limit: req.pagination.limit },
+    // { $sort: { createdAt: -1 } },
+    // { $skip: req.pagination.skip },
+    // { $limit: req.pagination.limit },
     {
       $lookup: {
         from: MODELS.user,
@@ -811,6 +811,20 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
         canEdit: { $eq: [{ $size: '$activeContract' }, 0] },
       },
     },
+  );
+
+  pipelines.push(
+    {
+      $sort: { 
+        createdAt: -1 
+      }
+    },
+    { 
+      $skip: req.pagination.skip 
+    },
+    { 
+      $limit: req.pagination.limit 
+    }
   );
 
   const projects = await ProjectCycle.aggregate(pipelines);
