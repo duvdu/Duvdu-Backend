@@ -56,11 +56,13 @@ export const create = [
   body('invitedCreatives.*.number').exists().isString().isMobilePhone('ar-EG'),
   body('invitedCreatives.*.mainCategory').isObject().withMessage('invitedCreatives'),
   body('invitedCreatives.*.mainCategory.category').isMongoId().withMessage('invitedCreatives'),
-  body('invitedCreatives.*.mainCategory.subCategories').isObject().withMessage('invitedCreatives'),
+  body('invitedCreatives.*.mainCategory.subCategories').optional().isObject().withMessage('invitedCreatives'),
   body('invitedCreatives.*.mainCategory.subCategories.subCategory')
+    .optional()
     .isMongoId()
     .withMessage('invitedCreatives'),
   body('invitedCreatives.*.mainCategory.subCategories.tags')
+    .optional()
     .isArray()
     .withMessage('invitedCreatives'),
   body('invitedCreatives.*.mainCategory.subCategories.tags.*.tag')
@@ -86,7 +88,7 @@ export const create = [
     .optional()
     .isArray()
     .withMessage('invitedCreatives'),
-  body('invitedCreatives.*.mainCategory.relatedCategory.subCategories.tags.tag')
+  body('invitedCreatives.*.mainCategory.relatedCategory.subCategories.tags.*.tag')
     .optional()
     .isMongoId()
     .withMessage('invitedCreatives'),
