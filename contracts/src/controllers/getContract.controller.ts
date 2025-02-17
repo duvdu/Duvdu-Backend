@@ -131,7 +131,7 @@ export const getContract: RequestHandler<
     {
       $lookup: {
         from: MODELS.contractReview,
-        let: { contractId: '$_id', customerId: '$customer._id' },
+        let: { contractId: '$contract._id', customerId: '$customer._id' },
         pipeline: [
           {
             $match: {
