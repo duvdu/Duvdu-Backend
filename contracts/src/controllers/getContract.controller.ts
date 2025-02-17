@@ -129,7 +129,27 @@ export const getContract: RequestHandler<
     },
     { $unwind: '$sp' },
     {
+      $lookup: {
+        from: MODELS.contractReview,
+        let: { contractId: '$_id', customerId: '$customer._id' },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ['$contract', '$$contractId'] },
+                  { $eq: ['$customer', '$$customerId'] }
+                ]
+              }
+            }
+          }
+        ],
+        as: 'review'
+      }
+    },
+    {
       $set: {
+        hasReview: { $gt: [{ $size: '$review' }, 0] },
         customer: {
           profileImage: {
             $concat: [process.env.BUCKET_HOST, '/', '$customer.profileImage'],
@@ -162,6 +182,7 @@ export const getContract: RequestHandler<
         ref: 1,
         cycle: 1,
         contract: 1,
+        hasReview: 1,
         customer: {
           _id: '$customer._id',
           name: '$customer.name',
