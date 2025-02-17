@@ -25,8 +25,8 @@ export const create = [
   body('creatives.*.creative').isMongoId().withMessage('creatives'),
   body('creatives.*.mainCategory').isObject().withMessage('creatives'),
   body('creatives.*.mainCategory.category').isMongoId().withMessage('creatives'),
-  body('creatives.*.mainCategory.subCategories').optional().isArray().withMessage('creatives'),
-  body('creatives.*.mainCategory.subCategories.*.subCategory').isMongoId().withMessage('creatives'),
+  body('creatives.*.mainCategory.subCategories').optional().isObject().withMessage('creatives'),
+  body('creatives.*.mainCategory.subCategories.subCategory').optional().isMongoId().withMessage('creatives'),
   body('creatives.*.mainCategory.subCategories.*.tags').optional().isArray().withMessage('creatives'),
   body('creatives.*.mainCategory.subCategories.*.tags.*.tag').optional().isMongoId().withMessage('creatives'),
   body('creatives.*.mainCategory.relatedCategory').optional().isObject().withMessage('creatives'),
@@ -38,7 +38,7 @@ export const create = [
     .optional()
     .isObject()
     .withMessage('creatives'),
-  body('creatives.*.mainCategory.relatedCategory.subCategories.*.subCategory')
+  body('creatives.*.mainCategory.relatedCategory.subCategories.subCategory')
     .optional()
     .isMongoId()
     .withMessage('creatives'),
