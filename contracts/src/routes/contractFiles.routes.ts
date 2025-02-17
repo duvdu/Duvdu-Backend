@@ -8,6 +8,11 @@ export const router = express.Router();
 
 router.use(isauthenticated);
 
+
+router
+  .route('/:contractId/accept-all')
+  .patch(validator.acceptAllFilesValidator, controller.acceptAllFilesController);
+
 router
   .route('/:contractId')
   .post(validator.contractFilesValidator, controller.addContractFileController);
@@ -16,6 +21,4 @@ router
   .route('/:contractId/:fileId')
   .patch(validator.updateContractFileValidator, controller.updateContractFileController);
 
-router
-  .route('/:contractId/accept-all')
-  .patch(validator.acceptAllFilesValidator, controller.acceptAllFilesController);
+
