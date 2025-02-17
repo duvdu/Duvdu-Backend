@@ -131,7 +131,7 @@ export const getContract: RequestHandler<
     {
       $lookup: {
         from: MODELS.contractReview,
-        localField: 'contract._id',
+        localField: '_id',
         foreignField: 'contract',
         as: 'review'
       }
