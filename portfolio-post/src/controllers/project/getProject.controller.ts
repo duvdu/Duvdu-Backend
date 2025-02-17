@@ -96,14 +96,20 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
             $push: {
               $cond: [
                 {
-                  $or: [
+                  $and: [
                     { 
-                      $eq: [
-                        new mongoose.Types.ObjectId(req.loggedUser?.id || '000000000000000000000000'),
-                        '$user._id'
+                      $or: [
+                        { 
+                          $eq: [
+                            new mongoose.Types.ObjectId(req.loggedUser?.id || '000000000000000000000000'),
+                            '$user._id'
+                          ]
+                        },
+                        { $eq: ['$creatives.inviteStatus', InviteStatus.accepted] }
                       ]
                     },
-                    { $eq: ['$creatives.inviteStatus', InviteStatus.accepted] }
+                    { $ne: ['$creativeDetails', null] },
+                    { $ne: [{ $type: '$creativeDetails' }, 'missing'] }
                   ]
                 },
                 {
