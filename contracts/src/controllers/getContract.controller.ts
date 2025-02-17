@@ -131,19 +131,8 @@ export const getContract: RequestHandler<
     {
       $lookup: {
         from: MODELS.contractReview,
-        let: { contractId: '$contract._id', customerId: '$customer._id' },
-        pipeline: [
-          {
-            $match: {
-              $expr: {
-                $and: [
-                  { $eq: ['$contract', '$$contractId'] },
-                  { $eq: ['$customer', '$$customerId'] }
-                ]
-              }
-            }
-          }
-        ],
+        localField: 'contract._id',
+        foreignField: 'contract',
         as: 'review'
       }
     },
