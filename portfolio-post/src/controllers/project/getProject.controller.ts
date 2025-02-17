@@ -423,6 +423,7 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
           category: {
             title: '$category.title.' + req.lang,
             _id: '$category._id',
+            media: '$category.media',
           },
           subCategory: {
             title: '$subCategory.' + req.lang,
