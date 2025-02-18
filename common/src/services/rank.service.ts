@@ -32,8 +32,6 @@ export const updateRankForUser = async (userId: string) => {
     })
     .exec();
 
-  console.log('currentRank', currentRank);
-
   // Find next possible rank
   const nextRank = await Rank.findOne({
     $or: [
@@ -49,8 +47,6 @@ export const updateRankForUser = async (userId: string) => {
       projectsCount: 1 
     })
     .exec();
-
-  console.log('nextRank', nextRank);
 
   if (currentRank) {
     user.rank.title = currentRank.rank;
@@ -77,6 +73,7 @@ export const updateRankForUser = async (userId: string) => {
       const progress = criteriaProgress
         .filter(c => c.needed > 0)
         .map(c => (c.completed / c.needed) * 100);
+      console.log('progress', progress);
       
       user.rank.nextRangPercentage = progress.length ? Math.max(...progress) : 0;
       user.rank.nextRankTitle = nextRank.rank;
@@ -132,7 +129,6 @@ export const recalculateAllUsersRanks = async () => {
               })
               .exec();
           
-            console.log('currentRank', currentRank);
           
             // Find next possible rank
             const nextRank = await Rank.findOne({
@@ -150,7 +146,6 @@ export const recalculateAllUsersRanks = async () => {
               })
               .exec();
           
-            console.log('nextRank', nextRank);
           
             if (currentRank) {
               user.rank.title = currentRank.rank;
@@ -173,11 +168,14 @@ export const recalculateAllUsersRanks = async () => {
                   }
                 ];
           
+                console.log('criteriaProgress', criteriaProgress);
+
                 // Find the criterion with the highest progress percentage
                 const progress = criteriaProgress
                   .filter(c => c.needed > 0)
                   .map(c => (c.completed / c.needed) * 100);
-                
+                console.log('progress', progress);
+                console.log('progress.length', progress.length ? Math.max(...progress) : 0);
                 user.rank.nextRangPercentage = progress.length ? Math.max(...progress) : 0;
                 user.rank.nextRankTitle = nextRank.rank;
               } else {
