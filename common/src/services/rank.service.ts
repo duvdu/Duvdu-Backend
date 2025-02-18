@@ -13,6 +13,9 @@ export const updateRankForUser = async (user: UserDocument) => {
   const projectsLiked = user.likes;
   const acceptedProjectsCounter = user.acceptedProjectsCounter;
 
+  console.log('acceptedProjectsCounter', acceptedProjectsCounter);
+  console.log('projectsLiked', projectsLiked);
+  console.log('projectsCount', projectsCount);
   // Find current rank that matches ALL criteria
   const currentRank = await Rank.findOne({
     actionCount: { $lte: acceptedProjectsCounter },
@@ -26,6 +29,8 @@ export const updateRankForUser = async (user: UserDocument) => {
       projectsCount: -1 
     })
     .exec();
+
+  console.log('currentRank', currentRank);
 
   // Find next possible rank
   const nextRank = await Rank.findOne({
@@ -42,6 +47,8 @@ export const updateRankForUser = async (user: UserDocument) => {
       projectsCount: 1 
     })
     .exec();
+
+  console.log('nextRank', nextRank);
 
   if (currentRank) {
     user.rank.title = currentRank.rank;
@@ -81,7 +88,8 @@ export const updateRankForUser = async (user: UserDocument) => {
     user.rank.color = null;
   }
 
-  return user.save();
+  await user.save();
+  return user;
 };
 
 export const recalculateAllUsersRanks = async () => {
