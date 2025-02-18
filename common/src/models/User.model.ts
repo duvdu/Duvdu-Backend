@@ -1,6 +1,6 @@
 import { Schema, model } from 'mongoose';
 
-import { updateRankForUser, UserDocument } from '../services/rank.service';
+import { updateRankForUser } from '../services/rank.service';
 import { MODELS } from '../types/model-names';
 import { Iuser } from '../types/User';
 
