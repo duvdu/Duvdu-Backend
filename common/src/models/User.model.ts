@@ -85,7 +85,7 @@ userSchema.pre('save', async function (next) {
     this.isModified('likes') ||
     this.isModified('projectsCount')
   ) {
-    await updateRankForUser(this as UserDocument);
+    await updateRankForUser(this._id.toString());
   }
   next();
 });
