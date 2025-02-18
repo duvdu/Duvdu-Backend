@@ -22,6 +22,7 @@ router
   .post(
     globalUploadMiddleware(FOLDERS.report, {
       maxSize: 1024 * 1024 * 10, // 10MB
+      fileTypes: ['image/*', 'application/pdf'],
     }).fields([
       { name: 'attachments', maxCount: 10 },
     ]),
