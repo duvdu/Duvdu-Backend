@@ -34,18 +34,9 @@ export const updateRankForUser = async (userId: string) => {
 
   // Find next possible rank
   const nextRank = await Rank.findOne({
-    $or: [
-      { actionCount: { $gt: acceptedProjectsCounter } },
-      { projectsLiked: { $gt: projectsLiked } },
-      { projectsCount: { $gt: projectsCount } }
-    ]
+    actionCount: { $gt: acceptedProjectsCounter || 0 }
   })
-    .sort({ 
-      actionCount: 1,
-      favoriteCount: 1,
-      projectsLiked: 1,
-      projectsCount: 1 
-    })
+    .sort({ actionCount: 1 })
     .exec();
 
   if (currentRank) {
@@ -53,7 +44,6 @@ export const updateRankForUser = async (userId: string) => {
     user.rank.color = currentRank.color;
 
     if (nextRank) {
-      // Calculate progress based on the most relevant criterion
       const criteriaProgress = [
         {
           completed: acceptedProjectsCounter - currentRank.actionCount,
@@ -69,12 +59,11 @@ export const updateRankForUser = async (userId: string) => {
         }
       ];
 
-      // Find the criterion with the highest progress percentage
+      // Improved progress calculation
       const progress = criteriaProgress
         .filter(c => c.needed > 0)
-        .map(c => (c.completed / c.needed) * 100);
-      console.log('progress', progress);
-      
+        .map(c => Math.min(Math.max((c.completed / c.needed) * 100, 0), 100)); // Ensure between 0-100
+
       user.rank.nextRangPercentage = progress.length ? Math.max(...progress) : 0;
       user.rank.nextRankTitle = nextRank.rank;
     } else {
@@ -111,10 +100,7 @@ export const recalculateAllUsersRanks = async () => {
             const projectsCount = user.projectsCount;
             const projectsLiked = user.likes;
             const acceptedProjectsCounter = user.acceptedProjectsCounter;
-          
-            console.log('acceptedProjectsCounter', acceptedProjectsCounter);
-            console.log('projectsLiked', projectsLiked);
-            console.log('projectsCount', projectsCount);
+
             // Find current rank that matches ALL criteria
             const currentRank = await Rank.findOne({
               actionCount: { $lte: acceptedProjectsCounter },
@@ -132,18 +118,9 @@ export const recalculateAllUsersRanks = async () => {
           
             // Find next possible rank
             const nextRank = await Rank.findOne({
-              $or: [
-                { actionCount: { $gt: acceptedProjectsCounter } },
-                { projectsLiked: { $gt: projectsLiked } },
-                { projectsCount: { $gt: projectsCount } }
-              ]
+              actionCount: { $gt: acceptedProjectsCounter || 0 }
             })
-              .sort({ 
-                actionCount: 1,
-                favoriteCount: 1,
-                projectsLiked: 1,
-                projectsCount: 1 
-              })
+              .sort({ actionCount: 1 })
               .exec();
           
           
@@ -152,7 +129,6 @@ export const recalculateAllUsersRanks = async () => {
               user.rank.color = currentRank.color;
           
               if (nextRank) {
-                // Calculate progress based on the most relevant criterion
                 const criteriaProgress = [
                   {
                     completed: acceptedProjectsCounter - currentRank.actionCount,
@@ -170,10 +146,10 @@ export const recalculateAllUsersRanks = async () => {
           
                 console.log('criteriaProgress', criteriaProgress);
 
-                // Find the criterion with the highest progress percentage
+                // Improved progress calculation
                 const progress = criteriaProgress
                   .filter(c => c.needed > 0)
-                  .map(c => (c.completed / c.needed) * 100);
+                  .map(c => Math.min(Math.max((c.completed / c.needed) * 100, 0), 100)); // Ensure between 0-100
                 console.log('progress', progress);
                 console.log('progress.length', progress.length ? Math.max(...progress) : 0);
                 user.rank.nextRangPercentage = progress.length ? Math.max(...progress) : 0;

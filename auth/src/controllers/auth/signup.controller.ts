@@ -8,6 +8,7 @@ import {
   Setting,
 } from '@duvdu-v1/duvdu';
 
+import { getRankProgress } from './loginWithProvider.controller';
 import { SignupHandler } from '../../types/endpoints/user.endpoints';
 import { hashPassword } from '../../utils/bcrypt';
 import { hashVerificationCode } from '../../utils/crypto';
@@ -39,6 +40,7 @@ export const signupHandler: SignupHandler = async (req, res, next) => {
         expireAt: new Date(Date.now() + 60 * 1000),
         reason: VerificationReason.signup,
       },
+      rank: await getRankProgress()
     });
   } else {
     await Users.findByIdAndUpdate(

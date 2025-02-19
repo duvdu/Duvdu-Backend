@@ -2,7 +2,9 @@ import 'express-async-errors';
 import {
   Iuser,
   NotFound,
+  Rank,
   Roles,
+  Setting,
   SuccessResponse,
   SystemRoles,
   UnauthenticatedError,
@@ -119,6 +121,8 @@ export const loginWithProviderHandler: RequestHandler<
     role = await Roles.findOne({ key: SystemRoles.verified });
     if (!role) return next(new NotFound(undefined, req.lang));
 
+    const appSettings = await Setting.findOne();
+
     // Ensure username is unique
     const usernameExists = await Users.findOne({ username: req.body.username });
     if (usernameExists) {
@@ -132,6 +136,9 @@ export const loginWithProviderHandler: RequestHandler<
       role: role._id,
       email: req.body.email,
       name: req.body.name,
+      profileImage: appSettings?.default_profile,
+      coverImage: appSettings?.default_cover,
+      rank: await getRankProgress()
     });
   }
 
@@ -162,3 +169,76 @@ export const loginWithProviderHandler: RequestHandler<
 
   return res.status(200).json({ message: 'success' });
 };
+
+
+
+export async function getRankProgress(stats = { 
+  actionCount: 0, 
+  projectsLiked: 0, 
+  projectsCount: 0 
+}): Promise<{
+  title: string|null,
+  nextRankTitle: string|null,
+  nextRangPercentage: number,
+  color: string|null
+}> {
+  // Get current rank (where all requirements match or are less than the stats)
+  const currentRank = await Rank.findOne({
+    actionCount: { $lte: stats.actionCount },
+    projectsLiked: { $lte: stats.projectsLiked },
+    projectsCount: { $lte: stats.projectsCount }
+  }).sort({ actionCount: -1 }); // Get the highest matching rank
+
+  if (!currentRank) {
+    return {
+      title: 'مستخدم جديد',
+      nextRankTitle: 'مستخدم جديد',
+      nextRangPercentage: 0,
+      color: '#000000'
+    };
+  }
+
+  // Get next rank (the rank with the next higher requirements)
+  const nextRank = await Rank.findOne({
+    actionCount: { $gt: currentRank.actionCount }
+  }).sort({ actionCount: 1 }); // Get the next rank by action count
+
+  if (!nextRank) {
+    return {
+      title: currentRank.rank,
+      nextRankTitle: null,
+      nextRangPercentage: 0,
+      color: currentRank.color
+    };
+  }
+
+  // Calculate progress for each criterion
+  const criteriaProgress = [
+    {
+      completed: stats.actionCount - currentRank.actionCount,
+      needed: nextRank.actionCount - currentRank.actionCount
+    },
+    {
+      completed: stats.projectsLiked - currentRank.projectsLiked,
+      needed: nextRank.projectsLiked - currentRank.projectsLiked
+    },
+    {
+      completed: stats.projectsCount - currentRank.projectsCount,
+      needed: nextRank.projectsCount - currentRank.projectsCount
+    }
+  ];
+
+  // Calculate the progress percentage (highest among all criteria)
+  const progress = Math.max(
+    ...criteriaProgress
+      .filter(c => c.needed > 0)
+      .map(c => (c.completed / c.needed) * 100)
+  );
+
+  return {
+    title: currentRank.rank,
+    nextRankTitle: nextRank.rank,
+    nextRangPercentage: Math.min(Math.max(progress, 0), 100),
+    color: currentRank.color
+  };
+}
