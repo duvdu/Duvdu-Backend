@@ -1,5 +1,5 @@
 import 'express-async-errors';
-import { SuccessResponse, Favourites, Users, Channels, Project } from '@duvdu-v1/duvdu';
+import { SuccessResponse, Favourites, Users, Channels } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import mongoose, { PipelineStage } from 'mongoose';
 
@@ -15,16 +15,18 @@ export const addToFavourite: RequestHandler<
     user: req.loggedUser.id,
   });
 
-  const project = await Project.findOne({project: req.params.projectId});
 
-  await Users.findByIdAndUpdate(project?.user, {
-    $inc: { likes: 1 },
-  });
+
 
   const projectFavourite = await Favourites.findOne({project: req.params.projectId} ).populate('project');
 
 
   if ((projectFavourite?.project as any).user) {
+
+    await Users.findByIdAndUpdate((projectFavourite?.project as any).user, {
+      $inc: { likes: 1 },
+    });
+
     await sendNotification(
       req.loggedUser.id,
       (projectFavourite?.project as any).user.toString(),
@@ -43,16 +45,20 @@ export const removeFromFavourite: RequestHandler<
   { projectId: string },
   SuccessResponse<{ data: any }>
 > = async (req, res) => {
+
+  const projectFavourite = await Favourites.findOne({project: req.params.projectId} ).populate('project');
+
+
   const post = await Favourites.deleteOne({
     project: req.params.projectId,
     user: req.loggedUser.id,
   });
 
-  const project = await Project.findOne({project: req.params.projectId});
 
-  await Users.findOneAndUpdate({_id:project?.user , likes: {$gt: 0}}, {
-    $inc: { likes: -1 },
-  });
+  if ((projectFavourite?.project as any).user) 
+    await Users.findOneAndUpdate({_id:(projectFavourite?.project as any).user, likes: {$gt: 0}}, {
+      $inc: { likes: -1 },
+    });
 
   res.json({ message: 'success', data: post });
 };
