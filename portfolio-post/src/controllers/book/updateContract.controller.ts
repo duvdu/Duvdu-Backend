@@ -89,7 +89,7 @@ export const updateContractHandler: RequestHandler<
       'contract',
       'copyright contract updates',
       `${user?.name} updated the contract`,
-      Channels.update_contract,
+      Channels.notification,
     ),
     sendNotification(
       req.loggedUser.id,
@@ -98,7 +98,7 @@ export const updateContractHandler: RequestHandler<
       'contract',
       'copyright contract updates',
       `${user?.name} updated the contract`,
-      Channels.update_contract,
+      Channels.notification,
     ),
   ]);
 

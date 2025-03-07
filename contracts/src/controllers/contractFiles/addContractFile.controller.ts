@@ -80,7 +80,7 @@ export const addContractFileController: RequestHandler<
       'contract',
       'new file submitted from provider',
       'new file submitted from provider',
-      Channels.update_contract,
+      Channels.notification,
     ),
     sendNotification(
       contract.customer.toString(),
@@ -89,7 +89,7 @@ export const addContractFileController: RequestHandler<
       'contract',
       'new file submitted from provider',
       'new file submitted from provider',
-      Channels.update_contract,
+      Channels.notification,
     ),
   ]);
 

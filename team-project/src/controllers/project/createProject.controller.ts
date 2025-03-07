@@ -147,7 +147,7 @@ export const createProjectHandler: CreateProjectHandler = async (req, res) => {
           'contract',
           'team project new contract',
           `new team project contract from ${customer?.name}`,
-          Channels.new_contract,
+          Channels.notification,
         ),
         sendNotification(
           contract.customer.toString(),
@@ -156,7 +156,7 @@ export const createProjectHandler: CreateProjectHandler = async (req, res) => {
           'contract',
           'team project new contract',
           'your team project contract created successfully',
-          Channels.new_contract,
+          Channels.notification,
         ),
       ]);
     })

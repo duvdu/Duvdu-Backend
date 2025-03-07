@@ -35,7 +35,7 @@ export const getProjectsPagination: RequestHandler<
   if (req.query.duration) req.pagination.filter['duration.value'] = { $eq: req.query.duration };
   if (req.query.instant != undefined) req.pagination.filter.instant = req.query.instant;
   if (req.query.search) req.pagination.filter.$text = { $search: req.query.search };
-  if (req.query.user) req.pagination.filter.user = req.query.user;
+  if (req.query.user) req.pagination.filter.user = new mongoose.Types.ObjectId(req.query.user);
   if (req.query.address)
     req.pagination.filter.address = { $regex: req.query.address, $options: 'i' };
   if (req.query.priceFrom) req.pagination.filter.price = { $gte: req.query.priceFrom };

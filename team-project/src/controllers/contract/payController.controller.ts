@@ -66,7 +66,7 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
       'contract',
       'available contracts',
       `${user?.name} your available contracts is ${updatedUser?.avaliableContracts}`,
-      Channels.update_contract,
+      Channels.notification,
     ),
     sendNotification(
       req.loggedUser.id,
@@ -75,7 +75,7 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
       'contract',
       'team contract updates',
       `${user?.name} paid 10% of the amount`,
-      Channels.update_contract,
+      Channels.notification,
     ),
   ]);
 

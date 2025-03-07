@@ -29,7 +29,7 @@ export const createCategoryVal = [
       }
       return true;
     }),
-  body('jobTitles').isArray().withMessage('jobTitlesMustBeArray').bail(),
+  body('jobTitles').optional().isArray().withMessage('jobTitlesMustBeArray').bail(),
   body('jobTitles.*').isObject().withMessage('jobTitlesItemMustBeObject'),
   body('jobTitles.*.ar').isString().withMessage('jobTitlesArabicRequired'),
   body('jobTitles.*.en').isString().withMessage('jobTitlesEnglishRequired'),

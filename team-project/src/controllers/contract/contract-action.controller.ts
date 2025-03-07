@@ -81,7 +81,7 @@ export const contractAction: RequestHandler<
               'contract',
               'team project contract update',
               `${sp?.name} reject contract`,
-              Channels.update_contract,
+              Channels.notification,
             ),
             sendNotification(
               req.loggedUser.id,
@@ -90,7 +90,7 @@ export const contractAction: RequestHandler<
               'contract',
               'team project contract update',
               'you reject this contract successfully',
-              Channels.update_contract,
+              Channels.notification,
             ),
           ]);
         }
@@ -135,7 +135,7 @@ export const contractAction: RequestHandler<
             'contract',
             'team project contract update',
             `${sp?.name} accept contract`,
-            Channels.update_contract,
+            Channels.notification,
           ),
           sendNotification(
             req.loggedUser.id,
@@ -144,7 +144,7 @@ export const contractAction: RequestHandler<
             'contract',
             'team project contract update',
             'you accept this contract successfully',
-            Channels.update_contract,
+            Channels.notification,
           ),
         ]);
 
@@ -178,7 +178,7 @@ export const contractAction: RequestHandler<
             'contract',
             'team project contract update',
             `${customer?.name} cancel contract`,
-            Channels.update_contract,
+            Channels.notification,
           ),
           sendNotification(
             req.loggedUser.id,
@@ -187,7 +187,7 @@ export const contractAction: RequestHandler<
             'contract',
             'team project contract update',
             'you cancel this contract successfully',
-            Channels.update_contract,
+            Channels.notification,
           ),
         ]);
 
@@ -233,7 +233,7 @@ export const contractAction: RequestHandler<
           'contract',
           'team project contract update',
           `${customer?.name} reject contract`,
-          Channels.update_contract,
+          Channels.notification,
         ),
         sendNotification(
           req.loggedUser.id,
@@ -242,7 +242,7 @@ export const contractAction: RequestHandler<
           'contract',
           'team project contract update',
           'you reject this contract successfully',
-          Channels.update_contract,
+          Channels.notification,
         ),
       ]);
     }

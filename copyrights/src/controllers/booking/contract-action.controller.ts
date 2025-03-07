@@ -45,7 +45,7 @@ const sendContractNotifications = async ({
       'contract',
       'copyright contract updates',
       isActor ? otherPartyMessage : selfMessage,
-      Channels.update_contract,
+      Channels.notification,
     ),
     sendNotification(
       actorId,
@@ -54,7 +54,7 @@ const sendContractNotifications = async ({
       'contract',
       'copyright contract updates',
       isActor ? selfMessage : otherPartyMessage,
-      Channels.update_contract,
+      Channels.notification,
     ),
   ]);
 };
@@ -108,7 +108,7 @@ const handleSpAction = async (
         'contract',
         'available contracts',
         `${user?.name} available contracts is ${user?.avaliableContracts}`,
-        Channels.update_contract,
+        Channels.notification,
       );
     }
 

@@ -118,7 +118,7 @@ export const updateContractHandler: UpdateContractHandler = async (req, res, nex
         'contract',
         'producer contract update',
         `${sp?.name} accept this contract` ,
-        Channels.update_contract,
+        Channels.notification,
       ),
       sendNotification(
         req.loggedUser.id,
@@ -127,7 +127,7 @@ export const updateContractHandler: UpdateContractHandler = async (req, res, nex
         'contract',
         'producer contract update',
         'you accept this contract successfully',
-        Channels.update_contract,
+        Channels.notification,
       ),
     ]);
 
@@ -155,7 +155,7 @@ export const updateContractHandler: UpdateContractHandler = async (req, res, nex
         'contract',
         'producer contract updated',
         `${sp?.name} ${updatedContract.status} this contract`,
-        Channels.update_contract,
+        Channels.notification,
       ),
       sendNotification(
         req.loggedUser.id,
@@ -164,7 +164,7 @@ export const updateContractHandler: UpdateContractHandler = async (req, res, nex
         'contract',
         'producer contract updated',
         'this contract updated successfully',
-        Channels.update_contract,
+        Channels.notification,
       ),
     ]);
 
@@ -181,7 +181,7 @@ export const updateContractHandler: UpdateContractHandler = async (req, res, nex
         'contract',
         'producer contract updated',
         `${user?.name} ${updatedContract.status} this contract`,
-        Channels.update_contract,
+        Channels.notification,
       ),
       sendNotification(
         req.loggedUser.id,
@@ -190,7 +190,7 @@ export const updateContractHandler: UpdateContractHandler = async (req, res, nex
         'contract',
         'producer contract updated',
         'this contract updated successfully',
-        Channels.update_contract,
+        Channels.notification,
       ),
     ]);
 

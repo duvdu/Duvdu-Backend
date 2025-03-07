@@ -59,7 +59,7 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
           'contract',
           'project contract updates',
           `${sp?.name} reject this contract`,
-          Channels.update_contract,
+          Channels.notification,
         ),
         sendNotification(
           req.loggedUser.id,
@@ -68,7 +68,7 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
           'contract',
           'project contract updates',
           'you rejected this contract',
-          Channels.update_contract,
+          Channels.notification,
         ),
       ]);
     } else if (req.body.action === 'accept' && contract.status === ProjectContractStatus.pending) {
@@ -111,7 +111,7 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
           'contract',
           'project contract updates',
           'you accepted this contract',
-          Channels.update_contract,
+          Channels.notification,
         ),
       ]);
 
@@ -139,7 +139,7 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
         'contract',
         'available contracts',
         `${user?.name} available contracts is ${user?.avaliableContracts}`,
-        Channels.update_contract,
+        Channels.notification,
       );
 
       // send notification from sp
@@ -151,7 +151,7 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
           'contract',
           'project contract updates',
           `${sp?.name} reject this contract`,
-          Channels.update_contract,
+          Channels.notification,
         ),
         sendNotification(
           req.loggedUser.id,
@@ -160,7 +160,7 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
           'contract',
           'project contract updates',
           'you rejected this contract',
-          Channels.update_contract,
+          Channels.notification,
         ),
       ]);
     } else if (
@@ -186,7 +186,7 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
           'contract',
           'project contract updates',
           `${sp?.name} accept this contract`,
-          Channels.update_contract,
+          Channels.notification,
         ),
         sendNotification(
           req.loggedUser.id,
@@ -195,7 +195,7 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
           'contract',
           'project contract updates',
           'you accepted this contract',
-          Channels.update_contract,
+          Channels.notification,
         ),
       ]);
 
@@ -227,7 +227,7 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
           'contract',
           'project contract updates',
           `${customer?.name} canceled this contract`,
-          Channels.update_contract,
+          Channels.notification,
         ),
         sendNotification(
           req.loggedUser.id,
@@ -236,7 +236,7 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
           'contract',
           'project contract updates',
           'you canceled this contract',
-          Channels.update_contract,
+          Channels.notification,
         ),
       ]);
     } else if (
@@ -256,7 +256,7 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
           'contract',
           'project contract updates',
           `${customer?.name} reject this contract`,
-          Channels.update_contract,
+          Channels.notification,
         ),
         sendNotification(
           req.loggedUser.id,
@@ -265,7 +265,7 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
           'contract',
           'project contract updates',
           'you rejected this contract',
-          Channels.update_contract,
+          Channels.notification,
         ),
       ]);
     } else if (
@@ -285,7 +285,7 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
           'contract',
           'project contract updates',
           `${customer?.name} reject this contract`,
-          Channels.update_contract,
+          Channels.notification,
         ),
         sendNotification(
           req.loggedUser.id,
@@ -294,7 +294,7 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
           'contract',
           'project contract updates',
           'you rejected this contract',
-          Channels.update_contract,
+          Channels.notification,
         ),
       ]);
     } else

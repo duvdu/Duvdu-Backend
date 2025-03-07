@@ -114,7 +114,7 @@ export const createContractHandler: RequestHandler<
       'contract',
       'new contract',
       `new contract created from ${user?.name}`,
-      Channels.new_contract,
+      Channels.notification,
     ),
     sendNotification(
       req.loggedUser.id,
@@ -123,7 +123,7 @@ export const createContractHandler: RequestHandler<
       'contract',
       'new contract',
       'contract created successfully',
-      Channels.new_contract,
+      Channels.notification,
     ),
   ]);
 

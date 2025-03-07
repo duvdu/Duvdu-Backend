@@ -32,7 +32,7 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
       'contract',
       'contract subscription',
       'you not have avaliable contracts right now',
-      Channels.update_contract,
+      Channels.notification,
     );
     return next(
       new BadRequestError(
@@ -75,7 +75,7 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
       'contract',
       'available contracts',
       `${user?.name} your available contracts is ${updatedUser?.avaliableContracts}`,
-      Channels.update_contract,
+      Channels.notification,
     ),
     sendNotification(
       req.loggedUser.id,
@@ -84,7 +84,7 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
       'contract',
       'rental contract updates',
       `${customer?.name} pay rental contract`,
-      Channels.update_contract,
+      Channels.notification,
     ),
     sendNotification(
       req.loggedUser.id,
@@ -93,7 +93,7 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
       'contract',
       'rental contract updates',
       'you pay rental contract successfully',
-      Channels.update_contract,
+      Channels.notification,
     ),
   ]);
 

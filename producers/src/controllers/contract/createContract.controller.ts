@@ -103,7 +103,7 @@ export const createContractHandler: CreateContractHandler = async (req, res, nex
         'contract',
         'new producer contract',
         `new contract created by ${user?.name}`,
-        Channels.new_contract,
+        Channels.notification,
       ),
       sendNotification(
         req.loggedUser.id,
@@ -112,7 +112,7 @@ export const createContractHandler: CreateContractHandler = async (req, res, nex
         'contract',
         'new producer contract',
         'contract created successfully',
-        Channels.new_contract,
+        Channels.notification,
       ),
       Contracts.create({
         _id: contract._id,

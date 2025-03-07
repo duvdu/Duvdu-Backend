@@ -66,7 +66,7 @@ export const acceptAllFilesController: RequestHandler<
         'contract',
         'contract approved',
         'all files approved and the contract is completed',
-        Channels.update_contract,
+        Channels.notification,
       ),
       sendNotification(
         contract.customer.toString(),
@@ -75,7 +75,7 @@ export const acceptAllFilesController: RequestHandler<
         'contract',
         'contract approved',
         'all files approved and the contract is completed',
-        Channels.update_contract,
+        Channels.notification,
       ),
     ]);
   

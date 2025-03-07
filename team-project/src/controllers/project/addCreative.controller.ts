@@ -140,7 +140,7 @@ export const addCreativeHandler: AddCreativeHandler = async (req, res, next) => 
       'contract',
       'team project new contract',
       `new team project contract from ${customer?.name}`,
-      Channels.new_contract,
+      Channels.notification,
     ),
     sendNotification(
       contract.sp.toString(),
@@ -149,7 +149,7 @@ export const addCreativeHandler: AddCreativeHandler = async (req, res, next) => 
       'contract',
       'team project new contract',
       'your team project contract created successfully',
-      Channels.new_contract,
+      Channels.notification,
     ),
   ]);
 

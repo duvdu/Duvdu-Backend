@@ -3,6 +3,7 @@ import {
   BadRequestError,
   Bucket,
   CategoryMedia,
+  Channels,
   CYCLES,
   filterRelatedCategoryForCategory,
   filterTagsForCategory,
@@ -315,7 +316,7 @@ async function handleProjectNotifications(projectCycle: IprojectCycle & Document
         'new tag',
         'You were mentioned in the project.',
         `${loggedUser?.name} has tagged you in his project. Accept or decline.`,
-        'new-tag',
+        Channels.notification,
       ),
       sendNotification(
         userId,
@@ -324,7 +325,7 @@ async function handleProjectNotifications(projectCycle: IprojectCycle & Document
         'new tag',
         `tagged from project ${projectCycle.name}`,
         `you tagged ${creativeUser?.name} in your project successfully`,
-        'new-tag',
+        Channels.notification,
       ),
     ]);
   }

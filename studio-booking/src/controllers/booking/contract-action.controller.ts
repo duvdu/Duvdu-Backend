@@ -74,7 +74,7 @@ export const contractAction: RequestHandler<
             'contract',
             'rental contract updates',
             `${sp?.name} reject this contract`,
-            Channels.update_contract,
+            Channels.notification,
           ),
           sendNotification(
             req.loggedUser.id,
@@ -83,7 +83,7 @@ export const contractAction: RequestHandler<
             'contract',
             'rental contract updates',
             'you reject this contract successfully',
-            Channels.update_contract,
+            Channels.notification,
           ),
         ]);
       }
@@ -120,7 +120,7 @@ export const contractAction: RequestHandler<
           'contract',
           'rental contract updates',
           `${sp?.name} accept this contract`,
-          Channels.update_contract,
+          Channels.notification,
         ),
         sendNotification(
           req.loggedUser.id,
@@ -129,7 +129,7 @@ export const contractAction: RequestHandler<
           'contract',
           'rental contract updates',
           'you accept this contract successfully',
-          Channels.update_contract,
+          Channels.notification,
         ),
       ]);
 
@@ -153,7 +153,7 @@ export const contractAction: RequestHandler<
           'contract',
           'rental contract updates',
           `${customer?.name} cancel this contract`,
-          Channels.update_contract,
+          Channels.notification,
         ),
         sendNotification(
           req.loggedUser.id,
@@ -162,7 +162,7 @@ export const contractAction: RequestHandler<
           'contract',
           'rental contract updates',
           'you cancel this contract successfully',
-          Channels.update_contract,
+          Channels.notification,
         ),
       ]);
     } else if (
@@ -197,7 +197,7 @@ export const contractAction: RequestHandler<
           'contract',
           'rental contract updates',
           `${customer?.name} reject this contract`,
-          Channels.update_contract,
+          Channels.notification,
         ),
         sendNotification(
           req.loggedUser.id,
@@ -206,7 +206,7 @@ export const contractAction: RequestHandler<
           'contract',
           'rental contract updates',
           'you reject this contract successfully',
-          Channels.update_contract,
+          Channels.notification,
         ),
       ]);
     }

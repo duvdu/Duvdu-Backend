@@ -1,5 +1,5 @@
 import 'express-async-errors';
-import { SuccessResponse, Favourites, Users } from '@duvdu-v1/duvdu';
+import { SuccessResponse, Favourites, Users, Channels } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import mongoose, { PipelineStage } from 'mongoose';
 
@@ -30,7 +30,7 @@ export const addToFavourite: RequestHandler<
       'newFavorite',
       'New Favorite Project',
       'New Favorite Project Added from your projects',
-      'favorites',
+      Channels.notification,
     );
   }
 

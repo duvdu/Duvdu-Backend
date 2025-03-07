@@ -1,12 +1,17 @@
 import {
   BadRequestError,
+  Channels,
+  CYCLES,
   InviteStatus,
   NotFound,
   ProjectCycle,
   SuccessResponse,
+  Users,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
+
 import 'express-async-errors';
+import { sendNotification } from '../book/sendNotification';
 
 export const invitationActionHandler: RequestHandler<
   { projectId: string },
@@ -34,6 +39,21 @@ export const invitationActionHandler: RequestHandler<
     );
 
   project.creatives[creativeIndex].inviteStatus = req.body.status;
+
+  const user = await Users.findById(req.loggedUser.id);
+
+  await sendNotification(
+    req.loggedUser.id,
+    project.user.toString(),
+    project._id.toString(),
+    CYCLES.portfolioPost,
+    'project invitation updates',
+    `${user?.name} ${
+      req.body.status === InviteStatus.accepted ? 'accept' : 'reject'
+    } your invitation`,
+    Channels.notification,
+  );
+
   await project.save();
   res.status(200).json({ message: 'success' });
 };

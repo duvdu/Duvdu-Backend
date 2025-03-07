@@ -94,7 +94,7 @@ export const updateContractFileController: RequestHandler<
       'contract',
       notificationTitle,
       notificationMessage,
-      Channels.update_contract,
+      Channels.notification,
     ),
     sendNotification(
       contract.customer.toString(),
@@ -103,7 +103,7 @@ export const updateContractFileController: RequestHandler<
       'contract',
       notificationTitle,
       notificationMessage,
-      Channels.update_contract,
+      Channels.notification,
     ),
   ]);
 
