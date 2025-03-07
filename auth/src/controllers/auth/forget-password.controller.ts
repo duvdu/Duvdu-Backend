@@ -51,10 +51,6 @@ export const askForgetPasswordHandler: RequestHandler<
   const user = await Users.findOne(query);
   if (!user) return next(new NotFound(undefined, req.lang));
 
-  if (!user.isVerified)
-    return next(
-      new BadRequestError({ en: 'account not verified', ar: 'الحساب غير موثق' }, req.lang),
-    );
   if (user.isBlocked.value)
     return next(
       new BadRequestError(
@@ -121,10 +117,7 @@ export const updateForgetenPasswordHandler: RequestHandler<
     return next(
       new UnauthorizedError({ en: 'User is blocked: ', ar: 'المستخدم محظور: ' }, req.lang),
     );
-  if (!user.isVerified)
-    return next(
-      new BadRequestError({ en: 'account not verified', ar: 'الحساب غير موثق' }, req.lang),
-    );
+
 
   if (user.verificationCode?.reason !== VerificationReason.forgetPasswordVerified)
     return next(new UnauthorizedError(undefined, req.lang));
