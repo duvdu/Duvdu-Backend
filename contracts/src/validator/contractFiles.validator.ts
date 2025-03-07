@@ -3,7 +3,7 @@ import { body, param } from 'express-validator';
 
 export const contractFilesValidator = [
   param('contractId').isMongoId(),
-  body('link').isURL({ protocols: ['http', 'https'] }),
+  body('link').isURL({ protocols: ['http', 'https'], require_protocol: true , require_valid_protocol: true }),
   body('cycle').isIn([CYCLES.copyRights, CYCLES.portfolioPost, CYCLES.teamProject]),
   body('notes').optional().isString(),
   globalValidatorMiddleware,
