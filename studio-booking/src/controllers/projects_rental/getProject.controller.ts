@@ -5,7 +5,6 @@ import {
   Rentals,
   Contracts,
   Users,
-  RentalContractStatus,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import { Types } from 'mongoose';
@@ -213,9 +212,7 @@ export const getProjectHandler: RequestHandler = async (req, res, next) => {
     match: {
       status: {
         $nin: [
-          RentalContractStatus.rejected,
-          RentalContractStatus.complaint,
-          RentalContractStatus.canceled,
+          'canceled', 'pending', 'rejected', 'reject', 'cancel'
         ],
       },
     },
