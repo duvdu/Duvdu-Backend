@@ -75,8 +75,8 @@ export const getLoggedUserProjects: RequestHandler<
   });
 
   filteredProjects.sort((a: any, b: any) => {
-    const dateA = a.project?.createdAt ? new Date(a.project.createdAt) : new Date(0);
-    const dateB = b.project?.createdAt ? new Date(b.project.createdAt) : new Date(0);
+    const dateA = a.createdAt ? new Date(a.createdAt) : new Date(0);
+    const dateB = b.createdAt ? new Date(b.createdAt) : new Date(0);
     return dateB.getTime() - dateA.getTime();
   });
 
@@ -164,8 +164,8 @@ export const getUserProjectsByUsername: RequestHandler<
   });
 
   filteredProjects.sort((a: any, b: any) => {
-    const dateA = a.project?.createdAt ? new Date(a.project.createdAt) : new Date(0);
-    const dateB = b.project?.createdAt ? new Date(b.project.createdAt) : new Date(0);
+    const dateA = a.createdAt ? new Date(a.createdAt) : new Date(0);
+    const dateB = b.createdAt ? new Date(b.createdAt) : new Date(0);
     return dateB.getTime() - dateA.getTime();
   });
 
