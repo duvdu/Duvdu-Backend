@@ -30,7 +30,11 @@ export const getLoggedUserProjects: RequestHandler<
     })
     .lean();
 
-  projects.forEach((el: any) => {
+  const filteredProjects = projects.filter((el: any) => {
+    return !el.project?.isDeleted;
+  });
+
+  filteredProjects.forEach((el: any) => {
     if (!el.project?.type) return;
     el.project = el.project.type;
     el.project.tags = (el.project.tags as { _id: string; en: string; ar: string }[])?.map((el) =>
@@ -70,6 +74,12 @@ export const getLoggedUserProjects: RequestHandler<
     delete el.project.type;
   });
 
+  filteredProjects.sort((a: any, b: any) => {
+    const dateA = a.project?.createdAt ? new Date(a.project.createdAt) : new Date(0);
+    const dateB = b.project?.createdAt ? new Date(b.project.createdAt) : new Date(0);
+    return dateB.getTime() - dateA.getTime();
+  });
+
   res.status(200).json({ message: 'success', data: { total: count, projects } });
 };
 
@@ -105,7 +115,11 @@ export const getUserProjectsByUsername: RequestHandler<
     })
     .lean();
 
-  projects.forEach((el: any) => {
+  const filteredProjects = projects.filter((el: any) => {
+    return !el.project?.isDeleted;
+  });
+
+  filteredProjects.forEach((el: any) => {
     if (!el.project?.type) return;
     el.project = el.project.type;
     el.project.tags = (el.project.tags as { _id: string; en: string; ar: string }[])?.map((el) =>
@@ -149,5 +163,13 @@ export const getUserProjectsByUsername: RequestHandler<
     delete el.project.type;
   });
 
+  filteredProjects.sort((a: any, b: any) => {
+    const dateA = a.project?.createdAt ? new Date(a.project.createdAt) : new Date(0);
+    const dateB = b.project?.createdAt ? new Date(b.project.createdAt) : new Date(0);
+    return dateB.getTime() - dateA.getTime();
+  });
+
   res.status(200).json({ message: 'success', data: { total: count, projects } });
 };
+
+

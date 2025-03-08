@@ -23,6 +23,7 @@ export const getUserTaggedProjectsHandler: RequestHandler<
   const countPipeline = [
     {
       $match: {
+        isDeleted: false,
         creatives: {
           $elemMatch: {
             creative: new Types.ObjectId(userId),
