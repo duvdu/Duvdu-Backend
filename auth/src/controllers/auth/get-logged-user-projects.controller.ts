@@ -80,7 +80,7 @@ export const getLoggedUserProjects: RequestHandler<
     return dateB.getTime() - dateA.getTime();
   });
 
-  res.status(200).json({ message: 'success', data: { total: count, projects } });
+  res.status(200).json({ message: 'success', data: { total: count, filteredProjects } });
 };
 
 export const getUserProjectsByUsername: RequestHandler<
@@ -169,7 +169,7 @@ export const getUserProjectsByUsername: RequestHandler<
     return dateB.getTime() - dateA.getTime();
   });
 
-  res.status(200).json({ message: 'success', data: { total: count, projects } });
+  res.status(200).json({ message: 'success', data: { total: count, filteredProjects } });
 };
 
 
