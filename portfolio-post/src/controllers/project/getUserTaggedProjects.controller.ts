@@ -54,6 +54,7 @@ export const getUserTaggedProjectsHandler: RequestHandler<
   pipelines.push(
     {
       $match: {
+        isDeleted: false,
         creatives: {
           $elemMatch: {
             creative: new Types.ObjectId(userId),
