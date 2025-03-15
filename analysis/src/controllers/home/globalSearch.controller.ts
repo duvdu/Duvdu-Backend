@@ -26,6 +26,7 @@ export const globalSearchHandler: RequestHandler<
           { 'tags.en': { $regex: searchKeyword, $options: 'i' } },
           { cycle: { $regex: searchKeyword, $options: 'i' } },
         ],
+        isRelated: false,
       },
     },
     {
