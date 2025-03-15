@@ -54,7 +54,6 @@ export const updateContractHandler: RequestHandler<
   if (req.body.deadline)
     assertDeadline(new Date(req.body.deadline), new Date(contract.deadline), req.lang);
 
-
   await CopyrightContracts.updateOne(
     { _id: req.params.contractId },
     { ...req.body, secondPaymentAmount: req.body.totalPrice - contract.firstPaymentAmount },
@@ -79,7 +78,7 @@ export const updateContractHandler: RequestHandler<
       'contract',
       'copyright contract updates',
       `${user?.name} updated the contract`,
-        Channels.notification,
+      Channels.notification,
     ),
   ]);
   res.status(200).json({ message: 'success' });

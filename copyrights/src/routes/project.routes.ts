@@ -50,11 +50,6 @@ router
     val.update,
     handlers.updateProjectHandler,
   )
-  .delete(
-    isauthenticated,
-    isauthorized(PERMISSIONS.removeCopyrightHandler),
-    val.get,
-    handlers.removeProjectHandler,
-  );
+  .delete(isauthenticated, val.get, handlers.removeProjectHandler);
 
 export const copyrightRoutes = router;

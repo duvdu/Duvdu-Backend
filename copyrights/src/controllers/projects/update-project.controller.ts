@@ -17,7 +17,14 @@ export const updateProjectHandler: RequestHandler<
   Partial<
     Pick<
       IcopyRights,
-      'price' | 'duration' | 'address' | 'showOnHome' | 'searchKeywords' | 'isDeleted' | 'location' | 'category'
+      | 'price'
+      | 'duration'
+      | 'address'
+      | 'showOnHome'
+      | 'searchKeywords'
+      | 'isDeleted'
+      | 'location'
+      | 'category'
     > & { tags?: string[]; subCategory?: string }
   >
 > = async (req, res, next) => {
@@ -29,7 +36,7 @@ export const updateProjectHandler: RequestHandler<
     return next(new NotAllowedError(undefined, req.lang));
 
   // check if the project is editable or not with the contract status
-  if (Object.keys(req.body).some(key => key !== 'showOnHome' && key !== 'isDeleted')) {
+  if (Object.keys(req.body).some((key) => key !== 'showOnHome' && key !== 'isDeleted')) {
     const contract = await CopyrightContracts.findOne({
       project: req.params.projectId,
     }).sort({ createdAt: -1 });
@@ -37,13 +44,17 @@ export const updateProjectHandler: RequestHandler<
     const nonEditableStatuses = [
       CopyrightContractStatus.rejected,
       CopyrightContractStatus.completed,
-      CopyrightContractStatus.canceled
+      CopyrightContractStatus.canceled,
     ];
 
     if (contract && nonEditableStatuses.includes(contract.status))
-      return next(new NotAllowedError({ en: 'project is not editable', ar: 'المشروع غير قابل للتعديل' }, req.lang));
+      return next(
+        new NotAllowedError(
+          { en: 'project is not editable', ar: 'المشروع غير قابل للتعديل' },
+          req.lang,
+        ),
+      );
   }
-  
 
   if (req.body.category || req.body.subCategory || req.body.tags) {
     const { filteredTags, subCategoryTitle } = await filterTagsForCategory(

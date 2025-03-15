@@ -1,4 +1,11 @@
-import { PaginationResponse, CopyRights, IcopyRights, MODELS, Categories, CopyrightContractStatus } from '@duvdu-v1/duvdu';
+import {
+  PaginationResponse,
+  CopyRights,
+  IcopyRights,
+  MODELS,
+  Categories,
+  CopyrightContractStatus,
+} from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import mongoose, { PipelineStage } from 'mongoose';
 
@@ -93,7 +100,6 @@ export const getProjectsHandler: RequestHandler<
   let isInstant = undefined;
   if (req.pagination.filter.instant != undefined) isInstant = req.pagination.filter.instant;
   delete req.pagination.filter.instant;
-
 
   const countPipeline: PipelineStage[] = [
     {
@@ -228,13 +234,13 @@ export const getProjectsHandler: RequestHandler<
         from: MODELS.copyrightContract,
         localField: '_id',
         foreignField: 'project',
-        as: 'contracts'
+        as: 'contracts',
       },
     },
     {
       $addFields: {
         latestContract: { $arrayElemAt: ['$contracts', -1] },
-      }
+      },
     },
     {
       $addFields: {
@@ -249,20 +255,20 @@ export const getProjectsHandler: RequestHandler<
                   [
                     CopyrightContractStatus.rejected,
                     CopyrightContractStatus.completed,
-                    CopyrightContractStatus.canceled
-                  ]
-                ]
-              }
-            }
-          }
-        }
-      }
+                    CopyrightContractStatus.canceled,
+                  ],
+                ],
+              },
+            },
+          },
+        },
+      },
     },
     {
       $project: {
         contracts: 0,
-        latestContract: 0
-      }
+        latestContract: 0,
+      },
     },
     {
       $project: {

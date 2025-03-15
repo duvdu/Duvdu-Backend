@@ -141,7 +141,7 @@ const handleSpAction = async (
     const firstPaymentAmount = contract.firstPaymentAmount
       ? contract.firstPaymentAmount
       : (contract.totalPrice * 0.1).toFixed(2);
-    const secondPaymentAmount =  (contract.totalPrice - firstPaymentAmount).toFixed(2);
+    const secondPaymentAmount = (contract.totalPrice - firstPaymentAmount).toFixed(2);
 
     await CopyrightContracts.updateOne(
       { _id: contract._id },
@@ -150,7 +150,7 @@ const handleSpAction = async (
         actionAt: new Date(),
         paymentLink: paymentSession,
         firstPaymentAmount: firstPaymentAmount,
-        secondPaymentAmount: secondPaymentAmount
+        secondPaymentAmount: secondPaymentAmount,
       },
     );
 

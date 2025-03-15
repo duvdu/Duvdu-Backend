@@ -65,7 +65,11 @@ export const update = [
   body('tags.*').isMongoId().withMessage('tagLength'),
   body('subCategory').optional().isMongoId().withMessage('subCategoryInvalid'),
   body('category').optional().isMongoId().withMessage('categoryInvalid'),
-  body('isDeleted').optional().isBoolean({ strict: true }).toBoolean().withMessage('isDeletedBoolean'),
+  body('isDeleted')
+    .optional()
+    .isBoolean({ strict: true })
+    .toBoolean()
+    .withMessage('isDeletedBoolean'),
   globalValidatorMiddleware,
 ];
 

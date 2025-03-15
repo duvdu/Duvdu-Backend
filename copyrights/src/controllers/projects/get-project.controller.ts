@@ -70,11 +70,10 @@ export const getProjectHandler: RequestHandler<
   const nonEditableStatuses = [
     CopyrightContractStatus.rejected,
     CopyrightContractStatus.completed,
-    CopyrightContractStatus.canceled
+    CopyrightContractStatus.canceled,
   ];
 
   (project as any).canEdit = !contract || !nonEditableStatuses.includes(contract.status);
-
 
   await Users.updateOne({ _id: project.user.id }, { $inc: { projectsView: 1 } });
 
