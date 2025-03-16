@@ -12,11 +12,9 @@ export const getComplaintHandler: RequestHandler<
   { contractId: string },
   SuccessResponse<{ data: IcontractReport }>
 > = async (req, res, next) => {
-  const complaint = await ContractReports.findOne(
-    {
-      contract: req.params.contractId,
-    },
-  )
+  const complaint = await ContractReports.findOne({
+    contract: req.params.contractId,
+  })
     .populate([
       {
         path: 'reporter',

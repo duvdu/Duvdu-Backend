@@ -2,13 +2,13 @@ import { isauthenticated } from '@duvdu-v1/duvdu';
 import { Router } from 'express';
 
 import { complaintRoutes } from './complaint.routes';
+import { router as contractCancelRoutes } from './contractCancel.routes';
 import { router as contractFilesRoutes } from './contractFiles.routes';
 import { router as couponRoutes } from './coupon.routes';
 import { router as subscribeRoutes } from './subscribe.routes';
 import * as controllers from '../controllers';
 import { contractAnalysis } from '../controllers/analysis.controller';
 import * as val from '../validator/contract.validator';
-
 const router = Router();
 router.get('/analysis', contractAnalysis);
 router.use('/subscribe', subscribeRoutes);
@@ -16,6 +16,7 @@ router.route('/').get(isauthenticated, val.getContracts, controllers.getContract
 router.use('/complaints', complaintRoutes);
 router.use('/coupons', couponRoutes);
 router.use('/contractFiles', contractFilesRoutes);
+router.use('/contractCancel', contractCancelRoutes);
 
 router
   .route('/:contractId')

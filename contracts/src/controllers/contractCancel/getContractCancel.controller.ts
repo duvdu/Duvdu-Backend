@@ -1,29 +1,35 @@
-import { Contracts, SuccessResponse, MODELS } from '@duvdu-v1/duvdu';
+import {
+  ContractCancel,
+  Contracts,
+  IContractCancel,
+  MODELS,
+  NotFound,
+  SuccessResponse,
+} from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import mongoose from 'mongoose';
 
-export const getContracts: RequestHandler<
-  unknown,
-  SuccessResponse<{ data: any }>,
-  unknown,
-  { filter: 'i_created' | 'i_received' }
+export const getContractCancel: RequestHandler<
+  { contractCancelId: string },
+  SuccessResponse<{ data: IContractCancel }>
 > = async (req, res) => {
-  const filter: any = {};
-  if (req.query.filter === 'i_created')
-    filter.customer = new mongoose.Types.ObjectId(req.loggedUser.id);
-  else if (req.query.filter === 'i_received')
-    filter.sp = new mongoose.Types.ObjectId(req.loggedUser.id);
-  else
-    filter.$or = [
-      { customer: new mongoose.Types.ObjectId(req.loggedUser.id) },
-      { sp: new mongoose.Types.ObjectId(req.loggedUser.id) },
-    ];
+  const contractCancel = await ContractCancel.findById(req.params.contractCancelId).populate({
+    path: 'user',
+    select: 'name profileImage phoneNumber email',
+  });
 
-  console.log(await Contracts.aggregate([{ $match: filter }]));
+  if (!contractCancel)
+    throw new NotFound(
+      { en: 'contract cancel not found', ar: 'طلب إلغاء العقد غير موجود' },
+      req.lang,
+    );
 
-  const contracts = await Contracts.aggregate([
-    { $match: filter },
-    { $sort: { createdAt: -1 } },
+  const contract = await Contracts.aggregate([
+    {
+      $match: {
+        _id: new mongoose.Types.ObjectId(contractCancel.contract),
+      },
+    },
     {
       $lookup: {
         from: MODELS.copyrightContract,
@@ -72,12 +78,6 @@ export const getContracts: RequestHandler<
     },
     {
       $unwind: {
-        path: '$team_contracts',
-        preserveNullAndEmptyArrays: true,
-      },
-    },
-    {
-      $unwind: {
         path: '$project_contracts',
         preserveNullAndEmptyArrays: true,
       },
@@ -91,6 +91,12 @@ export const getContracts: RequestHandler<
     {
       $unwind: {
         path: '$copyright_contract',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $unwind: {
+        path: '$team_contracts',
         preserveNullAndEmptyArrays: true,
       },
     },
@@ -136,15 +142,15 @@ export const getContracts: RequestHandler<
     { $unwind: '$sp' },
     {
       $lookup: {
-        from: MODELS.contractCancel,
+        from: MODELS.contractReview,
         localField: '_id',
         foreignField: 'contract',
-        as: 'cancelRequests',
+        as: 'review',
       },
     },
     {
       $set: {
-        haveCancelRequest: { $gt: [{ $size: '$cancelRequests' }, 0] },
+        hasReview: { $gt: [{ $size: '$review' }, 0] },
         customer: {
           profileImage: {
             $concat: [process.env.BUCKET_HOST, '/', '$customer.profileImage'],
@@ -177,6 +183,7 @@ export const getContracts: RequestHandler<
         ref: 1,
         cycle: 1,
         contract: 1,
+        hasReview: 1,
         customer: {
           _id: '$customer._id',
           name: '$customer.name',
@@ -245,38 +252,16 @@ export const getContracts: RequestHandler<
     },
   ]);
 
-  res.status(200).json({
+  if (contract.length === 0)
+    throw new NotFound({ en: 'contract not found', ar: 'العقد غير موجود' }, req.lang);
+
+  const contractCancelData: IContractCancel = {
+    ...contractCancel,
+    contract: contract?.[0],
+  };
+
+  return res.status(200).json({
     message: 'success',
-    data: contracts,
+    data: contractCancelData,
   });
 };
-// import { Contracts, SuccessResponse } from '@duvdu-v1/duvdu';
-// import { RequestHandler } from 'express';
-// import mongoose from 'mongoose';
-
-// export const getContracts: RequestHandler<
-//   unknown,
-//   SuccessResponse<{ data: any }>,
-//   unknown,
-//   { filter: 'i_created' | 'i_received' }
-// > = async (req, res) => {
-//   const filter: any = {};
-//   if (req.query.filter === 'i_created')
-//     filter.customer = new mongoose.Types.ObjectId(req.loggedUser.id);
-//   else if (req.query.filter === 'i_received')
-//     filter.sp = new mongoose.Types.ObjectId(req.loggedUser.id);
-//   else
-//     filter.$or = [
-//       { customer: new mongoose.Types.ObjectId(req.loggedUser.id) },
-//       { sp: new mongoose.Types.ObjectId(req.loggedUser.id) },
-//     ];
-//   const contracts = await Contracts.find(filter)
-//     .populate([
-//       { path: 'sp', select: 'isOnline profileImage username name rank projectsView' },
-//       { path: 'customer', select: 'isOnline profileImage username name rank projectsView' },
-//       { path: 'contract' },
-//     ])
-//     .sort({ createdAt: -1 });
-
-//   res.status(200).json({ message: 'success', data: contracts });
-// };

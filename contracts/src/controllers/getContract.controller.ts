@@ -133,12 +133,21 @@ export const getContract: RequestHandler<
         from: MODELS.contractReview,
         localField: '_id',
         foreignField: 'contract',
-        as: 'review'
-      }
+        as: 'review',
+      },
+    },
+    {
+      $lookup: {
+        from: MODELS.contractCancel,
+        localField: '_id',
+        foreignField: 'contract',
+        as: 'cancelRequests',
+      },
     },
     {
       $set: {
         hasReview: { $gt: [{ $size: '$review' }, 0] },
+        haveCancelRequest: { $gt: [{ $size: '$cancelRequests' }, 0] },
         customer: {
           profileImage: {
             $concat: [process.env.BUCKET_HOST, '/', '$customer.profileImage'],
@@ -172,6 +181,7 @@ export const getContract: RequestHandler<
         cycle: 1,
         contract: 1,
         hasReview: 1,
+        haveCancelRequest: 1,
         customer: {
           _id: '$customer._id',
           name: '$customer.name',
@@ -179,17 +189,27 @@ export const getContract: RequestHandler<
           isOnline: '$customer.isOnline',
           profileImage: {
             $cond: {
-              if: { $regexMatch: { input: '$customer.profileImage', regex: new RegExp(process.env.BUCKET_HOST || '') } },
+              if: {
+                $regexMatch: {
+                  input: '$customer.profileImage',
+                  regex: new RegExp(process.env.BUCKET_HOST || ''),
+                },
+              },
               then: '$customer.profileImage',
-              else: { $concat: [process.env.BUCKET_HOST, '/', '$customer.profileImage'] }
-            }
+              else: { $concat: [process.env.BUCKET_HOST, '/', '$customer.profileImage'] },
+            },
           },
           faceRecognition: {
             $cond: {
-              if: { $regexMatch: { input: '$customer.faceRecognition', regex: new RegExp(process.env.BUCKET_HOST || '') } },
+              if: {
+                $regexMatch: {
+                  input: '$customer.faceRecognition',
+                  regex: new RegExp(process.env.BUCKET_HOST || ''),
+                },
+              },
               then: '$customer.faceRecognition',
-              else: { $concat: [process.env.BUCKET_HOST, '/', '$customer.faceRecognition'] }
-            }
+              else: { $concat: [process.env.BUCKET_HOST, '/', '$customer.faceRecognition'] },
+            },
           },
           email: '$customer.email',
           phoneNumber: '$customer.phoneNumber',
@@ -201,17 +221,27 @@ export const getContract: RequestHandler<
           isOnline: '$sp.isOnline',
           profileImage: {
             $cond: {
-              if: { $regexMatch: { input: '$sp.profileImage', regex: new RegExp(process.env.BUCKET_HOST || '') } },
+              if: {
+                $regexMatch: {
+                  input: '$sp.profileImage',
+                  regex: new RegExp(process.env.BUCKET_HOST || ''),
+                },
+              },
               then: '$sp.profileImage',
-              else: { $concat: [process.env.BUCKET_HOST, '/', '$sp.profileImage'] }
-            }
+              else: { $concat: [process.env.BUCKET_HOST, '/', '$sp.profileImage'] },
+            },
           },
           faceRecognition: {
             $cond: {
-              if: { $regexMatch: { input: '$sp.faceRecognition', regex: new RegExp(process.env.BUCKET_HOST || '') } },
+              if: {
+                $regexMatch: {
+                  input: '$sp.faceRecognition',
+                  regex: new RegExp(process.env.BUCKET_HOST || ''),
+                },
+              },
               then: '$sp.faceRecognition',
-              else: { $concat: [process.env.BUCKET_HOST, '/', '$sp.faceRecognition'] }
-            }
+              else: { $concat: [process.env.BUCKET_HOST, '/', '$sp.faceRecognition'] },
+            },
           },
           email: '$sp.email',
           phoneNumber: '$sp.phoneNumber',

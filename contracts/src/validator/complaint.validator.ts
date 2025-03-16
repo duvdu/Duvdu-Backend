@@ -7,10 +7,7 @@ export const create = [
   globalValidatorMiddleware,
 ];
 
-export const getOne = [
-  param('contractId').isMongoId(),
-  globalValidatorMiddleware,
-];
+export const getOne = [param('contractId').isMongoId(), globalValidatorMiddleware];
 
 export const getAll = [
   query('limit').optional().isInt().toInt(),

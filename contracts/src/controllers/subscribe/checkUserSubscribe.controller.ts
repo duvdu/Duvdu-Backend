@@ -28,7 +28,10 @@ export const checkUserSubscribeController: RequestHandler<
   // const highestPrice = Math.max(
   //   ...lastContracts.map((contract: any) => contract.contract.totalPrice || 0),
   // );
-  const totalPrice = lastContracts.reduce((acc: number, contract: any) => acc + (contract.contract.totalPrice || 0), 0);
+  const totalPrice = lastContracts.reduce(
+    (acc: number, contract: any) => acc + (contract.contract.totalPrice || 0),
+    0,
+  );
   const total = (totalPrice * setting.contractSubscriptionPercentage) / 100;
   return res.status(200).json(<any>{ message: 'success', data: { newFiveContractsPrice: total } });
 };

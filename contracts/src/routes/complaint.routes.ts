@@ -13,9 +13,7 @@ const router = Router();
 
 router.use(isauthenticated);
 
-
 router.route('/:contractId').get(val.getOne, handlers.getComplaintHandler);
-
 
 router
   .route('/')
@@ -23,9 +21,7 @@ router
     globalUploadMiddleware(FOLDERS.report, {
       maxSize: 1024 * 1024 * 10, // 10MB
       fileTypes: ['image/*', 'application/pdf'],
-    }).fields([
-      { name: 'attachments', maxCount: 10 },
-    ]),
+    }).fields([{ name: 'attachments', maxCount: 10 }]),
     val.create,
     handlers.createComplaintHandler,
   )
