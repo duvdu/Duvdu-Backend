@@ -22,19 +22,19 @@ export const updateRankForUser = async (userId: string) => {
   const currentRank = await Rank.findOne({
     actionCount: { $lte: acceptedProjectsCounter },
     projectsLiked: { $lte: projectsLiked },
-    projectsCount: { $lte: projectsCount }
+    projectsCount: { $lte: projectsCount },
   })
-    .sort({ 
+    .sort({
       actionCount: -1,
       favoriteCount: -1,
       projectsLiked: -1,
-      projectsCount: -1 
+      projectsCount: -1,
     })
     .exec();
 
   // Find next possible rank
   const nextRank = await Rank.findOne({
-    actionCount: { $gt: acceptedProjectsCounter || 0 }
+    actionCount: { $gt: acceptedProjectsCounter || 0 },
   })
     .sort({ actionCount: 1 })
     .exec();
@@ -47,22 +47,22 @@ export const updateRankForUser = async (userId: string) => {
       const criteriaProgress = [
         {
           completed: acceptedProjectsCounter - currentRank.actionCount,
-          needed: nextRank.actionCount - currentRank.actionCount
+          needed: nextRank.actionCount - currentRank.actionCount,
         },
         {
           completed: projectsLiked - currentRank.projectsLiked,
-          needed: nextRank.projectsLiked - currentRank.projectsLiked
+          needed: nextRank.projectsLiked - currentRank.projectsLiked,
         },
         {
           completed: projectsCount - currentRank.projectsCount,
-          needed: nextRank.projectsCount - currentRank.projectsCount
-        }
+          needed: nextRank.projectsCount - currentRank.projectsCount,
+        },
       ];
 
       // Improved progress calculation
       const progress = criteriaProgress
-        .filter(c => c.needed > 0)
-        .map(c => Math.min(Math.max((c.completed / c.needed) * 100, 0), 100)); // Ensure between 0-100
+        .filter((c) => c.needed > 0)
+        .map((c) => Math.min(Math.max((c.completed / c.needed) * 100, 0), 100)); // Ensure between 0-100
 
       user.rank.nextRangPercentage = progress.length ? Math.max(...progress) : 0;
       user.rank.nextRankTitle = nextRank.rank;
@@ -83,19 +83,17 @@ export const updateRankForUser = async (userId: string) => {
 export const recalculateAllUsersRanks = async () => {
   const BATCH_SIZE = 100;
   let processedCount = 0;
-  
+
   try {
     // Process users in batches
     while (true) {
-      const users = await Users.find({})
-        .skip(processedCount)
-        .limit(BATCH_SIZE);
+      const users = await Users.find({}).skip(processedCount).limit(BATCH_SIZE);
 
       if (users.length === 0) break;
 
       // Update rank for each user in the batch
       await Promise.all(
-        users.map(async user => {
+        users.map(async (user) => {
           try {
             const projectsCount = user.projectsCount;
             const projectsLiked = user.likes;
@@ -105,51 +103,49 @@ export const recalculateAllUsersRanks = async () => {
             const currentRank = await Rank.findOne({
               actionCount: { $lte: acceptedProjectsCounter },
               projectsLiked: { $lte: projectsLiked },
-              projectsCount: { $lte: projectsCount }
+              projectsCount: { $lte: projectsCount },
             })
-              .sort({ 
+              .sort({
                 actionCount: -1,
                 favoriteCount: -1,
                 projectsLiked: -1,
-                projectsCount: -1 
+                projectsCount: -1,
               })
               .exec();
-          
-          
+
             // Find next possible rank
             const nextRank = await Rank.findOne({
-              actionCount: { $gt: acceptedProjectsCounter || 0 }
+              actionCount: { $gt: acceptedProjectsCounter || 0 },
             })
               .sort({ actionCount: 1 })
               .exec();
-          
-          
+
             if (currentRank) {
               user.rank.title = currentRank.rank;
               user.rank.color = currentRank.color;
-          
+
               if (nextRank) {
                 const criteriaProgress = [
                   {
                     completed: acceptedProjectsCounter - currentRank.actionCount,
-                    needed: nextRank.actionCount - currentRank.actionCount
+                    needed: nextRank.actionCount - currentRank.actionCount,
                   },
                   {
                     completed: projectsLiked - currentRank.projectsLiked,
-                    needed: nextRank.projectsLiked - currentRank.projectsLiked
+                    needed: nextRank.projectsLiked - currentRank.projectsLiked,
                   },
                   {
                     completed: projectsCount - currentRank.projectsCount,
-                    needed: nextRank.projectsCount - currentRank.projectsCount
-                  }
+                    needed: nextRank.projectsCount - currentRank.projectsCount,
+                  },
                 ];
-          
+
                 console.log('criteriaProgress', criteriaProgress);
 
                 // Improved progress calculation
                 const progress = criteriaProgress
-                  .filter(c => c.needed > 0)
-                  .map(c => Math.min(Math.max((c.completed / c.needed) * 100, 0), 100)); // Ensure between 0-100
+                  .filter((c) => c.needed > 0)
+                  .map((c) => Math.min(Math.max((c.completed / c.needed) * 100, 0), 100)); // Ensure between 0-100
                 console.log('progress', progress);
                 console.log('progress.length', progress.length ? Math.max(...progress) : 0);
                 user.rank.nextRangPercentage = progress.length ? Math.max(...progress) : 0;
@@ -163,13 +159,13 @@ export const recalculateAllUsersRanks = async () => {
               user.rank.nextRankTitle = null;
               user.rank.color = null;
             }
-          
+
             await user.save();
             return user;
           } catch (error) {
             console.error(`Failed to update rank for user ${user._id}:`, error);
           }
-        })
+        }),
       );
 
       processedCount += users.length;

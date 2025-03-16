@@ -24,7 +24,7 @@ export async function filterTagsForCategory(
   filteredTags: Itag[];
   media: string | undefined;
 }> {
-  const category = await Categories.findOne({ _id: categoryId , isRelated:false });
+  const category = await Categories.findOne({ _id: categoryId, isRelated: false });
   if (!category) throw new NotFound({ en: 'Category not found', ar: 'الفئة غير موجودة' }, lang);
   if (category.cycle !== cycle)
     throw new BadRequestError(
@@ -86,7 +86,7 @@ export async function filterRelatedCategoryForCategory(
       tags: Array<{ tag: string }>;
     }>;
   }>,
-  lang: string
+  lang: string,
 ): Promise<boolean> {
   // Validate main category exists and is not a related category
   const mainCategory = await Categories.findOne({ _id: categoryId, isRelated: false });
@@ -95,49 +95,54 @@ export async function filterRelatedCategoryForCategory(
   }
 
   // Get all related category IDs
-  const relatedCategoryIds = relatedCategories.map(rc => rc.category);
+  const relatedCategoryIds = relatedCategories.map((rc) => rc.category);
 
   // Fetch all related categories in one query
   const relatedCategoryDocs = await Categories.find({
     _id: { $in: relatedCategoryIds },
-    isRelated: true
+    isRelated: true,
   });
 
   if (relatedCategoryDocs.length !== relatedCategoryIds.length) {
     throw new BadRequestError(
-      { en: 'One or more related categories not found', ar: 'واحد أو أكثر من الفئات المرتبطة غير موجودة' },
-      lang
+      {
+        en: 'One or more related categories not found',
+        ar: 'واحد أو أكثر من الفئات المرتبطة غير موجودة',
+      },
+      lang,
     );
   }
 
   // Validate each related category's subcategories and tags
   for (const relatedCategory of relatedCategories) {
-    const categoryDoc = relatedCategoryDocs.find(doc => doc._id.toString() === relatedCategory.category);
-    
+    const categoryDoc = relatedCategoryDocs.find(
+      (doc) => doc._id.toString() === relatedCategory.category,
+    );
+
     if (relatedCategory.subCategories) {
       for (const subCat of relatedCategory.subCategories) {
         // Find matching subcategory in the category document
         const foundSubCategory = categoryDoc?.subCategories?.find(
-          (sc:any) => sc._id.toString() === subCat.subCategory
+          (sc: any) => sc._id.toString() === subCat.subCategory,
         );
 
         if (!foundSubCategory) {
           throw new BadRequestError(
             { en: 'Invalid subcategory ID', ar: 'معرف الفئة الفرعية غير صالح' },
-            lang
+            lang,
           );
         }
 
         // Validate tags
         if (subCat.tags && subCat.tags.length > 0) {
-          const validTagIds = foundSubCategory.tags.map((tag:any) => tag._id.toString());
-          const providedTagIds = subCat.tags.map(t => t.tag);
+          const validTagIds = foundSubCategory.tags.map((tag: any) => tag._id.toString());
+          const providedTagIds = subCat.tags.map((t) => t.tag);
 
-          const invalidTags = providedTagIds.filter(tagId => !validTagIds.includes(tagId));
+          const invalidTags = providedTagIds.filter((tagId) => !validTagIds.includes(tagId));
           if (invalidTags.length > 0) {
             throw new BadRequestError(
               { en: 'Invalid tags found', ar: 'تم العثور على علامات غير صالحة' },
-              lang
+              lang,
             );
           }
         }

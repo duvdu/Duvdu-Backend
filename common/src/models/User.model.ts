@@ -74,7 +74,7 @@ const userSchema = new Schema<Iuser>(
           ret.faceRecognition = process.env.BUCKET_HOST + '/' + ret.faceRecognition;
       },
     },
-  }
+  },
 )
   .index({ name: 'text' })
   .index({ location: '2dsphere' });

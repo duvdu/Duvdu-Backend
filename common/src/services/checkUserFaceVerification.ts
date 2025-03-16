@@ -1,11 +1,6 @@
 import { Users } from '../models/User.model';
 
-
-
-
-
 export async function checkUserFaceVerification(userId: string): Promise<boolean> {
-
   const user = await Users.findOne({ _id: userId });
 
   let isVerified = false;
@@ -15,4 +10,3 @@ export async function checkUserFaceVerification(userId: string): Promise<boolean
 
   return isVerified;
 }
-

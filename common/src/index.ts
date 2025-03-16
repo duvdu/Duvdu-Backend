@@ -85,6 +85,7 @@ export * from './models/coupon.model';
 export * from './models/favourites.model';
 export * from './models/Bookmark.model';
 export * from './models/Bookmark-projects.model';
+export * from './models/contractCancel.model';
 
 export * from './services/category.service';
 export * from './services/projectView.service';
