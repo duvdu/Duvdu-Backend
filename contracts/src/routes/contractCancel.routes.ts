@@ -28,4 +28,8 @@ router
     isauthorized(PERMISSIONS.deleteContractCancel),
     validations.deleteContractCancelValidation,
     controllers.deleteContractCancel,
+  ).patch(
+    isauthorized(PERMISSIONS.acceptContractCancel),
+    validations.acceptContractCancelValidation,
+    controllers.acceptContractCancel,
   );

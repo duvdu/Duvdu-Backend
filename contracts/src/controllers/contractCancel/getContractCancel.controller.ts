@@ -8,6 +8,7 @@ import {
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import mongoose from 'mongoose';
+import 'express-async-errors';
 
 export const getContractCancel: RequestHandler<
   { contractCancelId: string },

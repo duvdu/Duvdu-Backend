@@ -17,6 +17,11 @@ export const deleteContractCancelValidation = [
   globalValidatorMiddleware,
 ];
 
+export const acceptContractCancelValidation = [
+  param('contractCancelId').isMongoId().withMessage('contractCancelId is required'),
+  globalValidatorMiddleware,
+];
+
 export const getContractsCancelValidation = [
   query('user').optional().isMongoId().withMessage('user is required'),
   query('contract').optional().isMongoId().withMessage('contract is required'),
