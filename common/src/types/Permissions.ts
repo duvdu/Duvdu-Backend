@@ -89,6 +89,7 @@ export enum PERMISSIONS {
   // contract cancel
   getContractsCancel = 'get contracts cancel',
   deleteContractCancel = 'delete contract cancel',
+  acceptContractCancel = 'accept contract cancel',
 }
 
 export const permissions = {
@@ -181,5 +182,6 @@ export const permissions = {
   contractCancel: [
     PERMISSIONS.getContractsCancel,
     PERMISSIONS.deleteContractCancel,
+    PERMISSIONS.acceptContractCancel,
   ],
 };
