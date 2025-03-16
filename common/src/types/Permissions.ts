@@ -85,6 +85,10 @@ export enum PERMISSIONS {
   createPlatform = 'create producer platform',
   updatePlatform = 'update producer platform',
   getPlatform = 'get producer platform',
+
+  // contract cancel
+  getContractsCancel = 'get contracts cancel',
+  deleteContractCancel = 'delete contract cancel',
 }
 
 export const permissions = {
@@ -173,5 +177,9 @@ export const permissions = {
     PERMISSIONS.getProducerAnalysis,
     PERMISSIONS.createPlatform,
     PERMISSIONS.updatePlatform,
+  ],
+  contractCancel: [
+    PERMISSIONS.getContractsCancel,
+    PERMISSIONS.deleteContractCancel,
   ],
 };
