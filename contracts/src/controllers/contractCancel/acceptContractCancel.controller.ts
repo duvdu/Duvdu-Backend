@@ -1,8 +1,7 @@
 import 'express-async-errors';
-import { ContractCancel, Contracts, NotFound, SuccessResponse, MODELS, ProjectContractStatus, ProjectContract, TeamContract, TeamContractStatus, RentalContractStatus, RentalContracts, CopyrightContractStatus, CopyrightContracts, ProducerContract, Channels, Roles, SystemRoles, Users  } from '@duvdu-v1/duvdu';
+import { ContractCancel , ContractStatus, Contracts, NotFound, SuccessResponse, MODELS, ProjectContractStatus, ProjectContract, TeamContract, TeamContractStatus, RentalContractStatus, RentalContracts, CopyrightContractStatus, CopyrightContracts, ProducerContract, Channels, Roles, SystemRoles, Users  } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-import { ContractStatus } from '../../../../common/src/models/producer_contracts.model';
 import { sendNotification } from '../contractFiles/sendNotification';
 
 
