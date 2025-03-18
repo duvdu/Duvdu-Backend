@@ -39,8 +39,8 @@ export const askForNewDeadline: RequestHandler<
     );
   }
 
-  contract.deadline = req.body.deadline;
-  contract.status = ProjectContractStatus.pending;
+  contract.requestedDeadline.deadline = req.body.deadline;
+  contract.requestedDeadline.status = RequestedDeadlineStatus.pending;
   contract.requestedDeadline.user = new Types.ObjectId(req.loggedUser.id);
   await contract.save();
 
