@@ -61,13 +61,13 @@ export const action = [
 export const pay = [param('paymentSession').isString(), globalValidatorMiddleware];
 
 export const askForNewDeadline = [
-  param('projectId').isMongoId().withMessage('projectId'),
+  param('contractId').isMongoId().withMessage('contractId'),
   body('deadline').isISO8601().toDate().withMessage('deadline'),
   globalValidatorMiddleware,
 ];
 
 export const respondToNewDeadline = [
-  param('projectId').isMongoId().withMessage('projectId'),
+  param('contractId').isMongoId().withMessage('contractId'),
   body('status').isIn([RequestedDeadlineStatus.approved, RequestedDeadlineStatus.rejected]),
   globalValidatorMiddleware,
 ];
