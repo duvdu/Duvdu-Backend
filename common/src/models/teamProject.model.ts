@@ -1,6 +1,6 @@
 import { model, Schema, Types } from 'mongoose';
 
-import { SubmitFilesStatus } from './copyright-contract.model';
+import { RequestedDeadlineStatus, SubmitFilesStatus } from './copyright-contract.model';
 import { Icategory } from '../types/Category';
 import { CYCLES } from '../types/cycles';
 import { MODELS } from '../types/model-names';
@@ -117,6 +117,7 @@ export enum TeamContractStatus {
   complaint = 'complaint',
 }
 
+
 export interface ITeamContract {
   sp: Types.ObjectId | Iuser;
   customer: Types.ObjectId | Iuser;
@@ -146,6 +147,11 @@ export interface ITeamContract {
     reason?: string;
     dateOfSubmission: Date;
   }[];
+  requestedDeadline:{
+    deadline: Date,
+    status: RequestedDeadlineStatus,
+    user: Types.ObjectId | Iuser,
+  }
 }
 
 export const TeamContract = model<ITeamContract>(
@@ -181,6 +187,11 @@ export const TeamContract = model<ITeamContract>(
           status: { type: String, enum: SubmitFilesStatus, default: SubmitFilesStatus.pending },
         },
       ],
+      requestedDeadline: {
+        deadline: { type: Date, default: null },
+        status: { type: String, enum: RequestedDeadlineStatus, default: RequestedDeadlineStatus.pending },
+        user: { type: Schema.Types.ObjectId, ref: MODELS.user, default: null },
+      },
     },
     { timestamps: true, collection: MODELS.teamContract },
   ),

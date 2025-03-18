@@ -22,6 +22,12 @@ export enum SubmitFilesStatus {
   rejected = 'rejected',
 }
 
+export enum RequestedDeadlineStatus {
+  pending = 'pending',
+  approved = 'approved',
+  rejected = 'rejected',
+}
+
 export interface IcopyrightContract {
   id: string;
   customer: Types.ObjectId | Iuser;
@@ -54,6 +60,11 @@ export interface IcopyrightContract {
   }[];
   createdAt: Date;
   updatedAt: Date;
+  requestedDeadline:{
+    deadline: Date,
+    status: RequestedDeadlineStatus,
+    user: Types.ObjectId | Iuser,
+  }
 }
 
 export const CopyrightContracts = model<IcopyrightContract>(
@@ -90,6 +101,11 @@ export const CopyrightContracts = model<IcopyrightContract>(
       ],
       rejectedBy: { type: String, enum: ['sp', 'customer'], default: null },
       paymentLink: { type: String, default: null },
+      requestedDeadline: {
+        deadline: { type: Date, default: null },
+        status: { type: String, enum: RequestedDeadlineStatus, default: RequestedDeadlineStatus.pending },
+        user: { type: Schema.Types.ObjectId, ref: MODELS.user, default: null },
+      },
     },
     { collection: MODELS.copyrightContract, timestamps: true },
   ),

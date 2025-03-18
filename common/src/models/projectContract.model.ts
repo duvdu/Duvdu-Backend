@@ -1,6 +1,6 @@
 import { model, Schema, Types } from 'mongoose';
 
-import { SubmitFilesStatus } from './copyright-contract.model';
+import { RequestedDeadlineStatus, SubmitFilesStatus } from './copyright-contract.model';
 import { IprojectCycle } from './portfolio-post.model';
 import { MODELS } from '../types/model-names';
 import { Iuser } from '../types/User';
@@ -51,6 +51,11 @@ export interface IprojectContract {
     reason?: string;
     dateOfSubmission: Date;
   }[];
+  requestedDeadline:{
+    deadline: Date,
+    status: RequestedDeadlineStatus,
+    user: Types.ObjectId | Iuser,
+  }
 }
 
 export const ProjectContract = model<IprojectContract>(
@@ -107,6 +112,11 @@ export const ProjectContract = model<IprojectContract>(
           status: { type: String, enum: SubmitFilesStatus, default: SubmitFilesStatus.pending },
         },
       ],
+      requestedDeadline: {
+        deadline: { type: Date, default: null },
+        status: { type: String, enum: RequestedDeadlineStatus, default: RequestedDeadlineStatus.pending },
+        user: { type: Schema.Types.ObjectId, ref: MODELS.user, default: null },
+      },
     },
     { timestamps: true, collection: MODELS.projectContract },
   ),
