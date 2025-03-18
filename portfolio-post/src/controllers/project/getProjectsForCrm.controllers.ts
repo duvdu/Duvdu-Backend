@@ -91,8 +91,8 @@ export const getProjetcsCrm: GetProjectsForCrmHandler = async (req, res) => {
                 $and: [
                   { $eq: ['$creatives.inviteStatus', InviteStatus.accepted] },
                   { $ne: ['$creativeDetails', null] },
-                  { $ne: [{ $type: '$creativeDetails' }, 'missing'] }
-                ]
+                  { $ne: [{ $type: '$creativeDetails' }, 'missing'] },
+                ],
               },
               {
                 _id: '$creativeDetails._id',

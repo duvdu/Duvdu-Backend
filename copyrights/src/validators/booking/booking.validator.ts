@@ -1,4 +1,4 @@
-import { BookingState, globalValidatorMiddleware } from '@duvdu-v1/duvdu';
+import { BookingState, globalValidatorMiddleware, RequestedDeadlineStatus } from '@duvdu-v1/duvdu';
 import { body, param } from 'express-validator';
 
 export const bookProject = [
@@ -65,5 +65,19 @@ export const updateContract = [
       if (['minutes', 'hours', 'days', 'months', 'weeks'].includes(val)) return true;
       throw new Error('durationUnit');
     }),
+  globalValidatorMiddleware,
+];
+
+export const askForNewDeadline = [
+  param('contractId').isMongoId().withMessage('contractIdInvalid'),
+  body('deadline').isISO8601().toDate().withMessage('deadlineInvalid'),
+  globalValidatorMiddleware,
+];
+
+export const respondToNewDeadline = [
+  param('contractId').isMongoId().withMessage('contractIdInvalid'),
+  body('status')
+    .isIn([RequestedDeadlineStatus.approved, RequestedDeadlineStatus.rejected])
+    .withMessage('statusInvalid'),
   globalValidatorMiddleware,
 ];

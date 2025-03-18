@@ -27,7 +27,10 @@ export const createContractHandler: CreateContractHandler = async (req, res, nex
 
     if (!isVerified)
       return next(
-        new BadRequestError({ en: 'user not verified with face recognition', ar: 'المستخدم غير موثوق بالوجه' }, req.lang),
+        new BadRequestError(
+          { en: 'user not verified with face recognition', ar: 'المستخدم غير موثوق بالوجه' },
+          req.lang,
+        ),
       );
 
     // Project validation

@@ -26,9 +26,18 @@ export const create = [
   body('creatives.*.mainCategory').isObject().withMessage('creatives'),
   body('creatives.*.mainCategory.category').isMongoId().withMessage('creatives'),
   body('creatives.*.mainCategory.subCategories').optional().isObject().withMessage('creatives'),
-  body('creatives.*.mainCategory.subCategories.subCategory').optional().isMongoId().withMessage('creatives'),
-  body('creatives.*.mainCategory.subCategories.*.tags').optional().isArray().withMessage('creatives'),
-  body('creatives.*.mainCategory.subCategories.*.tags.*.tag').optional().isMongoId().withMessage('creatives'),
+  body('creatives.*.mainCategory.subCategories.subCategory')
+    .optional()
+    .isMongoId()
+    .withMessage('creatives'),
+  body('creatives.*.mainCategory.subCategories.*.tags')
+    .optional()
+    .isArray()
+    .withMessage('creatives'),
+  body('creatives.*.mainCategory.subCategories.*.tags.*.tag')
+    .optional()
+    .isMongoId()
+    .withMessage('creatives'),
   body('creatives.*.mainCategory.relatedCategory').optional().isObject().withMessage('creatives'),
   body('creatives.*.mainCategory.relatedCategory.category')
     .optional()
@@ -56,7 +65,10 @@ export const create = [
   body('invitedCreatives.*.number').exists().isString().isMobilePhone('ar-EG'),
   body('invitedCreatives.*.mainCategory').isObject().withMessage('invitedCreatives'),
   body('invitedCreatives.*.mainCategory.category').isMongoId().withMessage('invitedCreatives'),
-  body('invitedCreatives.*.mainCategory.subCategories').optional().isObject().withMessage('invitedCreatives'),
+  body('invitedCreatives.*.mainCategory.subCategories')
+    .optional()
+    .isObject()
+    .withMessage('invitedCreatives'),
   body('invitedCreatives.*.mainCategory.subCategories.subCategory')
     .optional()
     .isMongoId()
@@ -203,7 +215,10 @@ export const getProject = [
 ];
 
 export const getAll = [
-  query('inviteStatus').optional().isIn([InviteStatus.accepted, InviteStatus.pending]).withMessage('inviteStatus'),
+  query('inviteStatus')
+    .optional()
+    .isIn([InviteStatus.accepted, InviteStatus.pending])
+    .withMessage('inviteStatus'),
   query('relatedCategory').optional().isArray().withMessage('relatedCategory'),
   query('relatedCategory.*').isMongoId().withMessage('relatedCategory'),
   query('relatedSubCategory').optional().isArray().withMessage('relatedSubCategory'),
@@ -280,10 +295,8 @@ export const acceptAction = [
   globalPaginationMiddleware,
 ];
 
-
 export const removeTaggedCreative = [
   param('projectId').isMongoId().withMessage('projectId'),
   param('creativeId').isMongoId().withMessage('creativeId'),
   globalValidatorMiddleware,
 ];
-

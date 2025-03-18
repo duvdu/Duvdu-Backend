@@ -22,17 +22,16 @@ import { CreateProjectHandler } from '../../types/project.endpoints';
 export const createProjectHandler: CreateProjectHandler = async (req, res) => {
   const files = req.files as { [fieldName: string]: Express.Multer.File[] };
   const s3 = new Bucket();
-  
+
   // Initialize upload promises array
   const uploadPromises: Promise<void>[] = [];
 
   // Handle cover upload if exists
   if (files['cover']?.[0]) {
     uploadPromises.push(
-      s3.saveBucketFiles(FOLDERS.team_project, files['cover'][0])
-        .then(() => {          
-          req.body.cover = `${FOLDERS.team_project}/${files['cover'][0].filename}`;
-        })
+      s3.saveBucketFiles(FOLDERS.team_project, files['cover'][0]).then(() => {
+        req.body.cover = `${FOLDERS.team_project}/${files['cover'][0].filename}`;
+      }),
     );
   }
 
@@ -41,13 +40,18 @@ export const createProjectHandler: CreateProjectHandler = async (req, res) => {
     if (!(await Categories.findById(creative.category))) {
       throw new BadRequestError({ en: 'invalid category', ar: 'فئة غير صالحة' }, req.lang);
     }
-    
+
     if (creative.users?.length) {
-      await Promise.all(creative.users.map(async (user) => {
-        if (!(await Users.findById(user.user))) {
-          throw new BadRequestError({ en: 'invalid users', ar: 'المستخدمين غير الصالحين' }, req.lang);
-        }
-      }));
+      await Promise.all(
+        creative.users.map(async (user) => {
+          if (!(await Users.findById(user.user))) {
+            throw new BadRequestError(
+              { en: 'invalid users', ar: 'المستخدمين غير الصالحين' },
+              req.lang,
+            );
+          }
+        }),
+      );
     }
   });
 
@@ -57,15 +61,14 @@ export const createProjectHandler: CreateProjectHandler = async (req, res) => {
       creative.users.forEach((user, userIndex) => {
         user.attachments = [];
         const key = `creatives[${creativeIndex}][users][${userIndex}][attachments]`;
-        
+
         if (files[key]?.length) {
           uploadPromises.push(
-            s3.saveBucketFiles(FOLDERS.team_project, ...files[key])
-              .then(() => {
-                files[key].forEach((file) => {
-                  user.attachments.push(`${FOLDERS.team_project}/${file.filename}`);
-                });
-              })
+            s3.saveBucketFiles(FOLDERS.team_project, ...files[key]).then(() => {
+              files[key].forEach((file) => {
+                user.attachments.push(`${FOLDERS.team_project}/${file.filename}`);
+              });
+            }),
           );
         }
       });
@@ -73,10 +76,7 @@ export const createProjectHandler: CreateProjectHandler = async (req, res) => {
   });
 
   // Wait for all validations and uploads to complete
-  await Promise.all([
-    ...validationPromises,
-    ...uploadPromises
-  ]);
+  await Promise.all([...validationPromises, ...uploadPromises]);
 
   // Calculate deadlines and total amounts
   req.body.creatives.forEach((creative) => {
@@ -137,7 +137,7 @@ export const createProjectHandler: CreateProjectHandler = async (req, res) => {
       });
 
       const customer = await Users.findById(req.loggedUser.id);
-      
+
       // Send notifications
       return Promise.all([
         sendNotification(
@@ -159,7 +159,7 @@ export const createProjectHandler: CreateProjectHandler = async (req, res) => {
           Channels.notification,
         ),
       ]);
-    })
+    }),
   );
 
   // Wait for all contracts and notifications to be created

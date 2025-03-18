@@ -54,7 +54,10 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
     );
 
   // increment the user contracts count
-  const updatedUser = await Users.findOneAndUpdate({ _id: contract.sp }, { $inc: { avaliableContracts: -1 } });
+  const updatedUser = await Users.findOneAndUpdate(
+    { _id: contract.sp },
+    { $inc: { avaliableContracts: -1 } },
+  );
   const user = await Users.findById(contract.customer);
 
   // send notification to the service provider

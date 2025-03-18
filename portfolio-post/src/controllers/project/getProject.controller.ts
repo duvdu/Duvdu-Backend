@@ -97,20 +97,22 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
               $cond: [
                 {
                   $and: [
-                    { 
+                    {
                       $or: [
-                        { 
+                        {
                           $eq: [
-                            new mongoose.Types.ObjectId(req.loggedUser?.id || '000000000000000000000000'),
-                            '$user._id'
-                          ]
+                            new mongoose.Types.ObjectId(
+                              req.loggedUser?.id || '000000000000000000000000',
+                            ),
+                            '$user._id',
+                          ],
                         },
-                        { $eq: ['$creatives.inviteStatus', InviteStatus.accepted] }
-                      ]
+                        { $eq: ['$creatives.inviteStatus', InviteStatus.accepted] },
+                      ],
                     },
                     { $ne: ['$creativeDetails', null] },
-                    { $ne: [{ $type: '$creativeDetails' }, 'missing'] }
-                  ]
+                    { $ne: [{ $type: '$creativeDetails' }, 'missing'] },
+                  ],
                 },
                 {
                   _id: '$creativeDetails._id',
@@ -388,14 +390,25 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
                 $expr: {
                   $and: [
                     { $eq: ['$project', '$$projectId'] },
-                    { $not: { $in: ['$status', [ProjectContractStatus.rejected, ProjectContractStatus.completed, ProjectContractStatus.canceled] ] } }
-                  ]
-                }
-              }
-            }
+                    {
+                      $not: {
+                        $in: [
+                          '$status',
+                          [
+                            ProjectContractStatus.rejected,
+                            ProjectContractStatus.completed,
+                            ProjectContractStatus.canceled,
+                          ],
+                        ],
+                      },
+                    },
+                  ],
+                },
+              },
+            },
           ],
-          as: 'activeContract'
-        }
+          as: 'activeContract',
+        },
       },
 
       // Single consolidated $project stage

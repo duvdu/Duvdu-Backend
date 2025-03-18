@@ -1,6 +1,12 @@
 import 'express-async-errors';
 
-import { Categories, InviteStatus, MODELS, ProjectContractStatus, ProjectCycle } from '@duvdu-v1/duvdu';
+import {
+  Categories,
+  InviteStatus,
+  MODELS,
+  ProjectContractStatus,
+  ProjectCycle,
+} from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import mongoose, { PipelineStage, Types } from 'mongoose';
 
@@ -196,12 +202,12 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
     { $unwind: '$user' },
     ...(isInstant !== undefined
       ? [
-        {
-          $match: {
-            'user.isAvaliableToInstantProjects': isInstant,
+          {
+            $match: {
+              'user.isAvaliableToInstantProjects': isInstant,
+            },
           },
-        },
-      ]
+        ]
       : []),
     {
       $count: 'totalCount',
@@ -296,8 +302,8 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
                 $and: [
                   { $eq: ['$creatives.inviteStatus', InviteStatus.accepted] },
                   { $ne: ['$creativeDetails', null] },
-                  { $ne: [{ $type: '$creativeDetails' }, 'missing'] }
-                ]
+                  { $ne: [{ $type: '$creativeDetails' }, 'missing'] },
+                ],
               },
               {
                 _id: '$creativeDetails._id',
@@ -563,14 +569,25 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
               $expr: {
                 $and: [
                   { $eq: ['$project', '$$projectId'] },
-                  { $not: { $in: ['$status', [ProjectContractStatus.rejected, ProjectContractStatus.completed, ProjectContractStatus.canceled] ] } }
-                ]
-              }
-            }
-          }
+                  {
+                    $not: {
+                      $in: [
+                        '$status',
+                        [
+                          ProjectContractStatus.rejected,
+                          ProjectContractStatus.completed,
+                          ProjectContractStatus.canceled,
+                        ],
+                      ],
+                    },
+                  },
+                ],
+              },
+            },
+          },
         ],
-        as: 'activeContract'
-      }
+        as: 'activeContract',
+      },
     },
 
     {
@@ -821,16 +838,16 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
 
   pipelines.push(
     {
-      $sort: { 
-        createdAt: -1 
-      }
+      $sort: {
+        createdAt: -1,
+      },
     },
-    { 
-      $skip: req.pagination.skip 
+    {
+      $skip: req.pagination.skip,
     },
-    { 
-      $limit: req.pagination.limit 
-    }
+    {
+      $limit: req.pagination.limit,
+    },
   );
 
   const projects = await ProjectCycle.aggregate(pipelines);

@@ -10,3 +10,13 @@ router.use(isauthenticated);
 
 router.route('/:contractId').post(val.action, controllers.contractAction);
 router.post('/pay/:paymentSession', val.pay, controllers.payContract);
+router.post(
+  '/:contractId/ask-for-new-deadline',
+  val.askForNewDeadline,
+  controllers.askForNewDeadline,
+);
+router.post(
+  '/:contractId/respond-to-new-deadline',
+  val.respondToNewDeadline,
+  controllers.respondToNewDeadline,
+);

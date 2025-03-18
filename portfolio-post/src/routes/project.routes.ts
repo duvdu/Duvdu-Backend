@@ -21,7 +21,7 @@ router
 
 router
   .route('/:projectId/tagged-creative/:creativeId')
-  .delete(isauthenticated , val.removeTaggedCreative, handler.removeTaggedCreative);
+  .delete(isauthenticated, val.removeTaggedCreative, handler.removeTaggedCreative);
 
 router
   .route('/analysis')

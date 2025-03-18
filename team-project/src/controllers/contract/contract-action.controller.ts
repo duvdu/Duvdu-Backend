@@ -33,7 +33,12 @@ export const contractAction: RequestHandler<
     const isVerified = await checkUserFaceVerification(req.loggedUser.id);
 
     if (!isVerified)
-      return next(new BadRequestError({ en: 'user not verified with face recognition', ar: 'المستخدم غير موثوق بالوجه' }, req.lang));
+      return next(
+        new BadRequestError(
+          { en: 'user not verified with face recognition', ar: 'المستخدم غير موثوق بالوجه' },
+          req.lang,
+        ),
+      );
 
     const isSp = contract.sp.toString() === req.loggedUser.id;
 

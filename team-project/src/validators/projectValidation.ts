@@ -1,4 +1,8 @@
-import { globalPaginationMiddleware, globalValidatorMiddleware } from '@duvdu-v1/duvdu';
+import {
+  globalPaginationMiddleware,
+  globalValidatorMiddleware,
+  RequestedDeadlineStatus,
+} from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import { body, param, query } from 'express-validator';
 
@@ -85,4 +89,18 @@ export const addCategory = [
 export const deleteCategory = [
   param('teamId').isMongoId().withMessage('teamId'),
   param('categoryId').isMongoId().withMessage('category'),
+];
+
+export const askForNewDeadline = [
+  param('contractId').isMongoId(),
+  body('deadline').isISO8601().toDate().withMessage('deadline'),
+  globalValidatorMiddleware,
+];
+
+export const respondToNewDeadline = [
+  param('contractId').isMongoId(),
+  body('status')
+    .isIn(Object.values([RequestedDeadlineStatus.approved, RequestedDeadlineStatus.rejected]))
+    .withMessage('status'),
+  globalValidatorMiddleware,
 ];

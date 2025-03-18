@@ -20,3 +20,9 @@ router.post('/pay/:paymentSession', val.pay, handler.payContract);
 
 router.route('/:contractId/contract').patch(val.update, handler.updateContractHandler);
 router.route('/:contractId/action').post(val.action, handler.contractActionHandler);
+router
+  .route('/:contractId/ask-for-new-deadline')
+  .post(val.askForNewDeadline, handler.askForNewDeadline);
+router
+  .route('/:contractId/respond-to-new-deadline')
+  .post(val.respondToNewDeadline, handler.respondToNewDeadline);

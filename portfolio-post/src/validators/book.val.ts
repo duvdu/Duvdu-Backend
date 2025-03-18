@@ -1,4 +1,4 @@
-import { globalValidatorMiddleware } from '@duvdu-v1/duvdu';
+import { globalValidatorMiddleware, RequestedDeadlineStatus } from '@duvdu-v1/duvdu';
 import { body, param } from 'express-validator';
 
 export const create = [
@@ -60,3 +60,14 @@ export const action = [
 
 export const pay = [param('paymentSession').isString(), globalValidatorMiddleware];
 
+export const askForNewDeadline = [
+  param('projectId').isMongoId().withMessage('projectId'),
+  body('deadline').isISO8601().toDate().withMessage('deadline'),
+  globalValidatorMiddleware,
+];
+
+export const respondToNewDeadline = [
+  param('projectId').isMongoId().withMessage('projectId'),
+  body('status').isIn([RequestedDeadlineStatus.approved, RequestedDeadlineStatus.rejected]),
+  globalValidatorMiddleware,
+];

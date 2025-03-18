@@ -35,5 +35,5 @@ export const removeTaggedCreative: RequestHandler<
 
   await project.save();
 
-  return res.status(200).json({ message: 'success'});
+  return res.status(200).json({ message: 'success' });
 };

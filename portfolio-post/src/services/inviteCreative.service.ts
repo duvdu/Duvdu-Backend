@@ -38,7 +38,9 @@ export const inviteCreatives = async (
       if (subCategory._id.toString() === user.mainCategory.subCategories.subCategory?.toString()) {
         // check tags
         user.mainCategory.subCategories?.tags?.forEach((tag: any) => {
-          if (!subCategory.tags.some((subTag: any) => subTag._id.toString() === tag.tag.toString())) {
+          if (
+            !subCategory.tags.some((subTag: any) => subTag._id.toString() === tag.tag.toString())
+          ) {
             throw new BadRequestError(
               { en: 'tag is not in the sub category', ar: 'التصنيف غير موجود في الفئة الفرعية' },
               lang,
@@ -73,7 +75,9 @@ export const inviteCreatives = async (
         ) {
           // check tags
           user.mainCategory.relatedCategory?.subCategories.tags?.forEach((tag: any) => {
-            if (!subCategory.tags.some((subTag: any) => subTag._id.toString() === tag.tag.toString())) {
+            if (
+              !subCategory.tags.some((subTag: any) => subTag._id.toString() === tag.tag.toString())
+            ) {
               throw new BadRequestError(
                 { en: 'tag is not in the sub category', ar: 'التصنيف غير موجود في الفئة الفرعية' },
                 lang,
@@ -98,9 +102,13 @@ export const inviteCreatives = async (
 
   try {
     const createdUsers = await Users.create(
-      invitedUsers.map((user) => ({ phoneNumber: { number: user.number }, haveInvitation: true , profileImage: appSettings?.default_profile , coverImage: appSettings?.default_cover })),
+      invitedUsers.map((user) => ({
+        phoneNumber: { number: user.number },
+        haveInvitation: true,
+        profileImage: appSettings?.default_profile,
+        coverImage: appSettings?.default_cover,
+      })),
     );
-
 
     // Update return structure to match IprojectCycle
     return createdUsers.map((el, index) => ({
@@ -111,9 +119,9 @@ export const inviteCreatives = async (
         subCategories: invitedUsers[index].mainCategory.subCategories,
         relatedCategory: invitedUsers[index].mainCategory.relatedCategory
           ? {
-            category: invitedUsers[index].mainCategory.relatedCategory?.category,
-            subCategories: invitedUsers[index].mainCategory.relatedCategory?.subCategories,
-          }
+              category: invitedUsers[index].mainCategory.relatedCategory?.category,
+              subCategories: invitedUsers[index].mainCategory.relatedCategory?.subCategories,
+            }
           : null,
       },
     }));
@@ -158,10 +166,14 @@ export const validateCreative = async (
     }
 
     const subCategoryExists = category.subCategories?.some((subCategory: any) => {
-      if (subCategory._id.toString() === creative.mainCategory.subCategories.subCategory?.toString()) {
+      if (
+        subCategory._id.toString() === creative.mainCategory.subCategories.subCategory?.toString()
+      ) {
         // check tags
         creative.mainCategory.subCategories.tags?.forEach((tag: any) => {
-          if (!subCategory.tags.some((subTag: any) => subTag._id.toString() === tag.tag.toString())) {
+          if (
+            !subCategory.tags.some((subTag: any) => subTag._id.toString() === tag.tag.toString())
+          ) {
             throw new BadRequestError(
               { en: 'tag is not in the sub category', ar: 'التصنيف غير موجود في الفئة الفرعية' },
               lang,
@@ -181,21 +193,25 @@ export const validateCreative = async (
     }
 
     if (creative.mainCategory.relatedCategory) {
-      const relatedCategory = await Categories.findById(creative.mainCategory.relatedCategory.category);
+      const relatedCategory = await Categories.findById(
+        creative.mainCategory.relatedCategory.category,
+      );
       if (!relatedCategory)
         throw new NotFound(
           { en: 'related category not found', ar: 'الفئة المتعلقة غير موجودة' },
           lang,
         );
-    
+
       const relatedSubCategoryExists = relatedCategory.subCategories?.some((subCategory: any) => {
         if (
           subCategory._id.toString() ===
-              creative.mainCategory.relatedCategory?.subCategories.subCategory?.toString()
+          creative.mainCategory.relatedCategory?.subCategories.subCategory?.toString()
         ) {
           // check tags
           creative.mainCategory.relatedCategory?.subCategories.tags?.forEach((tag: any) => {
-            if (!subCategory.tags.some((subTag: any) => subTag._id.toString() === tag.tag.toString())) {
+            if (
+              !subCategory.tags.some((subTag: any) => subTag._id.toString() === tag.tag.toString())
+            ) {
               throw new BadRequestError(
                 { en: 'tag is not in the sub category', ar: 'التصنيف غير موجود في الفئة الفرعية' },
                 lang,
@@ -206,7 +222,7 @@ export const validateCreative = async (
         }
         return false;
       });
-    
+
       if (!relatedSubCategoryExists) {
         throw new BadRequestError(
           { en: 'related sub category not found', ar: 'الفئة الفرعية المتعلقة غير موجودة' },

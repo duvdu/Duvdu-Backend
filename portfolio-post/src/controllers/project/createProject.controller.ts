@@ -204,10 +204,7 @@ export const createProjectHandler: RequestHandler<
     );
 
     // Update user projects count
-    await Users.updateOne(
-      { _id: req.loggedUser.id },
-      { $inc: { projectsCount: 1 } },
-    );
+    await Users.updateOne({ _id: req.loggedUser.id }, { $inc: { projectsCount: 1 } });
 
     // Send success response
     res.status(201).json({ message: 'success', data: projectCycle });

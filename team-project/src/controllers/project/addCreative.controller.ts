@@ -22,23 +22,22 @@ import { AddCreativeHandler } from '../../types/project.endpoints';
 
 export const addCreativeHandler: AddCreativeHandler = async (req, res, next) => {
   const files = req.files as { [fieldName: string]: Express.Multer.File[] };
-  
+
   // Start file upload early and in parallel with other operations
   let uploadPromise;
   if (files['attachments']?.length) {
     const s3 = new Bucket();
-    uploadPromise = s3.saveBucketFiles(FOLDERS.team_project, ...files['attachments'])
-      .then(() => {
-        req.body.attachments = files['attachments'].map(
-          (file) => `${FOLDERS.team_project}/${file.filename}`
-        );
-      });
+    uploadPromise = s3.saveBucketFiles(FOLDERS.team_project, ...files['attachments']).then(() => {
+      req.body.attachments = files['attachments'].map(
+        (file) => `${FOLDERS.team_project}/${file.filename}`,
+      );
+    });
   }
 
   // Run database queries in parallel
   const [project, creative] = await Promise.all([
     TeamProject.findOne({ _id: req.params.teamId, isDeleted: { $ne: true } }),
-    Users.findById(req.body.user)
+    Users.findById(req.body.user),
   ]);
 
   if (!project)
@@ -130,7 +129,7 @@ export const addCreativeHandler: AddCreativeHandler = async (req, res, next) => 
   });
 
   const customer = await Users.findById(req.loggedUser.id);
-  
+
   // Send notifications in parallel
   await Promise.all([
     sendNotification(
