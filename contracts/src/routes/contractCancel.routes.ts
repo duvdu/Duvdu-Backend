@@ -1,4 +1,4 @@
-import { isauthenticated, isauthorized, PERMISSIONS } from '@duvdu-v1/duvdu';
+import { globalPaginationMiddleware, isauthenticated, isauthorized, PERMISSIONS } from '@duvdu-v1/duvdu';
 import express from 'express';
 
 import * as controllers from '../controllers/contractCancel';
@@ -13,6 +13,7 @@ router
   .post(validations.createContractCancelValidation, controllers.createContractCancel)
   .get(
     isauthorized(PERMISSIONS.getContractsCancel),
+    globalPaginationMiddleware,
     validations.getContractsCancelValidation,
     controllers.getContractsCancel,
   );
