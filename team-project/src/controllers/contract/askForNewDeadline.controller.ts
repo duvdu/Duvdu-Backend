@@ -103,6 +103,7 @@ export const respondToNewDeadline: RequestHandler<
   }
 
   contract.requestedDeadline.status = req.body.status;
+  contract.deadline = req.body.status === RequestedDeadlineStatus.approved? contract.requestedDeadline.deadline : contract.deadline;
   await contract.save();
 
   const user = await Users.findById(req.loggedUser.id);

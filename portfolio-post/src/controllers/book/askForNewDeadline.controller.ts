@@ -107,6 +107,7 @@ export const respondToNewDeadline: RequestHandler<
   }
 
   contract.requestedDeadline.status = req.body.status;
+  contract.deadline = req.body.status === RequestedDeadlineStatus.approved? contract.requestedDeadline.deadline : contract.deadline;
   await contract.save();
 
   //#TODO: add the logic to update the contract deadline and status
