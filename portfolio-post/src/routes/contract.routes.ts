@@ -25,4 +25,4 @@ router
   .post(val.askForNewDeadline, handler.askForNewDeadline);
 router
   .route('/:contractId/respond-to-new-deadline')
-  .post(val.respondToNewDeadline, handler.respondToNewDeadline);
+  .patch(val.respondToNewDeadline, handler.respondToNewDeadline);

@@ -15,7 +15,7 @@ router.post(
   val.askForNewDeadline,
   controllers.askForNewDeadline,
 );
-router.post(
+router.patch(
   '/:contractId/respond-to-new-deadline',
   val.respondToNewDeadline,
   controllers.respondToNewDeadline,
