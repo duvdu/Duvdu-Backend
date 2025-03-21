@@ -86,7 +86,7 @@ export const respondToNewDeadline: RequestHandler<
     );
   }
 
-  if (contract.status !== ProjectContractStatus.pending) {
+  if (contract.status !== ProjectContractStatus.ongoing) {
     throw new BadRequestError(
       {
         ar: 'لا يمكن الرد على طلب جديد للموعد لهذا العقدة',
