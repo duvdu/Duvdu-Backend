@@ -10,7 +10,7 @@ export const appInit = async () => {
   // await dbConnection(env.mongoDb.uri);
   let adminRole = await Roles.findOne({ key: SystemRoles.admin });
   if (!adminRole)
-    adminRole = await Roles.create({ _id: new mongoose.Types.ObjectId('662b930f4566c8d2f8ed6adb'), key: SystemRoles.admin, system: true, permissions: [] });
+    adminRole = await Roles.create({ key: SystemRoles.admin, system: true, permissions: [] });
   if (!(await Roles.findOne({ key: SystemRoles.verified })))
     await Roles.create({
       _id: new mongoose.Types.ObjectId('662b930f4566c8d2f8ed6ae4'),

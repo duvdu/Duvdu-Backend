@@ -24,6 +24,10 @@ export const createRoleHandler: CreateRoleHandler = async (req, res) => {
 export const removeRoleHandler: RemoveRoleHandler = async (req, res, next) => {
   const role = await Roles.findOneAndDelete({ _id: req.params.roleId, key: { $ne: 'admin' } });
   if (!role) return next(new NotFound({ en: 'role not found', ar: 'الدور غير موجود' }, req.lang));
+  if (role.system)
+    return next(
+      new BadRequestError({ en: 'system role cannot be deleted', ar: 'لا يمكن حذف الدور المنضبط' }, req.lang),
+    );
   const plans = await Plans.countDocuments({ role: req.params.roleId });
   if (plans > 0)
     return next(
