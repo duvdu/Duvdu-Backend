@@ -9,20 +9,16 @@ export const addToFavourite: RequestHandler<
   { projectId: string },
   SuccessResponse<{ data: any }>
 > = async (req, res) => {
-
   const post = await Favourites.create({
     project: req.params.projectId,
     user: req.loggedUser.id,
   });
 
-
-
-
-  const projectFavourite = await Favourites.findOne({project: req.params.projectId} ).populate('project');
-
+  const projectFavourite = await Favourites.findOne({ project: req.params.projectId }).populate(
+    'project',
+  );
 
   if ((projectFavourite?.project as any).user) {
-
     await Users.findByIdAndUpdate((projectFavourite?.project as any).user, {
       $inc: { likes: 1 },
     });
@@ -45,20 +41,22 @@ export const removeFromFavourite: RequestHandler<
   { projectId: string },
   SuccessResponse<{ data: any }>
 > = async (req, res) => {
-
-  const projectFavourite = await Favourites.findOne({project: req.params.projectId} ).populate('project');
-
+  const projectFavourite = await Favourites.findOne({ project: req.params.projectId }).populate(
+    'project',
+  );
 
   const post = await Favourites.deleteOne({
     project: req.params.projectId,
     user: req.loggedUser.id,
   });
 
-
-  if ((projectFavourite?.project as any).user) 
-    await Users.findOneAndUpdate({_id:(projectFavourite?.project as any).user, likes: {$gt: 0}}, {
-      $inc: { likes: -1 },
-    });
+  if ((projectFavourite?.project as any).user)
+    await Users.findOneAndUpdate(
+      { _id: (projectFavourite?.project as any).user, likes: { $gt: 0 } },
+      {
+        $inc: { likes: -1 },
+      },
+    );
 
   res.json({ message: 'success', data: post });
 };

@@ -171,5 +171,3 @@ export const getUserProjectsByUsername: RequestHandler<
 
   res.status(200).json({ message: 'success', data: { total: count, projects: filteredProjects } });
 };
-
-

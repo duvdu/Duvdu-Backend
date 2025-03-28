@@ -108,7 +108,7 @@ export const blockUser = [
 export const unblockUser = [param('userId').isMongoId(), globalValidatorMiddleware];
 
 export const loginProvider = [
-  body('email').isEmail().withMessage('invalidEmail'),
+  body('email').optional().isEmail().withMessage('invalidEmail'),
   body('googleId')
     .optional()
     .isString()
@@ -133,6 +133,7 @@ export const loginProvider = [
     }),
   body('notificationToken').optional().isString(),
   body('username')
+    .optional()
     .isString()
     .custom((val, { req }) => {
       if (!req.body.appleId && !req.body.googleId) {

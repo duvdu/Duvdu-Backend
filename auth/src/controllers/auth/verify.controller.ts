@@ -67,7 +67,6 @@ export const verifyHandler: RequestHandler<
 
     user.role = role?.id;
 
-    
     const { accessToken, refreshToken } = await createOrUpdateSessionAndGenerateTokens(
       req.headers,
       user,

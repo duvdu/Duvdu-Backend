@@ -3,7 +3,6 @@ import mongoose from 'mongoose';
 
 import { hashPassword } from './../src/utils/bcrypt';
 
-
 // import { env } from '../src/config/env';
 
 export const appInit = async () => {

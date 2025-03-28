@@ -47,7 +47,7 @@ export const signinHandler: SigninHandler = async (req, res, next) => {
       ),
     );
 
-  if (!user.isVerified && (user.verificationCode!.reason = VerificationReason.signup)){
+  if (!user.isVerified && (user.verificationCode!.reason = VerificationReason.signup)) {
     const verificationCode = generateRandom6Digit();
 
     user.verificationCode = {
@@ -55,12 +55,12 @@ export const signinHandler: SigninHandler = async (req, res, next) => {
       code: hashVerificationCode(verificationCode),
       expireAt: new Date(Date.now() + 60 * 1000).toString(),
     };
-    
-    await user.save();
-    return res.status(403).json(<any>{ message: 'success', code: verificationCode , username: user.username });
-  }
-    
 
+    await user.save();
+    return res
+      .status(403)
+      .json(<any>{ message: 'success', code: verificationCode, username: user.username });
+  }
 
   const role = await Roles.findById(user.role);
   if (!role)

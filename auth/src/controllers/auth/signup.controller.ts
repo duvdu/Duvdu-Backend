@@ -40,7 +40,7 @@ export const signupHandler: SignupHandler = async (req, res, next) => {
         expireAt: new Date(Date.now() + 60 * 1000),
         reason: VerificationReason.signup,
       },
-      rank: await getRankProgress()
+      rank: await getRankProgress(),
     });
   } else {
     await Users.findByIdAndUpdate(

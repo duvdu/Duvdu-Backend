@@ -38,7 +38,7 @@ const getPlatform = (osName: string | undefined): Platform => {
 
 export const generateUniqueDeviceId = (headers: any): { deviceId: string; deviceInfo: any } => {
   // Check if request is from mobile app by looking for custom headers
-  const isMobileApp = headers['x-app-version'] || headers['x-platform'];  
+  const isMobileApp = headers['x-app-version'] || headers['x-platform'];
   let deviceInfo;
 
   if (isMobileApp) {

@@ -118,7 +118,6 @@ export const updateForgetenPasswordHandler: RequestHandler<
       new UnauthorizedError({ en: 'User is blocked: ', ar: 'المستخدم محظور: ' }, req.lang),
     );
 
-
   if (user.verificationCode?.reason !== VerificationReason.forgetPasswordVerified)
     return next(new UnauthorizedError(undefined, req.lang));
 

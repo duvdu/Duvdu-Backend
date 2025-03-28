@@ -131,5 +131,5 @@ router.get('/profile/projects/:username', handlers.getUserProjectsByUsername);
 router.route('/profile/:username').get(optionalAuthenticated, handlers.getUserProfileHandler);
 
 router.route('/verify').post(val.verify, handlers.verifyHandler);
-
+router.route('/delete').delete(isauthenticated, handlers.deleteLoggedUser);
 export const authRoutes = router;

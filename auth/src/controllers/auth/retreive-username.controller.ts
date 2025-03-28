@@ -10,23 +10,23 @@ export const retreiveUsernameHandler: RetreiveUsernameHandler = async (req, res)
   }
 
   const conditions = [];
-  
+
   if (username) {
     conditions.push({ username });
   }
-  
+
   if (email) {
     conditions.push({ email });
   }
-  
+
   if (phoneNumber) {
-    conditions.push({ 
-      'phoneNumber.number': phoneNumber
+    conditions.push({
+      'phoneNumber.number': phoneNumber,
     });
   }
 
   const user = await Users.findOne({
-    $or: conditions
+    $or: conditions,
   });
   res.status(200).json({ message: 'success', isExists: !!user });
 };

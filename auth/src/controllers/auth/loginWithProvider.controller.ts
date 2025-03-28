@@ -30,7 +30,7 @@ export const loginWithProviderHandler: RequestHandler<
   // Refactored username validation and generation
   if (req.body.username) {
     let username = req.body.username.replace(/\s/g, '').toLowerCase();
-    
+
     // Ensure minimum length and generate unique username if needed
     while (username.length < 7) {
       const randomChar = String.fromCharCode(97 + Math.floor(Math.random() * 26));
@@ -43,7 +43,7 @@ export const loginWithProviderHandler: RequestHandler<
     // Generate username from email if no username provided
     const emailPrefix = req.body.email?.split('@')[0] || '';
     let username = emailPrefix.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-    
+
     // Add random chars if username is too short
     while (username.length < 7) {
       const randomChar = String.fromCharCode(97 + Math.floor(Math.random() * 26));
@@ -62,38 +62,31 @@ export const loginWithProviderHandler: RequestHandler<
   // First check: Find user with matching provider ID and email
   user = await Users.findOne({
     [providerId]: providerValue,
-    email: req.body.email
+    email: req.body.email,
   });
 
   // Second check: Find user with matching email and null provider ID
   if (!user && req.body.email) {
     user = await Users.findOne({
-      email: req.body.email
+      email: req.body.email,
     });
 
-    if (user && user[providerId]) 
+    if (user && user[providerId])
       return next(
-        new UnauthenticatedError(
-          { en: 'invalidProvider', ar: 'الموفر غير صالح' },
-          req.lang,
-        ),
+        new UnauthenticatedError({ en: 'invalidProvider', ar: 'الموفر غير صالح' }, req.lang),
       );
   }
 
   if (!user && providerId) {
     const user = await Users.findOne({
-      [providerId]: providerValue
+      [providerId]: providerValue,
     });
 
-    if (user) 
+    if (user)
       return next(
-        new UnauthenticatedError(
-          { en: 'invalidProvider', ar: 'الموفر غير صالح' },
-          req.lang,
-        ),
+        new UnauthenticatedError({ en: 'invalidProvider', ar: 'الموفر غير صالح' }, req.lang),
       );
   }
-
 
   // Handle existing user
   if (user) {
@@ -101,7 +94,7 @@ export const loginWithProviderHandler: RequestHandler<
     if (!user[providerId]) {
       user[providerId] = providerValue;
     }
-    
+
     // Update name if not present
     if (req.body.name && !user.name) {
       user.name = req.body.name;
@@ -138,7 +131,7 @@ export const loginWithProviderHandler: RequestHandler<
       name: req.body.name,
       profileImage: appSettings?.default_profile,
       coverImage: appSettings?.default_cover,
-      rank: await getRankProgress()
+      rank: await getRankProgress(),
     });
   }
 
@@ -150,10 +143,12 @@ export const loginWithProviderHandler: RequestHandler<
       code: hashVerificationCode(verificationCode),
       expireAt: new Date(Date.now() + 60 * 1000).toString(),
     };
-    
+
     await user.save();
 
-    return res.status(403).json(<any>{ message: 'success', code: verificationCode , username: user.username });
+    return res
+      .status(403)
+      .json(<any>{ message: 'success', code: verificationCode, username: user.username });
   }
 
   const { accessToken, refreshToken } = await createOrUpdateSessionAndGenerateTokens(
@@ -170,23 +165,23 @@ export const loginWithProviderHandler: RequestHandler<
   return res.status(200).json({ message: 'success' });
 };
 
-
-
-export async function getRankProgress(stats = { 
-  actionCount: 0, 
-  projectsLiked: 0, 
-  projectsCount: 0 
-}): Promise<{
-  title: string|null,
-  nextRankTitle: string|null,
-  nextRangPercentage: number,
-  color: string|null
+export async function getRankProgress(
+  stats = {
+    actionCount: 0,
+    projectsLiked: 0,
+    projectsCount: 0,
+  },
+): Promise<{
+  title: string | null;
+  nextRankTitle: string | null;
+  nextRangPercentage: number;
+  color: string | null;
 }> {
   // Get current rank (where all requirements match or are less than the stats)
   const currentRank = await Rank.findOne({
     actionCount: { $lte: stats.actionCount },
     projectsLiked: { $lte: stats.projectsLiked },
-    projectsCount: { $lte: stats.projectsCount }
+    projectsCount: { $lte: stats.projectsCount },
   }).sort({ actionCount: -1 }); // Get the highest matching rank
 
   if (!currentRank) {
@@ -194,13 +189,13 @@ export async function getRankProgress(stats = {
       title: 'مستخدم جديد',
       nextRankTitle: 'مستخدم جديد',
       nextRangPercentage: 0,
-      color: '#000000'
+      color: '#000000',
     };
   }
 
   // Get next rank (the rank with the next higher requirements)
   const nextRank = await Rank.findOne({
-    actionCount: { $gt: currentRank.actionCount }
+    actionCount: { $gt: currentRank.actionCount },
   }).sort({ actionCount: 1 }); // Get the next rank by action count
 
   if (!nextRank) {
@@ -208,7 +203,7 @@ export async function getRankProgress(stats = {
       title: currentRank.rank,
       nextRankTitle: null,
       nextRangPercentage: 0,
-      color: currentRank.color
+      color: currentRank.color,
     };
   }
 
@@ -216,29 +211,27 @@ export async function getRankProgress(stats = {
   const criteriaProgress = [
     {
       completed: stats.actionCount - currentRank.actionCount,
-      needed: nextRank.actionCount - currentRank.actionCount
+      needed: nextRank.actionCount - currentRank.actionCount,
     },
     {
       completed: stats.projectsLiked - currentRank.projectsLiked,
-      needed: nextRank.projectsLiked - currentRank.projectsLiked
+      needed: nextRank.projectsLiked - currentRank.projectsLiked,
     },
     {
       completed: stats.projectsCount - currentRank.projectsCount,
-      needed: nextRank.projectsCount - currentRank.projectsCount
-    }
+      needed: nextRank.projectsCount - currentRank.projectsCount,
+    },
   ];
 
   // Calculate the progress percentage (highest among all criteria)
   const progress = Math.max(
-    ...criteriaProgress
-      .filter(c => c.needed > 0)
-      .map(c => (c.completed / c.needed) * 100)
+    ...criteriaProgress.filter((c) => c.needed > 0).map((c) => (c.completed / c.needed) * 100),
   );
 
   return {
     title: currentRank.rank,
     nextRankTitle: nextRank.rank,
     nextRangPercentage: Math.min(Math.max(progress, 0), 100),
-    color: currentRank.color
+    color: currentRank.color,
   };
 }

@@ -18,5 +18,3 @@ export const blockUserHandler: RequestHandler<
   await user.save();
   res.status(200).json({ message: 'success' });
 };
-
-
