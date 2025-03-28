@@ -63,6 +63,14 @@ export const isauthenticated: RequestHandler = async (req, res, next) => {
           ),
         );
 
+      if (user.isDeleted)
+        return next(
+          new UnauthorizedError(
+            { en: 'user not found', ar: 'لا يوجد مستخدم' },
+            (req as any).lang,
+          ),
+        );
+
       const role = await Roles.findById(user.role);
       if (!role) return res.status(423).json({ message: 'invalid role' });
 

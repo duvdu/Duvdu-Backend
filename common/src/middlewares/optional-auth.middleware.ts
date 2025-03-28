@@ -21,6 +21,11 @@ export const optionalAuthenticated: RequestHandler = async (req, res, next) => {
           (req as any).lang,
         ),
       );
+
+    if ((req as any).loggedUser.isDeleted)
+      return next(
+        new UnauthorizedError({ en: 'user not found', ar: 'لا يوجد مستخدم' }, (req as any).lang),
+      );
   } catch (error) {
     return next();
   }

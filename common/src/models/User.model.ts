@@ -10,6 +10,7 @@ const userSchema = new Schema<Iuser>(
     appleId: { type: String, default: null },
     email: { type: String, unique: true, sparse: true },
     name: { type: String, default: null },
+    isDeleted: { type: Boolean, default: false },
     phoneNumber: {
       key: { type: String, default: null },
       number: { type: String, unique: true, sparse: true },
