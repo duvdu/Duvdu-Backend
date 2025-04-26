@@ -17,7 +17,7 @@ export const getProjectsPagination: RequestHandler<
     maxBudget?: number;
     minBudget?: number;
     user?: string;
-    creative?: string;
+    contract?: string;
     isDeleted?: boolean;
   }
 > = (req, res, next) => {
@@ -46,9 +46,9 @@ export const getProjectsPagination: RequestHandler<
 
   if (req.query.isDeleted) req.pagination.filter.isDeleted = req.query.isDeleted;
 
-  if (req.query.creative)
-    req.pagination.filter['relatedContracts.contracts.contract.sp'] = new mongoose.Types.ObjectId(
-      req.query.creative,
+  if (req.query.contract)
+    req.pagination.filter['relatedContracts.contracts.contract'] = new mongoose.Types.ObjectId(
+      req.query.contract,
     );
 
   next();

@@ -5,12 +5,17 @@ import {
   NotFound,
   ProjectContract,
   ProjectContractStatus,
+  SuccessResponse,
   TeamProject,
 } from '@duvdu-v1/duvdu';
+import { RequestHandler } from 'express';
 
-import { DeleteProjectHandler } from '../../types/project.endpoints';
-
-export const deleteProjectHandler: DeleteProjectHandler = async (req, res, next) => {
+export const deleteProjectHandler: RequestHandler<
+  { teamId: string },
+  SuccessResponse,
+  unknown,
+  unknown
+> = async (req, res, next) => {
   const project = await TeamProject.findOne({ _id: req.params.teamId, isDeleted: { $ne: true } });
 
   if (!project) return next(new NotFound({ en: 'team not found', ar: 'التيم غير موجود' }));
