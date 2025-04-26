@@ -41,15 +41,7 @@ router
     globalUploadMiddleware(FOLDERS.team_project, {
       maxSize: 100 * 1024 * 1024,
       fileTypes: ['video/*', 'image/*'],
-    }).fields([
-      { name: 'creatives[0][users][0][attachments]', maxCount: 10 },
-      { name: 'creatives[0][users][1][attachments]', maxCount: 10 },
-      { name: 'creatives[0][users][2][attachments]', maxCount: 10 },
-      { name: 'creatives[1][users][0][attachments]', maxCount: 10 },
-      { name: 'creatives[1][users][1][attachments]', maxCount: 10 },
-      { name: 'creatives[1][users][2][attachments]', maxCount: 10 },
-      { name: 'cover', maxCount: 1 },
-    ]),
+    }).fields([{ name: 'cover', maxCount: 1 }]),
     val.create,
     checkRequiredFields({ fields: ['cover'] }),
     controllers.createProjectHandler,
@@ -68,17 +60,9 @@ router
   .delete(isauthenticated, val.getOne, controllers.deleteProjectHandler);
 
 router
-  .route('/:teamId/creative')
-  .post(
-    isauthenticated,
-    globalUploadMiddleware(FOLDERS.team_project, {
-      maxSize: 100 * 1024 * 1024,
-      fileTypes: ['video/*', 'image/*'],
-    }).fields([{ name: 'attachments', maxCount: 10 }]),
-    val.addCreative,
-    controllers.addCreativeHandler,
-  )
-  .delete(isauthenticated, val.deleteCreative, controllers.deleteCreativeHandler);
+  .route('/:teamId/contract')
+  .post(isauthenticated, val.addContract, controllers.addContractHandler)
+  .delete(isauthenticated, val.deleteContract, controllers.deleteContractHandler);
 
 router
   .route('/:teamId/category')

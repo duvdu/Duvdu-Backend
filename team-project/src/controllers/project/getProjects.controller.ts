@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import 'express-async-errors';
 
-import { Icategory, ITeamProject, TeamContract, TeamProject } from '@duvdu-v1/duvdu';
+import { Icategory, ITeamProject, TeamProject } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import mongoose from 'mongoose';
 
@@ -30,18 +30,26 @@ export const getProjectsPagination: RequestHandler<
     };
 
   if (req.query.category)
-    req.pagination.filter['creatives.category'] = new mongoose.Types.ObjectId(req.query.category);
+    req.pagination.filter['relatedContracts.category'] = new mongoose.Types.ObjectId(
+      req.query.category,
+    );
 
   if (req.query.maxBudget !== undefined)
-    req.pagination.filter['creatives.users.totalAmount'] = { $lte: req.query.maxBudget };
+    req.pagination.filter['relatedContracts.contracts.contract.totalPrice'] = {
+      $lte: req.query.maxBudget,
+    };
 
   if (req.query.minBudget !== undefined)
-    req.pagination.filter['creatives.users.totalAmount'] = { $gte: req.query.minBudget };
+    req.pagination.filter['relatedContracts.contracts.contract.totalPrice'] = {
+      $gte: req.query.minBudget,
+    };
 
   if (req.query.isDeleted) req.pagination.filter.isDeleted = req.query.isDeleted;
 
   if (req.query.creative)
-    req.pagination.filter['creatives.users.user'] = new mongoose.Types.ObjectId(req.query.creative);
+    req.pagination.filter['relatedContracts.contracts.contract.sp'] = new mongoose.Types.ObjectId(
+      req.query.creative,
+    );
 
   next();
 };
@@ -61,11 +69,22 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
         select:
           'profileImage projectsView rank rate name acceptedProjectsCounter isOnline username',
       },
-      { path: 'creatives.category', select: 'title' },
+      { path: 'relatedContracts.category', select: 'title' },
       {
-        path: 'creatives.users.user',
-        select:
-          'profileImage projectsView rank rate name acceptedProjectsCounter isOnline username',
+        path: 'relatedContracts.contracts.contract',
+        select: 'totalPrice',
+        populate: [
+          {
+            path: 'customer',
+            select:
+              'profileImage projectsView rank rate name acceptedProjectsCounter isOnline username',
+          },
+          {
+            path: 'sp',
+            select:
+              'profileImage projectsView rank rate name acceptedProjectsCounter isOnline username',
+          },
+        ],
       },
     ]);
 
@@ -93,23 +112,29 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
       projectObject.cover = `${process.env.BUCKET_HOST}/${projectObject.cover}`;
     }
 
-    for (const [index, creative] of projectObject.creatives.entries()) {
-      if (creative.category && (creative.category as any).title) {
-        (creative.category as Icategory).title = (creative.category as any).title[req.lang];
+    for (const contract of projectObject.relatedContracts || []) {
+      if (contract.category && (contract.category as any).title) {
+        (contract.category as Icategory).title = (contract.category as any).title[req.lang];
       }
 
-      for (const user of creative.users) {
+      for (const contractItem of contract.contracts || []) {
+        const contractData = contractItem.contract as any;
         if (
-          user.user &&
-          (user.user as any).profileImage &&
-          !(user.user as any).profileImage.startsWith(process.env.BUCKET_HOST)
+          contractData &&
+          contractData.customer &&
+          contractData.customer.profileImage &&
+          !contractData.customer.profileImage.startsWith(process.env.BUCKET_HOST)
         ) {
-          (user.user as any).profileImage =
-            `${process.env.BUCKET_HOST}/${(user.user as any).profileImage}`;
+          contractData.customer.profileImage = `${process.env.BUCKET_HOST}/${contractData.customer.profileImage}`;
         }
-        user.attachments = user.attachments.map(
-          (attachment: string) => `${process.env.BUCKET_HOST}/${attachment}`,
-        );
+        if (
+          contractData &&
+          contractData.sp &&
+          contractData.sp.profileImage &&
+          !contractData.sp.profileImage.startsWith(process.env.BUCKET_HOST)
+        ) {
+          contractData.sp.profileImage = `${process.env.BUCKET_HOST}/${contractData.sp.profileImage}`;
+        }
       }
     }
 

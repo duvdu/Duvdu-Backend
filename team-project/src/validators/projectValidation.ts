@@ -18,34 +18,29 @@ export const create = [
   body('location.lat').isFloat({ min: -90, max: 90 }).withMessage('locationLatFloat'),
   body('location.lng').isFloat({ min: -180, max: 180 }).withMessage('locationLngFloat'),
   body('address').exists().isString().withMessage('address'),
-  body('creatives').isArray({ min: 1 }).withMessage('creatives'),
-  body('creatives.*.category').isMongoId().withMessage('creativesCategory'),
-  body('creatives.*.users').optional().isArray({ min: 1 }).withMessage('creativesUsers'),
-  body('creatives.*.users.*.user').isMongoId().withMessage('creativesUsersUser'),
-  body('creatives.*.users.*.duration').isInt({ min: 1 }).withMessage('creativesUsersDuration'),
-  body('creatives.*.users.*.startDate').isISO8601().withMessage('creativesUsersStartDate'),
-  body('creatives.*.users.*.workHours').isInt({ min: 1 }).withMessage('creativesUsersWorkHours'),
-  body('creatives.*.users.*.hourPrice').isInt({ min: 1 }).withMessage('creativesUsersHourPrice'),
-  body('creatives.*.users.*.details').isString().withMessage('creativesUsersDetails'),
+  // body('creatives').isArray({ min: 1 }).withMessage('creatives'),
+  // body('creatives.*.category').isMongoId().withMessage('creativesCategory'),
+  // body('creatives.*.users').optional().isArray({ min: 1 }).withMessage('creativesUsers'),
+  // body('creatives.*.users.*.user').isMongoId().withMessage('creativesUsersUser'),
+  // body('creatives.*.users.*.duration').isInt({ min: 1 }).withMessage('creativesUsersDuration'),
+  // body('creatives.*.users.*.startDate').isISO8601().withMessage('creativesUsersStartDate'),
+  // body('creatives.*.users.*.workHours').isInt({ min: 1 }).withMessage('creativesUsersWorkHours'),
+  // body('creatives.*.users.*.hourPrice').isInt({ min: 1 }).withMessage('creativesUsersHourPrice'),
+  // body('creatives.*.users.*.details').isString().withMessage('creativesUsersDetails'),
   globalValidatorMiddleware,
 ];
 
-export const addCreative = [
+export const addContract = [
   param('teamId').isMongoId().withMessage('teamId'),
-  body('user').isMongoId().withMessage('user'),
-  body('duration').isInt({ min: 1 }).withMessage('duration'),
-  body('startDate').isISO8601().withMessage('startDate'),
-  body('workHours').isInt({ min: 1 }).withMessage('workHours'),
-  body('hourPrice').isInt({ min: 1 }).withMessage('hourPrice'),
-  body('details').isString().withMessage('details'),
   body('category').isMongoId().withMessage('category'),
+  body('contract').isMongoId().withMessage('contract'),
   globalValidatorMiddleware,
 ];
 
-export const deleteCreative = [
+export const deleteContract = [
   param('teamId').isMongoId().withMessage('teamId'),
   body('category').isMongoId().withMessage('category'),
-  body('user').isMongoId().withMessage('user'),
+  body('contract').isMongoId().withMessage('contract'),
   globalValidatorMiddleware,
 ];
 
@@ -55,7 +50,7 @@ export const getAll = [
   query('maxBudget').optional().isNumeric().withMessage('maxBudget'),
   query('minBudget').optional().isNumeric().withMessage('minBudget'),
   query('user').optional().isMongoId().withMessage('user'),
-  query('creative').optional().isMongoId().withMessage('creative'),
+  query('contract').optional().isMongoId().withMessage('contract'),
   query('isDeleted').optional().isBoolean().toBoolean().withMessage('isDeleted'),
   query('limit').optional().isInt({ min: 1 }).withMessage('limit'),
   query('page').optional().isInt({ min: 1 }).withMessage('page'),

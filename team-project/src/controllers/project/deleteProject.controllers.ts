@@ -1,6 +1,12 @@
 import 'express-async-errors';
 
-import { NotAllowedError, NotFound, TeamProject } from '@duvdu-v1/duvdu';
+import {
+  NotAllowedError,
+  NotFound,
+  ProjectContract,
+  ProjectContractStatus,
+  TeamProject,
+} from '@duvdu-v1/duvdu';
 
 import { DeleteProjectHandler } from '../../types/project.endpoints';
 
@@ -9,24 +15,21 @@ export const deleteProjectHandler: DeleteProjectHandler = async (req, res, next)
 
   if (!project) return next(new NotFound({ en: 'team not found', ar: 'التيم غير موجود' }));
 
-  let userFound = false;
-  project.creatives.forEach((creative) => {
-    if (creative.users.length > 0) {
-      userFound = true;
-      return;
-    }
+  let activeContract = false;
+  project.relatedContracts.forEach((contract) => {
+    contract.contracts.forEach(async (cont) => {
+      const contract = await ProjectContract.findById(cont);
+      if (
+        contract?.status != ProjectContractStatus.canceled &&
+        contract?.status != ProjectContractStatus.rejected &&
+        contract?.status != ProjectContractStatus.pending
+      ) {
+        activeContract = true;
+      }
+    });
+    if (activeContract)
+      throw new NotAllowedError({ en: 'team has active contract', ar: 'التيم لديه عقد فعال' });
   });
-
-  if (userFound)
-    return next(
-      new NotAllowedError(
-        {
-          en: 'can not delete this team because have a creative',
-          ar: 'لا يمكن حذف هذا الفريق لأنه يحتوي على مصمم إبداعي',
-        },
-        req.lang,
-      ),
-    );
 
   await TeamProject.findByIdAndDelete(req.params.teamId);
   res.status(204).json({ message: 'success' });

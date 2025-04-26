@@ -1,14 +1,11 @@
 import 'express-async-errors';
 
-import { Icategory, NotFound, TeamProject, Users } from '@duvdu-v1/duvdu';
+import { Icategory, NotFound, TeamProject } from '@duvdu-v1/duvdu';
 
-import { GetProjectHandler } from '../../types/project.endpoints';
+import { GetTeamCrmHandler } from '../../types/project.endpoints';
 
-export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
-  const project = await TeamProject.findOne({
-    _id: req.params.teamId,
-    isDeleted: { $ne: true },
-  }).populate([
+export const getCrmTeamHandler: GetTeamCrmHandler = async (req, res, next) => {
+  const project = await TeamProject.findById(req.params.teamId).populate([
     {
       path: 'user',
       select: 'profileImage projectsView rank rate name acceptedProjectsCounter isOnline username',
@@ -48,12 +45,12 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
     projectObject.cover = `${process.env.BUCKET_HOST}/${projectObject.cover}`;
   }
 
-  for (const contract of projectObject.relatedContracts) {
+  for (const contract of projectObject.relatedContracts || []) {
     if (contract.category && (contract.category as any).title) {
       (contract.category as Icategory).title = (contract.category as any).title[req.lang];
     }
 
-    for (const contractItem of contract.contracts) {
+    for (const contractItem of contract.contracts || []) {
       const contractData = contractItem.contract as any;
       if (
         contractData &&
@@ -73,9 +70,6 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
       }
     }
   }
-
-  // increment the user projects view count
-  await Users.updateOne({ _id: projectObject.user.id }, { $inc: { projectsView: 1 } });
 
   res.status(200).json({ message: 'success', data: projectObject });
 };

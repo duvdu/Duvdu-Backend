@@ -28,14 +28,19 @@ export const addCategoryHandler: RequestHandler<
       new NotFound({ en: 'category not found', ar: 'لم يتم العثور على الفئة' }, req.lang),
     );
 
-  if (hasDuplicates([req.body.category, ...project.creatives.map((el) => el.category.toString())]))
+  if (
+    hasDuplicates([
+      req.body.category,
+      ...project.relatedContracts.map((el) => el.category.toString()),
+    ])
+  )
     return next(new BadRequestError({ en: 'duplicated category', ar: 'فئة مكررة' }, req.lang));
 
   await TeamProject.findByIdAndUpdate(
     req.params.teamId,
     {
       $push: {
-        creatives: { category: req.body.category },
+        relatedContracts: { category: req.body.category, contracts: [] },
       },
     },
     { new: true },
