@@ -6,7 +6,6 @@ export const getLoggedUserProjects: RequestHandler<
   SuccessResponse<{ data: any }>
 > = async (req, res) => {
   const count = await Project.countDocuments({
-    isDeleted: false,
     user: req.loggedUser.id,
     ref: { $in: [MODELS.portfolioPost, 'rentals'] },
   });
@@ -14,7 +13,6 @@ export const getLoggedUserProjects: RequestHandler<
   const projects = await Project.find({
     user: req.loggedUser.id,
     ref: { $in: [MODELS.portfolioPost, 'rentals'] },
-    isDeleted: false,
   })
     .populate({
       path: 'project.type',
@@ -95,13 +93,11 @@ export const getUserProjectsByUsername: RequestHandler<
   const count = await Project.countDocuments({
     user: targetUser.id,
     ref: { $in: [MODELS.portfolioPost, 'rentals'] },
-    isDeleted: false,
   });
 
   const projects = await Project.find({
     user: targetUser.id,
     ref: { $in: [MODELS.portfolioPost, 'rentals'] },
-    isDeleted: false,
   })
     .populate({
       path: 'project.type',
