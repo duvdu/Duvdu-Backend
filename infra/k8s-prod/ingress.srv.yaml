@@ -105,6 +105,16 @@ spec:
                 name: client-srv
                 port:
                   number: 3000
+    - host: mainstreet.company
+      http:
+        paths:
+          - path: /?(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: client-srv
+                port:
+                  number: 3000
 
     - host: www.duvdu.com
       http:
@@ -133,6 +143,7 @@ spec:
         - duvdu.com
         - www.duvdu.com
         - dashboard.duvdu.com
+        - mainstreet.company
       secretName: duvdu-tls-secret
 
 
