@@ -52,16 +52,20 @@ export const getCrmProjectsHandler: RequestHandler<
             if: { $eq: [{ $size: '$userDetails' }, 0] }, // Check if user not found
             then: null,
             else: {
-              acceptedProjectsCounter: '$userDetails.acceptedProjectsCounter',
+              acceptedProjectsCounter: { $arrayElemAt: ['$userDetails.acceptedProjectsCounter', 0] },
               profileImage: {
-                $concat: [process.env.BUCKET_HOST, '/', '$userDetails.profileImage'],
+                $cond: {
+                  if: { $isArray: { $arrayElemAt: ["$userDetails.profileImage", 0] } },
+                  then: { $concat: [process.env.BUCKET_HOST, "/", { $arrayElemAt: [{ $arrayElemAt: ["$userDetails.profileImage", 0] }, 0] }] },
+                  else: { $concat: [process.env.BUCKET_HOST, "/", { $arrayElemAt: ["$userDetails.profileImage", 0] }] }
+                }
               },
-              name: '$userDetails.name',
-              username: '$userDetails.username',
-              isOnline: '$userDetails.isOnline',
-              rank: '$userDetails.rank',
-              projectsView: '$userDetails.projectsView',
-              rate: '$userDetails.rate',
+              name: { $arrayElemAt: ['$userDetails.name', 0] },
+              username: { $arrayElemAt: ['$userDetails.username', 0] },
+              isOnline: { $arrayElemAt: ['$userDetails.isOnline', 0] },
+              rank: { $arrayElemAt: ['$userDetails.rank', 0] },
+              projectsView: { $arrayElemAt: ['$userDetails.projectsView', 0] },
+              rate: { $arrayElemAt: ['$userDetails.rate', 0] },
             },
           },
         },
