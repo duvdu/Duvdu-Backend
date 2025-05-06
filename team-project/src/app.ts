@@ -26,6 +26,7 @@ app.use(
       'https://duvdu.com',
       'https://www.duvdu.com',
       'https://dashboard.duvdu.com',
+      'https://mainstreet.company',
     ],
     credentials: true,
     exposedHeaders: ['set-cookie'],
