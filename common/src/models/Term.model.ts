@@ -5,7 +5,7 @@ import { Iterm } from '../types/Terms';
 
 const termSchema = new mongoose.Schema<Iterm>(
   {
-    desc: { type: String, default: null },
+    desc: { ar: { type: String, default: null }, en: { type: String, default: null } },
   },
   { timestamps: true, collection: MODELS.term },
 );

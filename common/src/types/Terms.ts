@@ -1,3 +1,3 @@
 export interface Iterm {
-  desc: string;
+  desc: { ar: string; en: string };
 }
