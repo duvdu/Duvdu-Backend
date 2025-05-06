@@ -45,34 +45,25 @@ export const getCrmProjectsHandler: RequestHandler<
       },
     },
     {
-      $addFields: {
+      $project: {
+        _id: 1,
         user: {
           $cond: {
             if: { $eq: [{ $size: '$userDetails' }, 0] }, // Check if user not found
             then: null,
             else: {
-              $arrayElemAt: ['$userDetails', 0],
+              acceptedProjectsCounter: '$userDetails.acceptedProjectsCounter',
+              profileImage: {
+                $concat: [process.env.BUCKET_HOST, '/', '$userDetails.profileImage'],
+              },
+              name: '$userDetails.name',
+              username: '$userDetails.username',
+              isOnline: '$userDetails.isOnline',
+              rank: '$userDetails.rank',
+              projectsView: '$userDetails.projectsView',
+              rate: '$userDetails.rate',
             },
           },
-        },
-        // Add process.env.BUCKET_HOST before profileImage
-        profileImage: {
-          $concat: [process.env.BUCKET_HOST, '$user.profileImage'],
-        },
-      },
-    },
-    {
-      $project: {
-        _id: 1,
-        user: {
-          acceptedProjectsCounter: '$user.acceptedProjectsCounter',
-          profileImage: 1, // Use the modified profileImage field
-          name: '$user.name',
-          username: '$user.username',
-          isOnline: '$user.isOnline',
-          rank: '$user.rank',
-          projectsView: '$user.projectsView',
-          rate: '$user.rate',
         },
         category: 1,
         price: 1,

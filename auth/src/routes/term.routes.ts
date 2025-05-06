@@ -16,6 +16,7 @@ router
   )
   .get(handler.getTermHandler);
 
+  
 router.put(
   '/:termId',
   isauthenticated,
