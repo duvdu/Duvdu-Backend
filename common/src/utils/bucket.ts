@@ -245,7 +245,7 @@ export class Bucket {
 
       const face = result.FaceDetails[0];
 
-      if (!face.Confidence || face.Confidence < 95) {
+      if (!face.Confidence || face.Confidence < 85) {
         return {
           isValid: false,
           error: { en: 'Image quality is not sufficient', ar: 'جودة الصورة غير كافية' },
@@ -262,8 +262,8 @@ export class Bucket {
         };
       }
 
-      const leftEyeOpen = face.EyesOpen?.Value && (face.EyesOpen?.Confidence ?? 0) > 95;
-      const rightEyeOpen = face.EyesOpen?.Value && (face.EyesOpen?.Confidence ?? 0) > 95;
+      const leftEyeOpen = face.EyesOpen?.Value && (face.EyesOpen?.Confidence ?? 0) > 85;
+      const rightEyeOpen = face.EyesOpen?.Value && (face.EyesOpen?.Confidence ?? 0) > 85;
       if (!leftEyeOpen || !rightEyeOpen) {
         return {
           isValid: false,
