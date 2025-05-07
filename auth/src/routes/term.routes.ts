@@ -6,6 +6,7 @@ import * as val from '../validators/terms&condition/createTerm.val';
 
 const router = express.Router();
 
+router.get('/crm', handler.getCrmTermsHandler);
 router
   .route('/')
   .post(
