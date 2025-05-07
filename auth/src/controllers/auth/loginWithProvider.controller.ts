@@ -59,13 +59,13 @@ export const loginWithProviderHandler: RequestHandler<
   const providerId = req.body.appleId ? 'appleId' : 'googleId';
   const providerValue = req.body.appleId || req.body.googleId;
 
-  // First check: Find user with matching provider ID and email
+  // Case 1: Find user with matching provider ID and email
   user = await Users.findOne({
     [providerId]: providerValue,
     email: req.body.email,
   });
 
-  // Second check: Find user with matching email and null provider ID
+  // Case 2: Find user with matching email and null provider ID
   if (!user && req.body.email) {
     user = await Users.findOne({
       email: req.body.email,
@@ -77,12 +77,13 @@ export const loginWithProviderHandler: RequestHandler<
       );
   }
 
-  if (!user && providerId) {
-    const user = await Users.findOne({
+  // Case 3: Find user with just provider ID
+  if (!user && providerValue) {
+    user = await Users.findOne({
       [providerId]: providerValue,
     });
 
-    if (user)
+    if (user && user.email !== req.body.email)
       return next(
         new UnauthenticatedError({ en: 'invalidProvider', ar: 'الموفر غير صالح' }, req.lang),
       );
