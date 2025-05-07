@@ -94,6 +94,86 @@ spec:
                   name: chat-srv
                   port: 
                     number: 3000
+    - host: dashboardapi.duvdu.com
+      http:
+        paths:
+          - path: /api/users/?(.*)
+            pathType: Prefix
+            backend: 
+              service:
+                  name: auth-srv
+                  port: 
+                    number: 3000
+          - path: /api/category/?(.*)
+            pathType: Prefix
+            backend: 
+              service:
+                  name: category-srv
+                  port: 
+                    number: 3000
+          - path: /api/projects/?(.*)
+            pathType: Prefix
+            backend: 
+              service:
+                  name: portfolio-post-srv
+                  port: 
+                    number: 3000
+          - path: /api/rentals/?(.*)
+            pathType: Prefix
+            backend: 
+              service:
+                  name: studio-booking-srv
+                  port: 
+                    number: 3000
+          - path: /api/copyrights/?(.*)
+            pathType: Prefix
+            backend: 
+              service:
+                  name: copyright-srv
+                  port: 
+                    number: 3000
+          - path: /api/analysis/?(.*)
+            pathType: Prefix
+            backend: 
+              service:
+                  name: analysis-srv
+                  port: 
+                    number: 3000
+          - path: /api/producers/?(.*)
+            pathType: Prefix
+            backend: 
+              service:
+                  name: producer-srv
+                  port: 
+                    number: 3000
+          - path: /api/contracts/?(.*)
+            pathType: Prefix
+            backend: 
+              service:
+                  name: contract-srv
+                  port: 
+                    number: 3000
+          - path: /api/team/?(.*)
+            pathType: Prefix
+            backend: 
+              service:
+                  name: team-srv
+                  port: 
+                    number: 3000
+          - path: /api/contracts/?(.*)
+            pathType: Prefix
+            backend: 
+              service:
+                  name: contract-srv
+                  port: 
+                    number: 3000
+          - path: /?(.*)
+            pathType: Prefix
+            backend: 
+              service:
+                  name: chat-srv
+                  port: 
+                    number: 3000
 
     - host: duvdu.com
       http:
@@ -140,6 +220,7 @@ spec:
   tls:
     - hosts:
         - api.duvdu.com
+        - dashboardapi.duvdu.com
         - duvdu.com
         - www.duvdu.com
         - dashboard.duvdu.com
