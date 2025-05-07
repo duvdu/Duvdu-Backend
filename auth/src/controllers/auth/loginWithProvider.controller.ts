@@ -61,33 +61,16 @@ export const loginWithProviderHandler: RequestHandler<
 
   // Case 1: Find user with matching provider ID and email
   user = await Users.findOne({
-    [providerId]: providerValue,
-    email: req.body.email,
+    [providerId]: providerValue
   });
 
   // Case 2: Find user with matching email and null provider ID
-  if (!user && req.body.email) {
+  if (!user && req.body.email) 
     user = await Users.findOne({
       email: req.body.email,
     });
+  
 
-    if (user && user[providerId])
-      return next(
-        new UnauthenticatedError({ en: 'invalidProvider', ar: 'الموفر غير صالح' }, req.lang),
-      );
-  }
-
-  // Case 3: Find user with just provider ID
-  if (!user && providerValue) {
-    user = await Users.findOne({
-      [providerId]: providerValue,
-    });
-
-    if (user)
-      return next(
-        new UnauthenticatedError({ en: 'invalidProvider', ar: 'الموفر غير صالح' }, req.lang),
-      );
-  }
 
   // Handle existing user
   if (user) {
@@ -100,6 +83,9 @@ export const loginWithProviderHandler: RequestHandler<
     if (req.body.name && !user.name) {
       user.name = req.body.name;
     }
+
+    if (req.body.email && user.email !== req.body.email) 
+      user.email = req.body.email;
 
     role = await Roles.findById(user.role);
     if (!role) {
