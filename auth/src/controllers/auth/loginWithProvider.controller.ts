@@ -83,7 +83,7 @@ export const loginWithProviderHandler: RequestHandler<
       [providerId]: providerValue,
     });
 
-    if (user && user.email !== req.body.email)
+    if (user)
       return next(
         new UnauthenticatedError({ en: 'invalidProvider', ar: 'الموفر غير صالح' }, req.lang),
       );
