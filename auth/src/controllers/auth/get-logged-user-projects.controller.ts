@@ -8,11 +8,13 @@ export const getLoggedUserProjects: RequestHandler<
   const count = await Project.countDocuments({
     user: req.loggedUser.id,
     ref: { $in: [MODELS.portfolioPost, 'rentals'] },
+    'project.isDeleted': { $ne: true }
   });
 
   const projects = await Project.find({
     user: req.loggedUser.id,
     ref: { $in: [MODELS.portfolioPost, 'rentals'] },
+    'project.isDeleted': { $ne: true }
   })
     .populate({
       path: 'project.type',
@@ -30,11 +32,7 @@ export const getLoggedUserProjects: RequestHandler<
     })
     .lean();
 
-  const filteredProjects = projects.filter((el: any) => {
-    return !el.project?.isDeleted;
-  });
-
-  filteredProjects.forEach((el: any) => {
+  projects.forEach((el: any) => {
     if (!el.project?.type) return;
     el.project = el.project.type;
     el.project.tags = (el.project.tags as { _id: string; en: string; ar: string }[])?.map((el) =>
@@ -74,13 +72,13 @@ export const getLoggedUserProjects: RequestHandler<
     delete el.project.type;
   });
 
-  filteredProjects.sort((a: any, b: any) => {
+  projects.sort((a: any, b: any) => {
     const dateA = a.createdAt ? new Date(a.createdAt) : new Date(0);
     const dateB = b.createdAt ? new Date(b.createdAt) : new Date(0);
     return dateB.getTime() - dateA.getTime();
   });
 
-  res.status(200).json({ message: 'success', data: { total: count, projects: filteredProjects } });
+  res.status(200).json({ message: 'success', data: { total: count, projects } });
 };
 
 export const getUserProjectsByUsername: RequestHandler<
@@ -93,11 +91,13 @@ export const getUserProjectsByUsername: RequestHandler<
   const count = await Project.countDocuments({
     user: targetUser.id,
     ref: { $in: [MODELS.portfolioPost, 'rentals'] },
+    'project.isDeleted': { $ne: true }
   });
 
   const projects = await Project.find({
     user: targetUser.id,
     ref: { $in: [MODELS.portfolioPost, 'rentals'] },
+    'project.isDeleted': { $ne: true }
   })
     .populate({
       path: 'project.type',
@@ -114,12 +114,8 @@ export const getUserProjectsByUsername: RequestHandler<
       options: { sort: { createdAt: -1 } },
     })
     .lean();
-
-  const filteredProjects = projects.filter((el: any) => {
-    return !el.project?.isDeleted;
-  });
-
-  filteredProjects.forEach((el: any) => {
+    
+  projects.forEach((el: any) => {
     if (!el.project?.type) return;
     el.project = el.project.type;
     el.project.tags = (el.project.tags as { _id: string; en: string; ar: string }[])?.map((el) =>
@@ -163,10 +159,14 @@ export const getUserProjectsByUsername: RequestHandler<
     delete el.project.type;
   });
 
-  filteredProjects.sort((a: any, b: any) => {
+  projects.sort((a: any, b: any) => {
     const dateA = a.createdAt ? new Date(a.createdAt) : new Date(0);
     const dateB = b.createdAt ? new Date(b.createdAt) : new Date(0);
     return dateB.getTime() - dateA.getTime();
+  });
+
+  const filteredProjects = projects.filter((el: any) => {
+    return !el.project?.isDeleted;
   });
 
   res.status(200).json({ message: 'success', data: { total: count, projects: filteredProjects } });
