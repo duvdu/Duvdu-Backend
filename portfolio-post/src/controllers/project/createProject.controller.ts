@@ -316,8 +316,8 @@ async function handleProjectNotifications(projectCycle: IprojectCycle & Document
         Channels.notification,
       ),
       sendNotification(
-        userId,
         creative.creative.toString(),
+        userId,
         (projectCycle as any)._id.toString(),
         'new tag',
         `tagged from project ${projectCycle.name}`,
