@@ -101,7 +101,7 @@ export const getUserProjectsByUsername: RequestHandler<
   })
     .populate({
       path: 'project.type',
-      select: 'cover title name creatives cycle audioCover',
+      select: 'cover title name creatives cycle audioCover isDeleted',
       populate: [
         { path: 'user', select: 'name username profileImage isOnline' },
         {
