@@ -9,6 +9,8 @@ export const getTermHandler: GetTermHandler = async (req, res, next) => {
       $project: {
         _id: 1,
         desc: `$desc.${req.lang}`,
+        refundPolicy: `$refundPolicy.${req.lang}`,
+        privacyPolicy: `$privacyPolicy.${req.lang}`,
       },
     },
   ]);

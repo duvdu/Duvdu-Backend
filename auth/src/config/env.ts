@@ -32,6 +32,11 @@ export const env = {
     clientId: process.env.NATS_CLIENT_ID,
     url: process.env.NATS_URL,
   },
+  twilio: {
+    accountSid: process.env.TWILIO_ACCOUNT_SID,
+    authToken: process.env.TWILIO_AUTH_TOKEN,
+    fromPhone: process.env.TWILIO_FROM_PHONE,
+  },
 };
 
 export const checkEnvVariables = () => {
@@ -45,5 +50,8 @@ export const checkEnvVariables = () => {
   if (!env.expressSession.secret) return new Error('env:SESSION_SECRET must be defined');
   if (!env.redis.uri) return new Error('env:REDIS_HOST must be defined');
   if (!env.redis.pass) return new Error('env:REDIS_PASS must be defined');
+  if (!env.twilio.accountSid) return new Error('env:TWILIO_ACCOUNT_SID must be defined');
+  if (!env.twilio.authToken) return new Error('env:TWILIO_AUTH_TOKEN must be defined');
+  if (!env.twilio.fromPhone) return new Error('env:TWILIO_FROM_PHONE must be defined');
   console.log(env.redis.uri);
 };
