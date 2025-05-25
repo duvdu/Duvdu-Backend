@@ -6,6 +6,8 @@ import { Iterm } from '../types/Terms';
 const termSchema = new mongoose.Schema<Iterm>(
   {
     desc: { ar: { type: String, default: null }, en: { type: String, default: null } },
+    refundPolicy: { ar: { type: String, default: null }, en: { type: String, default: null } },
+    privacyPolicy: { ar: { type: String, default: null }, en: { type: String, default: null } },
   },
   { timestamps: true, collection: MODELS.term },
 );
