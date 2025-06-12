@@ -69,6 +69,7 @@ export * from './models/copyrights-booking.model';
 export * from './models/rental-contracts.model';
 export * from './models/studio-booking-book.model';
 export * from './models/projectContract.model';
+export * from './models/withdrawMethods.model';
 // export * from './models/contracts.model';
 export * from './models/producer.model';
 export * from './models/follow.model';
