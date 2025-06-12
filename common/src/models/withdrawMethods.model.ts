@@ -14,6 +14,8 @@ export interface IWithdrawMethod {
     method: WithdrawMethod;
     name: string;
     number: string;
+    isDeleted: boolean;
+    default: boolean;
 }
 
 
@@ -22,6 +24,8 @@ export const WithdrawMethodModel = model<IWithdrawMethod>(MODELS.withdrawMethod,
   method: { type: String, enum: WithdrawMethod },
   name: { type: String, default: null },
   number: { type: String, default: null },
+  isDeleted: { type: Boolean, default: false },
+  default: { type: Boolean, default: false },
 }));
 
 
