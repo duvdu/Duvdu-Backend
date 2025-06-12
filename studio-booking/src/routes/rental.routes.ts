@@ -95,7 +95,10 @@ router.post(
 router.post(
   '/:projectId/contract',
   isauthenticated,
-  globalUploadMiddleware(FOLDERS.studio_booking).array('attachments'),
+  globalUploadMiddleware(FOLDERS.studio_booking, {
+    maxSize: 100 * 1024 * 1024,
+    fileTypes: ['video/*', 'image/*', 'audio/*', 'application/*'],
+  }).fields([{ name: 'attachments', maxCount: 10 }]),
   contractVal.create,
   createContractHandler,
 );
