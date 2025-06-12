@@ -18,6 +18,7 @@ router
   .post(
     globalUploadMiddleware(FOLDERS.producer, {
       fileTypes: ['image/*', 'application/*', 'video/*'],
+      maxSize: 10 * 1024 * 1024,
     }).fields([{ name: 'attachments', maxCount: 10 }]),
     val.createContractVal,
     handler.createContractHandler,

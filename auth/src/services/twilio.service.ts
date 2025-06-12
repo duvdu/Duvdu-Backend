@@ -32,3 +32,5 @@ export class OtpService {
     }
   }
 }
+
+export const twilioService = OtpService.getInstance();
