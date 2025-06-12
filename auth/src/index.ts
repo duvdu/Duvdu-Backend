@@ -30,7 +30,7 @@ const start = async () => {
   app.listen(3000, async () => {
     console.log('app listen on port 3000');
     console.log(env.environment);
-    twilioService.sendOtp('+201026272813', '123456');
+    // twilioService.sendOtp('+201026272813', '123456');
 
     await appInit();
   });
