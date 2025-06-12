@@ -61,16 +61,14 @@ export const loginWithProviderHandler: RequestHandler<
 
   // Case 1: Find user with matching provider ID and email
   user = await Users.findOne({
-    [providerId]: providerValue
+    [providerId]: providerValue,
   });
 
   // Case 2: Find user with matching email and null provider ID
-  if (!user && req.body.email) 
+  if (!user && req.body.email)
     user = await Users.findOne({
       email: req.body.email,
     });
-  
-
 
   // Handle existing user
   if (user) {
@@ -84,8 +82,7 @@ export const loginWithProviderHandler: RequestHandler<
       user.name = req.body.name;
     }
 
-    if (req.body.email && user.email !== req.body.email) 
-      user.email = req.body.email;
+    if (req.body.email && user.email !== req.body.email) user.email = req.body.email;
 
     role = await Roles.findById(user.role);
     if (!role) {

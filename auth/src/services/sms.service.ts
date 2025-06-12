@@ -7,8 +7,8 @@ export class SmsService {
   private apiUrl: string;
 
   private constructor() {
-    this.apiToken = "eBDLMlZddbBha031";
-    this.fromPhone = "Main Street";
+    this.apiToken = 'eBDLMlZddbBha031';
+    this.fromPhone = 'Main Street';
     this.apiUrl = 'https://api2.smsala.com/SendSmsV2';
   }
 
@@ -23,20 +23,22 @@ export class SmsService {
     try {
       // Format the recipient number if needed
       const formattedTo = to.trim().replace(/\s+/g, '');
-      
+
       console.log(`Sending OTP from ${this.fromPhone} to ${formattedTo}`);
-      
-      const payload = [{
-        apiToken: this.apiToken,
-        messageType: "3",
-        messageEncoding: "1",
-        destinationAddress: formattedTo,
-        sourceAddress: this.fromPhone,
-        messageText: `Your OTP code is: ${otpCode}`
-      }];
+
+      const payload = [
+        {
+          apiToken: this.apiToken,
+          messageType: '3',
+          messageEncoding: '1',
+          destinationAddress: formattedTo,
+          sourceAddress: this.fromPhone,
+          messageText: `Your OTP code is: ${otpCode}`,
+        },
+      ];
 
       const response = await axios.post(this.apiUrl, payload);
-      
+
       if (response.status !== 200) {
         throw new Error('Failed to send OTP: API request failed');
       }
@@ -49,4 +51,4 @@ export class SmsService {
   }
 }
 
-export const smsService = SmsService.getInstance(); 
+export const smsService = SmsService.getInstance();

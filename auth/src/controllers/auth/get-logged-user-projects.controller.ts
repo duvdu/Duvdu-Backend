@@ -8,13 +8,13 @@ export const getLoggedUserProjects: RequestHandler<
   const count = await Project.countDocuments({
     user: req.loggedUser.id,
     ref: { $in: [MODELS.portfolioPost, 'rentals'] },
-    'project.isDeleted': { $ne: true }
+    'project.isDeleted': { $ne: true },
   });
 
   const projects = await Project.find({
     user: req.loggedUser.id,
     ref: { $in: [MODELS.portfolioPost, 'rentals'] },
-    'project.isDeleted': { $ne: true }
+    'project.isDeleted': { $ne: true },
   })
     .populate({
       path: 'project.type',
@@ -91,13 +91,13 @@ export const getUserProjectsByUsername: RequestHandler<
   const count = await Project.countDocuments({
     user: targetUser.id,
     ref: { $in: [MODELS.portfolioPost, 'rentals'] },
-    'project.isDeleted': { $ne: true }
+    'project.isDeleted': { $ne: true },
   });
 
   const projects = await Project.find({
     user: targetUser.id,
     ref: { $in: [MODELS.portfolioPost, 'rentals'] },
-    'project.isDeleted': { $ne: true }
+    'project.isDeleted': { $ne: true },
   })
     .populate({
       path: 'project.type',
@@ -114,7 +114,7 @@ export const getUserProjectsByUsername: RequestHandler<
       options: { sort: { createdAt: -1 } },
     })
     .lean();
-    
+
   projects.forEach((el: any) => {
     if (!el.project?.type) return;
     el.project = el.project.type;
