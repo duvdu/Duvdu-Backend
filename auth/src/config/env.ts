@@ -37,6 +37,10 @@ export const env = {
     authToken: process.env.TWILIO_AUTH_TOKEN,
     fromPhone: process.env.TWILIO_PHONE_NUMBER,
   },
+  smsala: {
+    apiToken: process.env.SMSALA_API_TOKEN,
+    fromPhone: process.env.SMSALA_FROM_PHONE,
+  },
 };
 
 export const checkEnvVariables = () => {
@@ -53,5 +57,7 @@ export const checkEnvVariables = () => {
   if (!env.twilio.accountSid) return new Error('env:TWILIO_ACCOUNT_SID must be defined');
   if (!env.twilio.authToken) return new Error('env:TWILIO_AUTH_TOKEN must be defined');
   if (!env.twilio.fromPhone) return new Error('env:TWILIO_FROM_PHONE must be defined');
+  if (!env.smsala.apiToken) return new Error('env:SMSALA_API_TOKEN must be defined');
+  if (!env.smsala.fromPhone) return new Error('env:SMSALA_FROM_PHONE must be defined');
   console.log(env.redis.uri);
 };

@@ -4,7 +4,6 @@ import { appInit } from './../seeds/roles.seeder';
 import { app } from './app';
 import { env, checkEnvVariables } from './config/env';
 import { natsWrapper } from './nats-wrapper';
-import { twilioService } from './services/twilio.service';
 
 const start = async () => {
   checkEnvVariables();
@@ -30,7 +29,6 @@ const start = async () => {
   app.listen(3000, async () => {
     console.log('app listen on port 3000');
     console.log(env.environment);
-    // twilioService.sendOtp('+201026272813', '123456');
 
     await appInit();
   });
