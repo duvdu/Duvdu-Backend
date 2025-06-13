@@ -5,7 +5,7 @@ import {
   sessionStore,
 } from '@duvdu-v1/duvdu';
 import cors from 'cors';
-import express, { RequestHandler } from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import session from 'express-session';
 
 import { env } from './config/env';
@@ -30,25 +30,34 @@ app.use(
   }),
 );
 
-let mySession: RequestHandler;
+let mySession: (req: Request, res: Response, next: NextFunction) => void;
 
 const initializeSessionStore = async () => {
   const store = await sessionStore(env.redis.uri, env.redis.pass);
 
-  mySession = session({
-    secret: env.expressSession.secret,
-    resave: false,
-    saveUninitialized: false,
-    store,
-    cookie: {
-      sameSite: 'none',
-      secure: env.environment === 'production',
-      httpOnly: true,
-      maxAge: 2073600000, // 24 days
-    },
-    proxy: true,
-    rolling: true,
-  });
+  mySession = (req: Request, res: Response, next: NextFunction) => {
+    const origin = req.headers?.origin;
+    const isDashboard = origin?.includes('dashboard.duvdu.com');
+
+    const sessionConfig = session({
+      secret: env.expressSession.secret,
+      resave: false,
+      saveUninitialized: false,
+      store,
+      name: isDashboard ? 'dashboard_session' : 'main_session',
+      cookie: {
+        sameSite: 'none',
+        secure: env.environment === 'production',
+        httpOnly: true,
+        maxAge: 2073600000, // 24 days
+        domain: env.environment === 'production' ? '.duvdu.com' : undefined, // Allow subdomains
+      },
+      proxy: true,
+      rolling: true,
+    });
+
+    return sessionConfig(req, res, next);
+  };
 
   app.use(mySession);
 };
