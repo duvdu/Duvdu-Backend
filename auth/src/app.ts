@@ -35,7 +35,6 @@ app.use(
 (async () => {
   const store = await sessionStore(env.redis.uri, env.redis.pass);
 
-  
   const sessionMiddleware = (req: Request, res: Response, next: NextFunction) => {
     const origin = req.headers?.origin;
     const isDashboard = origin?.includes('dashboard.duvdu.com');
@@ -61,7 +60,6 @@ app.use(
   };
 
   app.use(sessionMiddleware);
-
 
   app.use(languageHeaderMiddleware);
 

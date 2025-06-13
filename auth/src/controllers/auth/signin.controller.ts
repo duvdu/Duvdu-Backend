@@ -4,6 +4,8 @@ import {
   Users,
   VerificationReason,
   BadRequestError,
+  SystemRoles,
+  Irole,
 } from '@duvdu-v1/duvdu';
 
 import { SigninHandler } from '../../types/endpoints/user.endpoints';
@@ -37,7 +39,7 @@ export const signinHandler: SigninHandler = async (req, res, next) => {
       ),
     );
 
-  const user = await Users.findOne(query);
+  const user = await Users.findOne(query).populate('role');
 
   if (!user || !(await comparePassword(password, user.password || '')))
     return next(
@@ -46,6 +48,39 @@ export const signinHandler: SigninHandler = async (req, res, next) => {
         req.lang,
       ),
     );
+
+  const origin = req.headers?.origin;
+  const isDashboard = origin?.includes('dashboard.duvdu.com');
+  const isMobileApp = req.headers['x-app-version'] || req.headers['x-platform'];
+
+  if (isDashboard) {
+    if ([SystemRoles.unverified, SystemRoles.verified].includes((user.role as Irole).key as SystemRoles)) {
+      return next(
+        new UnauthenticatedError(
+          { en: 'User not authorized', ar: 'المستخدم غير مصرح له' },
+          req.lang,
+        ),
+      );
+    }
+  } else if (isMobileApp) {
+    if (![SystemRoles.unverified, SystemRoles.verified].includes((user.role as Irole).key as SystemRoles)) {
+      return next(
+        new UnauthenticatedError(
+          { en: 'User not authorized for mobile app', ar: 'المستخدم غير مصرح له للتطبيق' },
+          req.lang,
+        ),
+      );
+    }
+  } else {
+    if (![SystemRoles.unverified, SystemRoles.verified].includes((user.role as Irole).key as SystemRoles)) {
+      return next(
+        new UnauthenticatedError(
+          { en: 'User not authorized', ar: 'المستخدم غير مصرح له' },
+          req.lang,
+        ),
+      );
+    }
+  }
 
   if (!user.isVerified && (user.verificationCode!.reason = VerificationReason.signup)) {
     const verificationCode = generateRandom6Digit();
