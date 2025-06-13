@@ -10,12 +10,12 @@ export const createMethodValidator = [
 ];
 
 export const updateMethodValidator = [
-  body('id').isMongoId().withMessage('Id is required'),
+  param('id').isMongoId().withMessage('Id is required'),
   globalValidatorMiddleware,
 ];
 
 export const deleteMethodValidator = [
-  body('id').isMongoId().withMessage('Id is required'),
+  param('id').isMongoId().withMessage('Id is required'),
   globalValidatorMiddleware,
 ];
 
