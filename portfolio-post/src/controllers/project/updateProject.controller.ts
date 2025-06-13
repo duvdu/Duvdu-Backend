@@ -18,37 +18,87 @@ import { RequestHandler } from 'express';
 
 import { filterFilesByType } from './createProject.controller';
 
-interface FileValidation {
-  type: string;
-  count: number;
-  message: string;
-  arMessage: string;
-}
+async function validateMediaRequirements(
+  media: CategoryMedia,
+  attachments: Express.Multer.File[],
+  cover: Express.Multer.File[],
+  audioCover: Express.Multer.File[],
+  lang: string,
+) {
+  const mediaValidators = {
+    [CategoryMedia.image]: () => {
+      const imageFiles = filterFilesByType(attachments, 'image/');
+      if (imageFiles.length === 0) {
+        throw new BadRequestError(
+          {
+            en: 'There must be exactly one image file as an attachment',
+            ar: 'يجب أن يكون هناك ملف صورة واحد كمرفق',
+          },
+          lang,
+        );
+      }
+    },
+    [CategoryMedia.audio]: () => {
+      const audioFiles = filterFilesByType(attachments, 'audio/');
+      if (audioFiles.length === 0) {
+        throw new BadRequestError(
+          {
+            en: 'There must be exactly one audio file as an attachment',
+            ar: 'يجب أن يكون هناك ملف صوتي واحد كمرفق',
+          },
+          lang,
+        );
+      }
+    },
+    [CategoryMedia.video]: () => {
+      const videoFiles = filterFilesByType(attachments, 'video/');
+      if (videoFiles.length === 0) {
+        throw new BadRequestError(
+          {
+            en: 'There must be exactly one video file as an attachment',
+            ar: 'يجب أن يكون هناك ملف فيديو واحد كمرفق',
+          },
+          lang,
+        );
+      }
+    },
+  };
 
-interface FileValidations {
-  [key: string]: FileValidation;
-}
+  // Execute media-specific validation
+  mediaValidators[media]?.();
 
-const fileValidations: FileValidations = {
-  image: {
-    type: 'image/',
-    count: 1,
-    message: 'exactly one image file',
-    arMessage: 'ملف صورة واحد',
-  },
-  audio: {
-    type: 'audio/',
-    count: 1,
-    message: 'exactly one audio file',
-    arMessage: 'ملف صوتي واحد',
-  },
-  video: {
-    type: 'video/',
-    count: 1,
-    message: 'exactly one video file',
-    arMessage: 'ملف فيديو واحد',
-  },
-};
+  // Validate cover based on media type
+  if (
+    (media === CategoryMedia.image || media === CategoryMedia.audio) &&
+    !cover[0]?.mimetype.startsWith('image/')
+  ) {
+    throw new BadRequestError(
+      { en: 'Cover must be an image', ar: 'يجب أن يكون الغلاف صورة' },
+      lang,
+    );
+  }
+
+  // Additional audio validation
+  if (media === CategoryMedia.audio) {
+    if (!audioCover?.[0]?.mimetype.startsWith('audio/')) {
+      throw new BadRequestError(
+        {
+          en: 'Audio cover is required and must be an audio file',
+          ar: 'يجب أن يكون الغلاف الصوتي صوتيًا',
+        },
+        lang,
+      );
+    }
+  }
+
+  // Video cover validation
+  if (media === CategoryMedia.video && !cover[0]?.mimetype.startsWith('video/')) {
+    throw new BadRequestError(
+      { en: 'Cover must be a video for video media type', ar: 'يجب أن يكون الغلاف فيديو' },
+      lang,
+    );
+  }
+}
 
 export const updateProjectHandler: RequestHandler<
   { projectId: string },
@@ -120,22 +170,16 @@ export const updateProjectHandler: RequestHandler<
       audioCover?: Express.Multer.File[];
     };
 
-    // Validate files based on media type
-    const validateFiles = async () => {
-      if (attachments && media in fileValidations) {
-        const validation = fileValidations[media];
-        const validFiles = filterFilesByType(attachments, validation.type);
-        if (validFiles.length !== validation.count) {
-          throw new BadRequestError(
-            {
-              en: `There must be ${validation.message} as an attachment`,
-              ar: `يجب أن يكون هناك ${validation.arMessage} كمرفق`,
-            },
-            req.lang,
-          );
-        }
-      }
-    };
+    // Validate media requirements if files are provided
+    if (attachments || cover || audioCover) {
+      await validateMediaRequirements(
+        media as CategoryMedia,
+        attachments || [],
+        cover || [],
+        audioCover || [],
+        req.lang,
+      );
+    }
 
     // Handle file uploads
     const s3 = new Bucket();
@@ -153,23 +197,6 @@ export const updateProjectHandler: RequestHandler<
       }
 
       if (cover) {
-        const isCoverValid =
-          media === 'image' || media === 'audio'
-            ? cover[0].mimetype.startsWith('image/')
-            : media === 'video'
-              ? cover[0].mimetype.startsWith('video/')
-              : false;
-
-        if (!isCoverValid) {
-          throw new BadRequestError(
-            {
-              en: `Cover must be ${media === 'video' ? 'a video' : 'an image'}`,
-              ar: `يجب أن يكون الغلاف ${media === 'video' ? 'فيديو' : 'صورة'}`,
-            },
-            req.lang,
-          );
-        }
-
         uploadTasks.push(
           s3.saveBucketFiles(FOLDERS.portfolio_post, ...cover).then(() => {
             req.body.cover = `${FOLDERS.portfolio_post}/${cover[0].filename}`;
@@ -178,16 +205,6 @@ export const updateProjectHandler: RequestHandler<
       }
 
       if (audioCover && media === CategoryMedia.audio) {
-        if (!audioCover[0].mimetype.startsWith('audio/')) {
-          throw new BadRequestError(
-            {
-              en: 'Audio cover must be an audio file',
-              ar: 'يجب أن يكون الغلاف الصوتي صوتيًا',
-            },
-            req.lang,
-          );
-        }
-
         uploadTasks.push(
           s3.saveBucketFiles(FOLDERS.portfolio_post, ...audioCover).then(() => {
             req.body.audioCover = `${FOLDERS.portfolio_post}/${audioCover[0].filename}`;
@@ -198,8 +215,7 @@ export const updateProjectHandler: RequestHandler<
       await Promise.all(uploadTasks);
     };
 
-    // Execute validation and file uploads
-    await validateFiles();
+    // Execute file uploads
     await handleFileUploads();
 
     // Update project and clean up old files in parallel
