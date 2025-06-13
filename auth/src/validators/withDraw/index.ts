@@ -1,8 +1,8 @@
-import { globalValidatorMiddleware, WithdrawMethodModel } from '@duvdu-v1/duvdu';
+import { globalValidatorMiddleware, WithdrawMethod } from '@duvdu-v1/duvdu';
 import { body, param, query } from 'express-validator';
 
 export const createMethodValidator = [
-  body('method').isIn(Object.values(WithdrawMethodModel)).withMessage('Method is required'),
+  body('method').isIn(Object.values(WithdrawMethod)).withMessage('Method is required'),
   body('name').isString().withMessage('Name is required'),
   body('number').isString().withMessage('Number is required'),
   body('default').optional().isBoolean().withMessage('Default is required'),
