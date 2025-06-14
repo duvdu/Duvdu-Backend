@@ -3,7 +3,7 @@ import {
   Bucket,
   SuccessResponse,
   Users,
-  redisClient,
+  getRedisClient,
   Setting,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
@@ -39,6 +39,7 @@ export const updateDefaultImagesCrm: RequestHandler<
     );
     if (!appSettings) throw new Error('app settings not found');
     await bucket.removeBucketFiles(appSettings?.default_cover);
+    const redisClient = getRedisClient();
     await redisClient.set('default_cover', 'defaults/' + coverImage.filename);
     await Users.updateMany(
       { coverImage: appSettings?.default_cover },

@@ -1,9 +1,9 @@
-import { redisClient, redisConnection } from '@duvdu-v1/duvdu';
+import { redisConnection } from '@duvdu-v1/duvdu';
 
 import { totalLogged, totalVisitors } from '../types/socket-events';
 
 export const handleRedisConnection = async () => {
-  await redisConnection('', ' ');
-  await redisClient.set(totalLogged, 0);
-  await redisClient.set(totalVisitors, 0);
+  const client = await redisConnection('', ' ');
+  await client.set(totalLogged, 0);
+  await client.set(totalVisitors, 0);
 };
