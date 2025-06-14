@@ -1,4 +1,4 @@
-import { Contracts, Iuser, SuccessResponse, TeamProject, Users } from '@duvdu-v1/duvdu';
+import { Contracts, Iuser, SuccessResponse, Users } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import 'express-async-errors';
 
@@ -26,20 +26,7 @@ export const getAvaliableUserICanChatHandler: RequestHandler<
     .map((contract) => (contract.sp.toString() === loggedUserId ? contract.customer : contract.sp))
     .filter((id) => id.toString() !== loggedUserId.toString());
 
-  const projects = await TeamProject.find({
-    isDeleted: false,
-    'creatives.users.user': { $all: [loggedUserId] },
-  });
-
-  const creativeUserIds = projects.flatMap((project) =>
-    project.creatives.flatMap((creative) =>
-      creative.users
-        .filter((user) => user.user.toString() !== loggedUserId)
-        .map((user) => user.user.toString()),
-    ),
-  );
-
-  const potentialChatUserIds = [...new Set([...contractUserIds, ...creativeUserIds])];
+  const potentialChatUserIds = [...new Set([...contractUserIds])];
 
   const potentialChatUsers = await Users.find(
     {

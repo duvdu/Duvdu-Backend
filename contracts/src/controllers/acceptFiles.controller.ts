@@ -5,7 +5,6 @@ import {
   NotFound,
   ProjectContract,
   SuccessResponse,
-  TeamContract,
   CopyrightContracts,
   RentalContracts,
 } from '@duvdu-v1/duvdu';
@@ -28,8 +27,6 @@ export const acceptFilesController: RequestHandler<
 
   if (req.body.reference === MODELS.projectContract)
     contract = await ProjectContract.findById(req.params.contractId);
-  else if (req.body.reference === MODELS.teamContract)
-    contract = await TeamContract.findById(req.params.contractId);
   else if (req.body.reference === MODELS.copyrightContract)
     contract = await CopyrightContracts.findById(req.params.contractId);
   else if (req.body.reference === MODELS.rentalContract)

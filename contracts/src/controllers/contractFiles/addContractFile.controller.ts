@@ -6,7 +6,6 @@ import {
   NotFound,
   ProjectContract,
   SuccessResponse,
-  TeamContract,
   ProjectContractStatus,
   SubmitFilesStatus,
   Channels,
@@ -33,9 +32,7 @@ export const addContractFileController: RequestHandler<
     contract = await CopyrightContracts.findById(contractId);
   } else if (cycle === CYCLES.portfolioPost) {
     contract = await ProjectContract.findById(contractId);
-  } else if (cycle === CYCLES.teamProject) {
-    contract = await TeamContract.findById(contractId);
-  }
+  } 
 
   if (!contract) throw new NotFound({ ar: 'العقد غير موجود', en: 'Contract not found' }, req.lang);
 

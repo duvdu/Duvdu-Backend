@@ -60,14 +60,9 @@ export const sendMessageHandler: SendMessageHandler = async (req, res, next) => 
     (project.user.toString() === req.loggedUser.id.toString() ||
       project.user.toString() === req.body.receiver!.toString());
 
-  // Check if the sender and receiver are in the same creative users array
-  const isInCreatives = project?.creatives.some((creative) =>
-    creative.users.some((u) =>
-      [req.loggedUser.id.toString(), req.body.receiver?.toString()].includes(u.user.toString()),
-    ),
-  );
+ 
 
-  if (!contract && !isMainUser && !isInCreatives && req.loggedUser.role.key !== SystemRoles.admin) {
+  if (!contract && !isMainUser && req.loggedUser.role.key !== SystemRoles.admin) {
     return next(new NotAllowedError(undefined, req.lang));
   }
 

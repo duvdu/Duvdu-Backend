@@ -1,5 +1,5 @@
 import 'express-async-errors';
-import { ContractCancel , ContractStatus, Contracts, NotFound, SuccessResponse, MODELS, ProjectContractStatus, ProjectContract, TeamContract, TeamContractStatus, RentalContractStatus, RentalContracts, CopyrightContractStatus, CopyrightContracts, ProducerContract, Channels, Roles, SystemRoles, Users  } from '@duvdu-v1/duvdu';
+import { ContractCancel , ContractStatus, Contracts, NotFound, SuccessResponse, MODELS, ProjectContractStatus, ProjectContract, RentalContractStatus, RentalContracts, CopyrightContractStatus, CopyrightContracts, ProducerContract, Channels, Roles, SystemRoles, Users  } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 import { sendNotification } from '../contractFiles/sendNotification';
@@ -24,8 +24,6 @@ export const acceptContractCancel: RequestHandler<
 
   if (contract.ref === MODELS.projectContract) {
     await ProjectContract.findOneAndUpdate(contractCancel.contract, {status: ProjectContractStatus.canceled});
-  }else if (contract.ref === MODELS.teamContract) {
-    await TeamContract.findOneAndUpdate(contractCancel.contract, {status: TeamContractStatus.canceled});
   }else if (contract.ref === MODELS.rentalContract) {
     await RentalContracts.findOneAndUpdate(contractCancel.contract, {status: RentalContractStatus.canceled});
   }else if (contract.ref === MODELS.copyrightContract) {
