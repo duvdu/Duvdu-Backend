@@ -192,7 +192,6 @@ export const getProjectHandler: RequestHandler = async (req, res, next) => {
         $match: {
           _id: new Types.ObjectId(req.params.projectId),
           isDeleted: { $ne: true },
-          showOnHome: { $ne: false },
         },
       },
       ...pipelines,
