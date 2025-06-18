@@ -199,5 +199,10 @@ export const responseWebhook: RequestHandler = async (
   console.log('responseWebhook======================');
   console.log(req.body);
   console.log('responseWebhook======================');
+
+  console.log('req.query======================');
+  console.log(req.query);
+  console.log('req.query======================');
+  
   res.status(200).json({ message: 'success' });
 };
