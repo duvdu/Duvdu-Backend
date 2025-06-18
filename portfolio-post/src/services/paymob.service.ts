@@ -471,7 +471,7 @@ export class PaymobService {
       const orderDetails = await this.getOrderDetails(webhookResult.transactionData.orderId);
 
       console.log('orderDetails======================');
-      console.log(orderDetails);
+      console.log('Full API Response:', JSON.stringify(orderDetails, null, 2));
       console.log('orderDetails======================');
 
       // Combine webhook data with metadata

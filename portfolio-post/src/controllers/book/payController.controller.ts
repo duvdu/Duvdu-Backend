@@ -165,6 +165,11 @@ export const paymobTest: RequestHandler<{ paymentSession: string }, SuccessRespo
   const order = await paymob.createOrder(100, 'EGP', [], {
     contractId: '1234567890',
     userId: '1234567890',
+    service_type: 'portfolio_booking',
+    booking_id: 'BOOK_' + Date.now(),
+    user_name: 'John Doe',
+    payment_type: 'test_payment',
+    timestamp: new Date().toISOString(),
   });
   console.log(order);
 
