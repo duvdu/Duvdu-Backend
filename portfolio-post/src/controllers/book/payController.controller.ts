@@ -196,8 +196,8 @@ export const responseWebhook: RequestHandler = async (req, res) => {
           });
         }
         if (contract.status === ProjectContractStatus.waitingForFirstPayment) {
-          await ProjectContract.updateOne(
-            { _id: req.params.contractId },
+          await ProjectContract.findByIdAndUpdate(
+            contractId,
             {
               status: ProjectContractStatus.updateAfterFirstPayment,
               firstCheckoutAt: new Date(),
@@ -248,8 +248,10 @@ export const responseWebhook: RequestHandler = async (req, res) => {
         }
 
         if (contract.status === ProjectContractStatus.waitingForTotalPayment) {
-          contract.status = ProjectContractStatus.ongoing;
-          contract.totalCheckoutAt = new Date();
+          await ProjectContract.findByIdAndUpdate(contractId, {
+            status: ProjectContractStatus.ongoing,
+            totalCheckoutAt: new Date(),
+          });
 
           await Promise.all([
             sendNotification(
@@ -282,8 +284,7 @@ export const responseWebhook: RequestHandler = async (req, res) => {
             timeStamp: new Date(),
           });
         }
-
-        await contract.save();
+        console.log(await ProjectContract.findById(contractId));
       }
     } else {
       console.log('❌ Payment failed');
