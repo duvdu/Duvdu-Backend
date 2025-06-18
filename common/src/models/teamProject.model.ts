@@ -14,7 +14,10 @@ export interface ITeamProject {
   location: { lat: number; lng: number };
   address: string;
   cycle: string;
-  relatedContracts:{category:Types.ObjectId | Icategory, contracts:{contract:Types.ObjectId | IprojectContract}[]}[]
+  relatedContracts: {
+    category: Types.ObjectId | Icategory;
+    contracts: { contract: Types.ObjectId | IprojectContract }[];
+  }[];
   isDeleted: boolean;
 }
 
@@ -28,7 +31,12 @@ export const TeamProject = model<ITeamProject>(
       desc: { type: String, default: null },
       location: { lat: { type: Number, default: null }, lng: { type: Number, default: null } },
       address: { type: String, default: null },
-      relatedContracts:[{category:{type:Types.ObjectId,ref:MODELS.category}, contracts:[{contract:{type:Types.ObjectId,ref:MODELS.projectContract}}] }],
+      relatedContracts: [
+        {
+          category: { type: Types.ObjectId, ref: MODELS.category },
+          contracts: [{ contract: { type: Types.ObjectId, ref: MODELS.projectContract } }],
+        },
+      ],
       isDeleted: { type: Boolean, default: false },
       cycle: { type: String, default: CYCLES.teamProject },
     },

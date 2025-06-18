@@ -11,7 +11,7 @@ export const getRedisClient = () => {
       url: process.env.REDIS_HOST,
       password: process.env.REDIS_PASS,
     });
-    
+
     // Set a higher limit for event listeners
     redisClient.setMaxListeners(20);
   }

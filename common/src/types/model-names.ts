@@ -39,4 +39,5 @@ export enum MODELS {
   favourites = 'favourites',
   contractCancel = 'contract_cancel',
   withdrawMethod = 'withdraw-methods',
+  transaction = 'transactions',
 }

@@ -60,11 +60,11 @@ export interface IcopyrightContract {
   }[];
   createdAt: Date;
   updatedAt: Date;
-  requestedDeadline:{
-    deadline: Date,
-    status: RequestedDeadlineStatus,
-    user: Types.ObjectId | Iuser,
-  }
+  requestedDeadline: {
+    deadline: Date;
+    status: RequestedDeadlineStatus;
+    user: Types.ObjectId | Iuser;
+  };
 }
 
 export const CopyrightContracts = model<IcopyrightContract>(
@@ -103,7 +103,11 @@ export const CopyrightContracts = model<IcopyrightContract>(
       paymentLink: { type: String, default: null },
       requestedDeadline: {
         deadline: { type: Date, default: null },
-        status: { type: String, enum: RequestedDeadlineStatus, default: RequestedDeadlineStatus.pending },
+        status: {
+          type: String,
+          enum: RequestedDeadlineStatus,
+          default: RequestedDeadlineStatus.pending,
+        },
         user: { type: Schema.Types.ObjectId, ref: MODELS.user, default: null },
       },
     },

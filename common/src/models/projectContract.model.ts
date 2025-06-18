@@ -51,11 +51,11 @@ export interface IprojectContract {
     reason?: string;
     dateOfSubmission: Date;
   }[];
-  requestedDeadline:{
-    deadline: Date,
-    status: RequestedDeadlineStatus,
-    user: Types.ObjectId | Iuser,
-  }
+  requestedDeadline: {
+    deadline: Date;
+    status: RequestedDeadlineStatus;
+    user: Types.ObjectId | Iuser;
+  };
 }
 
 export const ProjectContract = model<IprojectContract>(
@@ -114,7 +114,11 @@ export const ProjectContract = model<IprojectContract>(
       ],
       requestedDeadline: {
         deadline: { type: Date, default: null },
-        status: { type: String, enum: RequestedDeadlineStatus, default: RequestedDeadlineStatus.pending },
+        status: {
+          type: String,
+          enum: RequestedDeadlineStatus,
+          default: RequestedDeadlineStatus.pending,
+        },
         user: { type: Schema.Types.ObjectId, ref: MODELS.user, default: null },
       },
     },
