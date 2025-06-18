@@ -452,7 +452,7 @@ export class PaymobService {
       };
       responseCode: string;
       message: string;
-      metadata: Record<string, any>;
+      items: any[];
     } | null;
   }> {
     try {
@@ -474,7 +474,6 @@ export class PaymobService {
       const transactionData = {
         ...webhookResult.transactionData,
         items: orderDetails.items,
-        metadata: orderDetails.items,
       };
 
       return { isValid: true, transactionData };

@@ -230,7 +230,7 @@ export const responseWebhook: RequestHandler = async (
       amount: transactionData.amount,
       success: transactionData.success,
       currency: transactionData.currency,
-      metadata: transactionData.metadata,
+      items: transactionData.items,
     });
     
     // Check if payment was successful
@@ -238,7 +238,7 @@ export const responseWebhook: RequestHandler = async (
       console.log('💰 Payment successful');
       
       // Extract metadata for your business logic
-      const metadata = transactionData.metadata;
+      const metadata = transactionData.items;
       console.log('Metadata:', metadata);
       
       // TODO: Implement your business logic here
@@ -249,18 +249,18 @@ export const responseWebhook: RequestHandler = async (
       // - Process the specific service based on metadata
       
       // Example metadata usage:
-      if (metadata.user_id) {
-        console.log(`Processing payment for user: ${metadata.user_id}`);
+      if (metadata[0].user_id) {
+        console.log(`Processing payment for user: ${metadata[0].user_id}`);
         // Update user's booking/payment status
       }
       
-      if (metadata.booking_id) {
-        console.log(`Processing booking: ${metadata.booking_id}`);
+      if (metadata[0].booking_id) {
+        console.log(`Processing booking: ${metadata[0].booking_id}`);
         // Update booking status to paid
       }
       
-      if (metadata.service_type) {
-        console.log(`Service type: ${metadata.service_type}`);
+      if (metadata[0].service_type) {
+        console.log(`Service type: ${metadata[0].service_type}`);
         // Handle different service types
       }
       
