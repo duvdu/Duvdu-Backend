@@ -7,6 +7,7 @@ import {
   Users,
   ProjectContract,
   ProjectContractStatus,
+  MODELS,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
@@ -105,8 +106,6 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
         Channels.notification,
       ),
     ]);
-
-
   } else if (contract.status === ProjectContractStatus.waitingForTotalPayment) {
     await ProjectContract.updateOne(
       { paymentLink: req.params.paymentSession },
@@ -151,13 +150,10 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
   res.status(200).json({ message: 'success' });
 };
 
-
-
-
-export const paymobTest: RequestHandler<{ paymentSession: string }, SuccessResponse<{ paymentUrl: string }>> = async (
-  req,
-  res,
-) => {
+export const paymobTest: RequestHandler<
+  { paymentSession: string },
+  SuccessResponse<{ paymentUrl: string }>
+> = async (req, res) => {
   const paymob = new PaymobService();
   const authToken = await paymob.getAuthToken();
   console.log(authToken);
@@ -166,20 +162,12 @@ export const paymobTest: RequestHandler<{ paymentSession: string }, SuccessRespo
   const customData = {
     contractId: '1234567890',
     userId: '1234567890',
-    service_type: 'portfolio_booking',
+    service_type: MODELS.portfolioPost,
     booking_id: 'BOOK_' + Date.now(),
-    user_name: 'John Doe',
-    payment_type: 'test_payment',
     timestamp: new Date().toISOString(),
   };
 
-  const order = await paymob.createOrder(100, 'EGP', [{
-    name: 'Portfolio Service',
-    amount_cents: 10000,
-    description: 'Portfolio booking service',
-    quantity: 1,
-  }], JSON.stringify(customData));
-  console.log(order);
+  const order = await paymob.createOrder(100, 'EGP', [], JSON.stringify(customData));
 
   const paymentKey = await paymob.getPaymentKey(order.orderId, authToken, 100, {
     first_name: 'John',
@@ -195,51 +183,39 @@ export const paymobTest: RequestHandler<{ paymentSession: string }, SuccessRespo
     country: '123',
     postal_code: '123',
   });
-  console.log(paymentKey);
-
   const paymentUrl = paymob.createPaymentUrl(paymentKey);
-  console.log(paymentUrl);
-
   res.status(200).json({ message: 'success', paymentUrl });
 };
 
-
-
-export const responseWebhook: RequestHandler = async (
-  req,
-  res,
-) => {
+export const responseWebhook: RequestHandler = async (req, res) => {
   try {
-    console.log('Paymob webhook received');
-    console.log('Query params:', req.query);
-    
-    // Initialize PaymobService
     const paymobService = new PaymobService();
-    
-    // Handle webhook with items (makes API call to get order details)
-    const result = await paymobService.handleWebhookQueryWithItems(req.query as Record<string, string>);
-    
+
+    const result = await paymobService.handleWebhookQueryWithItems(
+      req.query as Record<string, string>,
+    );
+
     if (!result.isValid) {
       console.log('❌ Invalid webhook signature');
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: 'Invalid webhook signature',
-        message: 'Webhook verification failed' 
+        message: 'Webhook verification failed',
       });
     }
-    
+
     if (!result.transactionData) {
       console.log('❌ No transaction data found');
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: 'No transaction data',
-        message: 'Transaction data is missing' 
+        message: 'Transaction data is missing',
       });
     }
-    
+
     const { transactionData } = result;
-    
+
     // Get order details to access merchant_order_id
     const orderDetails = await paymobService.getOrderDetails(transactionData.orderId);
-    
+
     console.log('✅ Valid webhook received:', {
       transactionId: transactionData.transactionId,
       orderId: transactionData.orderId,
@@ -248,15 +224,15 @@ export const responseWebhook: RequestHandler = async (
       currency: transactionData.currency,
       items: transactionData.items,
     });
-    
+
     // Check if payment was successful
     if (transactionData.success) {
       console.log('💰 Payment successful');
-      
+
       // Extract items for your business logic
       const items = transactionData.items;
       console.log('Items:', items);
-      
+
       // Extract custom data from merchant_order_id if available
       let customData = null;
       try {
@@ -267,73 +243,61 @@ export const responseWebhook: RequestHandler = async (
       } catch (error) {
         console.log('Failed to parse merchant_order_id as JSON:', orderDetails.merchant_order_id);
       }
-      
+
       // TODO: Implement your business logic here
       // Example:
       // - Update booking status in database
       // - Send confirmation email
       // - Update user credits/balance
       // - Process the specific service based on custom data
-      
+
       // Example custom data usage:
       if (customData) {
         if (customData.userId) {
           console.log(`Processing payment for user: ${customData.userId}`);
           // Update user's booking/payment status
         }
-        
+
         if (customData.booking_id) {
           console.log(`Processing booking: ${customData.booking_id}`);
           // Update booking status to paid
         }
-        
+
         if (customData.service_type) {
           console.log(`Service type: ${customData.service_type}`);
           // Handle different service types
         }
-        
+
         if (customData.contractId) {
           console.log(`Processing contract: ${customData.contractId}`);
           // Update contract status
         }
       }
-      
+
       // Example items usage (for standard order items):
       if (items && items.length > 0) {
         const firstItem = items[0];
         console.log(`Item: ${firstItem.name} - ${firstItem.description}`);
         console.log(`Amount: ${firstItem.amount_cents / 100} ${transactionData.currency}`);
       }
-      
     } else {
       console.log('❌ Payment failed');
-      
-      // TODO: Handle failed payment
-      // - Update booking status to failed
-      // - Send failure notification
-      // - Log the failure reason
-      
-      console.log('Failure details:', {
-        responseCode: transactionData.responseCode,
-        message: transactionData.message,
-      });
     }
-    
+
     // Always respond with 200 to acknowledge receipt
-    res.status(200).json({ 
+    res.status(200).json({
       message: 'Webhook processed successfully',
       transactionId: transactionData.transactionId,
-      success: transactionData.success 
+      success: transactionData.success,
     });
-    
   } catch (error) {
     console.error('❌ Error processing webhook:', error);
-    
+
     // Still return 200 to prevent Paymob from retrying
     // but log the error for investigation
-    res.status(200).json({ 
+    res.status(200).json({
       message: 'Webhook received but processing failed',
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : 'Unknown error',
     });
   }
 };

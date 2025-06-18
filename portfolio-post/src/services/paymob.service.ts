@@ -72,13 +72,13 @@ interface PaymobWebhookData {
 
 /**
  * Paymob Service Configuration
- * 
+ *
  * Required Keys:
  * - apiKey: Your Paymob API Key (used for authentication)
  * - integrationId: Your Paymob Integration ID (found in your Paymob dashboard)
  * - iframeId: Your Paymob Iframe ID (found in your Paymob dashboard)
- * 
- * Note: 
+ *
+ * Note:
  * - Public Key: Used for client-side encryption (not needed for this service)
  * - Secret Key: Used for webhook signature verification (handled internally)
  */
@@ -90,7 +90,8 @@ export class PaymobService {
   private readonly hmacSecret: string;
 
   constructor() {
-    this.apiKey = 'ZXlKaGJHY2lPaUpJVXpVeE1pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SmpiR0Z6Y3lJNklrMWxjbU5vWVc1MElpd2ljSEp2Wm1sc1pWOXdheUk2TVRBek9URXpPQ3dpYm1GdFpTSTZJbWx1YVhScFlXd2lmUS41WG01anpmQVdVM3E4MzFkT2pUQUg5bGo1QklWY3EzeEhCMU1tMTNwM1FpcVlpRDJSRkRZa05fWmVaQkE2WGFKWUJCNVdkR2Z0SndoRW10Wi1XUk5wUQ==';
+    this.apiKey =
+      'ZXlKaGJHY2lPaUpJVXpVeE1pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SmpiR0Z6Y3lJNklrMWxjbU5vWVc1MElpd2ljSEp2Wm1sc1pWOXdheUk2TVRBek9URXpPQ3dpYm1GdFpTSTZJbWx1YVhScFlXd2lmUS41WG01anpmQVdVM3E4MzFkT2pUQUg5bGo1QklWY3EzeEhCMU1tMTNwM1FpcVlpRDJSRkRZa05fWmVaQkE2WGFKWUJCNVdkR2Z0SndoRW10Wi1XUk5wUQ==';
     this.integrationId = 5060202;
     this.iframeId = 915609;
     this.baseUrl = 'https://accept.paymob.com/api';
@@ -130,15 +131,11 @@ export class PaymobService {
         orderData.merchant_order_id = merchant_order_id;
       }
 
-      const response = await axios.post(
-        `${this.baseUrl}/ecommerce/orders`,
-        orderData,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
+      const response = await axios.post(`${this.baseUrl}/ecommerce/orders`, orderData, {
+        headers: {
+          'Content-Type': 'application/json',
         },
-      );
+      });
 
       return {
         orderId: response.data.id,
@@ -222,7 +219,7 @@ export class PaymobService {
     // Define the exact order of fields for HMAC calculation as per Paymob docs
     const orderedFields = [
       'amount_cents',
-      'created_at', 
+      'created_at',
       'currency',
       'error_occured',
       'has_parent_transaction',
@@ -240,13 +237,11 @@ export class PaymobService {
       'source_data.pan',
       'source_data.sub_type',
       'source_data.type',
-      'success'
+      'success',
     ];
 
     // Concatenate values in the exact order (no keys, just values)
-    const concatenatedString = orderedFields
-      .map(field => queryParams[field] || '')
-      .join('');
+    const concatenatedString = orderedFields.map((field) => queryParams[field] || '').join('');
 
     // Calculate HMAC using the secret key
     const calculatedHmac = crypto
@@ -375,15 +370,12 @@ export class PaymobService {
   }> {
     try {
       const authToken = await this.getAuthToken();
-      const response = await axios.get(
-        `${this.baseUrl}/acceptance/transactions/${transactionId}`,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${authToken}`,
-          },
+      const response = await axios.get(`${this.baseUrl}/acceptance/transactions/${transactionId}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${authToken}`,
         },
-      );
+      });
 
       return {
         success: response.data.success,
@@ -410,15 +402,12 @@ export class PaymobService {
   }> {
     try {
       const authToken = await this.getAuthToken();
-      const response = await axios.get(
-        `${this.baseUrl}/ecommerce/orders/${orderId}`,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${authToken}`,
-          },
+      const response = await axios.get(`${this.baseUrl}/ecommerce/orders/${orderId}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${authToken}`,
         },
-      );
+      });
 
       return {
         id: response.data.id,
@@ -465,17 +454,13 @@ export class PaymobService {
     try {
       // First verify the webhook
       const webhookResult = this.handleWebhookQuery(queryParams);
-      
+
       if (!webhookResult.isValid || !webhookResult.transactionData) {
         return { isValid: false, transactionData: null };
       }
 
       // Fetch order details to get items
       const orderDetails = await this.getOrderDetails(webhookResult.transactionData.orderId);
-
-      console.log('orderDetails======================');
-      console.log('Full API Response:', JSON.stringify(orderDetails, null, 2));
-      console.log('orderDetails======================');
 
       // Combine webhook data with items
       const transactionData = {
