@@ -1,6 +1,60 @@
 import * as crypto from 'crypto';
 
-import axios, { AxiosError } from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
+
+// PayMob API Types
+interface PaymobMerchant {
+  id: number;
+  created_at: string;
+  phones: string[];
+  company_emails: string[];
+  company_name: string;
+  state: string;
+  country: string;
+  city: string;
+  postal_code: string;
+  street: string;
+}
+
+interface PaymobOrder {
+  id: number;
+  created_at: string;
+  delivery_needed: boolean;
+  merchant: PaymobMerchant;
+  collector: null;
+  amount_cents: number;
+  shipping_data: null;
+  currency: string;
+  is_payment_locked: boolean;
+  is_return: boolean;
+  is_cancel: boolean;
+  is_returned: boolean;
+  is_canceled: boolean;
+  merchant_order_id: string;
+  wallet_notification: null;
+  paid_amount_cents: number;
+  notify_user_with_email: boolean;
+  items: PaymobOrderItem[];
+  order_url: string;
+  commission_fee: number;
+  delivery_fee_cents: number;
+  delivery_voucher_cost: number;
+  discount: number;
+  metadata: Record<string, any>;
+}
+
+interface PaymobOrderItem {
+  name: string;
+  description: string;
+  amount_cents: number;
+  quantity: number;
+}
+
+interface PaymobSourceData {
+  type: string;
+  pan: string;
+  sub_type: string;
+}
 
 interface PaymobWebhookData {
   obj: {
@@ -17,57 +71,138 @@ interface PaymobWebhookData {
     integration_id: number;
     profile_id: number;
     has_parent_transaction: boolean;
-    order: {
-      id: number;
-      created_at: string;
-      delivery_needed: boolean;
-      merchant: {
-        id: number;
-        created_at: string;
-        phones: string[];
-        company_emails: string[];
-        company_name: string;
-        state: string;
-        country: string;
-        city: string;
-        postal_code: string;
-        street: string;
-      };
-      collector: null;
-      amount_cents: number;
-      shipping_data: null;
-      currency: string;
-      is_payment_locked: boolean;
-      is_return: boolean;
-      is_cancel: boolean;
-      is_returned: boolean;
-      is_canceled: boolean;
-      merchant_order_id: string;
-      wallet_notification: null;
-      paid_amount_cents: number;
-      notify_user_with_email: boolean;
-      items: any[];
-      order_url: string;
-      commission_fee: number;
-      delivery_fee_cents: number;
-      delivery_voucher_cost: number;
-      discount: number;
-      metadata: Record<string, any>;
-    };
+    order: PaymobOrder;
     created_at: string;
     transaction_processed_callback_responses: null;
     currency: string;
-    source_data: {
-      type: string;
-      pan: string;
-      sub_type: string;
-    };
+    source_data: PaymobSourceData;
     api_source: string;
     terminal_id: string;
     merchant_commission: number;
     merchant_staff_tag: null;
     hmac: string;
   };
+}
+
+interface PaymobAuthResponse {
+  token: string;
+}
+
+interface PaymobOrderResponse {
+  id: number;
+  token: string;
+}
+
+interface PaymobPaymentKeyResponse {
+  token: string;
+}
+
+interface PaymobTransactionStatusResponse {
+  success: boolean;
+  status: string;
+  amount_cents: number;
+  currency: string;
+}
+
+interface PaymobOrderDetailsResponse {
+  id: number;
+  amount_cents: number;
+  currency: string;
+  items: PaymobOrderItem[];
+  created_at: string;
+  merchant_order_id: string;
+}
+
+// Request Types
+interface PaymobOrderRequest {
+  auth_token: string;
+  delivery_needed: boolean;
+  amount_cents: number;
+  currency: string;
+  items: PaymobOrderItem[];
+  merchant_order_id?: string;
+}
+
+interface PaymobBillingData {
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone_number: string;
+  apartment: string;
+  floor: string;
+  street: string;
+  building: string;
+  city: string;
+  state: string;
+  country: string;
+  postal_code: string;
+}
+
+interface PaymobPaymentKeyRequest {
+  auth_token: string;
+  amount_cents: number;
+  expiration: number;
+  order_id: number;
+  billing_data: PaymobBillingData;
+  currency: string;
+  integration_id: number;
+}
+
+// Response Types
+interface CreateOrderResult {
+  orderId: number;
+  token: string;
+}
+
+interface TransactionData {
+  orderId: number;
+  amount: number;
+  success: boolean;
+  currency: string;
+  transactionId: number;
+  createdAt: string;
+  isRefunded: boolean;
+  isCaptured: boolean;
+  isVoided: boolean;
+  metadata: Record<string, any>;
+}
+
+interface WebhookQueryTransactionData extends TransactionData {
+  isAuth: boolean;
+  isStandalone: boolean;
+  is3dSecure: boolean;
+  sourceData: {
+    type: string;
+    pan: string;
+    subType: string;
+  };
+  responseCode: string;
+  message: string;
+}
+
+interface WebhookQueryWithItemsTransactionData extends WebhookQueryTransactionData {
+  items: PaymobOrderItem[];
+}
+
+interface WebhookResult<T> {
+  isValid: boolean;
+  transactionData: T | null;
+}
+
+interface TransactionStatusResult {
+  success: boolean;
+  status: string;
+  amount: number;
+  currency: string;
+}
+
+interface OrderDetailsResult {
+  id: number;
+  amount_cents: number;
+  currency: string;
+  items: PaymobOrderItem[];
+  created_at: string;
+  merchant_order_id: string;
 }
 
 /**
@@ -101,7 +236,7 @@ export class PaymobService {
 
   async getAuthToken(): Promise<string> {
     try {
-      const response = await axios.post(`${this.baseUrl}/auth/tokens`, {
+      const response: AxiosResponse<PaymobAuthResponse> = await axios.post(`${this.baseUrl}/auth/tokens`, {
         api_key: this.apiKey,
       });
       return response.data.token;
@@ -114,12 +249,12 @@ export class PaymobService {
   async createOrder(
     amount: number,
     currency: string = 'EGP',
-    items: any[] = [],
+    items: PaymobOrderItem[] = [],
     merchant_order_id?: string,
-  ): Promise<{ orderId: number; token: string }> {
+  ): Promise<CreateOrderResult> {
     try {
       const authToken = await this.getAuthToken();
-      const orderData: any = {
+      const orderData: PaymobOrderRequest = {
         auth_token: authToken,
         delivery_needed: false,
         amount_cents: amount * 100,
@@ -131,11 +266,15 @@ export class PaymobService {
         orderData.merchant_order_id = merchant_order_id;
       }
 
-      const response = await axios.post(`${this.baseUrl}/ecommerce/orders`, orderData, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const response: AxiosResponse<PaymobOrderResponse> = await axios.post(
+        `${this.baseUrl}/ecommerce/orders`, 
+        orderData, 
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
 
       return {
         orderId: response.data.id,
@@ -152,33 +291,22 @@ export class PaymobService {
     orderId: number,
     token: string,
     amount: number,
-    billingData: {
-      first_name: string;
-      last_name: string;
-      email: string;
-      phone_number: string;
-      apartment: string;
-      floor: string;
-      street: string;
-      building: string;
-      city: string;
-      state: string;
-      country: string;
-      postal_code: string;
-    },
+    billingData: PaymobBillingData,
   ): Promise<string> {
     try {
-      const response = await axios.post(
+      const paymentKeyRequest: PaymobPaymentKeyRequest = {
+        auth_token: token,
+        amount_cents: amount * 100,
+        expiration: 3600,
+        order_id: orderId,
+        billing_data: billingData,
+        currency: 'EGP',
+        integration_id: this.integrationId,
+      };
+
+      const response: AxiosResponse<PaymobPaymentKeyResponse> = await axios.post(
         `${this.baseUrl}/acceptance/payment_keys`,
-        {
-          auth_token: token,
-          amount_cents: amount * 100,
-          expiration: 3600,
-          order_id: orderId,
-          billing_data: billingData,
-          currency: 'EGP',
-          integration_id: this.integrationId,
-        },
+        paymentKeyRequest,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -197,7 +325,7 @@ export class PaymobService {
     return `https://accept.paymob.com/api/acceptance/iframes/${this.iframeId}?payment_token=${paymentKey}`;
   }
 
-  async verifyPayment(hmac: string, data: any): Promise<boolean> {
+  async verifyPayment(hmac: string, data: Record<string, any>): Promise<boolean> {
     const concatenatedString = Object.entries(data)
       .sort()
       .map(([key, value]) => `${key}=${value}`)
@@ -252,21 +380,7 @@ export class PaymobService {
     return calculatedHmac === queryParams.hmac;
   }
 
-  async handleWebhook(webhookData: PaymobWebhookData): Promise<{
-    isValid: boolean;
-    transactionData: {
-      orderId: number;
-      amount: number;
-      success: boolean;
-      currency: string;
-      transactionId: number;
-      createdAt: string;
-      isRefunded: boolean;
-      isCaptured: boolean;
-      isVoided: boolean;
-      metadata: Record<string, any>;
-    } | null;
-  }> {
+  async handleWebhook(webhookData: PaymobWebhookData): Promise<WebhookResult<TransactionData>> {
     try {
       // Verify the webhook signature
       const isValid = await this.verifyPayment(webhookData.obj.hmac, webhookData.obj);
@@ -276,7 +390,7 @@ export class PaymobService {
       }
 
       // Extract relevant transaction data
-      const transactionData = {
+      const transactionData: TransactionData = {
         orderId: webhookData.obj.order.id,
         amount: webhookData.obj.amount_cents / 100, // Convert from cents to actual currency
         success: webhookData.obj.success,
@@ -300,30 +414,7 @@ export class PaymobService {
    * Handle webhook with query parameters (GET request)
    * This is for webhooks that come as URL query parameters instead of JSON body
    */
-  handleWebhookQuery(queryParams: Record<string, string>): {
-    isValid: boolean;
-    transactionData: {
-      orderId: number;
-      amount: number;
-      success: boolean;
-      currency: string;
-      transactionId: number;
-      createdAt: string;
-      isRefunded: boolean;
-      isCaptured: boolean;
-      isVoided: boolean;
-      isAuth: boolean;
-      isStandalone: boolean;
-      is3dSecure: boolean;
-      sourceData: {
-        type: string;
-        pan: string;
-        subType: string;
-      };
-      responseCode: string;
-      message: string;
-    } | null;
-  } {
+  handleWebhookQuery(queryParams: Record<string, string>): WebhookResult<WebhookQueryTransactionData> {
     try {
       // Verify the webhook HMAC signature
       const isValid = this.verifyWebhookHmac(queryParams);
@@ -333,7 +424,7 @@ export class PaymobService {
       }
 
       // Extract and parse transaction data from query parameters
-      const transactionData = {
+      const transactionData: WebhookQueryTransactionData = {
         orderId: parseInt(queryParams.order || '0'),
         amount: parseInt(queryParams.amount_cents || '0') / 100, // Convert from cents
         success: queryParams.success === 'true',
@@ -353,6 +444,7 @@ export class PaymobService {
         },
         responseCode: queryParams.txn_response_code || '',
         message: queryParams['data.message'] || '',
+        metadata: {}, // Adding the missing metadata property
       };
 
       return { isValid: true, transactionData };
@@ -362,20 +454,18 @@ export class PaymobService {
     }
   }
 
-  async getTransactionStatus(transactionId: number): Promise<{
-    success: boolean;
-    status: string;
-    amount: number;
-    currency: string;
-  }> {
+  async getTransactionStatus(transactionId: number): Promise<TransactionStatusResult> {
     try {
       const authToken = await this.getAuthToken();
-      const response = await axios.get(`${this.baseUrl}/acceptance/transactions/${transactionId}`, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${authToken}`,
-        },
-      });
+      const response: AxiosResponse<PaymobTransactionStatusResponse> = await axios.get(
+        `${this.baseUrl}/acceptance/transactions/${transactionId}`, 
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
 
       return {
         success: response.data.success,
@@ -392,22 +482,18 @@ export class PaymobService {
   /**
    * Get order details including metadata
    */
-  async getOrderDetails(orderId: number): Promise<{
-    id: number;
-    amount_cents: number;
-    currency: string;
-    items: any[];
-    created_at: string;
-    merchant_order_id: string;
-  }> {
+  async getOrderDetails(orderId: number): Promise<OrderDetailsResult> {
     try {
       const authToken = await this.getAuthToken();
-      const response = await axios.get(`${this.baseUrl}/ecommerce/orders/${orderId}`, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${authToken}`,
-        },
-      });
+      const response: AxiosResponse<PaymobOrderDetailsResponse> = await axios.get(
+        `${this.baseUrl}/ecommerce/orders/${orderId}`, 
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
 
       return {
         id: response.data.id,
@@ -426,31 +512,7 @@ export class PaymobService {
   /**
    * Handle webhook query and fetch items from order
    */
-  async handleWebhookQueryWithItems(queryParams: Record<string, string>): Promise<{
-    isValid: boolean;
-    transactionData: {
-      orderId: number;
-      amount: number;
-      success: boolean;
-      currency: string;
-      transactionId: number;
-      createdAt: string;
-      isRefunded: boolean;
-      isCaptured: boolean;
-      isVoided: boolean;
-      isAuth: boolean;
-      isStandalone: boolean;
-      is3dSecure: boolean;
-      sourceData: {
-        type: string;
-        pan: string;
-        subType: string;
-      };
-      responseCode: string;
-      message: string;
-      items: any[];
-    } | null;
-  }> {
+  async handleWebhookQueryWithItems(queryParams: Record<string, string>): Promise<WebhookResult<WebhookQueryWithItemsTransactionData>> {
     try {
       // First verify the webhook
       const webhookResult = this.handleWebhookQuery(queryParams);
@@ -463,7 +525,7 @@ export class PaymobService {
       const orderDetails = await this.getOrderDetails(webhookResult.transactionData.orderId);
 
       // Combine webhook data with items
-      const transactionData = {
+      const transactionData: WebhookQueryWithItemsTransactionData = {
         ...webhookResult.transactionData,
         items: orderDetails.items,
       };
