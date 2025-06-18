@@ -470,6 +470,10 @@ export class PaymobService {
       // Fetch order details to get metadata
       const orderDetails = await this.getOrderDetails(webhookResult.transactionData.orderId);
 
+      console.log('orderDetails======================');
+      console.log(orderDetails);
+      console.log('orderDetails======================');
+
       // Combine webhook data with metadata
       const transactionData = {
         ...webhookResult.transactionData,
