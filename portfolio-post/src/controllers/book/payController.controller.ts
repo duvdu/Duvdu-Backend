@@ -163,8 +163,17 @@ export const paymobTest: RequestHandler<{ paymentSession: string }, SuccessRespo
   console.log(authToken);
 
   const order = await paymob.createOrder(100, 'EGP', [{
+    name: 'Portfolio Service',
+    amount_cents: 10000,
+    description: 'Portfolio booking service',
+    quantity: 1,
     contractId: '1234567890',
     userId: '1234567890',
+    service_type: 'portfolio_booking',
+    booking_id: 'BOOK_' + Date.now(),
+    user_name: 'John Doe',
+    payment_type: 'test_payment',
+    timestamp: new Date().toISOString(),
   }]);
   console.log(order);
 
@@ -203,8 +212,8 @@ export const responseWebhook: RequestHandler = async (
     // Initialize PaymobService
     const paymobService = new PaymobService();
     
-    // Handle webhook with metadata (makes API call to get order details)
-    const result = await paymobService.handleWebhookQueryWithMetadata(req.query as Record<string, string>);
+    // Handle webhook with items (makes API call to get order details)
+    const result = await paymobService.handleWebhookQueryWithItems(req.query as Record<string, string>);
     
     if (!result.isValid) {
       console.log('❌ Invalid webhook signature');
@@ -237,31 +246,35 @@ export const responseWebhook: RequestHandler = async (
     if (transactionData.success) {
       console.log('💰 Payment successful');
       
-      // Extract metadata for your business logic
-      const metadata = transactionData.items;
-      console.log('Metadata:', metadata);
+      // Extract items for your business logic
+      const items = transactionData.items;
+      console.log('Items:', items);
       
       // TODO: Implement your business logic here
       // Example:
       // - Update booking status in database
       // - Send confirmation email
       // - Update user credits/balance
-      // - Process the specific service based on metadata
+      // - Process the specific service based on items data
       
-      // Example metadata usage:
-      if (metadata[0].user_id) {
-        console.log(`Processing payment for user: ${metadata[0].user_id}`);
-        // Update user's booking/payment status
-      }
-      
-      if (metadata[0].booking_id) {
-        console.log(`Processing booking: ${metadata[0].booking_id}`);
-        // Update booking status to paid
-      }
-      
-      if (metadata[0].service_type) {
-        console.log(`Service type: ${metadata[0].service_type}`);
-        // Handle different service types
+      // Example items usage:
+      if (items && items.length > 0) {
+        const firstItem = items[0];
+        
+        if (firstItem.userId) {
+          console.log(`Processing payment for user: ${firstItem.userId}`);
+          // Update user's booking/payment status
+        }
+        
+        if (firstItem.booking_id) {
+          console.log(`Processing booking: ${firstItem.booking_id}`);
+          // Update booking status to paid
+        }
+        
+        if (firstItem.service_type) {
+          console.log(`Service type: ${firstItem.service_type}`);
+          // Handle different service types
+        }
       }
       
     } else {

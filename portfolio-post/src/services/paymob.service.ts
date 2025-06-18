@@ -428,9 +428,9 @@ export class PaymobService {
   }
 
   /**
-   * Handle webhook query and fetch metadata from order
+   * Handle webhook query and fetch items from order
    */
-  async handleWebhookQueryWithMetadata(queryParams: Record<string, string>): Promise<{
+  async handleWebhookQueryWithItems(queryParams: Record<string, string>): Promise<{
     isValid: boolean;
     transactionData: {
       orderId: number;
@@ -463,14 +463,14 @@ export class PaymobService {
         return { isValid: false, transactionData: null };
       }
 
-      // Fetch order details to get metadata
+      // Fetch order details to get items
       const orderDetails = await this.getOrderDetails(webhookResult.transactionData.orderId);
 
       console.log('orderDetails======================');
       console.log('Full API Response:', JSON.stringify(orderDetails, null, 2));
       console.log('orderDetails======================');
 
-      // Combine webhook data with metadata
+      // Combine webhook data with items
       const transactionData = {
         ...webhookResult.transactionData,
         items: orderDetails.items,
@@ -479,7 +479,7 @@ export class PaymobService {
       return { isValid: true, transactionData };
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      throw new Error(`Failed to handle webhook with metadata: ${errorMessage}`);
+      throw new Error(`Failed to handle webhook with items: ${errorMessage}`);
     }
   }
 }
