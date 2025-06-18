@@ -1,7 +1,8 @@
-import { Icategory } from '@duvdu-v1/duvdu';
+
 import { model, Schema, Types } from 'mongoose';
 
 import { IprojectContract } from './projectContract.model';
+import { Icategory } from '../types/Category';
 import { CYCLES } from '../types/cycles';
 import { MODELS } from '../types/model-names';
 import { Iuser } from '../types/User';

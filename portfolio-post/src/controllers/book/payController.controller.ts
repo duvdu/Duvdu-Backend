@@ -8,11 +8,13 @@ import {
   ProjectContract,
   ProjectContractStatus,
   MODELS,
+  PaymobService,
+  Transaction,
+  TransactionStatus,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 import { sendNotification } from './sendNotification';
-import { PaymobService } from '../../services/paymob.service';
 
 export const payContract: RequestHandler<
   { contractId: string },
@@ -163,22 +165,22 @@ export const responseWebhook: RequestHandler = async (req, res) => {
       items: transactionData.items,
     });
 
+    // Extract custom data from merchant_order_id if available
+    let customData = null;
+    try {
+      if (orderDetails.merchant_order_id) {
+        customData = JSON.parse(orderDetails.merchant_order_id);
+        console.log('Custom data from merchant_order_id:', customData);
+      }
+    } catch (error) {
+      console.log('Failed to parse merchant_order_id as JSON:', orderDetails.merchant_order_id);
+    }
+
+    const { userId, contractId, service_type } = customData;
+
     // Check if payment was successful
     if (transactionData.success) {
       console.log('💰 Payment successful');
-
-      // Extract custom data from merchant_order_id if available
-      let customData = null;
-      try {
-        if (orderDetails.merchant_order_id) {
-          customData = JSON.parse(orderDetails.merchant_order_id);
-          console.log('Custom data from merchant_order_id:', customData);
-        }
-      } catch (error) {
-        console.log('Failed to parse merchant_order_id as JSON:', orderDetails.merchant_order_id);
-      }
-
-      const { userId, contractId, service_type } = customData;
 
       if (service_type === MODELS.portfolioPost) {
         const contract = await ProjectContract.findById(contractId);
@@ -233,6 +235,16 @@ export const responseWebhook: RequestHandler = async (req, res) => {
               Channels.notification,
             ),
           ]);
+
+          await Transaction.create({
+            user: userId,
+            amount: contract.firstPaymentAmount,
+            status: TransactionStatus.SUCCESS,
+            contract: contract._id.toString(),
+            model: MODELS.portfolioPost,
+            currency: 'EGP',
+            timeStamp: new Date(),
+          });
         }
 
         if (contract.status === ProjectContractStatus.waitingForTotalPayment) {
@@ -259,12 +271,29 @@ export const responseWebhook: RequestHandler = async (req, res) => {
               Channels.notification,
             ),
           ]);
+
+          await Transaction.create({
+            user: userId,
+            amount: contract.secondPaymentAmount,
+            status: TransactionStatus.SUCCESS,
+            contract: contract._id.toString(),
+            model: MODELS.portfolioPost,
+            currency: 'EGP',
+            timeStamp: new Date(),
+          });
         }
 
         await contract.save();
       }
     } else {
       console.log('❌ Payment failed');
+      await Transaction.create({
+        user: userId,
+        amount: transactionData.amount,
+        status: TransactionStatus.FAILED,
+        contract: contractId,
+        model: MODELS.portfolioPost,
+      });
     }
 
     // Always respond with 200 to acknowledge receipt

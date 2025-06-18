@@ -1,5 +1,6 @@
-import { MODELS } from '@duvdu-v1/duvdu';
 import { model, Schema, Types } from 'mongoose';
+
+import { MODELS } from '../types/model-names';
 
 export enum WithdrawMethod {
   WALLET = 'wallet',
