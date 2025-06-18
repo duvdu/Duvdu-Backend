@@ -19,7 +19,7 @@ router.route('/:projectId').post(
   val.create,
   handler.createContractHandler,
 );
-router.post('/pay/:paymentSession', val.pay, handler.payContract);
+router.post('/pay/:contractId', val.pay, handler.payContract);
 
 router.route('/:contractId/contract').patch(val.update, handler.updateContractHandler);
 router.route('/:contractId/action').post(val.action, handler.contractActionHandler);
