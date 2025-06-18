@@ -8,7 +8,7 @@ export const router = express.Router();
 
 
 router.get('/paymob-test', handler.paymobTest);
-router.post('/paymob-webhook', handler.responseWebhook);
+router.get('/paymob-webhook', handler.responseWebhook);
 
 router.use(isauthenticated);
 
