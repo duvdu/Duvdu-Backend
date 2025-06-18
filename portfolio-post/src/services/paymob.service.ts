@@ -114,18 +114,25 @@ export class PaymobService {
     amount: number,
     currency: string = 'EGP',
     items: any[] = [],
+    merchant_order_id?: string,
   ): Promise<{ orderId: number; token: string }> {
     try {
       const authToken = await this.getAuthToken();
+      const orderData: any = {
+        auth_token: authToken,
+        delivery_needed: false,
+        amount_cents: amount * 100,
+        currency,
+        items,
+      };
+
+      if (merchant_order_id) {
+        orderData.merchant_order_id = merchant_order_id;
+      }
+
       const response = await axios.post(
         `${this.baseUrl}/ecommerce/orders`,
-        {
-          auth_token: authToken,
-          delivery_needed: false,
-          amount_cents: amount * 100,
-          currency,
-          items,
-        },
+        orderData,
         {
           headers: {
             'Content-Type': 'application/json',

@@ -162,11 +162,8 @@ export const paymobTest: RequestHandler<{ paymentSession: string }, SuccessRespo
   const authToken = await paymob.getAuthToken();
   console.log(authToken);
 
-  const order = await paymob.createOrder(100, 'EGP', [{
-    name: 'Portfolio Service',
-    amount_cents: 10000,
-    description: 'Portfolio booking service',
-    quantity: 1,
+  // Store custom data in merchant_order_id as JSON string
+  const customData = {
     contractId: '1234567890',
     userId: '1234567890',
     service_type: 'portfolio_booking',
@@ -174,7 +171,14 @@ export const paymobTest: RequestHandler<{ paymentSession: string }, SuccessRespo
     user_name: 'John Doe',
     payment_type: 'test_payment',
     timestamp: new Date().toISOString(),
-  }]);
+  };
+
+  const order = await paymob.createOrder(100, 'EGP', [{
+    name: 'Portfolio Service',
+    amount_cents: 10000,
+    description: 'Portfolio booking service',
+    quantity: 1,
+  }], JSON.stringify(customData));
   console.log(order);
 
   const paymentKey = await paymob.getPaymentKey(order.orderId, authToken, 100, {
@@ -233,6 +237,9 @@ export const responseWebhook: RequestHandler = async (
     
     const { transactionData } = result;
     
+    // Get order details to access merchant_order_id
+    const orderDetails = await paymobService.getOrderDetails(transactionData.orderId);
+    
     console.log('✅ Valid webhook received:', {
       transactionId: transactionData.transactionId,
       orderId: transactionData.orderId,
@@ -250,31 +257,52 @@ export const responseWebhook: RequestHandler = async (
       const items = transactionData.items;
       console.log('Items:', items);
       
+      // Extract custom data from merchant_order_id if available
+      let customData = null;
+      try {
+        if (orderDetails.merchant_order_id) {
+          customData = JSON.parse(orderDetails.merchant_order_id);
+          console.log('Custom data from merchant_order_id:', customData);
+        }
+      } catch (error) {
+        console.log('Failed to parse merchant_order_id as JSON:', orderDetails.merchant_order_id);
+      }
+      
       // TODO: Implement your business logic here
       // Example:
       // - Update booking status in database
       // - Send confirmation email
       // - Update user credits/balance
-      // - Process the specific service based on items data
+      // - Process the specific service based on custom data
       
-      // Example items usage:
-      if (items && items.length > 0) {
-        const firstItem = items[0];
-        
-        if (firstItem.userId) {
-          console.log(`Processing payment for user: ${firstItem.userId}`);
+      // Example custom data usage:
+      if (customData) {
+        if (customData.userId) {
+          console.log(`Processing payment for user: ${customData.userId}`);
           // Update user's booking/payment status
         }
         
-        if (firstItem.booking_id) {
-          console.log(`Processing booking: ${firstItem.booking_id}`);
+        if (customData.booking_id) {
+          console.log(`Processing booking: ${customData.booking_id}`);
           // Update booking status to paid
         }
         
-        if (firstItem.service_type) {
-          console.log(`Service type: ${firstItem.service_type}`);
+        if (customData.service_type) {
+          console.log(`Service type: ${customData.service_type}`);
           // Handle different service types
         }
+        
+        if (customData.contractId) {
+          console.log(`Processing contract: ${customData.contractId}`);
+          // Update contract status
+        }
+      }
+      
+      // Example items usage (for standard order items):
+      if (items && items.length > 0) {
+        const firstItem = items[0];
+        console.log(`Item: ${firstItem.name} - ${firstItem.description}`);
+        console.log(`Amount: ${firstItem.amount_cents / 100} ${transactionData.currency}`);
       }
       
     } else {
