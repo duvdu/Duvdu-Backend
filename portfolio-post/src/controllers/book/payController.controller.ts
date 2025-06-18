@@ -295,6 +295,15 @@ export const responseWebhook: RequestHandler = async (req, res) => {
         contract: contractId,
         model: MODELS.portfolioPost,
       });
+      sendNotification(
+        userId,
+        userId,
+        contractId,
+        'contract',
+        'payment failed',
+        'your payment failed, please try again',
+        Channels.notification,
+      );
     }
 
     // Always respond with 200 to acknowledge receipt
