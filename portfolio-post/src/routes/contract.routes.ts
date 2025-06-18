@@ -6,7 +6,7 @@ import * as val from '../validators/book.val';
 
 export const router = express.Router();
 
-router.get('/paymob-test', handler.paymobTest);
+router.get('/paymob-test', handler.createPaymentUrl);
 router.get('/paymob-webhook', handler.responseWebhook);
 
 router.use(isauthenticated);

@@ -14,12 +14,11 @@ import { RequestHandler } from 'express';
 import { sendNotification } from './sendNotification';
 import { PaymobService } from '../../services/paymob.service';
 
-export const payContract: RequestHandler<{ paymentSession: string }, SuccessResponse> = async (
-  req,
-  res,
-  next,
-) => {
-  const contract = await ProjectContract.findOne({ paymentLink: req.params.paymentSession });
+export const payContract: RequestHandler<
+  { contractId: string },
+  SuccessResponse<{ paymentUrl: string }>
+> = async (req, res, next) => {
+  const contract = await ProjectContract.findOne({ _id: req.params.contractId });
   if (!contract) return next(new NotFound(undefined, req.lang));
 
   if (
@@ -36,106 +35,61 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
   const user = await Users.findById(req.loggedUser.id);
   if (!user) return next(new NotFound(undefined, req.lang));
 
-  // TODO: record the transaction from payment gateway webhook
-
-  if (contract.status === ProjectContractStatus.waitingForFirstPayment) {
-    const user = await Users.findById(contract.sp);
-    if (user && user.avaliableContracts === 0) {
-      await sendNotification(
-        req.loggedUser.id,
-        contract.sp.toString(),
-        contract._id.toString(),
-        'contract',
-        'contract subscription',
-        'you not have avaliable contracts right now',
-        Channels.notification,
-      );
-      return next(
-        new BadRequestError(
-          {
-            en: 'service provider not have avaliable contracts right now',
-            ar: 'لا يتوفر لدى مقدم الخدمة عقود متاحة في الوقت الحالي',
-          },
-          req.lang,
-        ),
-      );
-    }
-
-    // increment the user contracts count
-    const updatedUser = await Users.findOneAndUpdate(
-      { _id: contract.sp },
-      { $inc: { avaliableContracts: -1 } },
+  if (contract.customer.toString() !== req.loggedUser.id)
+    return next(
+      new NotAllowedError(
+        { en: 'you are not the customer of this contract', ar: 'أنت لست عميلاً لهذا العقد' },
+        req.lang,
+      ),
     );
 
+  if (contract.status === ProjectContractStatus.waitingForFirstPayment) {
     await ProjectContract.updateOne(
-      { paymentLink: req.params.paymentSession },
+      { _id: req.params.contractId },
       {
-        status: ProjectContractStatus.updateAfterFirstPayment,
-        firstCheckoutAt: new Date(),
         firstPaymentAmount: ((10 * contract.totalPrice) / 100).toFixed(2),
         secondPaymentAmount: contract.totalPrice - (10 * contract.totalPrice) / 100,
       },
     );
 
-    await Promise.all([
-      sendNotification(
-        req.loggedUser.id,
-        contract.sp.toString(),
-        contract._id.toString(),
-        'contract',
-        'available contracts',
-        `${user?.name} your available contracts is ${updatedUser?.avaliableContracts}`,
-        Channels.notification,
-      ),
-      sendNotification(
-        req.loggedUser.id,
-        contract.sp.toString(),
-        contract._id.toString(),
-        'contract',
-        'project contract updates',
-        `${user?.name} paid 10% of the amount`,
-        Channels.notification,
-      ),
-      sendNotification(
-        req.loggedUser.id,
-        req.loggedUser.id,
-        contract._id.toString(),
-        'contract',
-        'project contract updates',
-        'you paid 10% of the amount',
-        Channels.notification,
-      ),
-    ]);
+    const paymob = new PaymobService();
+    const paymentLink = await paymob.createPaymentUrlWithUserData(
+      contract.firstPaymentAmount,
+      req.loggedUser.id,
+      contract._id.toString(),
+      {
+        firstName: user?.name || '',
+        lastName: user?.name || '',
+        email: user?.email || '',
+        phone: user?.phoneNumber.number || '',
+      },
+      MODELS.portfolioPost,
+    );
+
+    res.status(200).json({ message: 'success', paymentUrl: paymentLink.paymentUrl });
   } else if (contract.status === ProjectContractStatus.waitingForTotalPayment) {
     await ProjectContract.updateOne(
-      { paymentLink: req.params.paymentSession },
+      { _id: req.params.contractId },
       {
-        status: ProjectContractStatus.ongoing,
-        totalCheckoutAt: new Date(),
         secondPaymentAmount: contract.totalPrice - contract.firstPaymentAmount,
       },
     );
 
-    await Promise.all([
-      sendNotification(
-        req.loggedUser.id,
-        contract.sp.toString(),
-        contract._id.toString(),
-        'contract',
-        'project contract updates',
-        `${user?.name} paid the total amount`,
-        Channels.notification,
-      ),
-      sendNotification(
-        req.loggedUser.id,
-        req.loggedUser.id,
-        contract._id.toString(),
-        'contract',
-        'project contract updates',
-        'you paid the total amount',
-        Channels.notification,
-      ),
-    ]);
+    const paymob = new PaymobService();
+    const paymentLink = await paymob.createPaymentUrlWithUserData(
+      contract.secondPaymentAmount,
+      req.loggedUser.id,
+      contract._id.toString(),
+      {
+        firstName: user?.name || '',
+        lastName: user?.name || '',
+        email: user?.email || '',
+        phone: user?.phoneNumber.number || '',
+      },
+      MODELS.portfolioPost,
+    );
+
+    res.status(200).json({ message: 'success', paymentUrl: paymentLink.paymentUrl });
   } else
     return next(
       new NotAllowedError(
@@ -146,45 +100,29 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
         req.lang,
       ),
     );
-
-  res.status(200).json({ message: 'success' });
 };
 
-export const paymobTest: RequestHandler<
-  { paymentSession: string },
-  SuccessResponse<{ paymentUrl: string }>
+export const createPaymentUrl: RequestHandler<
+  unknown,
+  SuccessResponse<{ paymentUrl: string }>,
+  {
+    amount: number;
+    userId: string;
+    contractId: string;
+    user: { firstName: string; lastName: string; email: string; phone: string };
+    model: MODELS;
+  }
 > = async (req, res) => {
   const paymob = new PaymobService();
-  const authToken = await paymob.getAuthToken();
-  console.log(authToken);
+  const paymentLink = await paymob.createPaymentUrlWithUserData(
+    req.body.amount,
+    req.body.userId,
+    req.body.contractId,
+    req.body.user,
+    req.body.model,
+  );
 
-  // Store custom data in merchant_order_id as JSON string
-  const customData = {
-    contractId: '1234567890',
-    userId: '1234567890',
-    service_type: MODELS.portfolioPost,
-    booking_id: 'BOOK_' + Date.now(),
-    timestamp: new Date().toISOString(),
-  };
-
-  const order = await paymob.createOrder(100, 'EGP', [], JSON.stringify(customData));
-
-  const paymentKey = await paymob.getPaymentKey(order.orderId, authToken, 100, {
-    first_name: 'John',
-    last_name: 'Doe',
-    email: 'john.doe@example.com',
-    phone_number: '01022484942',
-    apartment: '123',
-    floor: '123',
-    street: '123',
-    building: '123',
-    city: '123',
-    state: '123',
-    country: '123',
-    postal_code: '123',
-  });
-  const paymentUrl = paymob.createPaymentUrl(paymentKey);
-  res.status(200).json({ message: 'success', paymentUrl });
+  res.status(200).json({ message: 'success', paymentUrl: paymentLink.paymentUrl });
 };
 
 export const responseWebhook: RequestHandler = async (req, res) => {
@@ -229,10 +167,6 @@ export const responseWebhook: RequestHandler = async (req, res) => {
     if (transactionData.success) {
       console.log('💰 Payment successful');
 
-      // Extract items for your business logic
-      const items = transactionData.items;
-      console.log('Items:', items);
-
       // Extract custom data from merchant_order_id if available
       let customData = null;
       try {
@@ -244,41 +178,90 @@ export const responseWebhook: RequestHandler = async (req, res) => {
         console.log('Failed to parse merchant_order_id as JSON:', orderDetails.merchant_order_id);
       }
 
-      // TODO: Implement your business logic here
-      // Example:
-      // - Update booking status in database
-      // - Send confirmation email
-      // - Update user credits/balance
-      // - Process the specific service based on custom data
+      const { userId, contractId, service_type } = customData;
 
-      // Example custom data usage:
-      if (customData) {
-        if (customData.userId) {
-          console.log(`Processing payment for user: ${customData.userId}`);
-          // Update user's booking/payment status
+      if (service_type === MODELS.portfolioPost) {
+        const contract = await ProjectContract.findById(contractId);
+
+        const spUser = await Users.findById(contract?.sp);
+        const user = await Users.findById(userId);
+
+        if (!contract) {
+          console.log('❌ Contract not found');
+          return res.status(400).json({
+            error: 'Contract not found',
+            message: 'Contract is missing',
+          });
+        }
+        if (contract.status === ProjectContractStatus.waitingForFirstPayment) {
+          await ProjectContract.updateOne(
+            { _id: req.params.contractId },
+            {
+              status: ProjectContractStatus.updateAfterFirstPayment,
+              firstCheckoutAt: new Date(),
+              firstPaymentAmount: ((10 * contract.totalPrice) / 100).toFixed(2),
+              secondPaymentAmount: contract.totalPrice - (10 * contract.totalPrice) / 100,
+            },
+          );
+
+          await Promise.all([
+            sendNotification(
+              userId,
+              contract.sp.toString(),
+              contract._id.toString(),
+              'contract',
+              'available contracts',
+              `${spUser?.name} your available contracts is ${spUser?.avaliableContracts}`,
+              Channels.notification,
+            ),
+            sendNotification(
+              userId,
+              contract.sp.toString(),
+              contract._id.toString(),
+              'contract',
+              'project contract updates',
+              `${user?.name} paid 10% of the amount`,
+              Channels.notification,
+            ),
+            sendNotification(
+              userId,
+              userId,
+              contract._id.toString(),
+              'contract',
+              'project contract updates',
+              'you paid 10% of the amount',
+              Channels.notification,
+            ),
+          ]);
         }
 
-        if (customData.booking_id) {
-          console.log(`Processing booking: ${customData.booking_id}`);
-          // Update booking status to paid
+        if (contract.status === ProjectContractStatus.waitingForTotalPayment) {
+          contract.status = ProjectContractStatus.ongoing;
+          contract.totalCheckoutAt = new Date();
+
+          await Promise.all([
+            sendNotification(
+              userId,
+              contract.sp.toString(),
+              contract._id.toString(),
+              'contract',
+              'project contract updates',
+              `${user?.name} paid the total amount`,
+              Channels.notification,
+            ),
+            sendNotification(
+              userId,
+              userId,
+              contract._id.toString(),
+              'contract',
+              'project contract updates',
+              'you paid the total amount',
+              Channels.notification,
+            ),
+          ]);
         }
 
-        if (customData.service_type) {
-          console.log(`Service type: ${customData.service_type}`);
-          // Handle different service types
-        }
-
-        if (customData.contractId) {
-          console.log(`Processing contract: ${customData.contractId}`);
-          // Update contract status
-        }
-      }
-
-      // Example items usage (for standard order items):
-      if (items && items.length > 0) {
-        const firstItem = items[0];
-        console.log(`Item: ${firstItem.name} - ${firstItem.description}`);
-        console.log(`Amount: ${firstItem.amount_cents / 100} ${transactionData.currency}`);
+        await contract.save();
       }
     } else {
       console.log('❌ Payment failed');

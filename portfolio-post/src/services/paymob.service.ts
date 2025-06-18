@@ -2,6 +2,8 @@ import * as crypto from 'crypto';
 
 import axios, { AxiosError, AxiosResponse } from 'axios';
 
+import { env } from '../config/env';
+
 // PayMob API Types
 interface PaymobMerchant {
   id: number;
@@ -225,20 +227,27 @@ export class PaymobService {
   private readonly hmacSecret: string;
 
   constructor() {
-    this.apiKey =
-      'ZXlKaGJHY2lPaUpJVXpVeE1pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SmpiR0Z6Y3lJNklrMWxjbU5vWVc1MElpd2ljSEp2Wm1sc1pWOXdheUk2TVRBek9URXpPQ3dpYm1GdFpTSTZJbWx1YVhScFlXd2lmUS41WG01anpmQVdVM3E4MzFkT2pUQUg5bGo1QklWY3EzeEhCMU1tMTNwM1FpcVlpRDJSRkRZa05fWmVaQkE2WGFKWUJCNVdkR2Z0SndoRW10Wi1XUk5wUQ==';
-    this.integrationId = 5060202;
-    this.iframeId = 915609;
-    this.baseUrl = 'https://accept.paymob.com/api';
-    // TODO: Replace with your actual HMAC secret key from Paymob dashboard
-    this.hmacSecret = 'B133E76ACDA6A4BF822E3BF4B0E8DAD8';
+    this.apiKey = env.paymob.apiKey!;
+    this.integrationId = parseInt(env.paymob.integrationId!);
+    this.iframeId = parseInt(env.paymob.iframeId!);
+    this.baseUrl = env.paymob.baseUrl!;
+    this.hmacSecret = env.paymob.hmacSecret!;
+
+    console.log('PayMob configuration:', {
+      integrationId: this.integrationId,
+      iframeId: this.iframeId,
+      baseUrl: this.baseUrl,
+    });
   }
 
   async getAuthToken(): Promise<string> {
     try {
-      const response: AxiosResponse<PaymobAuthResponse> = await axios.post(`${this.baseUrl}/auth/tokens`, {
-        api_key: this.apiKey,
-      });
+      const response: AxiosResponse<PaymobAuthResponse> = await axios.post(
+        `${this.baseUrl}/auth/tokens`,
+        {
+          api_key: this.apiKey,
+        },
+      );
       return response.data.token;
     } catch (error) {
       const axiosError = error as AxiosError;
@@ -267,13 +276,13 @@ export class PaymobService {
       }
 
       const response: AxiosResponse<PaymobOrderResponse> = await axios.post(
-        `${this.baseUrl}/ecommerce/orders`, 
-        orderData, 
+        `${this.baseUrl}/ecommerce/orders`,
+        orderData,
         {
           headers: {
             'Content-Type': 'application/json',
           },
-        }
+        },
       );
 
       return {
@@ -282,7 +291,7 @@ export class PaymobService {
       };
     } catch (error) {
       const axiosError = error as AxiosError;
-      console.log(axiosError);
+      console.log('PayMob order error:', axiosError.response?.data);
       throw new Error(`Failed to create Paymob order: ${axiosError.message}`);
     }
   }
@@ -323,6 +332,59 @@ export class PaymobService {
 
   createPaymentUrl(paymentKey: string): string {
     return `https://accept.paymob.com/api/acceptance/iframes/${this.iframeId}?payment_token=${paymentKey}`;
+  }
+
+  /**
+   * Creates a payment URL with user data and custom metadata
+   * @param amount The payment amount
+   * @param userId The user ID
+   * @param contractId The contract ID
+   * @param userData The user data for billing
+   * @param serviceType The service type identifier
+   * @returns The payment URL and related data
+   */
+  async createPaymentUrlWithUserData(
+    amount: number,
+    userId: string,
+    contractId: string,
+    userData: {
+      firstName: string;
+      lastName: string;
+      email: string;
+      phone: string;
+    },
+    serviceType: string,
+  ): Promise<{ paymentUrl: string }> {
+    const authToken = await this.getAuthToken();
+
+    // Store custom data in merchant_order_id as JSON string
+    const customData = {
+      contractId,
+      userId,
+      service_type: serviceType,
+      booking_id: 'BOOK_' + Date.now(),
+      timestamp: new Date().toISOString(),
+    };
+
+    const order = await this.createOrder(amount, 'EGP', [], JSON.stringify(customData));
+
+    const paymentKey = await this.getPaymentKey(order.orderId, authToken, amount, {
+      first_name: userData.firstName,
+      last_name: userData.lastName,
+      email: userData.email,
+      phone_number: userData.phone,
+      apartment: '123',
+      floor: '123',
+      street: '123',
+      building: '123',
+      city: '123',
+      state: '123',
+      country: '123',
+      postal_code: '123',
+    });
+
+    const paymentUrl = this.createPaymentUrl(paymentKey);
+    return { paymentUrl };
   }
 
   async verifyPayment(hmac: string, data: Record<string, any>): Promise<boolean> {
@@ -414,7 +476,9 @@ export class PaymobService {
    * Handle webhook with query parameters (GET request)
    * This is for webhooks that come as URL query parameters instead of JSON body
    */
-  handleWebhookQuery(queryParams: Record<string, string>): WebhookResult<WebhookQueryTransactionData> {
+  handleWebhookQuery(
+    queryParams: Record<string, string>,
+  ): WebhookResult<WebhookQueryTransactionData> {
     try {
       // Verify the webhook HMAC signature
       const isValid = this.verifyWebhookHmac(queryParams);
@@ -458,13 +522,13 @@ export class PaymobService {
     try {
       const authToken = await this.getAuthToken();
       const response: AxiosResponse<PaymobTransactionStatusResponse> = await axios.get(
-        `${this.baseUrl}/acceptance/transactions/${transactionId}`, 
+        `${this.baseUrl}/acceptance/transactions/${transactionId}`,
         {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${authToken}`,
           },
-        }
+        },
       );
 
       return {
@@ -486,13 +550,13 @@ export class PaymobService {
     try {
       const authToken = await this.getAuthToken();
       const response: AxiosResponse<PaymobOrderDetailsResponse> = await axios.get(
-        `${this.baseUrl}/ecommerce/orders/${orderId}`, 
+        `${this.baseUrl}/ecommerce/orders/${orderId}`,
         {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${authToken}`,
           },
-        }
+        },
       );
 
       return {
@@ -512,7 +576,9 @@ export class PaymobService {
   /**
    * Handle webhook query and fetch items from order
    */
-  async handleWebhookQueryWithItems(queryParams: Record<string, string>): Promise<WebhookResult<WebhookQueryWithItemsTransactionData>> {
+  async handleWebhookQueryWithItems(
+    queryParams: Record<string, string>,
+  ): Promise<WebhookResult<WebhookQueryWithItemsTransactionData>> {
     try {
       // First verify the webhook
       const webhookResult = this.handleWebhookQuery(queryParams);
