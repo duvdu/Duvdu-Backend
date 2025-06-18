@@ -196,13 +196,103 @@ export const responseWebhook: RequestHandler = async (
   req,
   res,
 ) => {
-  console.log('responseWebhook======================');
-  console.log(req.body);
-  console.log('responseWebhook======================');
-
-  console.log('req.query======================');
-  console.log(req.query);
-  console.log('req.query======================');
-  
-  res.status(200).json({ message: 'success' });
+  try {
+    console.log('Paymob webhook received');
+    console.log('Query params:', req.query);
+    
+    // Initialize PaymobService
+    const paymobService = new PaymobService();
+    
+    // Handle webhook with metadata (makes API call to get order details)
+    const result = await paymobService.handleWebhookQueryWithMetadata(req.query as Record<string, string>);
+    
+    if (!result.isValid) {
+      console.log('❌ Invalid webhook signature');
+      return res.status(400).json({ 
+        error: 'Invalid webhook signature',
+        message: 'Webhook verification failed' 
+      });
+    }
+    
+    if (!result.transactionData) {
+      console.log('❌ No transaction data found');
+      return res.status(400).json({ 
+        error: 'No transaction data',
+        message: 'Transaction data is missing' 
+      });
+    }
+    
+    const { transactionData } = result;
+    
+    console.log('✅ Valid webhook received:', {
+      transactionId: transactionData.transactionId,
+      orderId: transactionData.orderId,
+      amount: transactionData.amount,
+      success: transactionData.success,
+      currency: transactionData.currency,
+      metadata: transactionData.metadata,
+    });
+    
+    // Check if payment was successful
+    if (transactionData.success) {
+      console.log('💰 Payment successful');
+      
+      // Extract metadata for your business logic
+      const metadata = transactionData.metadata;
+      console.log('Metadata:', metadata);
+      
+      // TODO: Implement your business logic here
+      // Example:
+      // - Update booking status in database
+      // - Send confirmation email
+      // - Update user credits/balance
+      // - Process the specific service based on metadata
+      
+      // Example metadata usage:
+      if (metadata.user_id) {
+        console.log(`Processing payment for user: ${metadata.user_id}`);
+        // Update user's booking/payment status
+      }
+      
+      if (metadata.booking_id) {
+        console.log(`Processing booking: ${metadata.booking_id}`);
+        // Update booking status to paid
+      }
+      
+      if (metadata.service_type) {
+        console.log(`Service type: ${metadata.service_type}`);
+        // Handle different service types
+      }
+      
+    } else {
+      console.log('❌ Payment failed');
+      
+      // TODO: Handle failed payment
+      // - Update booking status to failed
+      // - Send failure notification
+      // - Log the failure reason
+      
+      console.log('Failure details:', {
+        responseCode: transactionData.responseCode,
+        message: transactionData.message,
+      });
+    }
+    
+    // Always respond with 200 to acknowledge receipt
+    res.status(200).json({ 
+      message: 'Webhook processed successfully',
+      transactionId: transactionData.transactionId,
+      success: transactionData.success 
+    });
+    
+  } catch (error) {
+    console.error('❌ Error processing webhook:', error);
+    
+    // Still return 200 to prevent Paymob from retrying
+    // but log the error for investigation
+    res.status(200).json({ 
+      message: 'Webhook received but processing failed',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
 };

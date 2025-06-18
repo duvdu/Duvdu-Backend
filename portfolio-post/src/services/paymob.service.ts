@@ -87,12 +87,15 @@ export class PaymobService {
   private readonly integrationId: number;
   private readonly iframeId: number;
   private readonly baseUrl: string;
+  private readonly hmacSecret: string;
 
   constructor() {
     this.apiKey = 'ZXlKaGJHY2lPaUpJVXpVeE1pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SmpiR0Z6Y3lJNklrMWxjbU5vWVc1MElpd2ljSEp2Wm1sc1pWOXdheUk2TVRBek9URXpPQ3dpYm1GdFpTSTZJbWx1YVhScFlXd2lmUS41WG01anpmQVdVM3E4MzFkT2pUQUg5bGo1QklWY3EzeEhCMU1tMTNwM1FpcVlpRDJSRkRZa05fWmVaQkE2WGFKWUJCNVdkR2Z0SndoRW10Wi1XUk5wUQ==';
     this.integrationId = 5060202;
     this.iframeId = 915609;
     this.baseUrl = 'https://accept.paymob.com/api';
+    // TODO: Replace with your actual HMAC secret key from Paymob dashboard
+    this.hmacSecret = 'B133E76ACDA6A4BF822E3BF4B0E8DAD8';
   }
 
   async getAuthToken(): Promise<string> {
@@ -206,6 +209,49 @@ export class PaymobService {
     return calculatedHmac === hmac;
   }
 
+  /**
+   * Verify webhook HMAC signature for query parameters
+   * Uses the correct field order as per Paymob documentation
+   */
+  verifyWebhookHmac(queryParams: Record<string, string>): boolean {
+    // Define the exact order of fields for HMAC calculation as per Paymob docs
+    const orderedFields = [
+      'amount_cents',
+      'created_at', 
+      'currency',
+      'error_occured',
+      'has_parent_transaction',
+      'id',
+      'integration_id',
+      'is_3d_secure',
+      'is_auth',
+      'is_capture',
+      'is_refunded',
+      'is_standalone_payment',
+      'is_voided',
+      'order',
+      'owner',
+      'pending',
+      'source_data.pan',
+      'source_data.sub_type',
+      'source_data.type',
+      'success'
+    ];
+
+    // Concatenate values in the exact order (no keys, just values)
+    const concatenatedString = orderedFields
+      .map(field => queryParams[field] || '')
+      .join('');
+
+    // Calculate HMAC using the secret key
+    const calculatedHmac = crypto
+      .createHmac('sha512', this.hmacSecret)
+      .update(concatenatedString)
+      .digest('hex');
+
+    return calculatedHmac === queryParams.hmac;
+  }
+
   async handleWebhook(webhookData: PaymobWebhookData): Promise<{
     isValid: boolean;
     transactionData: {
@@ -250,6 +296,72 @@ export class PaymobService {
     }
   }
 
+  /**
+   * Handle webhook with query parameters (GET request)
+   * This is for webhooks that come as URL query parameters instead of JSON body
+   */
+  handleWebhookQuery(queryParams: Record<string, string>): {
+    isValid: boolean;
+    transactionData: {
+      orderId: number;
+      amount: number;
+      success: boolean;
+      currency: string;
+      transactionId: number;
+      createdAt: string;
+      isRefunded: boolean;
+      isCaptured: boolean;
+      isVoided: boolean;
+      isAuth: boolean;
+      isStandalone: boolean;
+      is3dSecure: boolean;
+      sourceData: {
+        type: string;
+        pan: string;
+        subType: string;
+      };
+      responseCode: string;
+      message: string;
+    } | null;
+  } {
+    try {
+      // Verify the webhook HMAC signature
+      const isValid = this.verifyWebhookHmac(queryParams);
+
+      if (!isValid) {
+        return { isValid: false, transactionData: null };
+      }
+
+      // Extract and parse transaction data from query parameters
+      const transactionData = {
+        orderId: parseInt(queryParams.order || '0'),
+        amount: parseInt(queryParams.amount_cents || '0') / 100, // Convert from cents
+        success: queryParams.success === 'true',
+        currency: queryParams.currency || 'EGP',
+        transactionId: parseInt(queryParams.id || '0'),
+        createdAt: queryParams.created_at || '',
+        isRefunded: queryParams.is_refunded === 'true',
+        isCaptured: queryParams.is_capture === 'true',
+        isVoided: queryParams.is_voided === 'true',
+        isAuth: queryParams.is_auth === 'true',
+        isStandalone: queryParams.is_standalone_payment === 'true',
+        is3dSecure: queryParams.is_3d_secure === 'true',
+        sourceData: {
+          type: queryParams['source_data.type'] || '',
+          pan: queryParams['source_data.pan'] || '',
+          subType: queryParams['source_data.sub_type'] || '',
+        },
+        responseCode: queryParams.txn_response_code || '',
+        message: queryParams['data.message'] || '',
+      };
+
+      return { isValid: true, transactionData };
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      throw new Error(`Failed to handle webhook query: ${errorMessage}`);
+    }
+  }
+
   async getTransactionStatus(transactionId: number): Promise<{
     success: boolean;
     status: string;
@@ -277,6 +389,97 @@ export class PaymobService {
     } catch (error) {
       const axiosError = error as AxiosError;
       throw new Error(`Failed to get transaction status: ${axiosError.message}`);
+    }
+  }
+
+  /**
+   * Get order details including metadata
+   */
+  async getOrderDetails(orderId: number): Promise<{
+    id: number;
+    amount_cents: number;
+    currency: string;
+    metadata: Record<string, any>;
+    items: any[];
+    created_at: string;
+    merchant_order_id: string;
+  }> {
+    try {
+      const authToken = await this.getAuthToken();
+      const response = await axios.get(
+        `${this.baseUrl}/ecommerce/orders/${orderId}`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${authToken}`,
+          },
+        },
+      );
+
+      return {
+        id: response.data.id,
+        amount_cents: response.data.amount_cents,
+        currency: response.data.currency,
+        metadata: response.data.metadata || {},
+        items: response.data.items || [],
+        created_at: response.data.created_at,
+        merchant_order_id: response.data.merchant_order_id,
+      };
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      throw new Error(`Failed to get order details: ${axiosError.message}`);
+    }
+  }
+
+  /**
+   * Handle webhook query and fetch metadata from order
+   */
+  async handleWebhookQueryWithMetadata(queryParams: Record<string, string>): Promise<{
+    isValid: boolean;
+    transactionData: {
+      orderId: number;
+      amount: number;
+      success: boolean;
+      currency: string;
+      transactionId: number;
+      createdAt: string;
+      isRefunded: boolean;
+      isCaptured: boolean;
+      isVoided: boolean;
+      isAuth: boolean;
+      isStandalone: boolean;
+      is3dSecure: boolean;
+      sourceData: {
+        type: string;
+        pan: string;
+        subType: string;
+      };
+      responseCode: string;
+      message: string;
+      metadata: Record<string, any>;
+    } | null;
+  }> {
+    try {
+      // First verify the webhook
+      const webhookResult = this.handleWebhookQuery(queryParams);
+      
+      if (!webhookResult.isValid || !webhookResult.transactionData) {
+        return { isValid: false, transactionData: null };
+      }
+
+      // Fetch order details to get metadata
+      const orderDetails = await this.getOrderDetails(webhookResult.transactionData.orderId);
+
+      // Combine webhook data with metadata
+      const transactionData = {
+        ...webhookResult.transactionData,
+        metadata: orderDetails.metadata,
+      };
+
+      return { isValid: true, transactionData };
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      throw new Error(`Failed to handle webhook with metadata: ${errorMessage}`);
     }
   }
 }
