@@ -174,6 +174,18 @@ export const responseWebhook: RequestHandler = async (req, res) => {
       }
     } catch (error) {
       console.log('Failed to parse merchant_order_id as JSON:', orderDetails.merchant_order_id);
+      return res.status(400).json({
+        error: 'Invalid merchant_order_id format',
+        message: 'Could not parse merchant_order_id as JSON',
+      });
+    }
+
+    if (!customData || !customData.userId || !customData.contractId) {
+      console.log('❌ Missing required custom data fields');
+      return res.status(400).json({
+        error: 'Missing data',
+        message: 'Required custom data fields are missing',
+      });
     }
 
     const { userId, contractId, service_type } = customData;
@@ -245,6 +257,8 @@ export const responseWebhook: RequestHandler = async (req, res) => {
             currency: 'EGP',
             timeStamp: new Date(),
           });
+
+          return res.redirect(`http://duvdu.com/contracts?contract=${contractId}&paymentStatus=success`);
         }
 
         if (contract.status === ProjectContractStatus.waitingForTotalPayment) {
@@ -283,9 +297,13 @@ export const responseWebhook: RequestHandler = async (req, res) => {
             currency: 'EGP',
             timeStamp: new Date(),
           });
+
+          return res.redirect(`http://duvdu.com/contracts?contract=${contractId}&paymentStatus=success`);
         }
-        console.log(await ProjectContract.findById(contractId));
       }
+      
+      // If we reach here, it means the contract status was neither waitingForFirstPayment nor waitingForTotalPayment
+      return res.redirect(`http://duvdu.com/contracts?contract=${contractId}&paymentStatus=invalid`);
     } else {
       console.log('❌ Payment failed');
       await Transaction.create({
@@ -294,8 +312,11 @@ export const responseWebhook: RequestHandler = async (req, res) => {
         status: TransactionStatus.FAILED,
         contract: contractId,
         model: MODELS.portfolioPost,
+        currency: 'EGP',
+        timeStamp: new Date(),
       });
-      sendNotification(
+      
+      await sendNotification(
         userId,
         userId,
         contractId,
@@ -304,22 +325,30 @@ export const responseWebhook: RequestHandler = async (req, res) => {
         'your payment failed, please try again',
         Channels.notification,
       );
+      
+      return res.redirect(`http://duvdu.com/contracts?contract=${contractId}&paymentStatus=failed`);
     }
 
-    // Always respond with 200 to acknowledge receipt
-    res.status(200).json({
-      message: 'Webhook processed successfully',
-      transactionId: transactionData.transactionId,
-      success: transactionData.success,
-    });
   } catch (error) {
     console.error('❌ Error processing webhook:', error);
-
-    // Still return 200 to prevent Paymob from retrying
-    // but log the error for investigation
-    res.status(200).json({
-      message: 'Webhook received but processing failed',
-      error: error instanceof Error ? error.message : 'Unknown error',
-    });
+    
+    // Extract contractId from query params if available for error redirection
+    let redirectUrl = 'http://duvdu.com/contracts?paymentStatus=error';
+    
+    try {
+      // Try to get contractId from request query or body
+      const contractId = 
+        (req.query.merchant_order_id && JSON.parse(req.query.merchant_order_id as string).contractId) ||
+        (req.body?.obj?.order?.merchant_order_id && JSON.parse(req.body.obj.order.merchant_order_id).contractId);
+      
+      if (contractId) {
+        redirectUrl = `http://duvdu.com/contracts?contract=${contractId}&paymentStatus=error`;
+      }
+    } catch (parseError) {
+      console.error('Failed to extract contractId for error redirect:', parseError);
+    }
+    
+    // Still return a redirect to prevent Paymob from retrying
+    return res.redirect(redirectUrl);
   }
 };
