@@ -162,15 +162,10 @@ export const paymobTest: RequestHandler<{ paymentSession: string }, SuccessRespo
   const authToken = await paymob.getAuthToken();
   console.log(authToken);
 
-  const order = await paymob.createOrder(100, 'EGP', [], {
+  const order = await paymob.createOrder(100, 'EGP', [{
     contractId: '1234567890',
     userId: '1234567890',
-    service_type: 'portfolio_booking',
-    booking_id: 'BOOK_' + Date.now(),
-    user_name: 'John Doe',
-    payment_type: 'test_payment',
-    timestamp: new Date().toISOString(),
-  });
+  }]);
   console.log(order);
 
   const paymentKey = await paymob.getPaymentKey(order.orderId, authToken, 100, {

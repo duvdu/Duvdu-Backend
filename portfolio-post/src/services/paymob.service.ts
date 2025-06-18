@@ -114,7 +114,6 @@ export class PaymobService {
     amount: number,
     currency: string = 'EGP',
     items: any[] = [],
-    metadata: Record<string, any> = {},
   ): Promise<{ orderId: number; token: string }> {
     try {
       const authToken = await this.getAuthToken();
@@ -126,7 +125,6 @@ export class PaymobService {
           amount_cents: amount * 100,
           currency,
           items,
-          metadata
         },
         {
           headers: {
@@ -399,7 +397,6 @@ export class PaymobService {
     id: number;
     amount_cents: number;
     currency: string;
-    metadata: Record<string, any>;
     items: any[];
     created_at: string;
     merchant_order_id: string;
@@ -420,7 +417,6 @@ export class PaymobService {
         id: response.data.id,
         amount_cents: response.data.amount_cents,
         currency: response.data.currency,
-        metadata: response.data.metadata || {},
         items: response.data.items || [],
         created_at: response.data.created_at,
         merchant_order_id: response.data.merchant_order_id,
@@ -477,7 +473,8 @@ export class PaymobService {
       // Combine webhook data with metadata
       const transactionData = {
         ...webhookResult.transactionData,
-        metadata: orderDetails.metadata,
+        items: orderDetails.items,
+        metadata: orderDetails.items,
       };
 
       return { isValid: true, transactionData };
