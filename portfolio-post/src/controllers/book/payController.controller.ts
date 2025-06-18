@@ -11,6 +11,7 @@ import {
 import { RequestHandler } from 'express';
 
 import { sendNotification } from './sendNotification';
+import { PaymobService } from '../../services/paymob.service';
 
 export const payContract: RequestHandler<{ paymentSession: string }, SuccessResponse> = async (
   req,
@@ -104,6 +105,8 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
         Channels.notification,
       ),
     ]);
+
+
   } else if (contract.status === ProjectContractStatus.waitingForTotalPayment) {
     await ProjectContract.updateOne(
       { paymentLink: req.params.paymentSession },
@@ -145,5 +148,56 @@ export const payContract: RequestHandler<{ paymentSession: string }, SuccessResp
       ),
     );
 
+  res.status(200).json({ message: 'success' });
+};
+
+
+
+
+export const paymobTest: RequestHandler<{ paymentSession: string }, SuccessResponse<{ paymentUrl: string }>> = async (
+  req,
+  res,
+) => {
+  const paymob = new PaymobService();
+  const authToken = await paymob.getAuthToken();
+  console.log(authToken);
+
+  const order = await paymob.createOrder(100, 'EGP', [], {
+    contractId: '1234567890',
+    userId: '1234567890',
+  });
+  console.log(order);
+
+  const paymentKey = await paymob.getPaymentKey(order.orderId, authToken, 100, {
+    first_name: 'John',
+    last_name: 'Doe',
+    email: 'john.doe@example.com',
+    phone_number: '01022484942',
+    apartment: '123',
+    floor: '123',
+    street: '123',
+    building: '123',
+    city: '123',
+    state: '123',
+    country: '123',
+    postal_code: '123',
+  });
+  console.log(paymentKey);
+
+  const paymentUrl = paymob.createPaymentUrl(paymentKey);
+  console.log(paymentUrl);
+
+  res.status(200).json({ message: 'success', paymentUrl });
+};
+
+
+
+export const responseWebhook: RequestHandler = async (
+  req,
+  res,
+) => {
+  console.log('responseWebhook======================');
+  console.log(req.body);
+  console.log('responseWebhook======================');
   res.status(200).json({ message: 'success' });
 };

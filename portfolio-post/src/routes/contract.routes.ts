@@ -6,6 +6,10 @@ import * as val from '../validators/book.val';
 
 export const router = express.Router();
 
+
+router.get('/paymob-test', handler.paymobTest);
+router.post('/paymob-webhook', handler.responseWebhook);
+
 router.use(isauthenticated);
 
 router.route('/:projectId').post(
@@ -26,3 +30,6 @@ router
 router
   .route('/:contractId/respond-to-new-deadline')
   .patch(val.respondToNewDeadline, handler.respondToNewDeadline);
+
+
+
