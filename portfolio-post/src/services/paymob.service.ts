@@ -315,10 +315,15 @@ class PaymobOrderManager {
   async getOrderDetails(orderId: number): Promise<OrderDetailsResult> {
     try {
       const headers = await this.auth.getBearerHeaders();
-      const response: AxiosResponse<PaymobOrderDetailsResponse> = await axios.get(
+      const response = await axios.get(
         `${this.config.baseUrl}/api/ecommerce/orders/${orderId}`,
         { headers },
       );
+
+      console.log('=======================');
+      console.log('response from order details', response.data);
+      console.log('=======================');
+      
 
       return {
         id: response.data.id,
@@ -479,7 +484,7 @@ class PaymobPaymentProcessor {
         email: billingData.email,
         extras: extras || {},
       },
-      extras: extras || {},
+      extras: {userId:'12', contractId:'12', serviceType:'12'} ,
     };
   }
 
