@@ -131,6 +131,12 @@ export const createPaymentUrl: RequestHandler<
 
 export const responseWebhook: RequestHandler = async (req, res) => {
   try {
+
+    console.log('==========from webhook=============');
+    console.log('req.query', req.query);
+    console.log('==========from webhook=============');
+
+
     const paymobService = new PaymobService();
 
     const result = await paymobService.handleWebhookQueryWithItems(
