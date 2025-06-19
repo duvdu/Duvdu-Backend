@@ -121,6 +121,7 @@ export interface PaymobIntentionRequest {
   billing_data: PaymobBillingData;
   customer?: PaymobCustomer;
   extras?: Record<string, any>;
+  merchant_order_id?: string;
 }
 
 export interface PaymobBillingData {

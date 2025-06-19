@@ -484,7 +484,8 @@ class PaymobPaymentProcessor {
         email: billingData.email,
         extras: extras || {},
       },
-      extras: {userId:'12', contractId:'12', serviceType:'12'} ,
+      extras: extras || {},
+      merchant_order_id: JSON.stringify(extras),
     };
   }
 
