@@ -531,7 +531,7 @@ export class PaymobService {
   async getAuthToken(): Promise<string> {
     try {
       const response: AxiosResponse<PaymobAuthResponse> = await axios.post(
-        `${this.baseUrl}api/auth/tokens`,
+        `${this.baseUrl}/api/auth/tokens`,
         {
           api_key: this.apiKey,
         },
