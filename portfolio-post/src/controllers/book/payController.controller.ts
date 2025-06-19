@@ -8,13 +8,15 @@ import {
   ProjectContract,
   ProjectContractStatus,
   MODELS,
-  PaymobService,
   Transaction,
   TransactionStatus,
+  PaymobService
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 import { sendNotification } from './sendNotification';
+
+
 
 export const payContract: RequestHandler<
   { contractId: string },
@@ -180,6 +182,11 @@ export const responseWebhook: RequestHandler = async (req, res) => {
       });
     }
 
+    console.log('=======================');
+    console.log('customData', customData);
+    console.log('=======================');
+    
+
     if (!customData || !customData.userId || !customData.contractId) {
       console.log('❌ Missing required custom data fields');
       return res.status(400).json({
@@ -303,7 +310,7 @@ export const responseWebhook: RequestHandler = async (req, res) => {
       }
       
       // If we reach here, it means the contract status was neither waitingForFirstPayment nor waitingForTotalPayment
-      return res.redirect(`http://duvdu.com/contracts?contract=${contractId}&paymentStatus=invalid`);
+      return res.redirect(`http://duvdu.com/contracts?contract=${contractId}&paymentStatus=failed`);
     } else {
       console.log('❌ Payment failed');
       await Transaction.create({
@@ -333,7 +340,7 @@ export const responseWebhook: RequestHandler = async (req, res) => {
     console.error('❌ Error processing webhook:', error);
     
     // Extract contractId from query params if available for error redirection
-    let redirectUrl = 'http://duvdu.com/contracts?paymentStatus=error';
+    let redirectUrl = 'http://duvdu.com/contracts?paymentStatus=failed';
     
     try {
       // Try to get contractId from request query or body
@@ -342,7 +349,7 @@ export const responseWebhook: RequestHandler = async (req, res) => {
         (req.body?.obj?.order?.merchant_order_id && JSON.parse(req.body.obj.order.merchant_order_id).contractId);
       
       if (contractId) {
-        redirectUrl = `http://duvdu.com/contracts?contract=${contractId}&paymentStatus=error`;
+        redirectUrl = `http://duvdu.com/contracts?contract=${contractId}&paymentStatus=failed`;
       }
     } catch (parseError) {
       console.error('Failed to extract contractId for error redirect:', parseError);

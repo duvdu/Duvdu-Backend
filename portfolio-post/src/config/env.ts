@@ -33,11 +33,11 @@ export const env = {
     url: process.env.NATS_URL,
   },
   paymob: {
-    apiKey: process.env.PAYMOB_API_KEY,
+    secretKey: process.env.PAYMOB_SECRET_KEY,
     integrationId: process.env.PAYMOB_INTEGRATION_ID,
-    iframeId: process.env.PAYMOB_IFRAME_ID,
     hmacSecret: process.env.PAYMOB_HMAC_SECRET,
     baseUrl: process.env.PAYMOB_BASE_URL,
+    publicKey: process.env.PAYMOB_PUBLIC_KEY,
   },
 };
 
@@ -55,9 +55,8 @@ export const checkEnvVariables = () => {
   if (!env.aws.s3.name) return new Error('env:BUCKET_NAME must be defined');
   if (!env.aws.s3.region) return new Error('env:BUCKET_REGION must be defined');
   if (!env.aws.s3.host) return new Error('env:BUCKET_HOST must be defined');
-  if (!env.paymob.apiKey) return new Error('env:PAYMOB_API_KEY must be defined');
+  if (!env.paymob.secretKey) return new Error('env:PAYMOB_SECRET_KEY must be defined');
   if (!env.paymob.integrationId) return new Error('env:PAYMOB_INTEGRATION_ID must be defined');
-  if (!env.paymob.iframeId) return new Error('env:PAYMOB_IFRAME_ID must be defined');
   if (!env.paymob.hmacSecret) return new Error('env:PAYMOB_HMAC_SECRET must be defined');
   if (!env.paymob.baseUrl) return new Error('env:PAYMOB_BASE_URL must be defined');
 };
