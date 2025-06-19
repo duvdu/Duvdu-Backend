@@ -471,7 +471,7 @@ class PaymobPaymentProcessor {
     extras?: Record<string, any>,
   ): PaymobIntentionRequest {
     return {
-      amount: amount * 100,
+      amount: amount,
       currency,
       payment_methods: [this.config.integrationId, 'card'],
       items,
