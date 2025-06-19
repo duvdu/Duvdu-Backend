@@ -105,14 +105,7 @@ interface PaymobTransactionStatusResponse {
   currency: string;
 }
 
-interface PaymobOrderDetailsResponse {
-  id: number;
-  amount_cents: number;
-  currency: string;
-  items: PaymobOrderItem[];
-  created_at: string;
-  merchant_order_id: string;
-}
+
 
 // Request Types
 interface PaymobIntentionRequest {
@@ -536,45 +529,62 @@ export class PaymobService {
   }
 
   /**
-   * Get order details including metadata
+   * Authenticate with Paymob to get Bearer token
+   */
+  private async authenticate(): Promise<string> {
+    try {
+      const response = await axios.post(
+        `${this.baseUrl}/api/auth/tokens`,
+        {
+          api_key: this.secretKey,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+
+      return response.data.token;
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      console.error('Authentication error:', axiosError.response?.data);
+      throw new Error(`Failed to authenticate with Paymob: ${axiosError.message}`);
+    }
+  }
+
+  /**
+   * Get order details including metadata using the correct Paymob API
    */
   async getOrderDetails(orderId: number): Promise<OrderDetailsResult> {
     try {
-      // Try the Flash Integration API endpoint first
-      let response: AxiosResponse<PaymobOrderDetailsResponse>;
-      
-      try {
-        response = await axios.get(
-          `${this.baseUrl}/v1/intention/orders/${orderId}`,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Token ${this.secretKey}`,
-            },
-          },
-        );
-      } catch (flashError) {
-        console.log('Flash API failed, trying legacy API...');
-        
-        // Fallback to legacy API endpoint
-        response = await axios.get(
-          `${this.baseUrl}/api/ecommerce/orders/${orderId}`,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Token ${this.secretKey}`,
-            },
-          },
-        );
-      }
+      // Step 1: Authenticate to get Bearer token
+      const authToken = await this.authenticate();
 
+      // Step 2: Get transaction details using the order inquiry endpoint
+      const response = await axios.post(
+        `${this.baseUrl}/api/ecommerce/orders/transaction_inquiry`,
+        {
+          order_id: orderId.toString(),
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`,
+          },
+        },
+      );
+
+      // The response might contain transaction data, we need to extract order info
+      const transactionData = response.data;
+      
       return {
-        id: response.data.id,
-        amount_cents: response.data.amount_cents,
-        currency: response.data.currency,
-        items: response.data.items || [],
-        created_at: response.data.created_at,
-        merchant_order_id: response.data.merchant_order_id,
+        id: orderId,
+        amount_cents: transactionData.amount_cents || 0,
+        currency: transactionData.currency || 'EGP',
+        items: transactionData.order?.items || [],
+        created_at: transactionData.created_at || new Date().toISOString(),
+        merchant_order_id: transactionData.order?.merchant_order_id || '',
       };
     } catch (error) {
       const axiosError = error as AxiosError;
@@ -582,7 +592,7 @@ export class PaymobService {
       console.error('Order details error status:', axiosError.response?.status);
       
       // If still failing, provide a fallback that returns minimal data
-      if (axiosError.response?.status === 401) {
+      if (axiosError.response?.status === 401 || axiosError.response?.status === 403) {
         console.log('Authentication failed, using fallback approach...');
         
         // Return a minimal response that won't break the webhook
