@@ -408,6 +408,9 @@ class PaymobPaymentProcessor {
       return this.buildPaymentResult(response.data.client_secret);
     } catch (error) {
       const axiosError = error as AxiosError;
+      console.log('=======================');
+      console.log('axiosError', axiosError);
+      console.log('=======================');
       throw new Error(`Failed to create Paymob payment intention: ${axiosError.message}`);
     }
   }
