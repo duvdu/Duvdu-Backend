@@ -13,11 +13,8 @@ import {
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-
 import { sendNotification } from './sendNotification';
 import { PaymobService } from '../../services/paymob.service';
-
-
 
 export const payContract: RequestHandler<
   { contractId: string },
@@ -133,20 +130,11 @@ export const createPaymentUrl: RequestHandler<
 export const responseWebhook: RequestHandler = async (req, res) => {
   try {
 
-    console.log('==========from webhook=============');
-    console.log('req.query', req.query);
-    console.log('==========from webhook=============');
-
-
     const paymobService = new PaymobService();
 
     const result = await paymobService.handleWebhookQueryWithItems(
       req.query as Record<string, string>,
     );
-
-    console.log('==========from webhook=============');
-    console.log('result', result);
-    console.log('==========from webhook=============');
 
     if (!result.isValid) {
       console.log('❌ Invalid webhook signature');
@@ -179,7 +167,7 @@ export const responseWebhook: RequestHandler = async (req, res) => {
     });
 
     // Extract custom data from merchant_order_id if available
-    const { name  , description} = orderDetails.items[0];
+    const { name, description } = orderDetails.items[0];
 
     const [userId, contractId] = name.split('-');
     const service_type = description;
@@ -189,7 +177,6 @@ export const responseWebhook: RequestHandler = async (req, res) => {
     console.log('contractId', contractId);
     console.log('service_type', service_type);
     console.log('=======================');
-
 
     // Check if payment was successful
     if (transactionData.success) {
@@ -202,22 +189,18 @@ export const responseWebhook: RequestHandler = async (req, res) => {
         const user = await Users.findById(userId);
 
         if (!contract) {
-          console.log('❌ Contract not found');
           return res.status(400).json({
             error: 'Contract not found',
             message: 'Contract is missing',
           });
         }
         if (contract.status === ProjectContractStatus.waitingForFirstPayment) {
-          await ProjectContract.findByIdAndUpdate(
-            contractId,
-            {
-              status: ProjectContractStatus.updateAfterFirstPayment,
-              firstCheckoutAt: new Date(),
-              firstPaymentAmount: ((10 * contract.totalPrice) / 100).toFixed(2),
-              secondPaymentAmount: contract.totalPrice - (10 * contract.totalPrice) / 100,
-            },
-          );
+          await ProjectContract.findByIdAndUpdate(contractId, {
+            status: ProjectContractStatus.updateAfterFirstPayment,
+            firstCheckoutAt: new Date(),
+            firstPaymentAmount: ((10 * contract.totalPrice) / 100).toFixed(2),
+            secondPaymentAmount: contract.totalPrice - (10 * contract.totalPrice) / 100,
+          });
 
           await Promise.all([
             sendNotification(
@@ -259,7 +242,9 @@ export const responseWebhook: RequestHandler = async (req, res) => {
             timeStamp: new Date(),
           });
 
-          return res.redirect(`http://duvdu.com/contracts?contract=${contractId}&paymentStatus=success`);
+          return res.redirect(
+            `http://duvdu.com/contracts?contract=${contractId}&paymentStatus=success`,
+          );
         }
 
         if (contract.status === ProjectContractStatus.waitingForTotalPayment) {
@@ -299,10 +284,12 @@ export const responseWebhook: RequestHandler = async (req, res) => {
             timeStamp: new Date(),
           });
 
-          return res.redirect(`http://duvdu.com/contracts?contract=${contractId}&paymentStatus=success`);
+          return res.redirect(
+            `http://duvdu.com/contracts?contract=${contractId}&paymentStatus=success`,
+          );
         }
       }
-      
+
       // If we reach here, it means the contract status was neither waitingForFirstPayment nor waitingForTotalPayment
       return res.redirect(`http://duvdu.com/contracts?contract=${contractId}&paymentStatus=failed`);
     } else {
@@ -316,7 +303,7 @@ export const responseWebhook: RequestHandler = async (req, res) => {
         currency: 'EGP',
         timeStamp: new Date(),
       });
-      
+
       await sendNotification(
         userId,
         userId,
@@ -326,29 +313,30 @@ export const responseWebhook: RequestHandler = async (req, res) => {
         'your payment failed, please try again',
         Channels.notification,
       );
-      
+
       return res.redirect(`http://duvdu.com/contracts?contract=${contractId}&paymentStatus=failed`);
     }
-
   } catch (error) {
     console.error('❌ Error processing webhook:', error);
-    
+
     // Extract contractId from query params if available for error redirection
     let redirectUrl = 'http://duvdu.com/contracts?paymentStatus=failed';
-    
+
     try {
       // Try to get contractId from request query or body
-      const contractId = 
-        (req.query.merchant_order_id && JSON.parse(req.query.merchant_order_id as string).contractId) ||
-        (req.body?.obj?.order?.merchant_order_id && JSON.parse(req.body.obj.order.merchant_order_id).contractId);
-      
+      const contractId =
+        (req.query.merchant_order_id &&
+          JSON.parse(req.query.merchant_order_id as string).contractId) ||
+        (req.body?.obj?.order?.merchant_order_id &&
+          JSON.parse(req.body.obj.order.merchant_order_id).contractId);
+
       if (contractId) {
         redirectUrl = `http://duvdu.com/contracts?contract=${contractId}&paymentStatus=failed`;
       }
     } catch (parseError) {
       console.error('Failed to extract contractId for error redirect:', parseError);
     }
-    
+
     // Still return a redirect to prevent Paymob from retrying
     return res.redirect(redirectUrl);
   }
