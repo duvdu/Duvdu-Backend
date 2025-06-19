@@ -236,15 +236,7 @@ export class PaymobService {
     });
   }
 
-  /**
-   * Creates a payment intention using the Flash API
-   * @param amount The payment amount
-   * @param billingData The user data for billing
-   * @param items The order items
-   * @param currency The currency code (default: EGP)
-   * @param extras Custom metadata
-   * @returns The payment URL and client secret
-   */
+
   async createPaymentIntention(
     amount: number,
     billingData: PaymobBillingData,
@@ -293,15 +285,7 @@ export class PaymobService {
     }
   }
 
-  /**
-   * Creates a payment URL with user data and custom metadata
-   * @param amount The payment amount
-   * @param userId The user ID
-   * @param contractId The contract ID
-   * @param userData The user data for billing
-   * @param serviceType The service type identifier
-   * @returns The payment URL and related data
-   */
+
   async createPaymentUrlWithUserData(
     amount: number,
     userId: string,
@@ -586,6 +570,7 @@ export class PaymobService {
         merchant_order_id: response.data.merchant_order_id,
       };
     } catch (error) {
+      console.log('Failed to get order details:', error);
       const axiosError = error as AxiosError;
       throw new Error(`Failed to get order details: ${axiosError.message}`);
     }
