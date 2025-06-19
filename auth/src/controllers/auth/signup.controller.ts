@@ -35,6 +35,7 @@ export const signupHandler: SignupHandler = async (req, res, next) => {
       isVerified: false,
       profileImage: appSettings?.default_profile,
       coverImage: appSettings?.default_cover,
+      avaliableContracts: 343,
       verificationCode: {
         code: hashVerificationCode(verificationCode),
         expireAt: new Date(Date.now() + 60 * 1000),
@@ -51,6 +52,7 @@ export const signupHandler: SignupHandler = async (req, res, next) => {
         role: role.id,
         isVerified: false,
         haveInvitation: false,
+        avaliableContracts: 343,
         verificationCode: {
           code: hashVerificationCode(verificationCode),
           expireAt: new Date(Date.now() + 60 * 1000),
