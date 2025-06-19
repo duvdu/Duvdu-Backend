@@ -315,16 +315,11 @@ class PaymobOrderManager {
   async getOrderDetails(orderId: number): Promise<OrderDetailsResult> {
     try {
       const headers = await this.auth.getBearerHeaders();
-      const response = await axios.get(
+      const response: AxiosResponse<PaymobOrderDetailsResponse> = await axios.get(
         `${this.config.baseUrl}/api/ecommerce/orders/${orderId}`,
         { headers },
       );
-
-      console.log('=======================');
-      console.log('response from order details', response.data);
-      console.log('=======================');
-      
-
+  
       return {
         id: response.data.id,
         amount_cents: response.data.amount_cents,
@@ -473,7 +468,7 @@ class PaymobPaymentProcessor {
     extras?: Record<string, any>,
   ): PaymobIntentionRequest {
     return {
-      amount,
+      amount: amount * 100,
       currency,
       payment_methods: [this.config.integrationId, 'card'],
       items,
