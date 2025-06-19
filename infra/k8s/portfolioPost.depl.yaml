@@ -86,21 +86,21 @@ spec:
                 secretKeyRef:
                   name: paymob-base-url
                   key: PAYMOB_BASE_URL
-            - name: PAYMOB_IFRAME_ID
-              valueFrom:
-                secretKeyRef:
-                  name: paymob-iframe-id
-                  key: PAYMOB_IFRAME_ID
             - name: PAYMOB_INTEGRATION_ID
               valueFrom:
                 secretKeyRef:
                   name: paymob-integration-id
                   key: PAYMOB_INTEGRATION_ID
-            - name: PAYMOB_API_KEY
+            - name: PAYMOB_SECRET_KEY
               valueFrom:
                 secretKeyRef:
-                  name: paymob-api-key
-                  key: PAYMOB_API_KEY
+                  name: paymob-secret-key
+                  key: PAYMOB_SECRET_KEY
+            - name: PAYMOB_PUBLIC_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: paymob-public-key
+                  key: PAYMOB_PUBLIC_KEY
             - name: NATS_CLIENT_ID
               valueFrom:
                 fieldRef:
