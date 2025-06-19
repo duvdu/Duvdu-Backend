@@ -10,11 +10,12 @@ import {
   MODELS,
   Transaction,
   TransactionStatus,
-  PaymobService
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
+
 import { sendNotification } from './sendNotification';
+import { PaymobService } from '../../services/paymob.service';
 
 
 

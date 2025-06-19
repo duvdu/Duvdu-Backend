@@ -304,11 +304,9 @@ export class PaymobService {
       contractId,
       userId,
       service_type: serviceType,
-      booking_id: 'BOOK_' + Date.now(),
       timestamp: new Date().toISOString(),
     };
 
-    const extras = customData;
 
     const billingData: PaymobBillingData = {
       first_name: userData.firstName,
@@ -344,10 +342,9 @@ export class PaymobService {
         first_name: billingData.first_name,
         last_name: billingData.last_name,
         email: billingData.email,
-        extras: extras || {},
+        extras:  {},
       },
-      extras: extras || {},
-      merchant_order_id: JSON.stringify(customData), // Store custom data here
+      extras: JSON.stringify(customData), 
     };
 
     try {
