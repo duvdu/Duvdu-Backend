@@ -314,10 +314,10 @@ export class PaymobService {
       last_name: userData.lastName,
       email: userData.email,
       phone_number: userData.phone,
-      apartment: '123',
-      floor: '1',
-      street: '123 Main St',
-      building: '123',
+      apartment: contractId, // Store contractId in apartment field
+      floor: userId, // Store userId in floor field  
+      street: serviceType, // Store serviceType in street field
+      building: JSON.stringify(customData), // Store full custom data in building field
       state: 'Cairo',
       country: 'EGY',
     };
@@ -325,14 +325,13 @@ export class PaymobService {
     const items: PaymobOrderItem[] = [
       {
         name: `${serviceType} Payment`,
-        description: `Payment for contract ${contractId}`,
+        description: `CUSTOM_DATA:${JSON.stringify(customData)}:END_CUSTOM_DATA Payment for contract ${contractId}`,
         amount,
         quantity: 1,
       },
     ];
 
-    // For Flash Integration, we need to create a modified intention request
-    // that includes merchant_order_id
+    // Store custom data in extras field and also try merchant_order_id
     const intentionData = {
       amount,
       currency: 'EGP',
@@ -346,10 +345,15 @@ export class PaymobService {
         extras: extras || {},
       },
       extras: extras || {},
-      merchant_order_id: JSON.stringify(customData), // Store custom data here
+      merchant_order_id: JSON.stringify(customData), // Try this field too
     };
 
     try {
+      console.log('=======================');
+      console.log('Creating payment intention with data:', JSON.stringify(intentionData, null, 2));
+      console.log('merchant_order_id being sent:', intentionData.merchant_order_id);
+      console.log('=======================');
+
       const response: AxiosResponse<PaymobIntentionResponse> = await axios.post(
         `${this.baseUrl}/v1/intention/`,
         intentionData,
@@ -360,6 +364,10 @@ export class PaymobService {
           },
         },
       );
+
+      console.log('=======================');
+      console.log('Payment intention response:', JSON.stringify(response.data, null, 2));
+      console.log('=======================');
 
       // Create the payment URL for Flash Checkout
       const paymentUrl = `${this.baseUrl}/unifiedcheckout/?publicKey=${this.publicKey}&clientSecret=${response.data.client_secret}`;
@@ -560,6 +568,11 @@ export class PaymobService {
           },
         },
       );
+
+      console.log('=======================');
+      console.log('Raw Paymob order API response:', JSON.stringify(response.data, null, 2));
+      console.log('merchant_order_id from API:', response.data.merchant_order_id);
+      console.log('=======================');
 
       return {
         id: response.data.id,

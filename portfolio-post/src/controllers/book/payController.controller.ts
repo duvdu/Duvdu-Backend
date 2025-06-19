@@ -178,19 +178,58 @@ export const responseWebhook: RequestHandler = async (req, res) => {
       items: transactionData.items,
     });
 
-    // Extract custom data from merchant_order_id if available
+    console.log('=======================');
+    console.log('orderDetails:', orderDetails);
+    console.log('merchant_order_id:', orderDetails.merchant_order_id);
+    console.log('merchant_order_id type:', typeof orderDetails.merchant_order_id);
+    console.log('=======================');
+
+    // Extract custom data from multiple possible sources
     let customData = null;
+    
+    // Try to get from merchant_order_id first
     try {
       if (orderDetails.merchant_order_id) {
         customData = JSON.parse(orderDetails.merchant_order_id);
-        console.log('Custom data from merchant_order_id:', customData);
+        console.log('✅ Custom data from merchant_order_id:', customData);
+      } else {
+        console.log('❌ merchant_order_id is empty or undefined');
       }
     } catch (error) {
       console.log('Failed to parse merchant_order_id as JSON:', orderDetails.merchant_order_id);
-      return res.status(400).json({
-        error: 'Invalid merchant_order_id format',
-        message: 'Could not parse merchant_order_id as JSON',
-      });
+      console.log('Parse error:', error);
+    }
+
+    // If no custom data from merchant_order_id, try multiple fallback methods
+    if (!customData) {
+      console.log('🔍 Trying fallback methods to extract custom data...');
+      
+      // Method 1: Extract from item description
+      if (transactionData.items && transactionData.items.length > 0) {
+        try {
+          const item = transactionData.items[0];
+          console.log('Item description:', item.description);
+          
+          // Look for our custom data pattern
+          const customDataMatch = item.description.match(/CUSTOM_DATA:(.*?):END_CUSTOM_DATA/);
+          if (customDataMatch) {
+            customData = JSON.parse(customDataMatch[1]);
+            console.log('✅ Custom data extracted from item description:', customData);
+          }
+        } catch (error) {
+          console.log('Failed to extract from item description:', error);
+        }
+      }
+      
+      // Method 2: Extract from merchant_order_id as fallback pattern
+      if (!customData) {
+        try {
+          // Sometimes the merchant_order_id might be available in a different format
+          console.log('Trying alternative merchant_order_id patterns...');
+        } catch (error) {
+          console.log('Failed alternative extraction:', error);
+        }
+      }
     }
 
     console.log('=======================');
