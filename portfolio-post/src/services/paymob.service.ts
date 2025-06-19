@@ -342,9 +342,9 @@ export class PaymobService {
         first_name: billingData.first_name,
         last_name: billingData.last_name,
         email: billingData.email,
-        extras:  {},
+        extras: {},
       },
-      extras: JSON.stringify(customData), 
+      extras: customData, 
     };
 
     try {
