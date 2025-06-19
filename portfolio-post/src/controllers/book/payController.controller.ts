@@ -137,6 +137,10 @@ export const responseWebhook: RequestHandler = async (req, res) => {
       req.query as Record<string, string>,
     );
 
+    console.log('==========from webhook=============');
+    console.log('result', result);
+    console.log('==========from webhook=============');
+
     if (!result.isValid) {
       console.log('❌ Invalid webhook signature');
       return res.status(400).json({
