@@ -81,6 +81,11 @@ spec:
                 secretKeyRef:
                   name: paymob-hmac-secret
                   key: PAYMOB_HMAC_SECRET
+            - name: PAYMOB_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: paymob-api-key
+                  key: PAYMOB_API_KEY
             - name: PAYMOB_BASE_URL
               valueFrom:
                 secretKeyRef:

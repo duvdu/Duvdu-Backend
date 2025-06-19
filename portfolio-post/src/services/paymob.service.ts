@@ -16,6 +16,15 @@ interface PaymobMerchant {
   street: string;
 }
 
+interface PaymobOrderDetailsResponse {
+  id: number;
+  amount_cents: number;
+  currency: string;
+  items: PaymobOrderItem[];
+  created_at: string;
+  merchant_order_id: string;
+}
+
 interface PaymobOrder {
   id: number;
   created_at: string;
@@ -191,6 +200,10 @@ interface OrderDetailsResult {
   merchant_order_id: string;
 }
 
+interface PaymobAuthResponse {
+  token: string;
+}
+
 /**
  * Paymob Service Configuration for Flash Integration
  *
@@ -201,6 +214,7 @@ interface OrderDetailsResult {
  * - hmacSecret: Your Paymob HMAC Secret (for webhook verification)
  */
 export class PaymobService {
+  private readonly apiKey: string;
   private readonly secretKey: string;
   private readonly publicKey: string;
   private readonly integrationId: number;
@@ -208,6 +222,7 @@ export class PaymobService {
   private readonly hmacSecret: string;
 
   constructor() {
+    this.apiKey = process.env.PAYMOB_API_KEY!;
     this.secretKey = process.env.PAYMOB_SECRET_KEY!;
     this.publicKey = process.env.PAYMOB_PUBLIC_KEY!;
     this.integrationId = parseInt(process.env.PAYMOB_INTEGRATION_ID!);
@@ -304,9 +319,11 @@ export class PaymobService {
       contractId,
       userId,
       service_type: serviceType,
+      booking_id: 'BOOK_' + Date.now(),
       timestamp: new Date().toISOString(),
     };
 
+    const extras = customData;
 
     const billingData: PaymobBillingData = {
       first_name: userData.firstName,
@@ -342,9 +359,10 @@ export class PaymobService {
         first_name: billingData.first_name,
         last_name: billingData.last_name,
         email: billingData.email,
-        extras: {},
+        extras: extras || {},
       },
-      extras: customData, 
+      extras: extras || {},
+      merchant_order_id: JSON.stringify(customData), // Store custom data here
     };
 
     try {
@@ -528,81 +546,47 @@ export class PaymobService {
   /**
    * Authenticate with Paymob to get Bearer token
    */
-  private async authenticate(): Promise<string> {
+  async getAuthToken(): Promise<string> {
     try {
-      const response = await axios.post(
-        `${this.baseUrl}/api/auth/tokens`,
+      const response: AxiosResponse<PaymobAuthResponse> = await axios.post(
+        `${this.baseUrl}/auth/tokens`,
         {
-          api_key: this.secretKey,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          api_key: this.apiKey,
         },
       );
-
       return response.data.token;
     } catch (error) {
       const axiosError = error as AxiosError;
-      console.error('Authentication error:', axiosError.response?.data);
-      throw new Error(`Failed to authenticate with Paymob: ${axiosError.message}`);
+      throw new Error(`Failed to get Paymob auth token: ${axiosError.message}`);
     }
   }
 
   /**
-   * Get order details including metadata using the correct Paymob API
+   * Get order details including metadata
    */
   async getOrderDetails(orderId: number): Promise<OrderDetailsResult> {
     try {
-      // Step 1: Authenticate to get Bearer token
-      const authToken = await this.authenticate();
-
-      // Step 2: Get transaction details using the order inquiry endpoint
-      const response = await axios.post(
-        `${this.baseUrl}/api/ecommerce/orders/transaction_inquiry`,
-        {
-          order_id: orderId.toString(),
-        },
+      const authToken = await this.getAuthToken();
+      const response: AxiosResponse<PaymobOrderDetailsResponse> = await axios.get(
+        `${this.baseUrl}/api/ecommerce/orders/${orderId}`,
         {
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${authToken}`,
+            Authorization: `Bearer ${authToken}`,
           },
         },
       );
 
-      // The response might contain transaction data, we need to extract order info
-      const transactionData = response.data;
-      
       return {
-        id: orderId,
-        amount_cents: transactionData.amount_cents || 0,
-        currency: transactionData.currency || 'EGP',
-        items: transactionData.order?.items || [],
-        created_at: transactionData.created_at || new Date().toISOString(),
-        merchant_order_id: transactionData.order?.merchant_order_id || '',
+        id: response.data.id,
+        amount_cents: response.data.amount_cents,
+        currency: response.data.currency,
+        items: response.data.items || [],
+        created_at: response.data.created_at,
+        merchant_order_id: response.data.merchant_order_id,
       };
     } catch (error) {
       const axiosError = error as AxiosError;
-      console.error('Order details error response:', axiosError.response?.data);
-      console.error('Order details error status:', axiosError.response?.status);
-      
-      // If still failing, provide a fallback that returns minimal data
-      if (axiosError.response?.status === 401 || axiosError.response?.status === 403) {
-        console.log('Authentication failed, using fallback approach...');
-        
-        // Return a minimal response that won't break the webhook
-        return {
-          id: orderId,
-          amount_cents: 0,
-          currency: 'EGP',
-          items: [],
-          created_at: new Date().toISOString(),
-          merchant_order_id: '', // Empty merchant_order_id will trigger fallback logic
-        };
-      }
-      
       throw new Error(`Failed to get order details: ${axiosError.message}`);
     }
   }
