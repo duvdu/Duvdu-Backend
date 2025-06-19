@@ -409,7 +409,7 @@ class PaymobPaymentProcessor {
     } catch (error) {
       const axiosError = error as AxiosError;
       console.log('=======================');
-      console.log('axiosError', axiosError);
+      console.log('axiosError', error);
       console.log('=======================');
       throw new Error(`Failed to create Paymob payment intention: ${axiosError.message}`);
     }
@@ -455,6 +455,9 @@ class PaymobPaymentProcessor {
       return { paymentUrl };
     } catch (error) {
       const axiosError = error as AxiosError;
+      console.log('=======================');
+      console.log('axiosError', error);
+      console.log('=======================');
       throw new Error(`Failed to create Paymob payment intention: ${axiosError.message}`);
     }
   }
@@ -539,7 +542,7 @@ class PaymobPaymentProcessor {
       {
         name: `${userId}-${contractId}`,
         description: serviceType,
-        amount,
+        amount: amount * 100,
         quantity: 1,
       },
     ];
