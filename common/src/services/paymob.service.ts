@@ -46,7 +46,7 @@ interface PaymobOrder {
 interface PaymobOrderItem {
   name: string;
   description: string;
-  amount_cents: number;
+  amount: number;
   quantity: number;
 }
 
@@ -84,17 +84,18 @@ interface PaymobWebhookData {
   };
 }
 
-interface PaymobAuthResponse {
-  token: string;
-}
-
-interface PaymobOrderResponse {
-  id: number;
-  token: string;
-}
-
-interface PaymobPaymentKeyResponse {
-  token: string;
+interface PaymobIntentionResponse {
+  id: string;
+  amount: number;
+  currency: string;
+  payment_methods: any[];
+  items: PaymobOrderItem[];
+  billing_data: PaymobBillingData;
+  customer: PaymobCustomer;
+  extras: Record<string, any>;
+  client_secret: string;
+  status: string;
+  created_at: string;
 }
 
 interface PaymobTransactionStatusResponse {
@@ -114,13 +115,14 @@ interface PaymobOrderDetailsResponse {
 }
 
 // Request Types
-interface PaymobOrderRequest {
-  auth_token: string;
-  delivery_needed: boolean;
-  amount_cents: number;
+interface PaymobIntentionRequest {
+  amount: number;
   currency: string;
+  payment_methods: (string | number)[];
   items: PaymobOrderItem[];
-  merchant_order_id?: string;
+  billing_data: PaymobBillingData;
+  customer?: PaymobCustomer;
+  extras?: Record<string, any>;
 }
 
 interface PaymobBillingData {
@@ -132,28 +134,19 @@ interface PaymobBillingData {
   floor: string;
   street: string;
   building: string;
-  city: string;
+  city?: string;
   state: string;
   country: string;
-  postal_code: string;
 }
 
-interface PaymobPaymentKeyRequest {
-  auth_token: string;
-  amount_cents: number;
-  expiration: number;
-  order_id: number;
-  billing_data: PaymobBillingData;
-  currency: string;
-  integration_id: number;
+interface PaymobCustomer {
+  first_name: string;
+  last_name: string;
+  email: string;
+  extras?: Record<string, any>;
 }
 
 // Response Types
-interface CreateOrderResult {
-  orderId: number;
-  token: string;
-}
-
 interface TransactionData {
   orderId: number;
   amount: number;
@@ -206,130 +199,90 @@ interface OrderDetailsResult {
 }
 
 /**
- * Paymob Service Configuration
+ * Paymob Service Configuration for Flash Integration
  *
  * Required Keys:
- * - apiKey: Your Paymob API Key (used for authentication)
- * - integrationId: Your Paymob Integration ID (found in your Paymob dashboard)
- * - iframeId: Your Paymob Iframe ID (found in your Paymob dashboard)
- *
- * Note:
- * - Public Key: Used for client-side encryption (not needed for this service)
- * - Secret Key: Used for webhook signature verification (handled internally)
+ * - secretKey: Your Paymob Secret Key (for API authentication)
+ * - publicKey: Your Paymob Public Key (for client-side)
+ * - integrationId: Your Paymob Integration ID
+ * - hmacSecret: Your Paymob HMAC Secret (for webhook verification)
  */
 export class PaymobService {
-  private readonly apiKey: string;
+  private readonly secretKey: string;
+  private readonly publicKey: string;
   private readonly integrationId: number;
-  private readonly iframeId: number;
   private readonly baseUrl: string;
   private readonly hmacSecret: string;
 
   constructor() {
-    this.apiKey = process.env.PAYMOB_API_KEY!;
+    this.secretKey = process.env.PAYMOB_SECRET_KEY!;
+    this.publicKey = process.env.PAYMOB_PUBLIC_KEY!;
     this.integrationId = parseInt(process.env.PAYMOB_INTEGRATION_ID!);
-    this.iframeId = parseInt(process.env.PAYMOB_IFRAME_ID!);
-    this.baseUrl = process.env.PAYMOB_BASE_URL!;
+    this.baseUrl = process.env.PAYMOB_BASE_URL || 'https://accept.paymob.com';
     this.hmacSecret = process.env.PAYMOB_HMAC_SECRET!;
 
     console.log('PayMob configuration:', {
       integrationId: this.integrationId,
-      iframeId: this.iframeId,
+      publicKey: this.publicKey,
       baseUrl: this.baseUrl,
     });
   }
 
-  async getAuthToken(): Promise<string> {
-    try {
-      const response: AxiosResponse<PaymobAuthResponse> = await axios.post(
-        `${this.baseUrl}/auth/tokens`,
-        {
-          api_key: this.apiKey,
-        },
-      );
-      return response.data.token;
-    } catch (error) {
-      const axiosError = error as AxiosError;
-      throw new Error(`Failed to get Paymob auth token: ${axiosError.message}`);
-    }
-  }
-
-  async createOrder(
-    amount: number,
-    currency: string = 'EGP',
-    items: PaymobOrderItem[] = [],
-    merchant_order_id?: string,
-  ): Promise<CreateOrderResult> {
-    try {
-      const authToken = await this.getAuthToken();
-      const orderData: PaymobOrderRequest = {
-        auth_token: authToken,
-        delivery_needed: false,
-        amount_cents: amount * 100,
-        currency,
-        items,
-      };
-
-      if (merchant_order_id) {
-        orderData.merchant_order_id = merchant_order_id;
-      }
-
-      const response: AxiosResponse<PaymobOrderResponse> = await axios.post(
-        `${this.baseUrl}/ecommerce/orders`,
-        orderData,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
-      );
-
-      return {
-        orderId: response.data.id,
-        token: authToken,
-      };
-    } catch (error) {
-      const axiosError = error as AxiosError;
-      console.log('PayMob order error:', axiosError.response?.data);
-      throw new Error(`Failed to create Paymob order: ${axiosError.message}`);
-    }
-  }
-
-  async getPaymentKey(
-    orderId: number,
-    token: string,
+  /**
+   * Creates a payment intention using the Flash API
+   * @param amount The payment amount
+   * @param billingData The user data for billing
+   * @param items The order items
+   * @param currency The currency code (default: EGP)
+   * @param extras Custom metadata
+   * @returns The payment URL and client secret
+   */
+  async createPaymentIntention(
     amount: number,
     billingData: PaymobBillingData,
-  ): Promise<string> {
+    items: PaymobOrderItem[],
+    currency: string = 'EGP',
+    extras?: Record<string, any>,
+  ): Promise<{ paymentUrl: string; clientSecret: string }> {
     try {
-      const paymentKeyRequest: PaymobPaymentKeyRequest = {
-        auth_token: token,
-        amount_cents: amount * 100,
-        expiration: 3600,
-        order_id: orderId,
+      const intentionData: PaymobIntentionRequest = {
+        amount,
+        currency,
+        payment_methods: [this.integrationId, 'card'],
+        items,
         billing_data: billingData,
-        currency: 'EGP',
-        integration_id: this.integrationId,
+        customer: {
+          first_name: billingData.first_name,
+          last_name: billingData.last_name,
+          email: billingData.email,
+          extras: extras || {},
+        },
+        extras: extras || {},
       };
 
-      const response: AxiosResponse<PaymobPaymentKeyResponse> = await axios.post(
-        `${this.baseUrl}/acceptance/payment_keys`,
-        paymentKeyRequest,
+      const response: AxiosResponse<PaymobIntentionResponse> = await axios.post(
+        `${this.baseUrl}/v1/intention/`,
+        intentionData,
         {
           headers: {
+            'Authorization': `Token ${this.secretKey}`,
             'Content-Type': 'application/json',
           },
         },
       );
 
-      return response.data.token;
+      // Create the payment URL for Flash Checkout
+      const paymentUrl = `${this.baseUrl}/unifiedcheckout/?publicKey=${this.publicKey}&clientSecret=${response.data.client_secret}`;
+      
+      return {
+        paymentUrl,
+        clientSecret: response.data.client_secret,
+      };
     } catch (error) {
       const axiosError = error as AxiosError;
-      throw new Error(`Failed to get payment key: ${axiosError.message}`);
+      console.log('PayMob intention error:', axiosError.response?.data);
+      throw new Error(`Failed to create Paymob payment intention: ${axiosError.message}`);
     }
-  }
-
-  createPaymentUrl(paymentKey: string): string {
-    return `https://accept.paymob.com/api/acceptance/iframes/${this.iframeId}?payment_token=${paymentKey}`;
   }
 
   /**
@@ -353,10 +306,8 @@ export class PaymobService {
     },
     serviceType: string,
   ): Promise<{ paymentUrl: string }> {
-    const authToken = await this.getAuthToken();
-
-    // Store custom data in merchant_order_id as JSON string
-    const customData = {
+    // Create metadata with custom data
+    const extras = {
       contractId,
       userId,
       service_type: serviceType,
@@ -364,25 +315,30 @@ export class PaymobService {
       timestamp: new Date().toISOString(),
     };
 
-    const order = await this.createOrder(amount, 'EGP', [], JSON.stringify(customData));
-
-    const paymentKey = await this.getPaymentKey(order.orderId, authToken, amount, {
+    const billingData: PaymobBillingData = {
       first_name: userData.firstName,
       last_name: userData.lastName,
       email: userData.email,
       phone_number: userData.phone,
       apartment: '123',
-      floor: '123',
-      street: '123',
+      floor: '1',
+      street: '123 Main St',
       building: '123',
-      city: '123',
-      state: '123',
-      country: '123',
-      postal_code: '123',
-    });
+      state: 'Cairo',
+      country: 'EGY',
+    };
 
-    const paymentUrl = this.createPaymentUrl(paymentKey);
-    return { paymentUrl };
+    const items: PaymobOrderItem[] = [
+      {
+        name: `${serviceType} Payment`,
+        description: `Payment for contract ${contractId}`,
+        amount,
+        quantity: 1,
+      },
+    ];
+
+    const result = await this.createPaymentIntention(amount, billingData, items, 'EGP', extras);
+    return { paymentUrl: result.paymentUrl };
   }
 
   async verifyPayment(hmac: string, data: Record<string, any>): Promise<boolean> {
@@ -392,7 +348,7 @@ export class PaymobService {
       .join('');
 
     const calculatedHmac = crypto
-      .createHmac('sha512', this.apiKey)
+      .createHmac('sha512', this.secretKey)
       .update(concatenatedString)
       .digest('hex');
 
@@ -518,13 +474,12 @@ export class PaymobService {
 
   async getTransactionStatus(transactionId: number): Promise<TransactionStatusResult> {
     try {
-      const authToken = await this.getAuthToken();
       const response: AxiosResponse<PaymobTransactionStatusResponse> = await axios.get(
-        `${this.baseUrl}/acceptance/transactions/${transactionId}`,
+        `${this.baseUrl}/api/acceptance/transactions/${transactionId}`,
         {
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${authToken}`,
+            'Authorization': `Token ${this.secretKey}`,
           },
         },
       );
@@ -546,13 +501,12 @@ export class PaymobService {
    */
   async getOrderDetails(orderId: number): Promise<OrderDetailsResult> {
     try {
-      const authToken = await this.getAuthToken();
       const response: AxiosResponse<PaymobOrderDetailsResponse> = await axios.get(
-        `${this.baseUrl}/ecommerce/orders/${orderId}`,
+        `${this.baseUrl}/api/ecommerce/orders/${orderId}`,
         {
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${authToken}`,
+            'Authorization': `Token ${this.secretKey}`,
           },
         },
       );
