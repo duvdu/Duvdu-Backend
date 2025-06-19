@@ -464,14 +464,15 @@ class PaymobPaymentProcessor {
    * @private
    */
   private buildIntentionRequest(
-    amount: number,
+    amount: number ,
     billingData: PaymobBillingData,
     items: PaymobOrderItem[],
     currency: string,
     extras?: Record<string, any>,
   ): PaymobIntentionRequest {
+    const amountInCents = amount * 100;
     return {
-      amount: amount,
+      amount: amountInCents,
       currency,
       payment_methods: [this.config.integrationId, 'card'],
       items,
