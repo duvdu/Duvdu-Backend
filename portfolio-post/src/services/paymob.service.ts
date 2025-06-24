@@ -443,6 +443,9 @@ class PaymobPaymentProcessor {
         'EGP',
         customData,
       );
+      console.log('=======================');
+      console.log('intentionData', intentionData);
+      console.log('=======================');
       const headers = await this.auth.getAuthHeaders();
 
       const response: AxiosResponse<PaymobIntentionResponse> = await axios.post(
@@ -487,7 +490,6 @@ class PaymobPaymentProcessor {
         extras: extras || {},
       },
       extras: extras || {},
-      merchant_order_id: JSON.stringify(extras),
     };
   }
 
