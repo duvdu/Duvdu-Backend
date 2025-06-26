@@ -66,11 +66,11 @@ spec:
                 secretKeyRef:
                   name: redis-host
                   key: REDIS_HOST
-            # - name: REDIS_QUEUE
-            #   valueFrom:
-            #     secretKeyRef:
-            #       name: redis-queue
-            #       key: REDIS_QUEUE
+            - name: REDIS_QUEUE
+              valueFrom:
+                secretKeyRef:
+                  name: redis-queue
+                  key: REDIS_QUEUE
             - name: REDIS_PASS
               valueFrom:
                 secretKeyRef:

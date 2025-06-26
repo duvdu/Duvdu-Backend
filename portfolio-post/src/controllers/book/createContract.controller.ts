@@ -20,6 +20,7 @@ import { sendNotification } from './sendNotification';
 import { calculateTotalPrice } from '../../services/checkToolsAndFunctions.service';
 import { getBestExpirationTime } from '../../services/getBestExpirationTime.service';
 import { CreateContractHandler } from '../../types/contract.endpoint';
+import { pendingQueue } from '../../utils/expirationQueue';
 
 export const createContractHandler: CreateContractHandler = async (req, res, next) => {
   try {
@@ -156,8 +157,8 @@ export const createContractHandler: CreateContractHandler = async (req, res, nex
     ]);
 
     // Optional: Add expiration queue if needed
-    // const delay = contract.stageExpiration * 3600 * 1000;
-    // await pendingQueue.add({contractId:contract._id.toString()} , {delay});
+    const delay = contract.stageExpiration * 3600 * 1000;
+    await pendingQueue.add({contractId:contract._id.toString()} , {delay});
 
     res.status(201).json(<any>{ message: 'success', data: contract });
   } catch (error) {

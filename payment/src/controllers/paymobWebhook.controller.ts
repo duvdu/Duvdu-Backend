@@ -11,6 +11,7 @@ import {
 import { RequestHandler } from 'express';
 
 import { sendNotification } from './sendNotification';
+import { updateAfterFirstPaymentQueue } from '../utils/expirationProjectQueue';
 
 export const responseWebhook: RequestHandler = async (req, res) => {
   try {
@@ -85,6 +86,9 @@ export const responseWebhook: RequestHandler = async (req, res) => {
             firstPaymentAmount: ((10 * contract.totalPrice) / 100).toFixed(2),
             secondPaymentAmount: contract.totalPrice - (10 * contract.totalPrice) / 100,
           });
+
+          const delay = contract.stageExpiration * 3600 * 1000;
+          await updateAfterFirstPaymentQueue.add({ contractId: contractId }, { delay });
 
           await Promise.all([
             sendNotification(
