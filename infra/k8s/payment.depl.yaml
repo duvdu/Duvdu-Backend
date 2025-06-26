@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: contract-depl
+  name: payment-depl
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: contract
+      app: payment
   template:
     metadata:
       labels:
-        app: contract
+        app: payment
     spec:
       containers:
-        - name: contract
-          image: duvdu/contract
+        - name: payment
+          image: duvdu/payment
           env:
             - name: MONGO_URI
               valueFrom:
@@ -26,16 +26,6 @@ spec:
                 secretKeyRef:
                   name: jwt-secret
                   key: JWT_KEY
-            - name: CLIENT_ID
-              valueFrom:
-                secretKeyRef:
-                  name: google-client-id
-                  key: clientId
-            - name: CLIENT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: google-client-secret
-                  key: clientSecret
             - name: SESSION_SECRET
               valueFrom:
                 secretKeyRef:
@@ -76,20 +66,17 @@ spec:
                 secretKeyRef:
                   name: redis-host
                   key: REDIS_HOST
+            # - name: REDIS_QUEUE
+            #   valueFrom:
+            #     secretKeyRef:
+            #       name: redis-queue
+            #       key: REDIS_QUEUE
             - name: REDIS_PASS
               valueFrom:
                 secretKeyRef:
                   name: redis-pass
                   key: REDIS_PASS
-            - name: NATS_CLIENT_ID
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
-            - name : NATS_URL
-              value: "http://nats-srv:4222"
-            - name : NATS_CLUSTER_ID
-              value: "duvdu"
-                        - name: PAYMOB_HMAC_SECRET
+            - name: PAYMOB_HMAC_SECRET
               valueFrom:
                 secretKeyRef:
                   name: paymob-hmac-secret
@@ -119,19 +106,26 @@ spec:
                 secretKeyRef:
                   name: paymob-public-key
                   key: PAYMOB_PUBLIC_KEY
-
-
+            - name: NATS_CLIENT_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name : NATS_URL
+              value: "http://nats-srv:4222"
+            - name : NATS_CLUSTER_ID
+              value: "duvdu"
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: contract-srv
+  name: payment-srv
 spec:
   selector:
-    app: contract
+    app: payment
   ports:
-    - name: contract
-      protocol: TCP
+    - name: payment
+      protocol: TCP 
       port: 3000
       targetPort: 3000
+

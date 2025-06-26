@@ -87,6 +87,13 @@ spec:
                   name: contract-srv
                   port: 
                     number: 3000
+          - path: /api/payment/?(.*)
+            pathType: Prefix
+            backend: 
+              service:
+                  name: payment-srv
+                  port: 
+                    number: 3000
           - path: /?(.*)
             pathType: Prefix
             backend: 
