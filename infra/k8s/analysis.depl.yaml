@@ -89,7 +89,7 @@ spec:
               value: "http://nats-srv:4222"
             - name : NATS_CLUSTER_ID
               value: "duvdu"
-                          - name: PAYMOB_HMAC_SECRET
+            - name: PAYMOB_HMAC_SECRET
               valueFrom:
                 secretKeyRef:
                   name: paymob-hmac-secret
