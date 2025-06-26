@@ -1,4 +1,3 @@
-
 import { model, Schema, Types } from 'mongoose';
 
 import { IprojectContract } from './projectContract.model';
