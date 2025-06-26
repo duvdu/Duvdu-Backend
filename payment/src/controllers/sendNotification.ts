@@ -1,6 +1,6 @@
 import { Notification } from '@duvdu-v1/duvdu';
 
-import { NewNotificationPublisher } from '../../event/publisher/newNotification.publisher';
+import { NewNotificationPublisher } from '../event/publisher/newNotification.publisher';
 import { natsWrapper } from '../nats-wrapper';
 
 export const sendNotification = async (
