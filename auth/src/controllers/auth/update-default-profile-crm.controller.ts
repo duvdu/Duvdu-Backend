@@ -39,7 +39,7 @@ export const updateDefaultImagesCrm: RequestHandler<
     );
     if (!appSettings) throw new Error('app settings not found');
     await bucket.removeBucketFiles(appSettings?.default_cover);
-    const redisClient = getRedisClient();
+    const redisClient = await getRedisClient();
     await redisClient.set('default_cover', 'defaults/' + coverImage.filename);
     await Users.updateMany(
       { coverImage: appSettings?.default_cover },
