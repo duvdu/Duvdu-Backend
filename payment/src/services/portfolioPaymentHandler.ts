@@ -9,7 +9,7 @@ import {
 } from '@duvdu-v1/duvdu';
 
 import { sendNotification } from '../controllers/sendNotification';
-import { updateAfterFirstPaymentQueue } from '../utils/expirationProjectQueue';
+import { onGoingExpiration, updateAfterFirstPaymentQueue } from '../utils/expirationProjectQueue';
 
 export const handlePortfolioPayment = async (
   userId: string,
@@ -17,7 +17,7 @@ export const handlePortfolioPayment = async (
   transactionData: {
     amount: number;
     success: boolean;
-  }
+  },
 ) => {
   // Check if payment was successful
   if (!transactionData.success) {
@@ -42,17 +42,20 @@ export const handlePortfolioPayment = async (
       Channels.notification,
     );
 
-    return { success: false, redirectUrl: `http://duvdu.com/contracts?contract=${contractId}&paymentStatus=failed` };
+    return {
+      success: false,
+      redirectUrl: `http://duvdu.com/contracts?contract=${contractId}&paymentStatus=failed`,
+    };
   }
 
   const contract = await ProjectContract.findById(contractId);
 
   if (!contract) {
-    return { 
-      success: false, 
+    return {
+      success: false,
       error: 'Contract not found',
       message: 'Contract is missing',
-      statusCode: 400
+      statusCode: 400,
     };
   }
 
@@ -110,7 +113,10 @@ export const handlePortfolioPayment = async (
       timeStamp: new Date(),
     });
 
-    return { success: true, redirectUrl: `http://duvdu.com/contracts?contract=${contractId}&paymentStatus=success` };
+    return {
+      success: true,
+      redirectUrl: `http://duvdu.com/contracts?contract=${contractId}&paymentStatus=success`,
+    };
   }
 
   if (contract.status === ProjectContractStatus.waitingForTotalPayment) {
@@ -118,6 +124,13 @@ export const handlePortfolioPayment = async (
       status: ProjectContractStatus.ongoing,
       totalCheckoutAt: new Date(),
     });
+
+    const deadlineDate =
+      contract.deadline instanceof Date ? contract.deadline : new Date(contract.deadline);
+    const now = new Date();
+    const delay = deadlineDate.getTime() - now.getTime();
+
+    await onGoingExpiration.add({ contractId: contractId }, { delay });
 
     await Promise.all([
       sendNotification(
@@ -150,9 +163,15 @@ export const handlePortfolioPayment = async (
       timeStamp: new Date(),
     });
 
-    return { success: true, redirectUrl: `http://duvdu.com/contracts?contract=${contractId}&paymentStatus=success` };
+    return {
+      success: true,
+      redirectUrl: `http://duvdu.com/contracts?contract=${contractId}&paymentStatus=success`,
+    };
   }
 
   // If we reach here, it means the contract status was neither waitingForFirstPayment nor waitingForTotalPayment
-  return { success: false, redirectUrl: `http://duvdu.com/contracts?contract=${contractId}&paymentStatus=failed` };
-}; 
+  return {
+    success: false,
+    redirectUrl: `http://duvdu.com/contracts?contract=${contractId}&paymentStatus=failed`,
+  };
+};

@@ -1,10 +1,4 @@
-import {
-  Channels,
-  MODELS,
-  PaymobService,
-  Transaction,
-  TransactionStatus,
-} from '@duvdu-v1/duvdu';
+import { Channels, MODELS, PaymobService, Transaction, TransactionStatus } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 import { sendNotification } from './sendNotification';
@@ -79,24 +73,27 @@ export const responseWebhook: RequestHandler = async (req, res) => {
     if (service_type === MODELS.portfolioPost) {
       const result = await handlePortfolioPayment(userId, contractId, {
         amount: transactionData.amount,
-        success: transactionData.success
+        success: transactionData.success,
       });
-      
+
       if (result.statusCode) {
         return res.status(result.statusCode).json({
           error: result.error,
-          message: result.message
+          message: result.message,
         });
       }
-      
-      return res.redirect(result.redirectUrl || `http://duvdu.com/contracts?contract=${contractId}&paymentStatus=success`);
+
+      return res.redirect(
+        result.redirectUrl ||
+          `http://duvdu.com/contracts?contract=${contractId}&paymentStatus=success`,
+      );
     }
 
     // Handle other service types here if needed
-    
+
     // Default fallback for unhandled service types or failed payments
     console.log('❌ Unhandled service type or payment failed');
-    
+
     await Transaction.create({
       user: userId,
       amount: transactionData.amount,
@@ -142,4 +139,4 @@ export const responseWebhook: RequestHandler = async (req, res) => {
     // Still return a redirect to prevent Paymob from retrying
     return res.redirect(redirectUrl);
   }
-}; 
+};
