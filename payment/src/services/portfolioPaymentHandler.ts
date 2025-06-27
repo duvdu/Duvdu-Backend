@@ -74,7 +74,7 @@ export const handlePortfolioPayment = async (
     await Users.findOneAndUpdate({ _id: contract.sp }, { $inc: { avaliableContracts: -1 } });
 
     const delay = contract.stageExpiration * 3600 * 1000;
-    await updateAfterFirstPaymentQueue.add({ contractId: contractId }, { delay });
+    await updateAfterFirstPaymentQueue.add('update-contract', { contractId }, { delay });
 
     await Promise.all([
       sendNotification(
@@ -133,7 +133,7 @@ export const handlePortfolioPayment = async (
     const now = new Date();
     const delay = deadlineDate.getTime() - now.getTime();
 
-    await onGoingExpiration.add({ contractId: contractId }, { delay });
+    await onGoingExpiration.add('expire-contract', { contractId }, { delay });
 
     await Promise.all([
       sendNotification(

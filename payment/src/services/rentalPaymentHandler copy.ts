@@ -72,7 +72,8 @@ export const handleRentalPayment = async (
     await Users.findOneAndUpdate({ _id: contract.sp }, { $inc: { avaliableContracts: -1 } });
 
     await onGoingExpiration.add(
-      { contractId: contract._id.toString() },
+      'update-contract',
+      { contractId },
       { delay: new Date(contract.deadline).getTime() - new Date().getTime() },
     );
 
