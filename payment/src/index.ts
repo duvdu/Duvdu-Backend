@@ -3,6 +3,8 @@ import { dbConnection, redisConnection } from '@duvdu-v1/duvdu';
 import { app } from './app';
 import { env, checkEnvVariables } from './config/env';
 import { natsWrapper } from './nats-wrapper';
+import { initializeProjectQueues } from './utils/expirationProjectQueue';
+import { initializeRentalQueues } from './utils/expirationRentalQueue';
 
 const start = async () => {
   checkEnvVariables();
@@ -22,7 +24,13 @@ const start = async () => {
   process.on('SIGTERM', () => {
     natsWrapper.client.close();
   });
+
   await dbConnection(env.mongoDb.uri);
+  
+  // Initialize BullMQ queues
+  await initializeProjectQueues();
+  await initializeRentalQueues();
+
   app.listen(3000, () => {
     console.log('app listen on port 3000');
   });

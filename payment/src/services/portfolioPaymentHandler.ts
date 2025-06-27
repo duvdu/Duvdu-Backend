@@ -9,7 +9,14 @@ import {
 } from '@duvdu-v1/duvdu';
 
 import { sendNotification } from '../controllers/sendNotification';
-import { onGoingExpiration, updateAfterFirstPaymentQueue } from '../utils/expirationProjectQueue';
+import { onGoingExpiration, updateAfterFirstPaymentQueue, initializeProjectQueues } from '../utils/expirationProjectQueue';
+
+// Helper function to ensure queues are initialized
+const ensureQueuesInitialized = async () => {
+  if (!updateAfterFirstPaymentQueue || !onGoingExpiration) {
+    await initializeProjectQueues();
+  }
+};
 
 export const handlePortfolioPayment = async (
   userId: string,
@@ -74,6 +81,10 @@ export const handlePortfolioPayment = async (
     await Users.findOneAndUpdate({ _id: contract.sp }, { $inc: { avaliableContracts: -1 } });
 
     const delay = contract.stageExpiration * 3600 * 1000;
+    
+    // Ensure queues are initialized before using them
+    await ensureQueuesInitialized();
+    
     await updateAfterFirstPaymentQueue.add('update-contract', { contractId }, { delay });
 
     await Promise.all([
@@ -133,6 +144,9 @@ export const handlePortfolioPayment = async (
     const now = new Date();
     const delay = deadlineDate.getTime() - now.getTime();
 
+    // Ensure queues are initialized before using them
+    await ensureQueuesInitialized();
+    
     await onGoingExpiration.add('expire-contract', { contractId }, { delay });
 
     await Promise.all([
