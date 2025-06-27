@@ -1,5 +1,3 @@
-import crypto from 'crypto';
-
 import {
   SuccessResponse,
   NotFound,
@@ -14,6 +12,7 @@ import {
 import { RequestHandler } from 'express';
 
 import { sendNotification } from './contract-notification.controller';
+import { paymentExpiration } from '../../config/expiration-queue';
 
 export const contractAction: RequestHandler<
   { contractId: string },
@@ -97,10 +96,6 @@ export const contractAction: RequestHandler<
           ),
         );
 
-      // update project state to await payment
-      // create payment link and send it to customer
-      const paymentSession = crypto.randomBytes(16).toString('hex');
-      // const paymentLink = `${req.protocol}://${req.hostname}/api/studio-booking/rental/contract/pay/${paymentSession}`;
       await RentalContracts.updateOne(
         {
           _id: req.params.contractId,
@@ -108,9 +103,12 @@ export const contractAction: RequestHandler<
         {
           status: RentalContractStatus.waitingForPayment,
           actionAt: new Date(),
-          paymentLink: paymentSession,
         },
       );
+
+      // queue payment expiration
+      const delay = contract.stageExpiration * 3600 * 1000;
+      await paymentExpiration.add({ contractId: contract._id.toString() }, { delay });
 
       await Promise.all([
         await sendNotification(

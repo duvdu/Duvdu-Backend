@@ -102,7 +102,7 @@ router.post(
   contractVal.create,
   createContractHandler,
 );
-router.post('/contract/pay/:paymentSession', isauthenticated, contractVal.pay, payContract);
+router.post('/contract/pay/:contractId', isauthenticated, contractVal.pay, payContract);
 router.post('/contract/:contractId/action', isauthenticated, contractVal.action, contractAction);
 
 export const rentalRoutes = router;

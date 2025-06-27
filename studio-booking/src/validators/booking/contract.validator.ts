@@ -30,4 +30,4 @@ export const action = [
   globalValidatorMiddleware,
 ];
 
-export const pay = [param('paymentSession').isString(), globalValidatorMiddleware];
+export const pay = [param('contractId').isMongoId(), globalValidatorMiddleware];

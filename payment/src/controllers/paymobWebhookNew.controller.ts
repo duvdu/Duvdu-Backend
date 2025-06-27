@@ -3,6 +3,7 @@ import { RequestHandler } from 'express';
 
 import { sendNotification } from './sendNotification';
 import { handlePortfolioPayment } from '../services/portfolioPaymentHandler';
+import { handleRentalPayment } from '../services/rentalPaymentHandler copy';
 
 export const responseWebhook: RequestHandler = async (req, res) => {
   try {
@@ -72,6 +73,23 @@ export const responseWebhook: RequestHandler = async (req, res) => {
     // Handle payment based on service type
     if (service_type === MODELS.portfolioPost) {
       const result = await handlePortfolioPayment(userId, contractId, {
+        amount: transactionData.amount,
+        success: transactionData.success,
+      });
+
+      if (result.statusCode) {
+        return res.status(result.statusCode).json({
+          error: result.error,
+          message: result.message,
+        });
+      }
+
+      return res.redirect(
+        result.redirectUrl ||
+          `http://duvdu.com/contracts?contract=${contractId}&paymentStatus=success`,
+      );
+    } else if (service_type === MODELS.studioBooking) {
+      const result = await handleRentalPayment(userId, contractId, {
         amount: transactionData.amount,
         success: transactionData.success,
       });

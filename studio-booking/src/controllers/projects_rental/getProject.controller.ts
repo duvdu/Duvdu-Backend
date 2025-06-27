@@ -210,9 +210,7 @@ export const getProjectHandler: RequestHandler = async (req, res, next) => {
     path: 'contract',
     match: {
       status: {
-        $nin: [
-          'canceled', 'pending', 'rejected', 'reject', 'cancel'
-        ],
+        $nin: ['canceled', 'pending', 'rejected', 'reject', 'cancel'],
       },
     },
   }));

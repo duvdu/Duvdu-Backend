@@ -1,17 +1,17 @@
 import {
   Channels,
   MODELS,
-  ProjectContract,
-  ProjectContractStatus,
+  RentalContracts,
+  RentalContractStatus,
   Transaction,
   TransactionStatus,
   Users,
 } from '@duvdu-v1/duvdu';
 
 import { sendNotification } from '../controllers/sendNotification';
-import { onGoingExpiration, updateAfterFirstPaymentQueue } from '../utils/expirationProjectQueue';
+import { onGoingExpiration } from '../utils/expirationRentalQueue';
 
-export const handlePortfolioPayment = async (
+export const handleRentalPayment = async (
   userId: string,
   contractId: string,
   transactionData: {
@@ -27,7 +27,7 @@ export const handlePortfolioPayment = async (
       amount: transactionData.amount,
       status: TransactionStatus.FAILED,
       contract: contractId,
-      model: MODELS.portfolioPost,
+      model: MODELS.studioBooking,
       currency: 'EGP',
       timeStamp: new Date(),
     });
@@ -48,7 +48,7 @@ export const handlePortfolioPayment = async (
     };
   }
 
-  const contract = await ProjectContract.findById(contractId);
+  const contract = await RentalContracts.findById(contractId);
 
   if (!contract) {
     return {
@@ -62,19 +62,19 @@ export const handlePortfolioPayment = async (
   const spUser = await Users.findById(contract?.sp);
   const user = await Users.findById(userId);
 
-  if (contract.status === ProjectContractStatus.waitingForFirstPayment) {
-    await ProjectContract.findByIdAndUpdate(contractId, {
-      status: ProjectContractStatus.updateAfterFirstPayment,
-      firstCheckoutAt: new Date(),
-      firstPaymentAmount: ((10 * contract.totalPrice) / 100).toFixed(2),
-      secondPaymentAmount: contract.totalPrice - (10 * contract.totalPrice) / 100,
+  if (contract.status === RentalContractStatus.waitingForPayment) {
+    await RentalContracts.findByIdAndUpdate(contractId, {
+      status: RentalContractStatus.ongoing,
+      checkoutAt: new Date(),
     });
 
     // decrement the user contracts count
     await Users.findOneAndUpdate({ _id: contract.sp }, { $inc: { avaliableContracts: -1 } });
 
-    const delay = contract.stageExpiration * 3600 * 1000;
-    await updateAfterFirstPaymentQueue.add({ contractId: contractId }, { delay });
+    await onGoingExpiration.add(
+      { contractId: contract._id.toString() },
+      { delay: new Date(contract.deadline).getTime() - new Date().getTime() },
+    );
 
     await Promise.all([
       sendNotification(
@@ -91,57 +91,7 @@ export const handlePortfolioPayment = async (
         contract.sp.toString(),
         contract._id.toString(),
         'contract',
-        'project contract updates',
-        `${user?.name} paid 10% of the amount`,
-        Channels.notification,
-      ),
-      sendNotification(
-        userId,
-        userId,
-        contract._id.toString(),
-        'contract',
-        'project contract updates',
-        'you paid 10% of the amount',
-        Channels.notification,
-      ),
-    ]);
-
-    await Transaction.create({
-      user: userId,
-      amount: contract.firstPaymentAmount,
-      status: TransactionStatus.SUCCESS,
-      contract: contract._id.toString(),
-      model: MODELS.portfolioPost,
-      currency: 'EGP',
-      timeStamp: new Date(),
-    });
-
-    return {
-      success: true,
-      redirectUrl: `http://duvdu.com/contracts?contract=${contractId}&paymentStatus=success`,
-    };
-  }
-
-  if (contract.status === ProjectContractStatus.waitingForTotalPayment) {
-    await ProjectContract.findByIdAndUpdate(contractId, {
-      status: ProjectContractStatus.ongoing,
-      totalCheckoutAt: new Date(),
-    });
-
-    const deadlineDate =
-      contract.deadline instanceof Date ? contract.deadline : new Date(contract.deadline);
-    const now = new Date();
-    const delay = deadlineDate.getTime() - now.getTime();
-
-    await onGoingExpiration.add({ contractId: contractId }, { delay });
-
-    await Promise.all([
-      sendNotification(
-        userId,
-        contract.sp.toString(),
-        contract._id.toString(),
-        'contract',
-        'project contract updates',
+        'rental contract updates',
         `${user?.name} paid the total amount`,
         Channels.notification,
       ),
@@ -150,7 +100,7 @@ export const handlePortfolioPayment = async (
         userId,
         contract._id.toString(),
         'contract',
-        'project contract updates',
+        'rental contract updates',
         'you paid the total amount',
         Channels.notification,
       ),
@@ -158,10 +108,10 @@ export const handlePortfolioPayment = async (
 
     await Transaction.create({
       user: userId,
-      amount: contract.secondPaymentAmount,
+      amount: contract.totalPrice,
       status: TransactionStatus.SUCCESS,
       contract: contract._id.toString(),
-      model: MODELS.portfolioPost,
+      model: MODELS.studioBooking,
       currency: 'EGP',
       timeStamp: new Date(),
     });

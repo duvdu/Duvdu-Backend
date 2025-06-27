@@ -8,8 +8,11 @@ import {
   ProjectContractStatus,
   MODELS,
   PaymobService,
+  Channels,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
+
+import { sendNotification } from './sendNotification';
 
 export const payContract: RequestHandler<
   { contractId: string },
@@ -17,17 +20,6 @@ export const payContract: RequestHandler<
 > = async (req, res, next) => {
   const contract = await ProjectContract.findOne({ _id: req.params.contractId });
   if (!contract) return next(new NotFound(undefined, req.lang));
-
-  if (
-    new Date(contract.actionAt).getTime() + contract.stageExpiration * 60 * 60 * 1000 <
-    new Date().getTime()
-  )
-    return next(
-      new BadRequestError(
-        { en: 'payment link is expired', ar: 'رابط الدفع منتهي الصلاحية' },
-        req.lang,
-      ),
-    );
 
   const user = await Users.findById(req.loggedUser.id);
   if (!user) return next(new NotFound(undefined, req.lang));
@@ -41,6 +33,30 @@ export const payContract: RequestHandler<
     );
 
   if (contract.status === ProjectContractStatus.waitingForFirstPayment) {
+
+    // check if the service provider have avaliable contracts
+    const sp = await Users.findById(contract.sp);
+    if (sp && sp.avaliableContracts === 0) {
+      await sendNotification(
+        req.loggedUser.id,
+        contract.sp.toString(),
+        contract._id.toString(),
+        'contract',
+        'contract subscription',
+        `${sp?.name} not have avaliable contracts right now`,
+        Channels.notification,
+      );
+      return next(
+        new BadRequestError(
+          {
+            en: 'service provider not have avaliable contracts right now',
+            ar: 'لا يتوفر لدى مقدم الخدمة عقود متاحة في الوقت الحالي',
+          },
+          req.lang,
+        ),
+      );
+    }
+
     await ProjectContract.updateOne(
       { _id: req.params.contractId },
       {
