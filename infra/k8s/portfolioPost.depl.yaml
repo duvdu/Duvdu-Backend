@@ -71,11 +71,6 @@ spec:
                 secretKeyRef:
                   name: redis-pass
                   key: REDIS_PASS
-            - name: REDIS_QUEUE
-              valueFrom:
-                secretKeyRef:
-                  name: redis-queue
-                  key: REDIS_QUEUE
             - name: PAYMOB_HMAC_SECRET
               valueFrom:
                 secretKeyRef:
