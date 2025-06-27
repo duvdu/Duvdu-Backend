@@ -4,10 +4,11 @@ import Redis from 'ioredis';
 import { DatabaseConnectionError } from '../errors/data-base-connections';
 
 // Create a Redis cluster or connection pool
-const MAX_CLIENTS = 2; // Limited to 2 connections to stay well below the connection limit
+const MAX_CLIENTS = 1; // Single connection per service to minimize total connections
 let connectionPool: Redis[] = [];
 let currentConnectionIndex = 0;
 let activeConnections = 0;
+let isInitializing = false;
 
 // Cache the RedisStore instance
 let redisStoreInstance: RedisStore | null = null;
@@ -25,6 +26,7 @@ const getRedisConfig = () => {
     password,
     maxRetriesPerRequest: null,
     enableReadyCheck: false,
+    lazyConnect: true, // Don't connect immediately
     retryStrategy: (times: number) => {
       if (times > 3) return null;
       return Math.min(times * 100, 3000);
@@ -47,7 +49,7 @@ const getClientInfo = async (client: Redis) => {
 const startMonitoring = () => {
   const monitorInterval = 60000; // 1 minute
   setInterval(async () => {
-    if (connectionPool.length > 0) {
+    if (connectionPool.length > 0 && activeConnections > 0) {
       try {
         const clientCount = await getClientInfo(connectionPool[0]);
         console.log(`[REDIS] Stats: Connected clients: ${clientCount}, Pool size: ${connectionPool.length}, Active: ${activeConnections}`);
@@ -59,8 +61,9 @@ const startMonitoring = () => {
 };
 
 // Initialize the connection pool
-const initializePool = () => {
-  if (connectionPool.length === 0) {
+const initializePool = async () => {
+  if (connectionPool.length === 0 && !isInitializing) {
+    isInitializing = true;
     const config = getRedisConfig();
     
     for (let i = 0; i < MAX_CLIENTS; i++) {
@@ -86,25 +89,31 @@ const initializePool = () => {
     
     // Start monitoring
     startMonitoring();
+    isInitializing = false;
   }
 };
 
 // Get a client from the pool using round-robin
-export const getRedisClient = () => {
+export const getRedisClient = async () => {
   if (connectionPool.length === 0) {
-    initializePool();
+    await initializePool();
   }
   
-  // Round-robin selection
+  // Round-robin selection (though with MAX_CLIENTS=1, this just returns the single client)
   const client = connectionPool[currentConnectionIndex];
   currentConnectionIndex = (currentConnectionIndex + 1) % connectionPool.length;
+  
+  // Ensure the client is connected
+  if (client.status !== 'ready' && client.status !== 'connecting') {
+    await client.connect();
+  }
   
   return client;
 };
 
 export const redisConnection = async () => {
   try {
-    const client = getRedisClient();
+    const client = await getRedisClient();
     return client;
   } catch (error) {
     const config = getRedisConfig();
@@ -118,7 +127,7 @@ export const sessionStore = async () => {
     return redisStoreInstance;
   }
   
-  const client = getRedisClient();
+  const client = await getRedisClient();
   redisStoreInstance = new RedisStore({ client });
   return redisStoreInstance;
 };
