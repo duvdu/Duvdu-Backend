@@ -81,6 +81,11 @@ spec:
                 secretKeyRef:
                   name: redis-pass
                   key: REDIS_PASS
+            - name: REDIS_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: redis-port
+                  key: REDIS_PASS
             - name: REDIS_QUEUE
               valueFrom:
                 secretKeyRef:
