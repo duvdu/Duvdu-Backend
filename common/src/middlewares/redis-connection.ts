@@ -4,10 +4,9 @@ import Redis from 'ioredis';
 import { DatabaseConnectionError } from '../errors/data-base-connections';
 
 // Create a Redis cluster or connection pool
-const MAX_CLIENTS = 5; // Limited to 5 connections to stay well below the 30 connection limit
+const MAX_CLIENTS = 2; // Limited to 2 connections to stay well below the connection limit
 let connectionPool: Redis[] = [];
 let currentConnectionIndex = 0;
-let totalConnectionsRequested = 0;
 let activeConnections = 0;
 
 // Cache the RedisStore instance
@@ -20,8 +19,6 @@ const getRedisConfig = () => {
   const port = parseInt(process.env.REDIS_PORT || '11177', 10);
   const password = process.env.REDIS_PASS || 'xgThFOa24hvwyVtsiNhIJiAxfhvJCLBU';
   
-  console.log(`[REDIS] Connecting to Redis at ${host}:${port}`);
-
   return {
     host,
     port,
@@ -42,7 +39,6 @@ const getClientInfo = async (client: Redis) => {
     const connectedClients = info.match(/connected_clients:(\d+)/);
     return connectedClients ? parseInt(connectedClients[1], 10) : 0;
   } catch (error) {
-    console.error('[REDIS] Error getting client info:', error);
     return 0;
   }
 };
@@ -53,11 +49,10 @@ const startMonitoring = () => {
   setInterval(async () => {
     if (connectionPool.length > 0) {
       try {
-        const client = connectionPool[0]; // Use first client for monitoring
-        const clientCount = await getClientInfo(client);
-        console.log(`[REDIS] Server stats - Connected clients: ${clientCount}, Pool size: ${connectionPool.length}, Active tracked connections: ${activeConnections}`);
+        const clientCount = await getClientInfo(connectionPool[0]);
+        console.log(`[REDIS] Stats: Connected clients: ${clientCount}, Pool size: ${connectionPool.length}, Active: ${activeConnections}`);
       } catch (error) {
-        console.error('[REDIS] Error monitoring Redis:', error);
+        // Silent error
       }
     }
   }, monitorInterval);
@@ -67,7 +62,6 @@ const startMonitoring = () => {
 const initializePool = () => {
   if (connectionPool.length === 0) {
     const config = getRedisConfig();
-    console.log(`[REDIS] Initializing connection pool with ${MAX_CLIENTS} clients to ${config.host}:${config.port}`);
     
     for (let i = 0; i < MAX_CLIENTS; i++) {
       const client = new Redis(config);
@@ -79,13 +73,12 @@ const initializePool = () => {
         console.log(`[REDIS] Client #${i+1} connected successfully (Active: ${activeConnections})`);
       });
       
-      client.on('error', (err) => {
-        console.error(`[REDIS] Client #${i+1} connection error:`, err);
+      client.on('error', () => {
+        // Silent error
       });
       
       client.on('close', () => {
         activeConnections = Math.max(0, activeConnections - 1);
-        console.log(`[REDIS] Client #${i+1} connection closed (Active: ${activeConnections})`);
       });
       
       connectionPool.push(client);
@@ -102,15 +95,9 @@ export const getRedisClient = () => {
     initializePool();
   }
   
-  totalConnectionsRequested++;
-  
   // Round-robin selection
   const client = connectionPool[currentConnectionIndex];
   currentConnectionIndex = (currentConnectionIndex + 1) % connectionPool.length;
-  
-  if (totalConnectionsRequested % 100 === 0) {
-    console.log(`[REDIS] Total connection requests: ${totalConnectionsRequested}, Current pool size: ${connectionPool.length}, Active connections: ${activeConnections}`);
-  }
   
   return client;
 };
@@ -118,11 +105,9 @@ export const getRedisClient = () => {
 export const redisConnection = async () => {
   try {
     const client = getRedisClient();
-    console.log('[REDIS] Connection provided from pool');
     return client;
   } catch (error) {
     const config = getRedisConfig();
-    console.error(`[REDIS] Cannot connect to Redis: ${config.host}:${config.port}`, error);
     throw new DatabaseConnectionError(`Cannot connect to Redis: ${config.host}:${config.port}`);
   }
 };
@@ -134,25 +119,21 @@ export const sessionStore = async () => {
   }
   
   const client = getRedisClient();
-  console.log('[REDIS] Created session store with pooled connection');
   redisStoreInstance = new RedisStore({ client });
   return redisStoreInstance;
 };
 
 export const cleanupRedis = async () => {
   if (connectionPool.length > 0) {
-    console.log('[REDIS] Closing all Redis connections in the pool');
     for (let i = 0; i < connectionPool.length; i++) {
       const client = connectionPool[i];
       await client.quit();
-      console.log(`[REDIS] Client #${i+1} quit successfully`);
     }
     connectionPool = [];
     currentConnectionIndex = 0;
     activeConnections = 0;
     // Reset the store instance
     redisStoreInstance = null;
-    console.log('[REDIS] Connection pool cleared');
   }
 };
 
