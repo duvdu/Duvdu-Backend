@@ -21,6 +21,7 @@ const connection = new IORedis({
   host: process.env.REDIS_HOST?.split('://')[1]?.split(':')[0] || 'localhost',
   port: parseInt(process.env.REDIS_HOST?.split(':').pop() || '6379'),
   password: process.env.REDIS_PASS,
+  maxRetriesPerRequest: null,
 });
 
 // Create queues with BullMQ
