@@ -108,7 +108,7 @@ export const contractAction: RequestHandler<
 
       // queue payment expiration
       const delay = contract.stageExpiration * 3600 * 1000;
-      await paymentExpiration.add({ contractId: contract._id.toString() }, { delay });
+      await paymentExpiration.add('update-contract', { contractId: contract._id.toString() }, { delay });
 
       await Promise.all([
         await sendNotification(

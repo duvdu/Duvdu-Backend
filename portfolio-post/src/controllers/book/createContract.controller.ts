@@ -158,7 +158,7 @@ export const createContractHandler: CreateContractHandler = async (req, res, nex
 
     // Optional: Add expiration queue if needed
     const delay = contract.stageExpiration * 3600 * 1000;
-    await pendingQueue.add({contractId:contract._id.toString()} , {delay});
+    await pendingQueue.add('update-contract', { contractId: contract._id.toString() }, { delay });
 
     res.status(201).json(<any>{ message: 'success', data: contract });
   } catch (error) {

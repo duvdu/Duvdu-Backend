@@ -4,6 +4,7 @@ import { app } from './app';
 import { env, checkEnvVariables } from './config/env';
 import { natsWrapper } from './nats-wrapper';
 
+
 const start = async () => {
   checkEnvVariables();
   await redisConnection('', ' ');

@@ -105,7 +105,7 @@ export const createContractHandler: RequestHandler<
   });
 
   const delay = contract.stageExpiration * 3600 * 1000;
-  await pendingExpiration.add({ contractId: contract._id.toString() }, { delay });
+  await pendingExpiration.add('update-contract', { contractId: contract._id.toString() }, { delay });
 
   await Contracts.create({
     _id: contract._id,
