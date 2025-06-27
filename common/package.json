@@ -1,6 +1,6 @@
 {
   "name": "@duvdu-v1/duvdu",
-  "version": "1.1.275",
+  "version": "1.1.276",
   "main": "./build/index.js",
   "types": "./build/index.d.ts",
   "files": [
