@@ -33,7 +33,7 @@ app.use(
 let mySession: (req: Request, res: Response, next: NextFunction) => void;
 
 const initializeSessionStore = async () => {
-  const store = await sessionStore(env.redis.uri, env.redis.pass);
+  const store = await sessionStore();
 
   mySession = (req: Request, res: Response, next: NextFunction) => {
     const origin = req.headers?.origin;

@@ -33,7 +33,7 @@ app.use(
 );
 
 (async () => {
-  const store = await sessionStore(env.redis.uri, env.redis.pass);
+  const store = await sessionStore();
 
   const sessionMiddleware: RequestHandler = (req: Request, res, next) => {
     const origin = req.headers?.origin;

@@ -6,7 +6,7 @@ import { natsWrapper } from './nats-wrapper';
 
 const start = async () => {
   checkEnvVariables();
-  await redisConnection('', '');
+  await redisConnection();
   await natsWrapper.connect(env.nats.clusterId!, env.nats.clientId!, env.nats.url!);
 
   natsWrapper.client.on('close', () => {
