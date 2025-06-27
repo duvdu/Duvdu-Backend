@@ -15,7 +15,7 @@ import {
 
 import { sendNotification } from './sendNotification';
 import { ContractActionHandler } from '../../types/contract.endpoint';
-import { firstPayMentQueue, secondPayMentQueue } from '../../utils/expirationQueue';
+import { getFirstPaymentQueue, getSecondPaymentQueue } from '../../utils/expirationQueue';
 
 export const contractActionHandler: ContractActionHandler = async (req, res, next) => {
   const contract = await ProjectContract.findOne({
@@ -118,8 +118,10 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
 
       // add expiration for first payment
       const delay = contract.stageExpiration * 3600 * 1000;
-
-      await firstPayMentQueue.add('update-contract', { contractId: contract._id.toString() }, { delay });
+      const firstPaymentQueue = getFirstPaymentQueue();
+      if (firstPaymentQueue) {
+        await firstPaymentQueue.add('update-contract', { contractId: contract._id.toString() }, { delay });
+      }
     } else if (
       req.body.action === 'reject' &&
       contract.status === ProjectContractStatus.updateAfterFirstPayment
@@ -202,7 +204,10 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
 
       // add second payment expiration
       const delay = contract.stageExpiration * 3600 * 1000;
-      await secondPayMentQueue.add('update-contract', { contractId: contract._id.toString() }, { delay });
+      const secondPaymentQueue = getSecondPaymentQueue();
+      if (secondPaymentQueue) {
+        await secondPaymentQueue.add('update-contract', { contractId: contract._id.toString() }, { delay });
+      }
     } else
       return next(
         new NotAllowedError(

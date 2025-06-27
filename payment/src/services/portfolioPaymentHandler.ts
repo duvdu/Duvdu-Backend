@@ -9,7 +9,7 @@ import {
 } from '@duvdu-v1/duvdu';
 
 import { sendNotification } from '../controllers/sendNotification';
-import { onGoingExpiration, updateAfterFirstPaymentQueue } from '../utils/expirationProjectQueue';
+import { getOnGoingExpiration, getUpdateAfterFirstPaymentQueue } from '../utils/expirationProjectQueue';
 
 export const handlePortfolioPayment = async (
   userId: string,
@@ -74,7 +74,10 @@ export const handlePortfolioPayment = async (
     await Users.findOneAndUpdate({ _id: contract.sp }, { $inc: { avaliableContracts: -1 } });
 
     const delay = contract.stageExpiration * 3600 * 1000;
-    await updateAfterFirstPaymentQueue.add('update-contract', { contractId }, { delay });
+    const updateQueue = getUpdateAfterFirstPaymentQueue();
+    if (updateQueue) {
+      await updateQueue.add('update-contract', { contractId }, { delay });
+    }
 
     await Promise.all([
       sendNotification(
@@ -133,7 +136,10 @@ export const handlePortfolioPayment = async (
     const now = new Date();
     const delay = deadlineDate.getTime() - now.getTime();
 
-    await onGoingExpiration.add('update-contract', { contractId }, { delay });
+    const ongoingQueue = getOnGoingExpiration();
+    if (ongoingQueue) {
+      await ongoingQueue.add('update-contract', { contractId }, { delay });
+    }
 
     await Promise.all([
       sendNotification(

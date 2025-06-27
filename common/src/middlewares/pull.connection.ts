@@ -19,11 +19,7 @@
 // bullmq-redis.ts
 import { getRedisClient } from './redis-connection';
 
-// Use the existing Redis client from redis-connection.ts
-const bullRedis = getRedisClient();
-
-// BullMQ specific settings can be configured in redis-connection.ts
-// or we can create a new connection if specific settings are required
-// for BullMQ that can't be shared with the main Redis client
-
-export { bullRedis };
+// Create a function that returns the Redis client for BullMQ
+export const getBullRedis = async () => {
+  return await getRedisClient();
+};

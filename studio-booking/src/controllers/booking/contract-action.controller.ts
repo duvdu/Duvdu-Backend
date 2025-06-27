@@ -12,7 +12,7 @@ import {
 import { RequestHandler } from 'express';
 
 import { sendNotification } from './contract-notification.controller';
-import { paymentExpiration } from '../../config/expiration-queue';
+import { getPaymentExpiration } from '../../config/expiration-queue';
 
 export const contractAction: RequestHandler<
   { contractId: string },
@@ -108,7 +108,10 @@ export const contractAction: RequestHandler<
 
       // queue payment expiration
       const delay = contract.stageExpiration * 3600 * 1000;
-      await paymentExpiration.add('update-contract', { contractId: contract._id.toString() }, { delay });
+      const paymentQueue = getPaymentExpiration();
+      if (paymentQueue) {
+        await paymentQueue.add('update-contract', { contractId: contract._id.toString() }, { delay });
+      }
 
       await Promise.all([
         await sendNotification(

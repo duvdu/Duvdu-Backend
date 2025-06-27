@@ -20,7 +20,7 @@ import {
 import { RequestHandler } from 'express';
 
 import { sendNotification } from './contract-notification.controller';
-import { pendingExpiration } from '../../config/expiration-queue';
+import { getPendingExpiration } from '../../config/expiration-queue';
 
 export const createContractHandler: RequestHandler<
   { projectId: string },
@@ -105,7 +105,10 @@ export const createContractHandler: RequestHandler<
   });
 
   const delay = contract.stageExpiration * 3600 * 1000;
-  await pendingExpiration.add('update-contract', { contractId: contract._id.toString() }, { delay });
+      const pendingQueue = getPendingExpiration();
+    if (pendingQueue) {
+      await pendingQueue.add('update-contract', { contractId: contract._id.toString() }, { delay });
+    }
 
   await Contracts.create({
     _id: contract._id,

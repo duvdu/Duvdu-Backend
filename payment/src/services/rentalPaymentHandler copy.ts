@@ -9,7 +9,7 @@ import {
 } from '@duvdu-v1/duvdu';
 
 import { sendNotification } from '../controllers/sendNotification';
-import { onGoingExpiration } from '../utils/expirationRentalQueue';
+import { getRentalOnGoingExpiration } from '../utils/expirationRentalQueue';
 
 export const handleRentalPayment = async (
   userId: string,
@@ -71,11 +71,14 @@ export const handleRentalPayment = async (
     // decrement the user contracts count
     await Users.findOneAndUpdate({ _id: contract.sp }, { $inc: { avaliableContracts: -1 } });
 
-    await onGoingExpiration.add(
-      'update-contract',
-      { contractId },
-      { delay: new Date(contract.deadline).getTime() - new Date().getTime() },
-    );
+    const rentalQueue = getRentalOnGoingExpiration();
+    if (rentalQueue) {
+      await rentalQueue.add(
+        'update-contract',
+        { contractId },
+        { delay: new Date(contract.deadline).getTime() - new Date().getTime() },
+      );
+    }
 
     await Promise.all([
       sendNotification(
