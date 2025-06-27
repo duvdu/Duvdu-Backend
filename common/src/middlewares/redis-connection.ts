@@ -10,6 +10,9 @@ let currentConnectionIndex = 0;
 let totalConnectionsRequested = 0;
 let activeConnections = 0;
 
+// Cache the RedisStore instance
+let redisStoreInstance: RedisStore | null = null;
+
 // Parse Redis connection details
 const getRedisConfig = () => {
   // Get Redis configuration from environment variables
@@ -125,9 +128,15 @@ export const redisConnection = async () => {
 };
 
 export const sessionStore = async () => {
+  // Return cached instance if available
+  if (redisStoreInstance) {
+    return redisStoreInstance;
+  }
+  
   const client = getRedisClient();
   console.log('[REDIS] Created session store with pooled connection');
-  return new RedisStore({ client });
+  redisStoreInstance = new RedisStore({ client });
+  return redisStoreInstance;
 };
 
 export const cleanupRedis = async () => {
@@ -141,6 +150,8 @@ export const cleanupRedis = async () => {
     connectionPool = [];
     currentConnectionIndex = 0;
     activeConnections = 0;
+    // Reset the store instance
+    redisStoreInstance = null;
     console.log('[REDIS] Connection pool cleared');
   }
 };
