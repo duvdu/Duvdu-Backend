@@ -70,7 +70,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: redis-port
-                  key: REDIS_PASS
+                  key: REDIS_PORT
             - name: REDIS_PASS
               valueFrom:
                 secretKeyRef:

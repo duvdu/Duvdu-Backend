@@ -75,7 +75,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: redis-port
-                  key: REDIS_PASS
+                  key: REDIS_PORT
             - name: PAYMOB_HMAC_SECRET
               valueFrom:
                 secretKeyRef:

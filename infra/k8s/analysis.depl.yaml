@@ -85,7 +85,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: redis-port
-                  key: REDIS_PASS
+                  key: REDIS_PORT
             - name: NATS_CLIENT_ID
               valueFrom:
                 fieldRef:
