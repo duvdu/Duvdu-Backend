@@ -12,9 +12,35 @@ import Queue from 'bull';
 import { env } from '../config/env';
 import { sendSystemNotification } from '../controllers/sendNotification';
 
+
+
+
+// Configure Redis connection options to handle connection issues
+const redisOptions = {
+  redis: {
+    host: env.redis.uri.split('://')[1].split(':')[0],
+    port: parseInt(env.redis.uri.split(':').pop() || '6379'),
+    password: env.redis.pass,
+    // Limit connection attempts to prevent "max clients reached" error
+    maxRetriesPerRequest: 1,
+    enableReadyCheck: false,
+    // Set a lower reconnect strategy
+    retryStrategy: (times: number) => {
+      if (times > 3) {
+        console.error('Redis connection failed too many times. Not retrying.');
+        return null; // Stop retrying
+      }
+      return Math.min(times * 100, 3000); // Increase delay between retries
+    }
+  }
+};
+
+
+
 export const onGoingExpiration = new Queue<{ contractId: string }>(
   'rental_ongoing_expiration',
   env.redis.queue,
+  redisOptions
 );
 
 onGoingExpiration.process(async (job) => {

@@ -16,14 +16,37 @@ interface IcontarctQueue {
   contractId: string;
 }
 
+// Configure Redis connection options to handle connection issues
+const redisOptions = {
+  redis: {
+    host: env.redis.uri.split('://')[1].split(':')[0],
+    port: parseInt(env.redis.uri.split(':').pop() || '6379'),
+    password: env.redis.pass,
+    // Limit connection attempts to prevent "max clients reached" error
+    maxRetriesPerRequest: 1,
+    enableReadyCheck: false,
+    // Set a lower reconnect strategy
+    retryStrategy: (times: number) => {
+      if (times > 3) {
+        console.error('Redis connection failed too many times. Not retrying.');
+        return null; // Stop retrying
+      }
+      return Math.min(times * 100, 3000); // Increase delay between retries
+    }
+  }
+};
+
+// Create queues with the configured Redis options
 export const updateAfterFirstPaymentQueue = new Queue<IcontarctQueue>(
   'updateAfterFirstPayment-contract-pending',
   env.redis.queue,
+  redisOptions
 );
 
 export const onGoingExpiration = new Queue<IcontarctQueue>(
   'onGoingExpiration-contract-pending',
   env.redis.queue,
+  redisOptions
 );
 
 updateAfterFirstPaymentQueue.process(async (job) => {
