@@ -6,23 +6,15 @@ import {
   Roles,
   SystemRoles,
   Users,
+  bullRedis,
 } from '@duvdu-v1/duvdu';
 import { Queue, Worker, Job } from 'bullmq';
-import IORedis from 'ioredis';
 
 import { sendSystemNotification } from '../controllers/sendNotification';
 
-// Create Redis connection for BullMQ
-const connection = new IORedis({
-  host: process.env.REDIS_HOST?.split('://')[1]?.split(':')[0] || 'localhost',
-  port: parseInt(process.env.REDIS_HOST?.split(':').pop() || '6379'),
-  password: process.env.REDIS_PASS,
-  maxRetriesPerRequest: null // Required by BullMQ
-});
-
 // Define the BullMQ queue (used for adding jobs)
 export const onGoingExpiration = new Queue<{ contractId: string }>('rental_ongoing_expiration', {
-  connection,
+  connection: bullRedis,
 });
 
 // Define the worker to process jobs
@@ -62,5 +54,5 @@ new Worker(
       );
     }
   },
-  { connection },
+  { connection: bullRedis },
 );

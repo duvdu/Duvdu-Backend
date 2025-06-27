@@ -6,9 +6,9 @@ import {
   Roles,
   SystemRoles,
   Users,
+  bullRedis,
 } from '@duvdu-v1/duvdu';
 import { Queue, Worker, Job } from 'bullmq';
-import IORedis from 'ioredis';
 
 import { sendSystemNotification } from '../controllers/sendNotification';
 
@@ -16,22 +16,14 @@ interface IcontarctQueue {
   contractId: string;
 }
 
-// Create Redis connection for BullMQ
-const connection = new IORedis({
-  host: process.env.REDIS_HOST?.split('://')[1]?.split(':')[0] || 'localhost',
-  port: parseInt(process.env.REDIS_HOST?.split(':').pop() || '6379'),
-  password: process.env.REDIS_PASS,
-  maxRetriesPerRequest: null,
-});
-
 // Create queues with BullMQ
 export const updateAfterFirstPaymentQueue = new Queue<IcontarctQueue>(
   'updateAfterFirstPayment-contract-pending',
-  { connection },
+  { connection: bullRedis },
 );
 
 export const onGoingExpiration = new Queue<IcontarctQueue>('onGoingExpiration-contract-pending', {
-  connection,
+  connection: bullRedis,
 });
 
 // Define worker for updateAfterFirstPaymentQueue
@@ -57,7 +49,7 @@ new Worker(
       throw new Error('Failed to cancelled project contract');
     }
   },
-  { connection },
+  { connection: bullRedis },
 );
 
 // Define worker for onGoingExpiration
@@ -100,5 +92,5 @@ new Worker(
       );
     }
   },
-  { connection },
+  { connection: bullRedis },
 );
