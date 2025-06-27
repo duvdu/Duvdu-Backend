@@ -86,11 +86,6 @@ spec:
                 secretKeyRef:
                   name: redis-port
                   key: REDIS_PORT
-            - name: REDIS_QUEUE
-              valueFrom:
-                secretKeyRef:
-                  name: redis-queue
-                  key: REDIS_QUEUE
             - name: NATS_CLIENT_ID
               valueFrom:
                 fieldRef:
