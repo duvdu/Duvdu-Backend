@@ -12,25 +12,17 @@ let activeConnections = 0;
 
 // Parse Redis connection details
 const getRedisConfig = () => {
-  let host = process.env.REDIS_HOST;
-  let port = 6379;
+  // Get Redis configuration from environment variables
+  const host = process.env.REDIS_HOST || 'redis-11177.c9.us-east-1-2.ec2.redns.redis-cloud.com';
+  const port = parseInt(process.env.REDIS_PORT || '11177', 10);
+  const password = process.env.REDIS_PASS || 'xgThFOa24hvwyVtsiNhIJiAxfhvJCLBU';
   
-  // Handle URL format (redis://hostname:port)
-  if (host?.includes('://')) {
-    const urlParts = host.split('://');
-    if (urlParts[1]?.includes(':')) {
-      const hostParts = urlParts[1].split(':');
-      host = hostParts[0];
-      port = parseInt(hostParts[1], 10) || 6379;
-    } else if (urlParts[1]) {
-      host = urlParts[1];
-    }
-  }
+  console.log(`[REDIS] Connecting to Redis at ${host}:${port}`);
 
   return {
     host,
     port,
-    password: process.env.REDIS_PASS,
+    password,
     maxRetriesPerRequest: null,
     enableReadyCheck: false,
     retryStrategy: (times: number) => {
@@ -123,12 +115,12 @@ export const getRedisClient = () => {
 export const redisConnection = async () => {
   try {
     const client = getRedisClient();
-    const config = getRedisConfig();
-    console.log(`[REDIS] Connection provided from pool to ${config.host}:${config.port}`);
+    console.log('[REDIS] Connection provided from pool');
     return client;
   } catch (error) {
-    console.error(`[REDIS] Cannot connect to Redis: ${process.env.REDIS_HOST}`, error);
-    throw new DatabaseConnectionError(`Cannot connect to Redis: ${process.env.REDIS_HOST}`);
+    const config = getRedisConfig();
+    console.error(`[REDIS] Cannot connect to Redis: ${config.host}:${config.port}`, error);
+    throw new DatabaseConnectionError(`Cannot connect to Redis: ${config.host}:${config.port}`);
   }
 };
 
@@ -152,6 +144,9 @@ export const cleanupRedis = async () => {
     console.log('[REDIS] Connection pool cleared');
   }
 };
+
+
+
 
 
 
