@@ -3,42 +3,66 @@ import Redis from 'ioredis';
 
 import { DatabaseConnectionError } from '../errors/data-base-connections';
 
-let redisClient: Redis | null = null;
+// Create a Redis cluster or connection pool
+const MAX_CLIENTS = 5; // Limited to 5 connections to stay well below the 30 connection limit
+let connectionPool: Redis[] = [];
+let currentConnectionIndex = 0;
 
-export const getRedisClient = () => {
-  if (!redisClient) {
-    // Parse host and port from REDIS_HOST if it's a URL
-    let host = process.env.REDIS_HOST;
-    let port = 6379;
-    
-    // Handle URL format (redis://hostname:port)
-    if (host?.includes('://')) {
-      const urlParts = host.split('://');
-      if (urlParts[1]?.includes(':')) {
-        const hostParts = urlParts[1].split(':');
-        host = hostParts[0];
-        port = parseInt(hostParts[1], 10) || 6379;
-      } else if (urlParts[1]) {
-        host = urlParts[1];
-      }
+// Parse Redis connection details
+const getRedisConfig = () => {
+  let host = process.env.REDIS_HOST;
+  let port = 6379;
+  
+  // Handle URL format (redis://hostname:port)
+  if (host?.includes('://')) {
+    const urlParts = host.split('://');
+    if (urlParts[1]?.includes(':')) {
+      const hostParts = urlParts[1].split(':');
+      host = hostParts[0];
+      port = parseInt(hostParts[1], 10) || 6379;
+    } else if (urlParts[1]) {
+      host = urlParts[1];
     }
-
-    redisClient = new Redis({
-      host,
-      port,
-      password: process.env.REDIS_PASS,
-      maxRetriesPerRequest: null,
-      enableReadyCheck: false,
-      retryStrategy: (times) => {
-        if (times > 3) return null;
-        return Math.min(times * 100, 3000);
-      }
-    });
-
-    // Set a higher limit for event listeners
-    redisClient.setMaxListeners(10000000);
   }
-  return redisClient;
+
+  return {
+    host,
+    port,
+    password: process.env.REDIS_PASS,
+    maxRetriesPerRequest: null,
+    enableReadyCheck: false,
+    retryStrategy: (times: number) => {
+      if (times > 3) return null;
+      return Math.min(times * 100, 3000);
+    }
+  };
+};
+
+// Initialize the connection pool
+const initializePool = () => {
+  if (connectionPool.length === 0) {
+    console.log(`Initializing Redis connection pool with ${MAX_CLIENTS} clients`);
+    const config = getRedisConfig();
+    
+    for (let i = 0; i < MAX_CLIENTS; i++) {
+      const client = new Redis(config);
+      client.setMaxListeners(1000);
+      connectionPool.push(client);
+    }
+  }
+};
+
+// Get a client from the pool using round-robin
+export const getRedisClient = () => {
+  if (connectionPool.length === 0) {
+    initializePool();
+  }
+  
+  // Round-robin selection
+  const client = connectionPool[currentConnectionIndex];
+  currentConnectionIndex = (currentConnectionIndex + 1) % connectionPool.length;
+  
+  return client;
 };
 
 export const redisConnection = async () => {
@@ -58,9 +82,13 @@ export const sessionStore = async () => {
 };
 
 export const cleanupRedis = async () => {
-  if (redisClient) {
-    await redisClient.quit();
-    redisClient = null;
+  if (connectionPool.length > 0) {
+    console.log('Closing all Redis connections in the pool');
+    for (const client of connectionPool) {
+      await client.quit();
+    }
+    connectionPool = [];
+    currentConnectionIndex = 0;
   }
 };
 
