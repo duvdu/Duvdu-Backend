@@ -107,3 +107,4 @@ export * from './events/subject';
 export * from './events/topic-notification.event';
 
 export * from './config/winston';
+export * from './middlewares/pull.connection';
