@@ -1,5 +1,3 @@
-import crypto from 'crypto';
-
 import {
   SuccessResponse,
   NotFound,
@@ -14,6 +12,10 @@ import {
 import { RequestHandler } from 'express';
 
 import { sendNotification } from './contract-notification.controller';
+import {
+  getFirstPaymentExpirationQueue,
+  getTotalPaymentExpirationQueue,
+} from '../../config/expiration-queue';
 
 interface NotificationParams {
   actorId: string;
@@ -132,7 +134,6 @@ const handleSpAction = async (
       }
     }
 
-    const paymentSession = crypto.randomBytes(16).toString('hex');
     const newStatus =
       contract.status === CopyrightContractStatus.pending
         ? CopyrightContractStatus.waitingForFirstPayment
@@ -148,12 +149,30 @@ const handleSpAction = async (
       {
         status: newStatus,
         actionAt: new Date(),
-        paymentLink: paymentSession,
         firstPaymentAmount: firstPaymentAmount,
         secondPaymentAmount: secondPaymentAmount,
       },
     );
 
+    const delay = contract.stageExpiration * 3600 * 1000;
+    // add to queue
+    if (newStatus === CopyrightContractStatus.waitingForFirstPayment) {
+      await getFirstPaymentExpirationQueue()?.add(
+        'first_payment_expiration_job',
+        {
+          contractId: contract._id.toString(),
+        },
+        { delay },
+      );
+    } else if (newStatus === CopyrightContractStatus.waitingForTotalPayment) {
+      await getTotalPaymentExpirationQueue()?.add(
+        'total_payment_expiration_job',
+        {
+          contractId: contract._id.toString(),
+        },
+        { delay },
+      );
+    }
     const customMessage = `${sp?.name} accept this contract, please pay to complete this contract`;
     await sendContractNotifications({
       actorId: userId,

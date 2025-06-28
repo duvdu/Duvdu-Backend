@@ -10,7 +10,7 @@ import {
 } from '@duvdu-v1/duvdu';
 import { Queue, Worker, Job } from 'bullmq';
 
-import { sendSystemNotification } from '../controllers/booking/contract-notification.controller';
+import { sendSystemNotification } from '../controllers';
 
 interface IContractQueue {
   contractId: string;
@@ -20,14 +20,6 @@ interface IContractQueue {
 export const createCopyrightQueues = async () => {
   const bullRedis = await getRedisClient();
 
-  const pendingExpiration = new Queue<IContractQueue>('copyright_pending_expiration', {
-    connection: bullRedis,
-  });
-
-  const firstPaymentExpiration = new Queue<IContractQueue>('copyright_first_payment_expiration', {
-    connection: bullRedis,
-  });
-
   const updateAfterFirstPaymentExpiration = new Queue<IContractQueue>(
     'copyright_update_after_first_payment_expiration',
     {
@@ -35,66 +27,9 @@ export const createCopyrightQueues = async () => {
     },
   );
 
-  const totalPaymentExpiration = new Queue<IContractQueue>('copyright_total_payment_expiration', {
-    connection: bullRedis,
-  });
-
   const onGoingExpiration = new Queue<IContractQueue>('copyright_ongoing_expiration', {
     connection: bullRedis,
   });
-
-  // Define workers to process jobs
-  new Worker(
-    'copyright_pending_expiration',
-    async (job: Job<IContractQueue>) => {
-      try {
-        const contract = await CopyrightContracts.findOneAndUpdate(
-          { _id: job.data.contractId, status: CopyrightContractStatus.pending },
-          { status: CopyrightContractStatus.canceled, actionAt: new Date() },
-          { new: true },
-        );
-
-        if (contract)
-          await sendSystemNotification(
-            [contract.sp.toString(), contract.customer.toString()],
-            contract._id.toString(),
-            'contract',
-            'copyright contract updates',
-            'contract canceled by system',
-            Channels.update_contract,
-          );
-      } catch (error) {
-        throw new Error('Failed to cancel copyright contract');
-      }
-    },
-    { connection: bullRedis },
-  );
-
-  new Worker(
-    'copyright_first_payment_expiration',
-    async (job: Job<IContractQueue>) => {
-      try {
-        const contract = await CopyrightContracts.findOneAndUpdate(
-          { _id: job.data.contractId, status: CopyrightContractStatus.waitingForFirstPayment },
-          { status: CopyrightContractStatus.canceled, actionAt: new Date() },
-          { new: true },
-        );
-
-        if (contract)
-          await sendSystemNotification(
-            [contract.sp.toString(), contract.customer.toString()],
-            contract._id.toString(),
-            'contract',
-            'copyright contract updates',
-            'contract canceled by system',
-            Channels.update_contract,
-          );
-      } catch (error) {
-        throw new Error('Failed to cancel copyright contract');
-      }
-    },
-    { connection: bullRedis },
-  );
 
   new Worker(
     'copyright_update_after_first_payment_expiration',
@@ -102,32 +37,6 @@ export const createCopyrightQueues = async () => {
       try {
         const contract = await CopyrightContracts.findOneAndUpdate(
           { _id: job.data.contractId, status: CopyrightContractStatus.updateAfterFirstPayment },
-          { status: CopyrightContractStatus.canceled, actionAt: new Date() },
-          { new: true },
-        );
-
-        if (contract)
-          await sendSystemNotification(
-            [contract.sp.toString(), contract.customer.toString()],
-            contract._id.toString(),
-            'contract',
-            'copyright contract updates',
-            'contract canceled by system',
-            Channels.update_contract,
-          );
-      } catch (error) {
-        throw new Error('Failed to cancel copyright contract');
-      }
-    },
-    { connection: bullRedis },
-  );
-
-  new Worker(
-    'copyright_total_payment_expiration',
-    async (job: Job<IContractQueue>) => {
-      try {
-        const contract = await CopyrightContracts.findOneAndUpdate(
-          { _id: job.data.contractId, status: CopyrightContractStatus.waitingForTotalPayment },
           { status: CopyrightContractStatus.canceled, actionAt: new Date() },
           { new: true },
         );
@@ -196,10 +105,7 @@ export const createCopyrightQueues = async () => {
   );
 
   return {
-    pendingExpiration,
-    firstPaymentExpiration,
     updateAfterFirstPaymentExpiration,
-    totalPaymentExpiration,
     onGoingExpiration,
   };
 };
@@ -210,9 +116,6 @@ createCopyrightQueues().then((result) => {
   copyrightQueues = result;
 });
 
-export const getPendingExpirationQueue = () => copyrightQueues?.pendingExpiration;
-export const getFirstPaymentExpirationQueue = () => copyrightQueues?.firstPaymentExpiration;
 export const getUpdateAfterFirstPaymentExpirationQueue = () =>
   copyrightQueues?.updateAfterFirstPaymentExpiration;
-export const getTotalPaymentExpirationQueue = () => copyrightQueues?.totalPaymentExpiration;
 export const getOnGoingExpirationQueue = () => copyrightQueues?.onGoingExpiration;

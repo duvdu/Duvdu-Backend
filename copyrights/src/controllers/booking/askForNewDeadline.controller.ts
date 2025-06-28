@@ -13,7 +13,7 @@ import { Types } from 'mongoose';
 
 import { sendNotification } from './contract-notification.controller';
 import 'express-async-errors';
-import { onGoingExpiration } from '../../config/expiration-queue';
+import { getOnGoingExpirationQueue } from '../../config/expiration-queue';
 
 export const askForNewDeadline: RequestHandler<
   { contractId: string },
@@ -106,23 +106,30 @@ export const respondToNewDeadline: RequestHandler<
   }
 
   contract.requestedDeadline.status = req.body.status;
-  contract.deadline = req.body.status === RequestedDeadlineStatus.approved? contract.requestedDeadline.deadline : contract.deadline;
+  contract.deadline =
+    req.body.status === RequestedDeadlineStatus.approved
+      ? contract.requestedDeadline.deadline
+      : contract.deadline;
   await contract.save();
 
   if (req.body.status === RequestedDeadlineStatus.approved) {
-    const existingJobs = await onGoingExpiration.getJobs(['active', 'delayed', 'waiting']);
-    for (const job of existingJobs) {
-      if (job.data.contractId === contract._id.toString()) {
-        await job.remove();
+    const ongoingQueue = getOnGoingExpirationQueue();
+    if (ongoingQueue) {
+      const existingJobs = await ongoingQueue.getJobs(['active', 'delayed', 'waiting']);
+      for (const job of existingJobs) {
+        if (job.data.contractId === contract._id.toString()) {
+          await job.remove();
+        }
       }
+      await ongoingQueue.add(
+        'ongoing_expiration_job',
+        { contractId: contract._id.toString() },
+        {
+          delay: new Date(contract.requestedDeadline.deadline).getTime() - Date.now(),
+          removeOnComplete: true,
+        },
+      );
     }
-    await onGoingExpiration.add(
-      { contractId: contract._id.toString() },
-      {
-        delay: new Date(contract.requestedDeadline.deadline).getTime() - Date.now(),
-        removeOnComplete: true,
-      },
-    );
   }
 
   const user = await Users.findById(req.loggedUser.id);

@@ -12,7 +12,7 @@ import { updateContractHandler } from '../controllers/booking/contract-update.co
 import * as val from '../validators/booking/booking.validator';
 const router = Router();
 
-router.get('/pay/:paymentSession', isauthenticated, val.pay, payContract);
+router.get('/pay/:contractId', isauthenticated, val.pay, payContract);
 
 router.post(
   '/:projectId',

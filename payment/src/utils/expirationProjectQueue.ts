@@ -24,7 +24,7 @@ const initializeBullRedis = async () => {
 // Create queues with BullMQ using async initialization
 export const createQueues = async () => {
   const bullRedis = await initializeBullRedis();
-  
+
   const updateAfterFirstPaymentQueue = new Queue<IcontarctQueue>(
     'updateAfterFirstPayment-contract-pending',
     { connection: bullRedis },

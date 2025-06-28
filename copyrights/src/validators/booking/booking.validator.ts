@@ -42,7 +42,7 @@ export const action = [
   globalValidatorMiddleware,
 ];
 
-export const pay = [param('paymentSession').isString(), globalValidatorMiddleware];
+export const pay = [param('contractId').isMongoId(), globalValidatorMiddleware];
 
 export const updateContract = [
   param('contractId').isMongoId().withMessage('contractIdInvalid'),

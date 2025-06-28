@@ -52,13 +52,27 @@ export const getCrmProjectsHandler: RequestHandler<
             if: { $eq: [{ $size: '$userDetails' }, 0] }, // Check if user not found
             then: null,
             else: {
-              acceptedProjectsCounter: { $arrayElemAt: ['$userDetails.acceptedProjectsCounter', 0] },
+              acceptedProjectsCounter: {
+                $arrayElemAt: ['$userDetails.acceptedProjectsCounter', 0],
+              },
               profileImage: {
                 $cond: {
-                  if: { $isArray: { $arrayElemAt: ["$userDetails.profileImage", 0] } },
-                  then: { $concat: [process.env.BUCKET_HOST, "/", { $arrayElemAt: [{ $arrayElemAt: ["$userDetails.profileImage", 0] }, 0] }] },
-                  else: { $concat: [process.env.BUCKET_HOST, "/", { $arrayElemAt: ["$userDetails.profileImage", 0] }] }
-                }
+                  if: { $isArray: { $arrayElemAt: ['$userDetails.profileImage', 0] } },
+                  then: {
+                    $concat: [
+                      process.env.BUCKET_HOST,
+                      '/',
+                      { $arrayElemAt: [{ $arrayElemAt: ['$userDetails.profileImage', 0] }, 0] },
+                    ],
+                  },
+                  else: {
+                    $concat: [
+                      process.env.BUCKET_HOST,
+                      '/',
+                      { $arrayElemAt: ['$userDetails.profileImage', 0] },
+                    ],
+                  },
+                },
               },
               name: { $arrayElemAt: ['$userDetails.name', 0] },
               username: { $arrayElemAt: ['$userDetails.username', 0] },

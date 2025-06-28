@@ -20,6 +20,7 @@ import {
 import { RequestHandler } from 'express';
 
 import { sendNotification } from './contract-notification.controller';
+import { getPendingExpirationQueue } from '../../config/expiration-queue';
 
 async function handleAttachments(attachments: Express.Multer.File[]) {
   if (!attachments.length) return [];
@@ -104,6 +105,16 @@ export const createContractHandler: RequestHandler<
     ref: MODELS.copyrightContract,
     cycle: CYCLES.copyRights,
   });
+
+  // add to queue
+  const delay = contract.stageExpiration * 3600 * 1000;
+  await getPendingExpirationQueue()?.add(
+    'pending_expiration_job',
+    {
+      contractId: contract._id.toString(),
+    },
+    { delay },
+  );
 
   // Send notifications in parallel with response
   Promise.all([

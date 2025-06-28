@@ -1,8 +1,8 @@
 import {
   Channels,
+  CopyrightContracts,
+  CopyrightContractStatus,
   MODELS,
-  ProjectContract,
-  ProjectContractStatus,
   Transaction,
   TransactionStatus,
   Users,
@@ -10,11 +10,11 @@ import {
 
 import { sendNotification } from '../controllers/sendNotification';
 import {
-  getOnGoingExpiration,
-  getUpdateAfterFirstPaymentQueue,
-} from '../utils/expirationProjectQueue';
+  getOnGoingExpirationQueue,
+  getUpdateAfterFirstPaymentExpirationQueue,
+} from '../utils/expirationCopyrightQueue';
 
-export const handlePortfolioPayment = async (
+export const handleCopyrightsPayment = async (
   userId: string,
   contractId: string,
   transactionData: {
@@ -51,7 +51,7 @@ export const handlePortfolioPayment = async (
     };
   }
 
-  const contract = await ProjectContract.findById(contractId);
+  const contract = await CopyrightContracts.findById(contractId);
 
   if (!contract) {
     return {
@@ -65,9 +65,9 @@ export const handlePortfolioPayment = async (
   const spUser = await Users.findById(contract?.sp);
   const user = await Users.findById(userId);
 
-  if (contract.status === ProjectContractStatus.waitingForFirstPayment) {
-    await ProjectContract.findByIdAndUpdate(contractId, {
-      status: ProjectContractStatus.updateAfterFirstPayment,
+  if (contract.status === CopyrightContractStatus.waitingForFirstPayment) {
+    await CopyrightContracts.findByIdAndUpdate(contractId, {
+      status: CopyrightContractStatus.updateAfterFirstPayment,
       firstCheckoutAt: new Date(),
       firstPaymentAmount: ((10 * contract.totalPrice) / 100).toFixed(2),
       secondPaymentAmount: contract.totalPrice - (10 * contract.totalPrice) / 100,
@@ -77,9 +77,9 @@ export const handlePortfolioPayment = async (
     await Users.findOneAndUpdate({ _id: contract.sp }, { $inc: { avaliableContracts: -1 } });
 
     const delay = contract.stageExpiration * 3600 * 1000;
-    const updateQueue = getUpdateAfterFirstPaymentQueue();
+    const updateQueue = getUpdateAfterFirstPaymentExpirationQueue();
     if (updateQueue) {
-      await updateQueue.add('update-contract', { contractId }, { delay });
+      await updateQueue.add('update_after_first_payment_expiration_job', { contractId }, { delay });
     }
 
     await Promise.all([
@@ -97,7 +97,7 @@ export const handlePortfolioPayment = async (
         contract.sp.toString(),
         contract._id.toString(),
         'contract',
-        'project contract updates',
+        'copyright contract updates',
         `${user?.name} paid 10% of the amount`,
         Channels.notification,
       ),
@@ -106,7 +106,7 @@ export const handlePortfolioPayment = async (
         userId,
         contract._id.toString(),
         'contract',
-        'project contract updates',
+        'copyright contract updates',
         'you paid 10% of the amount',
         Channels.notification,
       ),
@@ -128,9 +128,9 @@ export const handlePortfolioPayment = async (
     };
   }
 
-  if (contract.status === ProjectContractStatus.waitingForTotalPayment) {
-    await ProjectContract.findByIdAndUpdate(contractId, {
-      status: ProjectContractStatus.ongoing,
+  if (contract.status === CopyrightContractStatus.waitingForTotalPayment) {
+    await CopyrightContracts.findByIdAndUpdate(contractId, {
+      status: CopyrightContractStatus.ongoing,
       totalCheckoutAt: new Date(),
     });
 
@@ -139,9 +139,9 @@ export const handlePortfolioPayment = async (
     const now = new Date();
     const delay = deadlineDate.getTime() - now.getTime();
 
-    const ongoingQueue = getOnGoingExpiration();
+    const ongoingQueue = getOnGoingExpirationQueue();
     if (ongoingQueue) {
-      await ongoingQueue.add('update-contract', { contractId }, { delay });
+      await ongoingQueue.add('ongoing_expiration_job', { contractId }, { delay });
     }
 
     await Promise.all([
@@ -150,7 +150,7 @@ export const handlePortfolioPayment = async (
         contract.sp.toString(),
         contract._id.toString(),
         'contract',
-        'project contract updates',
+        'copyright contract updates',
         `${user?.name} paid the total amount`,
         Channels.notification,
       ),
@@ -159,7 +159,7 @@ export const handlePortfolioPayment = async (
         userId,
         contract._id.toString(),
         'contract',
-        'project contract updates',
+        'copyright contract updates',
         'you paid the total amount',
         Channels.notification,
       ),

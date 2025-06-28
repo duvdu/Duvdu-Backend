@@ -29,7 +29,9 @@ export const createRentalQueue = async () => {
       const contract = await RentalContracts.findOneAndUpdate(
         { _id: job.data.contractId, status: RentalContractStatus.ongoing },
         {
-          status: contractComplain ? RentalContractStatus.complaint : RentalContractStatus.completed,
+          status: contractComplain
+            ? RentalContractStatus.complaint
+            : RentalContractStatus.completed,
           actionAt: new Date(),
         },
       );
