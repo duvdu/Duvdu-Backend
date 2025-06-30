@@ -61,11 +61,6 @@ export const payContract: RequestHandler<
       MODELS.studioBooking,
     );
 
-    await RentalContracts.findByIdAndUpdate(
-      { _id: req.params.contractId },
-      { status: RentalContractStatus.ongoing, checkoutAt: new Date() },
-    );
-
     await Promise.all([
       sendNotification(
         req.loggedUser.id,
