@@ -74,7 +74,17 @@ export const handlePortfolioPayment = async (
     });
 
     // decrement the user contracts count
-    await Users.findOneAndUpdate({ _id: contract.sp }, { $inc: { avaliableContracts: -1 } });
+    const x = await Users.findOneAndUpdate(
+      { _id: contract.sp },
+      { $inc: { avaliableContracts: -1 } },
+      { new: true },
+    );
+
+    console.log('=====================');
+    console.log(x);
+    
+    console.log('=====================');
+    
 
     const delay = contract.stageExpiration * 3600 * 1000;
     const updateQueue = getUpdateAfterFirstPaymentQueue();
