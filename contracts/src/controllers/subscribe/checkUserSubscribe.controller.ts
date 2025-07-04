@@ -25,9 +25,6 @@ export const checkUserSubscribeController: RequestHandler<
     .limit(5)
     .populate('contract');
 
-  // const highestPrice = Math.max(
-  //   ...lastContracts.map((contract: any) => contract.contract.totalPrice || 0),
-  // );
   const totalPrice = lastContracts.reduce(
     (acc: number, contract: any) => acc + (contract.contract.totalPrice || 0),
     0,

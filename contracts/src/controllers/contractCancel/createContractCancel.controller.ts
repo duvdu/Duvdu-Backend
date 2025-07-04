@@ -40,9 +40,9 @@ export const createContractCancel: RequestHandler<
     user: req.loggedUser.id,
   });
 
-  const role = await Roles.findOne({'key.en': SystemRoles.admin});
+  const role = await Roles.findOne({ 'key.en': SystemRoles.admin });
 
-  const user = await Users.findOne({role: role?._id});
+  const user = await Users.findOne({ role: role?._id });
 
   await Promise.all([
     sendNotification(
@@ -63,15 +63,16 @@ export const createContractCancel: RequestHandler<
       'new contract cancel request',
       Channels.notification,
     ),
-    user && sendNotification(
-      req.loggedUser.id.toString(),
-      user.id.toString(),
-      contract._id.toString(),
-      'contract',
-      'contract cancel request',
-      'new contract cancel request',
-      Channels.notification,
-    ) 
+    user &&
+      sendNotification(
+        req.loggedUser.id.toString(),
+        user.id.toString(),
+        contract._id.toString(),
+        'contract',
+        'contract cancel request',
+        'new contract cancel request',
+        Channels.notification,
+      ),
   ]);
 
   return res.status(200).json({

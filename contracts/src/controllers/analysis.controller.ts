@@ -425,7 +425,6 @@ export const contractAnalysis: RequestHandler<
     },
   ]);
 
-
   res.json({
     copyrightContract: copyrightContracts[0],
     producerContracts: producerContracts[0],

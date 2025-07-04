@@ -30,7 +30,7 @@ export const updateContractFileController: RequestHandler<
     contract = await CopyrightContracts.findById(contractId);
   } else if (cycle === CYCLES.portfolioPost) {
     contract = await ProjectContract.findById(contractId);
-  } 
+  }
 
   if (!contract) throw new NotFound({ ar: 'العقد غير موجود', en: 'Contract not found' }, req.lang);
 

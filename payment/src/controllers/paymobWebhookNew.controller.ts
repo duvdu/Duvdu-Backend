@@ -2,9 +2,10 @@ import { Channels, MODELS, PaymobService, Transaction, TransactionStatus } from 
 import { RequestHandler } from 'express';
 
 import { sendNotification } from './sendNotification';
-import { handleCopyrightsPayment } from '../services/copyrightsPaymentHandler copy';
+import { handleCopyrightsPayment } from '../services/copyrightsPaymentHandler';
 import { handlePortfolioPayment } from '../services/portfolioPaymentHandler';
 import { handleRentalPayment } from '../services/rentalPaymentHandler copy';
+import { handleSubscribePayment } from '../services/subscribePaymentHandler';
 
 export const responseWebhook: RequestHandler = async (req, res) => {
   try {
@@ -123,6 +124,23 @@ export const responseWebhook: RequestHandler = async (req, res) => {
         result.redirectUrl ||
           `http://duvdu.com/contracts?contract=${contractId}&paymentStatus=success`,
       );
+    } else if (service_type === 'subscribe') {
+      const result = await handleSubscribePayment(userId, contractId, {
+        amount: transactionData.amount,
+        success: transactionData.success,
+      });
+
+      if (result.statusCode) {
+        return res.status(result.statusCode).json({
+          error: result.error,
+          message: result.message,
+        });
+      }
+
+      return res.redirect(
+        result.redirectUrl ||
+          'http://duvdu.com/contracts?paymentStatus=success',
+      );    
     }
 
     // Handle other service types here if needed

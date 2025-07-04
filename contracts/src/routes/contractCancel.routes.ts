@@ -1,12 +1,16 @@
-import { globalPaginationMiddleware, isauthenticated, isauthorized, PERMISSIONS } from '@duvdu-v1/duvdu';
+import {
+  globalPaginationMiddleware,
+  isauthenticated,
+  isauthorized,
+  PERMISSIONS,
+} from '@duvdu-v1/duvdu';
 import express from 'express';
 
 import * as controllers from '../controllers/contractCancel';
 import * as validations from '../validator/contractCancel.validation';
 
 export const router = express.Router();
-router.use(isauthenticated); 
-
+router.use(isauthenticated);
 
 router
   .route('/')
@@ -29,7 +33,8 @@ router
     isauthorized(PERMISSIONS.deleteContractCancel),
     validations.deleteContractCancelValidation,
     controllers.deleteContractCancel,
-  ).patch(
+  )
+  .patch(
     isauthorized(PERMISSIONS.acceptContractCancel),
     validations.acceptContractCancelValidation,
     controllers.acceptContractCancel,
