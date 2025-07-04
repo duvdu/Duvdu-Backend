@@ -8,7 +8,7 @@ import {
   Users,
 } from '@duvdu-v1/duvdu';
 
-import { sendNotification } from '../controllers/sendNotification';
+import { sendNotification } from '../controllers/webhook/sendNotification';
 import { getRentalOnGoingExpiration } from '../utils/expirationRentalQueue';
 
 export const handleRentalPayment = async (
@@ -69,7 +69,7 @@ export const handleRentalPayment = async (
     });
 
     // decrement the user contracts count
-    await Users.findOneAndUpdate({ _id:contract.sp }, { $inc: { avaliableContracts: -1 } });
+    await Users.findOneAndUpdate({ _id: contract.sp }, { $inc: { avaliableContracts: -1 } });
 
     const rentalQueue = getRentalOnGoingExpiration();
     if (rentalQueue) {

@@ -8,7 +8,7 @@ import {
   Users,
 } from '@duvdu-v1/duvdu';
 
-import { sendNotification } from '../controllers/sendNotification';
+import { sendNotification } from '../controllers/webhook/sendNotification';
 import {
   getOnGoingExpirationQueue,
   getUpdateAfterFirstPaymentExpirationQueue,

@@ -8,7 +8,7 @@ import {
   Users,
 } from '@duvdu-v1/duvdu';
 
-import { sendNotification } from '../controllers/sendNotification';
+import { sendNotification } from '../controllers/webhook/sendNotification';
 import {
   getOnGoingExpiration,
   getUpdateAfterFirstPaymentQueue,
@@ -82,9 +82,8 @@ export const handlePortfolioPayment = async (
 
     console.log('=====================');
     console.log(x);
-    
+
     console.log('=====================');
-    
 
     const delay = contract.stageExpiration * 3600 * 1000;
     const updateQueue = getUpdateAfterFirstPaymentQueue();

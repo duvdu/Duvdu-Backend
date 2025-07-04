@@ -1,11 +1,11 @@
 import { Channels, MODELS, PaymobService, Transaction, TransactionStatus } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-import { sendNotification } from './sendNotification';
-import { handleCopyrightsPayment } from '../services/copyrightsPaymentHandler';
-import { handlePortfolioPayment } from '../services/portfolioPaymentHandler';
-import { handleRentalPayment } from '../services/rentalPaymentHandler copy';
-import { handleSubscribePayment } from '../services/subscribePaymentHandler';
+import { sendNotification } from '../sendNotification';
+import { handleCopyrightsPayment } from '../../services/copyrightsPaymentHandler';
+import { handlePortfolioPayment } from '../../services/portfolioPaymentHandler';
+import { handleRentalPayment } from '../../services/rentalPaymentHandler copy';
+import { handleSubscribePayment } from '../../services/subscribePaymentHandler';
 
 export const responseWebhook: RequestHandler = async (req, res) => {
   try {
@@ -137,10 +137,7 @@ export const responseWebhook: RequestHandler = async (req, res) => {
         });
       }
 
-      return res.redirect(
-        result.redirectUrl ||
-          'http://duvdu.com/contracts?paymentStatus=success',
-      );    
+      return res.redirect(result.redirectUrl || 'http://duvdu.com/contracts?paymentStatus=success');
     }
 
     // Handle other service types here if needed

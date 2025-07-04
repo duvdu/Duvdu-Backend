@@ -1,12 +1,6 @@
-import {
-  Channels,
-  MODELS,
-  Transaction,
-  TransactionStatus,
-  Users,
-} from '@duvdu-v1/duvdu';
+import { Channels, MODELS, Transaction, TransactionStatus, Users } from '@duvdu-v1/duvdu';
 
-import { sendNotification } from '../controllers/sendNotification';
+import { sendNotification } from '../controllers/webhook/sendNotification';
 
 export const handleSubscribePayment = async (
   userId: string,
@@ -51,9 +45,13 @@ export const handleSubscribePayment = async (
   }
 
   // increment the user contracts count
-  const user = await Users.findByIdAndUpdate(userId, {
-    $inc: { avaliableContracts: 5 },
-  }, { new: true });
+  const user = await Users.findByIdAndUpdate(
+    userId,
+    {
+      $inc: { avaliableContracts: 5 },
+    },
+    { new: true },
+  );
 
   await sendNotification(
     userId,
@@ -64,7 +62,6 @@ export const handleSubscribePayment = async (
     `your payment success for new subscription, you now have ${user?.avaliableContracts} contracts`,
     Channels.notification,
   );
-
 
   // If we reach here, it means the contract status was neither waitingForFirstPayment nor waitingForTotalPayment
   return {

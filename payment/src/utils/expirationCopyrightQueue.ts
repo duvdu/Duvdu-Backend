@@ -10,7 +10,7 @@ import {
 } from '@duvdu-v1/duvdu';
 import { Queue, Worker, Job } from 'bullmq';
 
-import { sendSystemNotification } from '../controllers';
+import { sendSystemNotification } from '../controllers/webhook';
 
 interface IContractQueue {
   contractId: string;

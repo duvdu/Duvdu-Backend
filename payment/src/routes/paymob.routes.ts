@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { responseWebhook } from '../controllers';
+import { responseWebhook } from '../controllers/webhook';
 
 export const router = express.Router();
 
