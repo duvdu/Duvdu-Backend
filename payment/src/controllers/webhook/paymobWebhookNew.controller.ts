@@ -1,7 +1,7 @@
 import { Channels, MODELS, PaymobService, Transaction, TransactionStatus } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
-import { sendNotification } from '../sendNotification';
+import { sendNotification } from './sendNotification';
 import { handleCopyrightsPayment } from '../../services/copyrightsPaymentHandler';
 import { handlePortfolioPayment } from '../../services/portfolioPaymentHandler';
 import { handleRentalPayment } from '../../services/rentalPaymentHandler copy';
