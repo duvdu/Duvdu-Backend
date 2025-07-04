@@ -10,7 +10,7 @@ import {
 } from '@duvdu-v1/duvdu';
 import { Queue, Worker, Job } from 'bullmq';
 
-import { sendSystemNotification } from '../controllers/sendNotification';
+import { sendSystemNotification } from '../controllers/webhook/sendNotification';
 
 // Create rental queue with async initialization
 export const createRentalQueue = async () => {
