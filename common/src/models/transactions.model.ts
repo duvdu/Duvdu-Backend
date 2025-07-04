@@ -16,6 +16,7 @@ export interface ITransaction {
   status: string;
   timeStamp: Date;
   model: string;
+  isSubscription: boolean;
 }
 
 export const Transaction = model<ITransaction>(
@@ -28,5 +29,6 @@ export const Transaction = model<ITransaction>(
     status: { type: String, default: TransactionStatus.PENDING },
     timeStamp: { type: Date, default: Date.now },
     model: { type: String, default: null },
+    isSubscription: { type: Boolean, default: false },
   }),
 );
