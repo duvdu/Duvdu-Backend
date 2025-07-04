@@ -8,6 +8,11 @@ export enum TransactionStatus {
   FAILED = 'failed',
 }
 
+export enum TransactionType {
+  DEPOSIT = 'deposit',
+  WITHDRAW = 'withdraw',
+}
+
 export interface ITransaction {
   currency: string;
   amount: number;
@@ -17,6 +22,7 @@ export interface ITransaction {
   timeStamp: Date;
   model: string;
   isSubscription: boolean;
+  type: TransactionType;
 }
 
 export const Transaction = model<ITransaction>(
@@ -30,5 +36,6 @@ export const Transaction = model<ITransaction>(
     timeStamp: { type: Date, default: Date.now },
     model: { type: String, default: null },
     isSubscription: { type: Boolean, default: false },
+    type: { type: String, default: TransactionType.DEPOSIT },
   }),
 );
