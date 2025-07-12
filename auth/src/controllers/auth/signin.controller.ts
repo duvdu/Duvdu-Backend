@@ -50,7 +50,7 @@ export const signinHandler: SigninHandler = async (req, res, next) => {
     );
 
   const origin = req.headers?.origin;
-  const isDashboard = origin?.includes('dashboard.duvdu.com');
+  const isDashboard = origin?.includes('dashboard.duvdu.com') || origin?.includes('localhost:3000');
   const isMobileApp = req.headers['x-app-version'] || req.headers['x-platform'];
   const userAgent = req.headers['user-agent'] || '';
   const isPostman = userAgent.includes('Postman');
