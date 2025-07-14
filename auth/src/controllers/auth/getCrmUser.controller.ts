@@ -117,12 +117,6 @@ export const getCrmUser: RequestHandler<{ userId: string }, SuccessResponse<{ da
         categoryDetails: 0,
       },
     },
-    {
-      $facet: {
-        totalCount: [{ $count: 'totalCount' }],
-        users: [{ $skip: req.pagination.skip }, { $limit: req.pagination.limit }],
-      },
-    },
   );
   
   // Execute aggregation pipeline
