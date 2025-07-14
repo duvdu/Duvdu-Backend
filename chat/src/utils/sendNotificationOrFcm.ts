@@ -4,7 +4,7 @@ import SocketIO from 'socket.io';
 import admin from './fireBaseConfig';
 
 export async function sendFCMNotification(
-  token: string [],
+  token: string[],
   title: string,
   message: string,
   data: Inotification,

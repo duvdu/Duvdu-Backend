@@ -60,8 +60,6 @@ export const sendMessageHandler: SendMessageHandler = async (req, res, next) => 
     (project.user.toString() === req.loggedUser.id.toString() ||
       project.user.toString() === req.body.receiver!.toString());
 
- 
-
   if (!contract && !isMainUser && req.loggedUser.role.key !== SystemRoles.admin) {
     return next(new NotAllowedError(undefined, req.lang));
   }
@@ -98,9 +96,9 @@ export const sendMessageHandler: SendMessageHandler = async (req, res, next) => 
   ]);
 
   if (populatedMessage.media && populatedMessage.media.length > 0) {
-    populatedMessage.media = populatedMessage.media.map(item => ({
+    populatedMessage.media = populatedMessage.media.map((item) => ({
       ...item,
-      url: `${process.env.BUCKET_HOST}/${item.url}`
+      url: `${process.env.BUCKET_HOST}/${item.url}`,
     })) as any;
   }
   const notification = await Notification.create({
@@ -115,8 +113,6 @@ export const sendMessageHandler: SendMessageHandler = async (req, res, next) => 
   const populatedNotification = await (
     await notification.save()
   ).populate('sourceUser', 'isOnline profileImage username name');
-
-
 
   const io = req.app.get('socketio');
   sendNotificationOrFCM(

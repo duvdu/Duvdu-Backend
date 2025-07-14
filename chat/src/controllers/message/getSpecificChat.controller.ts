@@ -164,8 +164,6 @@ export const getSpecificChatHandler: GetSpecificChatHandler = async (req, res) =
     ],
   });
 
-
-
   await Message.updateMany(
     {
       sender: userOne,
@@ -189,13 +187,13 @@ export const getSpecificChatHandler: GetSpecificChatHandler = async (req, res) =
   }).populate({
     path: 'contract',
     match: {
-      status: { $nin: ['canceled', 'pending', 'rejected', 'reject', 'cancel'] }
-    }
+      status: { $nin: ['canceled', 'pending', 'rejected', 'reject', 'cancel'] },
+    },
   }));
 
-  const user = await Users.findById(userOne).select(
-    'name projectsView rank username isOnline profileImage',
-  ).lean();
+  const user = await Users.findById(userOne)
+    .select('name projectsView rank username isOnline profileImage')
+    .lean();
 
   res.status(200).json(<any>{
     message: 'success',
@@ -205,6 +203,14 @@ export const getSpecificChatHandler: GetSpecificChatHandler = async (req, res) =
       totalPages: Math.ceil(resultCount / req.pagination.limit),
     },
     data: chat,
-    user: user ? { ...user, profileImage: user?.profileImage ? `${process.env.BUCKET_HOST}/${user.profileImage}` : null, canChat } : null,
+    user: user
+      ? {
+          ...user,
+          profileImage: user?.profileImage
+            ? `${process.env.BUCKET_HOST}/${user.profileImage}`
+            : null,
+          canChat,
+        }
+      : null,
   });
 };

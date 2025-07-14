@@ -1,5 +1,5 @@
 import 'express-async-errors';
-import { Message, MODELS , Contracts } from '@duvdu-v1/duvdu';
+import { Message, MODELS, Contracts } from '@duvdu-v1/duvdu';
 import { Types } from 'mongoose';
 
 import { GetLoggedUserChatsHandler } from '../../types/endpoints/mesage.endpoints';
@@ -194,12 +194,12 @@ export const getLoggedUserChatsHandler: GetLoggedUserChatsHandler = async (req, 
       }).populate({
         path: 'contract',
         match: {
-          status: { $nin: ['canceled', 'pending', 'rejected', 'reject', 'cancel'] }
-        }
+          status: { $nin: ['canceled', 'pending', 'rejected', 'reject', 'cancel'] },
+        },
       }));
 
       return { ...chat, canChat };
-    })
+    }),
   );
 
   res.status(200).json({

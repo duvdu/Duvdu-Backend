@@ -19,8 +19,7 @@ export const getAvaliableUserICanChatHandler: RequestHandler<
     },
   });
 
-  const filteredContracts = contracts.filter(contract => contract.contract !== null);
-
+  const filteredContracts = contracts.filter((contract) => contract.contract !== null);
 
   const contractUserIds = filteredContracts
     .map((contract) => (contract.sp.toString() === loggedUserId ? contract.customer : contract.sp))
