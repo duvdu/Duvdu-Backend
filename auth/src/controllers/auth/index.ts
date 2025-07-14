@@ -21,3 +21,4 @@ export * from './loginWithProvider.controller';
 export * from './updateProviderPhone.controller';
 export * from './faceRecognition.controller';
 export * from './deleteLoggedUser.controller';
+export * from './getCrmUsers.controller';

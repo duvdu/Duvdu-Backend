@@ -2,6 +2,7 @@ import { globalValidatorMiddleware } from '@duvdu-v1/duvdu';
 import { query } from 'express-validator';
 
 export const findUsers = [
+  query('role').optional().isMongoId().withMessage('invalidFormat'),
   query('search').optional(),
   query('username')
     .optional()

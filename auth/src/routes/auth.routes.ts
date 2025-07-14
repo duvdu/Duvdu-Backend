@@ -35,7 +35,15 @@ router
     isauthorized(PERMISSIONS.createUser),
     val.createUser,
     handlers.createUserHandler,
+  ).get(
+    isauthenticated,
+    val.findUsers,
+    globalPaginationMiddleware,
+    handlers.filterUsers,
+    handlers.getCrmUsers,
   );
+
+
 router.route('/crm/:userId').patch(
   isauthenticated,
   isauthorized(PERMISSIONS.updateUser),

@@ -25,6 +25,7 @@ export const filterUsers: RequestHandler<
     isBlocked?: boolean;
     isAdmin?: boolean;
     maxDistance?: number;
+    role?: string;
   }
 > = async (req, res, next) => {
   if (req.query.search) {
@@ -55,6 +56,10 @@ export const filterUsers: RequestHandler<
       $nin: [unverifiedRole?._id, verifiedRole?._id],
     };
   }
+
+  if (req.query.role) 
+    req.pagination.filter.role = new mongoose.Types.ObjectId(req.query.role);
+  
 
   req.query.maxDistance = +(req.query.maxDistance || 1000);
 
