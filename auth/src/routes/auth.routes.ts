@@ -54,7 +54,7 @@ router.route('/crm/:userId').patch(
   val.updateUser,
   handlers.updateUserHandler,
 ).get(
-  isauthenticated,
+  // isauthenticated,
   val.getCrmUser,
   handlers.getCrmUser,
 );

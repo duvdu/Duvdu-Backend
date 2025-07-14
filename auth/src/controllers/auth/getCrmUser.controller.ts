@@ -121,11 +121,10 @@ export const getCrmUser: RequestHandler<{ userId: string }, SuccessResponse<{ da
   
   // Execute aggregation pipeline
   const users = await Users.aggregate(aggregationPipeline);
-
   
   res.status(200).json({
     message: 'success',
-    data: users[0].users[0],
+    data: users[0],
   });
 };
   
