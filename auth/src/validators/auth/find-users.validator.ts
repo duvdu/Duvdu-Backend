@@ -38,5 +38,6 @@ export const findUsers = [
   query('page').optional().isInt().withMessage('invalidFormat').toInt(),
   query('isAdmin').optional().isBoolean().toBoolean(),
   query('maxDistance').optional().isInt({ min: 1, max: 1000 }).bail().toInt(),
+  query('isBlocked').optional().isBoolean().toBoolean(),
   globalValidatorMiddleware,
 ];
