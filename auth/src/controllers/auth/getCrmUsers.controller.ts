@@ -73,6 +73,8 @@ export const getCrmUsers: RequestHandler<unknown, PaginationResponse<{ data: Ius
         haveInvitation: 1,
         projectsCount: 1,
         categories: 1,
+        createdAt: 1,
+        updatedAt: 1,
       },
     },
     {
