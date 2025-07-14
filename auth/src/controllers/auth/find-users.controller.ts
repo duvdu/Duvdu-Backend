@@ -26,6 +26,7 @@ export const filterUsers: RequestHandler<
     isAdmin?: boolean;
     maxDistance?: number;
     role?: string;
+    isOnline?: boolean;
   }
 > = async (req, res, next) => {
   if (req.query.search) {
@@ -48,7 +49,8 @@ export const filterUsers: RequestHandler<
     req.pagination.filter.price = { ...req.pagination.filter.price, $lte: req.query.priceTo };
   if (req.query.hasVerificationPadge !== undefined)
     req.pagination.filter.hasVerificationBadge = req.query.hasVerificationPadge;
-  req.pagination.filter['isBlocked.value'] = req.query.isBlocked || false;
+  if (req.query.isBlocked !== undefined) req.pagination.filter['isBlocked.value'] = req.query.isBlocked;
+  if (req.query.isOnline !== undefined) req.pagination.filter.isOnline = req.query.isOnline;
 
   if (req.query.isAdmin != false && req.query.isAdmin != undefined) {
     const unverifiedRole = await Roles.findOne({ key: SystemRoles.unverified }).select('_id');
