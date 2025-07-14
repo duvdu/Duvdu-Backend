@@ -1,12 +1,11 @@
 import {
-  Contracts,
   Iuser,
   MODELS,
   PaginationResponse,
   Users,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
-import mongoose, { PipelineStage, Document } from 'mongoose';
+import mongoose, { PipelineStage } from 'mongoose';
   
 export const getCrmUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser[] }>> = async (
   req,
@@ -147,28 +146,6 @@ export const getCrmUsers: RequestHandler<unknown, PaginationResponse<{ data: Ius
   const users = await Users.aggregate(aggregationPipeline);
   const resultCount = users[0]?.totalCount[0]?.totalCount || 0;
   
-  const processedUsers = await Promise.all(
-    users[0].users.map(async (user: Iuser & Document) => {
-      // Check contract status using simple query
-      const contract = await Contracts.findOne({
-        $or: [
-          { sp: req.loggedUser?.id, customer: user._id },
-          { sp: user._id, customer: req.loggedUser?.id },
-        ],
-      }).populate({
-        path: 'contract',
-        match: {
-          status: {
-            $nin: ['canceled', 'pending', 'rejected', 'reject', 'cancel'],
-          },
-        },
-      });
-      return {
-        ...user,
-        canChat: !!contract?.contract, // Will be true if valid contract exists
-      };
-    }),
-  );
   
   res.status(200).json({
     message: 'success',
@@ -177,7 +154,7 @@ export const getCrmUsers: RequestHandler<unknown, PaginationResponse<{ data: Ius
       resultCount,
       totalPages: Math.ceil(resultCount / req.pagination.limit),
     },
-    data: processedUsers,
+    data: users[0].users,
   });
 };
   
