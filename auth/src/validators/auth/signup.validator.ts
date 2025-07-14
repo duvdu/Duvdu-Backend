@@ -59,6 +59,11 @@ export const createUser = [
   globalValidatorMiddleware,
 ];
 
+export const getCrmUser = [
+  param('userId').isMongoId(),
+  globalValidatorMiddleware,
+];
+
 export const updateUser = [
   param('userId').isMongoId(),
   body('name')

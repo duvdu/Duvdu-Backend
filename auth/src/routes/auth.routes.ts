@@ -53,6 +53,10 @@ router.route('/crm/:userId').patch(
   ]),
   val.updateUser,
   handlers.updateUserHandler,
+).get(
+  isauthenticated,
+  val.getCrmUser,
+  handlers.getCrmUser,
 );
 router
   .route('/crm/:userId/block')
