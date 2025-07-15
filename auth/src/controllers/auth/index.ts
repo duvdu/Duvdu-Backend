@@ -23,3 +23,4 @@ export * from './faceRecognition.controller';
 export * from './deleteLoggedUser.controller';
 export * from './getCrmUsers.controller';
 export * from './getCrmUser.controller';
+export * from './deleteUser.controller';

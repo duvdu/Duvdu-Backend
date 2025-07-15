@@ -145,3 +145,5 @@ export const loginProvider = [
     }),
   globalValidatorMiddleware,
 ];
+
+export const deleteUser = [param('userId').isMongoId(), globalValidatorMiddleware];

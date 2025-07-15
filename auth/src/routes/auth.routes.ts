@@ -60,6 +60,11 @@ router
     // isauthenticated,
     val.getCrmUser,
     handlers.getCrmUser,
+  ).delete(
+    isauthenticated,
+    isauthorized(PERMISSIONS.removeUser),
+    val.deleteUser,
+    handlers.deleteUser,
   );
 router
   .route('/crm/:userId/block')
