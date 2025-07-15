@@ -27,6 +27,7 @@ export const filterUsers: RequestHandler<
     maxDistance?: number;
     role?: string;
     isOnline?: boolean;
+    isDeleted?: boolean;
   }
 > = async (req, res, next) => {
   if (req.query.search) {
@@ -64,6 +65,8 @@ export const filterUsers: RequestHandler<
   if (req.query.role) req.pagination.filter.role = new mongoose.Types.ObjectId(req.query.role);
 
   req.query.maxDistance = +(req.query.maxDistance || 1000);
+
+  if (req.query.isDeleted !== undefined) req.pagination.filter.isDeleted = req.query.isDeleted;
 
   next();
 };

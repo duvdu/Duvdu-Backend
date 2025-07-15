@@ -39,5 +39,6 @@ export const findUsers = [
   query('isAdmin').optional().isBoolean().toBoolean(),
   query('maxDistance').optional().isInt({ min: 1, max: 1000 }).bail().toInt(),
   query('isBlocked').optional().isBoolean().toBoolean(),
+  query('isDeleted').optional().isBoolean().toBoolean(),
   globalValidatorMiddleware,
 ];
