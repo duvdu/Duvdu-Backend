@@ -12,6 +12,7 @@ export enum PERMISSIONS {
   blockUser = 'block-user',
   unBlockUser = 'un-block-user',
   listUsers = 'list-users',
+  removeUser = 'remove-user',
 
     // roles
   createRoleHandler = 'create-role',
@@ -135,6 +136,7 @@ export const permissions = {
     PERMISSIONS.getProjectAnalysis,
     PERMISSIONS.listWithdrawMethods,
     PERMISSIONS.updateWithdrawMethod,
+    PERMISSIONS.removeUser,
   ],
   category: [
     PERMISSIONS.createCategory,
@@ -157,6 +159,7 @@ export const permissions = {
     PERMISSIONS.updateUser,
     PERMISSIONS.blockUser,
     PERMISSIONS.unBlockUser,
+    PERMISSIONS.removeUser,
   ],
   messages: [
     PERMISSIONS.listMessagesFromTo,
