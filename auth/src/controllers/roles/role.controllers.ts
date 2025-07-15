@@ -53,14 +53,14 @@ export const getRolesHandler: GetRolesHandler = async (req, res) => {
 };
 
 export const getRoleHandler: GetRoleHandler = async (req, res, next) => {
-  const role = await Roles.findOne({ _id: req.params.roleId, key: { $ne: 'admin' } });
+  const role = await Roles.findOne({ _id: req.params.roleId, system: { $ne: true } });
   if (!role) return next(new NotFound({ en: 'role not found', ar: 'الدور غير موجود' }, req.lang));
   res.status(200).json({ message: 'success', data: role });
 };
 
 export const updateRoleHandler: UpdateRoleHandler = async (req, res, next) => {
   const role = await Roles.findOneAndUpdate(
-    { _id: req.params.roleId, key: { $ne: 'admin' } },
+    { _id: req.params.roleId, system: { $ne: true } },
     req.body,
   );
   if (!role) return next(new NotFound({ en: 'role not found', ar: 'الدور غير موجود' }, req.lang));
