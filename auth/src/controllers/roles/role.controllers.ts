@@ -22,7 +22,7 @@ export const createRoleHandler: CreateRoleHandler = async (req, res) => {
 };
 
 export const removeRoleHandler: RemoveRoleHandler = async (req, res, next) => {
-  const role = await Roles.findOneAndDelete({ _id: req.params.roleId, key: { $ne: 'admin' } });
+  const role = await Roles.findById(req.params.roleId);
   if (!role) return next(new NotFound({ en: 'role not found', ar: 'الدور غير موجود' }, req.lang));
   if (role.system)
     return next(
@@ -31,7 +31,7 @@ export const removeRoleHandler: RemoveRoleHandler = async (req, res, next) => {
         req.lang,
       ),
     );
-  const plans = await Plans.countDocuments({ role: req.params.roleId });
+  const plans = await Plans.countDocuments({ role: role.id });
   if (plans > 0)
     return next(
       new BadRequestError(
@@ -42,6 +42,8 @@ export const removeRoleHandler: RemoveRoleHandler = async (req, res, next) => {
         req.lang,
       ),
     );
+
+  await Roles.findByIdAndDelete(req.params.roleId);
   res.status(204).json();
 };
 
