@@ -133,7 +133,6 @@ router
     val.updateProfileVal,
     handlers.updateProfileHandler,
   )
-  // TODO: add authorization
   .put(
     globalUploadMiddleware('defaults' as any).fields([
       { name: 'profileImage', maxCount: 1 },
