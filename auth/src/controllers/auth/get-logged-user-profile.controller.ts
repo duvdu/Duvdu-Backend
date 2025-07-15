@@ -6,6 +6,15 @@ import { GetLoggedUserProfileHandler } from '../../types/endpoints/user.endpoint
 export const getLoggedUserProfileHandler: GetLoggedUserProfileHandler = async (req, res, next) => {
   const user = await Users.aggregate([
     { $match: { _id: new mongoose.Types.ObjectId(req.loggedUser.id) } },
+    //roles
+    {
+      $lookup: {
+        from: MODELS.role,
+        localField: 'role',
+        foreignField: '_id',
+        as: 'role',
+      },
+    },
     {
       $lookup: {
         from: MODELS.category,
@@ -21,12 +30,12 @@ export const getLoggedUserProfileHandler: GetLoggedUserProfileHandler = async (r
         password: 0,
         verificationCode: 0,
         refreshTokens: 0,
-        role: 0,
         favourites: 0,
       },
     },
     {
       $addFields: {
+        role: { $arrayElemAt: ['$role', 0] },
         averageRate: {
           $cond: {
             if: { $gt: ['$rate.ratersCounter', 0] },
