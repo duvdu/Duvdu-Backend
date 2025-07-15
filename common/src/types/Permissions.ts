@@ -1,13 +1,46 @@
 export enum PERMISSIONS {
-  resetPassword = 'resetPassword',
-  updatePhoneNumber = 'updatePhoneNumber',
-  changePassword = 'changePassword',
-  updateProfile = 'updateProfile',
-  bookmarks = 'bookmarks',
+
+  //category
   createCategory = 'create-category',
   updateCategory = 'update-category',
   removeCategory = 'remove-category',
-  getAdminCategories = 'get-gategories-admin',
+  listCategories = 'list-categories',
+
+  //user
+  createUser = 'create-user',
+  updateUser = 'update-user',
+  blockUser = 'block-user',
+  unBlockUser = 'un-block-user',
+  listUsers = 'list-users',
+
+    // roles
+  createRoleHandler = 'create-role',
+  updateRoleHandler = 'update-role',
+  listRoles = 'list-roles',
+  removeRoleHandler = 'remove-role',
+  getAllPermissions = 'get-all-permissions',
+
+  //message
+  listMessagesFromTo = 'list-messages-from-to',
+
+  // project
+  listProjects = 'list-projects',
+  updateProject = 'update-project',
+  removeProject = 'remove-project',
+  getProjectAnalysis = 'get-project-analysis',
+
+  // withdraw
+  listWithdrawMethods = 'list-withdraw-methods',
+  updateWithdrawMethod = 'update-withdraw-method',
+  
+
+
+
+
+  bookmarks = 'bookmarks',
+
+
+
   createTicket = 'create ticket',
   getAllTickets = 'get-all-tickets',
   updateTicket = 'update-ticket',
@@ -16,29 +49,14 @@ export enum PERMISSIONS {
   createTerm = 'create-term',
   updateTerm = 'update-term',
 
-  createUser = 'create user',
-  updateUser = 'update user',
-  blockUser = 'block user',
-  unBlockUser = 'un block user',
+
   // plan
   createPlanHandler = 'create plan',
   updatePlanHandler = 'update plan',
   getPlanHandler = 'get plan',
   getAllPlansHandler = 'get all plans',
   removePlanHandler = 'remove plan',
-  // roles
-  createRoleHandler = 'create role',
-  updateRoleHandler = 'update role',
-  getRolesHandler = 'get roles',
-  getRoleHandler = 'get role',
-  removeRoleHandler = 'remove role',
-  getAllPermissions = 'get all permissions',
-  // project
-  createProjectHandler = 'create project project',
-  updateProjectHandler = 'update project project',
-  removeProjectHandler = 'remove project project',
-  getCrmProjectsHandlers = 'get crm project projects',
-  getAnalysisHandler = 'get project analysis handler',
+
   // copyrights
   createCopyrightHandler = 'create copyright project',
   updateCopyrightHandler = 'update copyright project',
@@ -93,20 +111,46 @@ export enum PERMISSIONS {
 }
 
 export const permissions = {
-  auth: [
-    PERMISSIONS.resetPassword,
-    PERMISSIONS.updatePhoneNumber,
-    PERMISSIONS.changePassword,
-    PERMISSIONS.updateProfile,
-  ],
-  bookmarks: [PERMISSIONS.bookmarks],
   category: [
     PERMISSIONS.createCategory,
     PERMISSIONS.updateCategory,
     PERMISSIONS.updateCategory,
     PERMISSIONS.removeCategory,
-    PERMISSIONS.getAdminCategories,
+    PERMISSIONS.listCategories,
   ],
+  roles: [
+    PERMISSIONS.listRoles,
+    PERMISSIONS.createRoleHandler,
+    PERMISSIONS.updateRoleHandler,
+    PERMISSIONS.updateRoleHandler,
+    PERMISSIONS.removeRoleHandler,
+    PERMISSIONS.getAllPermissions,
+  ],
+  users: [
+    PERMISSIONS.listUsers,
+    PERMISSIONS.createUser,
+    PERMISSIONS.updateUser,
+    PERMISSIONS.blockUser,
+    PERMISSIONS.unBlockUser,
+  ],
+  messages: [
+    PERMISSIONS.listMessagesFromTo,
+  ],
+  projects: [
+    PERMISSIONS.listProjects,
+    PERMISSIONS.updateProject,
+    PERMISSIONS.removeProject,
+    PERMISSIONS.getProjectAnalysis,
+  ],
+  withdrawMethods: [
+    PERMISSIONS.listWithdrawMethods,
+    PERMISSIONS.updateWithdrawMethod,
+  ],
+
+
+
+  bookmarks: [PERMISSIONS.bookmarks],
+
   ticket: [
     PERMISSIONS.createTicket,
     PERMISSIONS.getTicket,
@@ -122,22 +166,7 @@ export const permissions = {
     PERMISSIONS.removePlanHandler,
     PERMISSIONS.updatePlanHandler,
   ],
-  roles: [
-    PERMISSIONS.getRoleHandler,
-    PERMISSIONS.getRolesHandler,
-    PERMISSIONS.createRoleHandler,
-    PERMISSIONS.updateRoleHandler,
-    PERMISSIONS.updateRoleHandler,
-    PERMISSIONS.removeRoleHandler,
-    PERMISSIONS.getAllPermissions,
-  ],
-  Post: [
-    PERMISSIONS.createProjectHandler,
-    PERMISSIONS.updateProjectHandler,
-    PERMISSIONS.removeProjectHandler,
-    PERMISSIONS.getCrmProjectsHandlers,
-    PERMISSIONS.getAnalysisHandler,
-  ],
+
   copyrights: [
     PERMISSIONS.createCopyrightHandler,
     PERMISSIONS.updateCopyrightHandler,
