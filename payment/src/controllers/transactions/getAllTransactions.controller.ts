@@ -25,7 +25,7 @@ export const transactionPagination: RequestHandler<
     from?: string;
     to?: string;
   }
-> = async (req) => {
+> = async (req, res, next) => {
   req.pagination.filter = {};
 
   if (req.query.user) req.pagination.filter.user = new Types.ObjectId(req.query.user);
@@ -55,6 +55,7 @@ export const transactionPagination: RequestHandler<
     if (req.query.from) req.pagination.filter.createdAt.$gte = new Date(req.query.from);
     if (req.query.to) req.pagination.filter.createdAt.$lte = new Date(req.query.to);
   }
+  next();
 };
 
 export const getAllTransactions: RequestHandler<
