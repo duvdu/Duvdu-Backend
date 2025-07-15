@@ -80,18 +80,21 @@ export const Message = model<ImessageDoc>(
       collection: MODELS.messages,
       toJSON: {
         transform(doc, ret) {
-          if (ret.media?.url) ret.media.url = process.env.BUCKET_HOST + '/' + ret.media.url;
+          // Handle media array - transform URLs for each media item
+          if (ret.media && Array.isArray(ret.media)) {
+            ret.media = ret.media.map(mediaItem => {
+              if (mediaItem?.url) {
+                return {
+                  ...mediaItem,
+                  url: process.env.BUCKET_HOST + '/' + mediaItem.url
+                };
+              }
+              return mediaItem;
+            });
+          }
+          return ret;
         },
       },
     },
   ),
 );
-
-Message.schema.set('toJSON', {
-  transform: function (doc, ret) {
-    if (ret.media?.url) {
-      ret.media.url = process.env.BUCKET_HOST + '/' + ret.media.url;
-    }
-    return ret;
-  },
-});
