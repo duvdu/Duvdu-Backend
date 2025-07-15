@@ -7,6 +7,11 @@ export enum WithdrawMethod {
   BANK = 'bank',
 }
 
+export enum WithdrawMethodStatus {
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+}
+
 export interface IWithdrawMethod {
   user: Types.ObjectId;
   method: WithdrawMethod;
@@ -14,6 +19,7 @@ export interface IWithdrawMethod {
   number: string;
   isDeleted: boolean;
   default: boolean;
+  status: WithdrawMethodStatus;
 }
 
 export const WithdrawMethodModel = model<IWithdrawMethod>(
@@ -25,5 +31,6 @@ export const WithdrawMethodModel = model<IWithdrawMethod>(
     number: { type: String, default: null },
     isDeleted: { type: Boolean, default: false },
     default: { type: Boolean, default: false },
+    status: { type: String, enum: WithdrawMethodStatus, default: WithdrawMethodStatus.ACTIVE },
   }),
 );
