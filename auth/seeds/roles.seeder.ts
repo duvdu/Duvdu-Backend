@@ -12,6 +12,8 @@ export const appInit = async () => {
     adminRole = await Roles.create({ key: SystemRoles.admin, system: true, permissions: permissions.all });
   else
     await Roles.findOneAndUpdate({ key: SystemRoles.admin }, { permissions: permissions.all });
+
+
   if (!(await Roles.findOne({ key: SystemRoles.verified })))
     await Roles.create({
       _id: new mongoose.Types.ObjectId('662b930f4566c8d2f8ed6ae4'),
@@ -23,7 +25,8 @@ export const appInit = async () => {
     await Roles.findOneAndUpdate(
       { key: SystemRoles.verified },
       {
-        permissions: []
+        permissions: [],
+        system: true,
       },
     );
 
@@ -34,6 +37,14 @@ export const appInit = async () => {
       system: true,
       permissions: [],
     });
+  else
+    await Roles.findOneAndUpdate(
+      { key: SystemRoles.unverified },
+      {
+        permissions: [],
+        system: true,
+      },
+    );
 
   if (!(await Users.findOne({ username: 'metoooooo' })))
     await Users.create({
