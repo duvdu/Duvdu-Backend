@@ -1,4 +1,4 @@
-import { PERMISSIONS, SystemRoles, Roles, Users } from '@duvdu-v1/duvdu';
+import { SystemRoles, Roles, Users } from '@duvdu-v1/duvdu';
 import mongoose from 'mongoose';
 
 import { hashPassword } from './../src/utils/bcrypt';
@@ -15,39 +15,13 @@ export const appInit = async () => {
       _id: new mongoose.Types.ObjectId('662b930f4566c8d2f8ed6ae4'),
       key: SystemRoles.verified,
       system: true,
-      permissions: [
-        PERMISSIONS.bookmarks,
-        PERMISSIONS.changePassword,
-        PERMISSIONS.resetPassword,
-        PERMISSIONS.updatePhoneNumber,
-        PERMISSIONS.updateProfile,
-      ],
+      permissions: []
     });
   else
     await Roles.findOneAndUpdate(
       { key: SystemRoles.verified },
       {
-        permissions: [
-          PERMISSIONS.bookmarks,
-          PERMISSIONS.changePassword,
-          PERMISSIONS.resetPassword,
-          PERMISSIONS.updatePhoneNumber,
-          PERMISSIONS.updateProfile,
-          PERMISSIONS.createCopyrightHandler,
-          PERMISSIONS.createProjectHandler,
-          PERMISSIONS.createProjectHandler,
-          PERMISSIONS.updateProjectHandler,
-          PERMISSIONS.removeProjectHandler,
-          PERMISSIONS.updateProjectHandler,
-          PERMISSIONS.updateCopyrightHandler,
-          PERMISSIONS.createTicket,
-          PERMISSIONS.createTeamProjectHandler,
-          PERMISSIONS.updateTeamProjectCreativeHandler,
-          PERMISSIONS.updateTeamProjectHandler,
-          PERMISSIONS.deleteTeamProjectCreativeHandler,
-          PERMISSIONS.deleteTeamProjectHandler,
-          PERMISSIONS.booking,
-        ],
+        permissions: []
       },
     );
 
@@ -56,7 +30,7 @@ export const appInit = async () => {
       _id: new mongoose.Types.ObjectId('665313e6fd70dd6d63d23481'),
       key: SystemRoles.unverified,
       system: true,
-      permissions: [PERMISSIONS.changePassword, PERMISSIONS.updateProfile],
+      permissions: [],
     });
 
   if (!(await Users.findOne({ username: 'metoooooo' })))

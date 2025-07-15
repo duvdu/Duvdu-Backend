@@ -3,6 +3,8 @@ import {
   globalPaginationMiddleware,
   globalUploadMiddleware,
   isauthenticated,
+  isauthorized,
+  PERMISSIONS,
 } from '@duvdu-v1/duvdu';
 import express from 'express';
 
@@ -17,6 +19,7 @@ router.route('/avaliable-chat').get(isauthenticated, handler.getAvaliableUserICa
 
 router.get(
   '/:receiver/chat/:sender',
+  isauthorized(PERMISSIONS.listMessagesFromTo),
   globalPaginationMiddleware,
   val.getChatFromToVal,
   handler.getChatFromToHandler,

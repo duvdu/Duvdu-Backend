@@ -27,7 +27,7 @@ router
   .route('/analysis')
   .get(
     isauthenticated,
-    isauthorized(PERMISSIONS.getAnalysisHandler),
+    isauthorized(PERMISSIONS.getProjectAnalysis),
     val.getProjectAnalysis,
     handler.getProjectAnalysis,
   );
@@ -35,7 +35,7 @@ router
   .route('/crm')
   .get(
     isauthenticated,
-    isauthorized(PERMISSIONS.getCrmProjectsHandlers),
+    isauthorized(PERMISSIONS.listProjects),
     val.getAll,
     globalPaginationMiddleware,
     handler.getProjectsPagination,
@@ -46,7 +46,6 @@ router
   .route('/')
   .post(
     isauthenticated,
-    isauthorized(PERMISSIONS.createProjectHandler),
     globalUploadMiddleware(FOLDERS.portfolio_post, {
       maxSize: 400 * 1024 * 1024,
       fileTypes: ['video/*', 'image/*', 'audio/*', 'application/*'],
@@ -71,7 +70,6 @@ router
   .route('/:projectId')
   .patch(
     isauthenticated,
-    isauthorized(PERMISSIONS.updateProjectHandler),
     globalUploadMiddleware(FOLDERS.portfolio_post, {
       maxSize: 400 * 1024 * 1024,
       fileTypes: ['video/*', 'image/*', 'audio/*', 'application/*'],
@@ -86,7 +84,6 @@ router
   .get(optionalAuthenticated, val.getProject, handler.getProjectHandler)
   .delete(
     isauthenticated,
-    isauthorized(PERMISSIONS.removeProjectHandler),
     val.getProject,
     handler.deleteProjectHandler,
   )

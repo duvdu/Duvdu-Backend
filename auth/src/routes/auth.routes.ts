@@ -101,13 +101,11 @@ router.post(
 router.patch(
   '/change-password',
   isauthenticated,
-  isauthorized(PERMISSIONS.changePassword),
   val.changePasswordVal,
   handlers.changePasswordHandler,
 );
 router
   .route('/update-phone')
-  .all(isauthenticated, isauthorized(PERMISSIONS.updatePhoneNumber))
   .get(handlers.askUpdatePhoneNumberHandler)
   .patch(val.updatePhoneNumberVal, handlers.updatePhoneNumberHandler);
 
@@ -123,7 +121,6 @@ router
   .all(isauthenticated)
   .get(handlers.getLoggedUserProfileHandler)
   .patch(
-    isauthorized(PERMISSIONS.updateProfile),
     globalUploadMiddleware(FOLDERS.auth).fields([
       { name: 'profileImage', maxCount: 1 },
       { name: 'coverImage', maxCount: 1 },

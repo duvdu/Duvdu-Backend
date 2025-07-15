@@ -16,7 +16,7 @@ export const router = express.Router();
 router.get(
   '/crm',
   isauthenticated,
-  isauthorized(PERMISSIONS.getAdminCategories),
+  isauthorized(PERMISSIONS.listCategories),
   val.getCategoriesForCrmVal,
   globalPaginationMiddleware,
   handler.getCategoriesAdminPagination,
@@ -25,7 +25,7 @@ router.get(
 router.get(
   '/crm/:categoryId',
   isauthenticated,
-  isauthorized(PERMISSIONS.getAdminCategories),
+  isauthorized(PERMISSIONS.listCategories),
   val.getCategoryAdminVal,
   handler.getCategoryAdminController,
 );
