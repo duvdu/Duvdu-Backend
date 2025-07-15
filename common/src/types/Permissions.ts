@@ -111,6 +111,31 @@ export enum PERMISSIONS {
 }
 
 export const permissions = {
+  all: [
+    PERMISSIONS.createCategory,
+    PERMISSIONS.updateCategory,
+    PERMISSIONS.updateCategory,
+    PERMISSIONS.removeCategory,
+    PERMISSIONS.listCategories,
+    PERMISSIONS.listRoles,
+    PERMISSIONS.createRoleHandler,
+    PERMISSIONS.updateRoleHandler,
+    PERMISSIONS.updateRoleHandler,
+    PERMISSIONS.removeRoleHandler,
+    PERMISSIONS.getAllPermissions,
+    PERMISSIONS.listUsers,
+    PERMISSIONS.createUser,
+    PERMISSIONS.updateUser,
+    PERMISSIONS.blockUser,
+    PERMISSIONS.unBlockUser,
+    PERMISSIONS.listMessagesFromTo,
+    PERMISSIONS.listProjects,
+    PERMISSIONS.updateProject,
+    PERMISSIONS.removeProject,
+    PERMISSIONS.getProjectAnalysis,
+    PERMISSIONS.listWithdrawMethods,
+    PERMISSIONS.updateWithdrawMethod,
+  ],
   category: [
     PERMISSIONS.createCategory,
     PERMISSIONS.updateCategory,
