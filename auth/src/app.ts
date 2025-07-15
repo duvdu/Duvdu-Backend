@@ -37,7 +37,8 @@ app.use(
 
   const sessionMiddleware = (req: Request, res: Response, next: NextFunction) => {
     const origin = req.headers?.origin;
-    const isDashboard = origin?.includes('dashboard.duvdu.com') || origin?.includes('localhost:3000');
+    const isDashboard =
+      origin?.includes('dashboard.duvdu.com') || origin?.includes('localhost:3000');
 
     const sessionConfig = session({
       secret: env.expressSession.secret,

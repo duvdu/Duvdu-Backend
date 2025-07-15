@@ -49,7 +49,8 @@ export const filterUsers: RequestHandler<
     req.pagination.filter.price = { ...req.pagination.filter.price, $lte: req.query.priceTo };
   if (req.query.hasVerificationPadge !== undefined)
     req.pagination.filter.hasVerificationBadge = req.query.hasVerificationPadge;
-  if (req.query.isBlocked !== undefined) req.pagination.filter['isBlocked.value'] = req.query.isBlocked;
+  if (req.query.isBlocked !== undefined)
+    req.pagination.filter['isBlocked.value'] = req.query.isBlocked;
   if (req.query.isOnline !== undefined) req.pagination.filter.isOnline = req.query.isOnline;
 
   if (req.query.isAdmin != false && req.query.isAdmin != undefined) {
@@ -60,9 +61,7 @@ export const filterUsers: RequestHandler<
     };
   }
 
-  if (req.query.role) 
-    req.pagination.filter.role = new mongoose.Types.ObjectId(req.query.role);
-  
+  if (req.query.role) req.pagination.filter.role = new mongoose.Types.ObjectId(req.query.role);
 
   req.query.maxDistance = +(req.query.maxDistance || 1000);
 

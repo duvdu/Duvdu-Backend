@@ -1,17 +1,11 @@
-import {
-  Iuser,
-  MODELS,
-  SuccessResponse,
-  Users,
-} from '@duvdu-v1/duvdu';
+import { Iuser, MODELS, SuccessResponse, Users } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import mongoose, { PipelineStage } from 'mongoose';
-  
-export const getCrmUser: RequestHandler<{ userId: string }, SuccessResponse<{ data: Iuser }>> = async (
-  req,
-  res,
-) => {
-  
+
+export const getCrmUser: RequestHandler<
+  { userId: string },
+  SuccessResponse<{ data: Iuser }>
+> = async (req, res) => {
   const aggregationPipeline: PipelineStage[] = [];
 
   // Add filtering and matching stages
@@ -118,13 +112,12 @@ export const getCrmUser: RequestHandler<{ userId: string }, SuccessResponse<{ da
       },
     },
   );
-  
+
   // Execute aggregation pipeline
   const users = await Users.aggregate(aggregationPipeline);
-  
+
   res.status(200).json({
     message: 'success',
     data: users[0],
   });
 };
-  

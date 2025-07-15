@@ -58,7 +58,11 @@ export const signinHandler: SigninHandler = async (req, res, next) => {
   // Skip role checks if request is coming from Postman
   if (!isPostman) {
     if (isDashboard) {
-      if ([SystemRoles.unverified, SystemRoles.verified].includes((user.role as Irole).key as SystemRoles)) {
+      if (
+        [SystemRoles.unverified, SystemRoles.verified].includes(
+          (user.role as Irole).key as SystemRoles,
+        )
+      ) {
         return next(
           new UnauthenticatedError(
             { en: 'User not authorized', ar: 'المستخدم غير مصرح له' },
@@ -67,7 +71,11 @@ export const signinHandler: SigninHandler = async (req, res, next) => {
         );
       }
     } else if (isMobileApp) {
-      if (![SystemRoles.unverified, SystemRoles.verified].includes((user.role as Irole).key as SystemRoles)) {
+      if (
+        ![SystemRoles.unverified, SystemRoles.verified].includes(
+          (user.role as Irole).key as SystemRoles,
+        )
+      ) {
         return next(
           new UnauthenticatedError(
             { en: 'User not authorized for mobile app', ar: 'المستخدم غير مصرح له للتطبيق' },
@@ -76,7 +84,11 @@ export const signinHandler: SigninHandler = async (req, res, next) => {
         );
       }
     } else {
-      if (![SystemRoles.unverified, SystemRoles.verified].includes((user.role as Irole).key as SystemRoles)) {
+      if (
+        ![SystemRoles.unverified, SystemRoles.verified].includes(
+          (user.role as Irole).key as SystemRoles,
+        )
+      ) {
         return next(
           new UnauthenticatedError(
             { en: 'User not authorized', ar: 'المستخدم غير مصرح له' },

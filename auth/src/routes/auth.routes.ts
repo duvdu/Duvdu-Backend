@@ -35,7 +35,8 @@ router
     isauthorized(PERMISSIONS.createUser),
     val.createUser,
     handlers.createUserHandler,
-  ).get(
+  )
+  .get(
     isauthenticated,
     val.findUsers,
     globalPaginationMiddleware,
@@ -43,21 +44,23 @@ router
     handlers.getCrmUsers,
   );
 
-
-router.route('/crm/:userId').patch(
-  isauthenticated,
-  isauthorized(PERMISSIONS.updateUser),
-  globalUploadMiddleware(FOLDERS.auth).fields([
-    { name: 'profileImage', maxCount: 1 },
-    { name: 'coverImage', maxCount: 1 },
-  ]),
-  val.updateUser,
-  handlers.updateUserHandler,
-).get(
-  // isauthenticated,
-  val.getCrmUser,
-  handlers.getCrmUser,
-);
+router
+  .route('/crm/:userId')
+  .patch(
+    isauthenticated,
+    isauthorized(PERMISSIONS.updateUser),
+    globalUploadMiddleware(FOLDERS.auth).fields([
+      { name: 'profileImage', maxCount: 1 },
+      { name: 'coverImage', maxCount: 1 },
+    ]),
+    val.updateUser,
+    handlers.updateUserHandler,
+  )
+  .get(
+    // isauthenticated,
+    val.getCrmUser,
+    handlers.getCrmUser,
+  );
 router
   .route('/crm/:userId/block')
   .post(

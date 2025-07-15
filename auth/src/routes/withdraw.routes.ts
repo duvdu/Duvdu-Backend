@@ -17,7 +17,8 @@ router
   );
 router
   .route('/crm/:id')
-  .get(withdrawMethodsValidators.getMethodValidator, withdrawMethods.getMethodCrm);
+  .get(withdrawMethodsValidators.getMethodValidator, withdrawMethods.getMethodCrm)
+  .patch(withdrawMethodsValidators.updateMethodValidator, withdrawMethods.updateMethod);
 
 router
   .route('/')
@@ -31,5 +32,5 @@ router
 router
   .route('/:id')
   .get(withdrawMethodsValidators.getMethodValidator, withdrawMethods.getMethod)
-  .put(withdrawMethodsValidators.updateMethodValidator, withdrawMethods.updateMethod)
+  .patch(withdrawMethodsValidators.updateMethodValidator, withdrawMethods.updateMethod)
   .delete(withdrawMethodsValidators.deleteMethodValidator, withdrawMethods.deleteMethod);

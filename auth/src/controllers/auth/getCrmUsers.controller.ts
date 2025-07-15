@@ -1,20 +1,15 @@
-import {
-  Iuser,
-  MODELS,
-  PaginationResponse,
-  Users,
-} from '@duvdu-v1/duvdu';
+import { Iuser, MODELS, PaginationResponse, Users } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import mongoose, { PipelineStage } from 'mongoose';
-  
+
 export const getCrmUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser[] }>> = async (
   req,
   res,
 ) => {
   const currentUser = await Users.findById(req.loggedUser?.id, { location: 1 });
-  
+
   const aggregationPipeline: PipelineStage[] = [];
-  
+
   // Add $geoNear if user location exists
   if (currentUser?.location?.coordinates) {
     aggregationPipeline.push({
@@ -29,7 +24,7 @@ export const getCrmUsers: RequestHandler<unknown, PaginationResponse<{ data: Ius
       },
     });
   }
-  
+
   // Add filtering and matching stages
   aggregationPipeline.push(
     {
@@ -141,12 +136,11 @@ export const getCrmUsers: RequestHandler<unknown, PaginationResponse<{ data: Ius
       },
     },
   );
-  
+
   // Execute aggregation pipeline
   const users = await Users.aggregate(aggregationPipeline);
   const resultCount = users[0]?.totalCount[0]?.totalCount || 0;
-  
-  
+
   res.status(200).json({
     message: 'success',
     pagination: {
@@ -157,4 +151,3 @@ export const getCrmUsers: RequestHandler<unknown, PaginationResponse<{ data: Ius
     data: users[0].users,
   });
 };
-  

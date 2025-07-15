@@ -53,8 +53,6 @@ export const askForgetPasswordHandler: RequestHandler<
   const user = await Users.findOne(query).populate('role');
   if (!user) return next(new NotFound(undefined, req.lang));
 
-
-
   const origin = req.headers?.origin;
   const isDashboard = origin?.includes('dashboard.duvdu.com') || origin?.includes('localhost:3000');
   const isMobileApp = req.headers['x-app-version'] || req.headers['x-platform'];
@@ -63,7 +61,11 @@ export const askForgetPasswordHandler: RequestHandler<
 
   if (!isPostman) {
     if (isDashboard) {
-      if ([SystemRoles.unverified, SystemRoles.verified].includes((user.role as Irole).key as SystemRoles)) {
+      if (
+        [SystemRoles.unverified, SystemRoles.verified].includes(
+          (user.role as Irole).key as SystemRoles,
+        )
+      ) {
         return next(
           new UnauthenticatedError(
             { en: 'User not authorized', ar: 'المستخدم غير مصرح له' },
@@ -72,7 +74,11 @@ export const askForgetPasswordHandler: RequestHandler<
         );
       }
     } else if (isMobileApp) {
-      if (![SystemRoles.unverified, SystemRoles.verified].includes((user.role as Irole).key as SystemRoles)) {
+      if (
+        ![SystemRoles.unverified, SystemRoles.verified].includes(
+          (user.role as Irole).key as SystemRoles,
+        )
+      ) {
         return next(
           new UnauthenticatedError(
             { en: 'User not authorized for mobile app', ar: 'المستخدم غير مصرح له للتطبيق' },
@@ -81,7 +87,11 @@ export const askForgetPasswordHandler: RequestHandler<
         );
       }
     } else {
-      if (![SystemRoles.unverified, SystemRoles.verified].includes((user.role as Irole).key as SystemRoles)) {
+      if (
+        ![SystemRoles.unverified, SystemRoles.verified].includes(
+          (user.role as Irole).key as SystemRoles,
+        )
+      ) {
         return next(
           new UnauthenticatedError(
             { en: 'User not authorized', ar: 'المستخدم غير مصرح له' },
@@ -91,7 +101,6 @@ export const askForgetPasswordHandler: RequestHandler<
       }
     }
   }
-
 
   if (user.isBlocked.value)
     return next(
