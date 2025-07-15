@@ -60,7 +60,7 @@ export const sendMessageHandler: SendMessageHandler = async (req, res, next) => 
     (project.user.toString() === req.loggedUser.id.toString() ||
       project.user.toString() === req.body.receiver!.toString());
 
-  if (!contract && !isMainUser && req.loggedUser.role.key !== SystemRoles.admin) {
+  if (req.loggedUser.role.key === SystemRoles.verified && !contract && !isMainUser) {
     return next(new NotAllowedError(undefined, req.lang));
   }
 
