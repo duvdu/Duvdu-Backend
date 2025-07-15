@@ -1,4 +1,4 @@
-import { SystemRoles, Roles, Users } from '@duvdu-v1/duvdu';
+import { SystemRoles, Roles, Users, permissions } from '@duvdu-v1/duvdu';
 import mongoose from 'mongoose';
 
 import { hashPassword } from './../src/utils/bcrypt';
@@ -9,7 +9,9 @@ export const appInit = async () => {
   // await dbConnection(env.mongoDb.uri);
   let adminRole = await Roles.findOne({ key: SystemRoles.admin });
   if (!adminRole)
-    adminRole = await Roles.create({ key: SystemRoles.admin, system: true, permissions: [] });
+    adminRole = await Roles.create({ key: SystemRoles.admin, system: true, permissions: permissions.all });
+  else
+    await Roles.findOneAndUpdate({ key: SystemRoles.admin }, { permissions: permissions.all });
   if (!(await Roles.findOne({ key: SystemRoles.verified })))
     await Roles.create({
       _id: new mongoose.Types.ObjectId('662b930f4566c8d2f8ed6ae4'),
