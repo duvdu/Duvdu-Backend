@@ -34,7 +34,9 @@ export interface IcontractReport {
   ref: string;
   desc: string;
   attachments: string[];
-  state: { isClosed: boolean; closedBy: Types.ObjectId; feedback: string };
+  state: [{ addedBy: Types.ObjectId; feedback: string }];
+  isClosed: boolean;
+  closedBy: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -48,17 +50,22 @@ export const ContractReports = model<IcontractReport>(
       ref: String,
       desc: { type: String, default: null },
       attachments: [String],
-      state: {
-        isClosed: {
-          type: Boolean,
-          default: false,
-        },
-        closedBy: {
+      state: [{
+        addedBy: {
           type: Schema.Types.ObjectId,
           ref: MODELS.user,
           default: null,
         },
         feedback: { type: String, default: null },
+      }],
+      isClosed: {
+        type: Boolean,
+        default: false,
+      },
+      closedBy: {
+        type: Schema.Types.ObjectId,
+        ref: MODELS.user,
+        default: null,
       },
     },
     { collection: MODELS.contractReports, timestamps: true },
