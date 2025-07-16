@@ -3,6 +3,12 @@ import { Types, model, Schema } from 'mongoose';
 import { MODELS } from '../types/model-names';
 import { Iuser } from '../types/User';
 
+// Function to generate simple unique ticket number
+const generateTicketNumber = (): string => {
+  const random = Math.floor(100000 + Math.random() * 900000); // 6-digit random number
+  return `TKT${random}`;
+};
+
 export interface Icontract {
   id: string;
   customer: Types.ObjectId | Iuser;
@@ -29,6 +35,7 @@ export const Contracts = model<Icontract>(
 );
 
 export interface IcontractReport {
+  ticketNumber: string;
   reporter: Types.ObjectId | Iuser;
   contract: Types.ObjectId | Icontract;
   ref: string;
@@ -45,6 +52,7 @@ export const ContractReports = model<IcontractReport>(
   MODELS.contractReports,
   new Schema<IcontractReport>(
     {
+      ticketNumber: { type: String, default: generateTicketNumber, unique: true },
       reporter: { type: Schema.Types.ObjectId, ref: MODELS.user },
       contract: { type: Schema.Types.ObjectId, refPath: 'ref' },
       ref: String,

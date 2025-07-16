@@ -34,6 +34,11 @@ export enum PERMISSIONS {
   // withdraw
   listWithdrawMethods = 'list-withdraw-methods',
   updateWithdrawMethod = 'update-withdraw-method',
+
+  // complaint
+  listComplaints = 'list-complaints',
+  updateComplaint = 'update-complaint',
+  closeComplaint = 'close-complaint',
   
 
 
@@ -139,6 +144,9 @@ export const permissions = {
     PERMISSIONS.updateWithdrawMethod,
     PERMISSIONS.removeUser,
     PERMISSIONS.sendNotificationToUsers,
+    PERMISSIONS.listComplaints,
+    PERMISSIONS.updateComplaint,
+    PERMISSIONS.closeComplaint,
   ],
   category: [
     PERMISSIONS.createCategory,
@@ -177,7 +185,11 @@ export const permissions = {
     PERMISSIONS.listWithdrawMethods,
     PERMISSIONS.updateWithdrawMethod,
   ],
-
+  complaint: [
+    PERMISSIONS.listComplaints,
+    PERMISSIONS.updateComplaint,
+    PERMISSIONS.closeComplaint,
+  ],
 
 
   bookmarks: [PERMISSIONS.bookmarks],
