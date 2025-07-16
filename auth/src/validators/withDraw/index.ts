@@ -27,6 +27,10 @@ export const getMethodValidator = [
 export const getMethodsValidator = [
   query('page').optional().isInt({ min: 1 }).withMessage('Page is required'),
   query('limit').optional().isInt({ min: 1 }).withMessage('Limit is required'),
+  query('user').optional().isMongoId().withMessage('User is required'),
+  query('status').optional().isIn(Object.values(WithdrawMethodStatus)).withMessage('Status is required'),
+  query('method').optional().isIn(Object.values(WithdrawMethod)).withMessage('Method is required'),
+  query('isDeleted').optional().isBoolean().withMessage('Is deleted is required'),
   globalValidatorMiddleware,
 ];
 
