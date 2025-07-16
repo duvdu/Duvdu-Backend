@@ -12,7 +12,7 @@ export const getUserChatsHandlerPagination: RequestHandler<unknown , unknown , u
 
   // Store search term directly on request object for later use
   if (req.query.search) {
-    (req as any).searchTerm = req.query.search;
+    req.pagination.filter.search = req.query.search;
   }
 
   next();
@@ -20,7 +20,7 @@ export const getUserChatsHandlerPagination: RequestHandler<unknown , unknown , u
 
 export const getLoggedUserChatsHandler: GetLoggedUserChatsHandler = async (req, res) => {
   const userId = new Types.ObjectId(req.loggedUser?.id);
-  const searchTerm = (req as any).searchTerm;
+  const searchTerm = req.pagination.filter.search;
 
   // Build the main aggregation pipeline
   const mainPipeline: any[] = [
