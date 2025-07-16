@@ -10,16 +10,9 @@ export const getUserChatsHandlerPagination: RequestHandler<unknown , unknown , u
   search?: string;
 }> = async (req, res , next) => {
 
+  // Store search term directly on request object for later use
   if (req.query.search) {
-    req.pagination.filter = {
-      $or: [
-        { 'otherUserDetails.name': { $regex: req.query.search, $options: 'i' } },
-        { 'otherUserDetails.username': { $regex: req.query.search, $options: 'i' } },
-        { 'otherUserDetails.email': { $regex: req.query.search, $options: 'i' } },
-        { 'otherUserDetails.about': { $regex: req.query.search, $options: 'i' } },
-        { 'newestMessage.content': { $regex: req.query.search, $options: 'i' } },
-      ],
-    };
+    (req as any).searchTerm = req.query.search;
   }
 
   next();
@@ -27,8 +20,10 @@ export const getUserChatsHandlerPagination: RequestHandler<unknown , unknown , u
 
 export const getLoggedUserChatsHandler: GetLoggedUserChatsHandler = async (req, res) => {
   const userId = new Types.ObjectId(req.loggedUser?.id);
+  const searchTerm = (req as any).searchTerm;
 
-  const allChats = await Message.aggregate([
+  // Build the main aggregation pipeline
+  const mainPipeline: any[] = [
     {
       $match: {
         $or: [{ sender: userId }, { receiver: userId }],
@@ -165,24 +160,73 @@ export const getLoggedUserChatsHandler: GetLoggedUserChatsHandler = async (req, 
             },
           },
         },
+        // Add fields for easier search access
+        otherUserDetails: {
+          $cond: {
+            if: { $eq: ['$sender', userId] },
+            then: {
+              _id: { $ifNull: [{ $arrayElemAt: ['$receiverDetails._id', 0] }, null] },
+              name: { $ifNull: [{ $arrayElemAt: ['$receiverDetails.name', 0] }, null] },
+              username: { $ifNull: [{ $arrayElemAt: ['$receiverDetails.username', 0] }, null] },
+              email: { $ifNull: [{ $arrayElemAt: ['$receiverDetails.email', 0] }, null] },
+              about: { $ifNull: [{ $arrayElemAt: ['$receiverDetails.about', 0] }, null] },
+            },
+            else: {
+              _id: { $ifNull: [{ $arrayElemAt: ['$senderDetails._id', 0] }, null] },
+              name: { $ifNull: [{ $arrayElemAt: ['$senderDetails.name', 0] }, null] },
+              username: { $ifNull: [{ $arrayElemAt: ['$senderDetails.username', 0] }, null] },
+              email: { $ifNull: [{ $arrayElemAt: ['$senderDetails.email', 0] }, null] },
+              about: { $ifNull: [{ $arrayElemAt: ['$senderDetails.about', 0] }, null] },
+            },
+          },
+        },
       },
     },
+  ];
+
+  // Add search filter if search term exists
+  if (searchTerm) {
+    mainPipeline.push({
+      $match: {
+        $or: [
+          { 'otherUserDetails.name': { $regex: searchTerm, $options: 'i' } },
+          { 'otherUserDetails.username': { $regex: searchTerm, $options: 'i' } },
+          { 'otherUserDetails.email': { $regex: searchTerm, $options: 'i' } },
+          { 'otherUserDetails.about': { $regex: searchTerm, $options: 'i' } },
+          { 'newestMessage.content': { $regex: searchTerm, $options: 'i' } },
+        ],
+      },
+    });
+  }
+
+  // Add pagination
+  mainPipeline.push(
     {
       $skip: req.pagination.skip,
     },
     {
       $limit: req.pagination.limit,
     },
-  ]);
+  );
 
-  const countPipeline = [
+  const allChats = await Message.aggregate(mainPipeline);
+
+  // Count pipeline with search support
+  const countPipeline: any[] = [
     {
       $match: {
         $or: [{ sender: userId }, { receiver: userId }],
       },
     },
     {
+      $sort: {
+        createdAt: -1,
+      },
+    },
+    {
       $project: {
+        sender: 1,
+        receiver: 1,
         otherUser: {
           $cond: {
             if: { $eq: ['$sender', userId] },
@@ -190,20 +234,81 @@ export const getLoggedUserChatsHandler: GetLoggedUserChatsHandler = async (req, 
             else: '$sender',
           },
         },
+        message: '$$ROOT',
       },
     },
     {
       $group: {
         _id: '$otherUser',
+        newestMessage: { $first: '$message' },
       },
     },
     {
-      $match: req.pagination.filter,
-    },
-    {
-      $count: 'totalCount',
+      $match: {
+        newestMessage: { $exists: true },
+      },
     },
   ];
+
+  // Add search functionality to count pipeline if needed
+  if (searchTerm) {
+    countPipeline.push(
+      {
+        $lookup: {
+          from: MODELS.user,
+          localField: 'newestMessage.sender',
+          foreignField: '_id',
+          as: 'senderDetails',
+        },
+      },
+      {
+        $lookup: {
+          from: MODELS.user,
+          localField: 'newestMessage.receiver',
+          foreignField: '_id',
+          as: 'receiverDetails',
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          newestMessage: 1,
+          otherUserDetails: {
+            $cond: {
+              if: { $eq: ['$newestMessage.sender', userId] },
+              then: {
+                name: { $ifNull: [{ $arrayElemAt: ['$receiverDetails.name', 0] }, null] },
+                username: { $ifNull: [{ $arrayElemAt: ['$receiverDetails.username', 0] }, null] },
+                email: { $ifNull: [{ $arrayElemAt: ['$receiverDetails.email', 0] }, null] },
+                about: { $ifNull: [{ $arrayElemAt: ['$receiverDetails.about', 0] }, null] },
+              },
+              else: {
+                name: { $ifNull: [{ $arrayElemAt: ['$senderDetails.name', 0] }, null] },
+                username: { $ifNull: [{ $arrayElemAt: ['$senderDetails.username', 0] }, null] },
+                email: { $ifNull: [{ $arrayElemAt: ['$senderDetails.email', 0] }, null] },
+                about: { $ifNull: [{ $arrayElemAt: ['$senderDetails.about', 0] }, null] },
+              },
+            },
+          },
+        },
+      },
+      {
+        $match: {
+          $or: [
+            { 'otherUserDetails.name': { $regex: searchTerm, $options: 'i' } },
+            { 'otherUserDetails.username': { $regex: searchTerm, $options: 'i' } },
+            { 'otherUserDetails.email': { $regex: searchTerm, $options: 'i' } },
+            { 'otherUserDetails.about': { $regex: searchTerm, $options: 'i' } },
+            { 'newestMessage.content': { $regex: searchTerm, $options: 'i' } },
+          ],
+        },
+      },
+    );
+  }
+
+  countPipeline.push({
+    $count: 'totalCount',
+  });
 
   const totalCount = await Message.aggregate(countPipeline);
   const resultCount = totalCount.length > 0 ? totalCount[0].totalCount : 0;
