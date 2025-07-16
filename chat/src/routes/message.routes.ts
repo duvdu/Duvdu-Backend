@@ -35,7 +35,7 @@ router
     val.sendNessageVal,
     handler.sendMessageHandler,
   )
-  .get(globalPaginationMiddleware, val.gelLoggedUserVal, handler.getLoggedUserChatsHandler);
+  .get(globalPaginationMiddleware, val.gelLoggedUserVal, handler.getUserChatsHandlerPagination, handler.getLoggedUserChatsHandler);
 router.get(
   '/:userId/chats',
   isauthenticated,
