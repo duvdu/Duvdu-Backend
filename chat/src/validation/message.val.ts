@@ -50,6 +50,7 @@ export const markMessageAsWatchedVal = [
 ];
 
 export const gelLoggedUserVal = [
+  check('search').optional().isString().withMessage('searchInvalid'),
   check('limit').optional().isInt({ min: 1 }).withMessage('limitInvalid'),
   check('page').optional().isInt({ min: 1 }).withMessage('pageInvalid'),
   globalValidatorMiddleware,

@@ -1,17 +1,59 @@
 import 'express-async-errors';
 import { Message, MODELS, Contracts } from '@duvdu-v1/duvdu';
+import { RequestHandler } from 'express';
 import { Types } from 'mongoose';
 
 import { GetLoggedUserChatsHandler } from '../../types/endpoints/mesage.endpoints';
 
+
+export const getUserChatsHandlerPagination: RequestHandler<unknown , unknown , unknown , {
+  search?: string;
+}> = async (req, res , next) => {
+
+  if (req.query.search) {
+    const searchQuery = req.query.search.trim();
+    
+    // Configure search filters for the next middleware
+    req.pagination.filter = {
+      searchQuery,
+      messageContentFilter: { content: { $regex: searchQuery, $options: 'i' } },
+      userFieldsFilter: {
+        $or: [
+          { 'otherUserDetails.name': { $regex: searchQuery, $options: 'i' } },
+          { 'otherUserDetails.username': { $regex: searchQuery, $options: 'i' } },
+          { 'otherUserDetails.email': { $regex: searchQuery, $options: 'i' } },
+          { 'otherUserDetails.about': { $regex: searchQuery, $options: 'i' } },
+          { 'newestMessage.content': { $regex: searchQuery, $options: 'i' } }
+        ]
+      }
+    };
+  }
+
+  next();
+};
+
 export const getLoggedUserChatsHandler: GetLoggedUserChatsHandler = async (req, res) => {
   const userId = new Types.ObjectId(req.loggedUser?.id);
+  const searchFilters = req.pagination.filter;
+
+  // Base match condition for user's chats
+  const baseMatchCondition = {
+    $or: [{ sender: userId }, { receiver: userId }],
+  };
+
+  // Add search condition if filters are provided
+  const matchCondition = searchFilters 
+    ? {
+      $and: [
+        baseMatchCondition,
+        { $or: [searchFilters.messageContentFilter] }
+      ]
+    }
+    : baseMatchCondition;
 
   const allChats = await Message.aggregate([
     {
-      $match: {
-        $or: [{ sender: userId }, { receiver: userId }],
-      },
+      $match: matchCondition,
     },
     {
       $sort: {
@@ -65,6 +107,19 @@ export const getLoggedUserChatsHandler: GetLoggedUserChatsHandler = async (req, 
         as: 'receiverDetails',
       },
     },
+    // Add lookup for other user details when search is active
+    ...(searchFilters ? [{
+      $lookup: {
+        from: MODELS.user,
+        localField: '_id',
+        foreignField: '_id',
+        as: 'otherUserDetails',
+      },
+    }] : []),
+    // Add search filter for user fields if search is active
+    ...(searchFilters ? [{
+      $match: searchFilters.userFieldsFilter
+    }] : []),
     {
       $project: {
         _id: 1,
@@ -154,11 +209,19 @@ export const getLoggedUserChatsHandler: GetLoggedUserChatsHandler = async (req, 
     },
   ]);
 
+  // Count pipeline with search support
+  const countMatchCondition = searchFilters 
+    ? {
+      $and: [
+        baseMatchCondition,
+        { $or: [searchFilters.messageContentFilter] }
+      ]
+    }
+    : baseMatchCondition;
+
   const countPipeline = [
     {
-      $match: {
-        $or: [{ sender: userId }, { receiver: userId }],
-      },
+      $match: countMatchCondition,
     },
     {
       $project: {
@@ -171,6 +234,26 @@ export const getLoggedUserChatsHandler: GetLoggedUserChatsHandler = async (req, 
         },
       },
     },
+    // Add lookup for other user details when search is active
+    ...(searchFilters ? [{
+      $lookup: {
+        from: MODELS.user,
+        localField: 'otherUser',
+        foreignField: '_id',
+        as: 'otherUserDetails',
+      },
+    }] : []),
+    // Add search filter for user fields if search is active
+    ...(searchFilters ? [{
+      $match: {
+        $or: [
+          { 'otherUserDetails.name': { $regex: searchFilters.searchQuery, $options: 'i' } },
+          { 'otherUserDetails.username': { $regex: searchFilters.searchQuery, $options: 'i' } },
+          { 'otherUserDetails.email': { $regex: searchFilters.searchQuery, $options: 'i' } },
+          { 'otherUserDetails.about': { $regex: searchFilters.searchQuery, $options: 'i' } },
+        ]
+      }
+    }] : []),
     {
       $group: {
         _id: '$otherUser',
