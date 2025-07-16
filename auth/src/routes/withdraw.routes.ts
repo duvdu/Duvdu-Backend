@@ -20,7 +20,7 @@ router
 router
   .route('/crm/:id')
   .get(isauthorized(PERMISSIONS.listWithdrawMethods), withdrawMethodsValidators.getMethodValidator, withdrawMethods.getMethodCrm)
-  .patch(isauthorized(PERMISSIONS.updateWithdrawMethod), withdrawMethodsValidators.updateMethodValidator, withdrawMethods.updateMethodCrm);
+  .patch(isauthorized(PERMISSIONS.updateWithdrawMethod), withdrawMethodsValidators.updateMethodCrmValidator, withdrawMethods.updateMethodCrm);
 
 router
   .route('/')
