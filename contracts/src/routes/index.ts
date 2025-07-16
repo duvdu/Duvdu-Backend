@@ -1,7 +1,7 @@
 import { isauthenticated } from '@duvdu-v1/duvdu';
 import { Router } from 'express';
 
-import { complaintRoutes } from './complaint.routes';
+import { router as complaintRoutes } from './complaint.routes';
 import { router as contractCancelRoutes } from './contractCancel.routes';
 import { router as contractFilesRoutes } from './contractFiles.routes';
 import { router as couponRoutes } from './coupon.routes';

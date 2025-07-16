@@ -7,16 +7,32 @@ export const create = [
   globalValidatorMiddleware,
 ];
 
-export const getOne = [param('contractId').isMongoId(), globalValidatorMiddleware];
+export const getOne = [param('id').isMongoId(), globalValidatorMiddleware];
 
 export const getAll = [
   query('limit').optional().isInt().toInt(),
   query('page').optional().isInt().toInt(),
+  query('search').optional().isString(),
+  query('addedBy').optional().isMongoId(),
+  query('closedBy').optional().isMongoId(),
+  query('reporter').optional().isMongoId(),
+  query('contract').optional().isMongoId(),
+  query('startDate').optional().isDate().toDate(),
+  query('endDate').optional().isDate().toDate(),
+  query('ticketNumber').optional().isString(),
   globalValidatorMiddleware,
 ];
 
 export const close = [
-  param('contractId').isMongoId(),
+  param('id').isMongoId(),
   body('feedback').optional().isString(),
+  body('sendNotification').optional().isBoolean(),
+  globalValidatorMiddleware,
+];
+
+export const updateComplaint = [
+  param('id').isMongoId(),
+  body('feedback').isString(),
+  body('sendNotification').optional().isBoolean(),
   globalValidatorMiddleware,
 ];

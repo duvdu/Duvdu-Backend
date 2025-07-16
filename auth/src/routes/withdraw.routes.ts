@@ -14,6 +14,7 @@ router
     isauthorized(PERMISSIONS.listWithdrawMethods),
     globalPaginationMiddleware,
     withdrawMethodsValidators.getMethodsValidator,
+    withdrawMethods.getMethodsCrmPagination,
     withdrawMethods.getMethodsCrm,
   );
 router

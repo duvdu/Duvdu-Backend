@@ -60,8 +60,6 @@ export const createComplaintHandler: RequestHandler<unknown, SuccessResponse> = 
     { status: CopyrightContractStatus.complaint },
   );
 
-  // TODO: send event for admin about new complaint
-
   const user = await Users.findById(req.loggedUser.id);
   const role = await Roles.findOne({ key: SystemRoles.admin });
   const admins = await Users.findOne({ role: role?._id });

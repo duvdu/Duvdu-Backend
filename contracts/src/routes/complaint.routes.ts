@@ -3,17 +3,37 @@ import {
   globalPaginationMiddleware,
   globalUploadMiddleware,
   isauthenticated,
+  isauthorized,
+  PERMISSIONS,
 } from '@duvdu-v1/duvdu';
 import { Router } from 'express';
 
 import * as handlers from '../controllers/complaint';
 import * as val from '../validator/complaint.validator';
 
-const router = Router();
+export const router = Router();
 
 router.use(isauthenticated);
 
-router.route('/:contractId').get(val.getOne, handlers.getComplaintHandler);
+router
+  .route('/crm')
+  .get(
+    isauthorized(PERMISSIONS.listComplaints),
+    globalPaginationMiddleware,
+    handlers.getComplaintsPagination,
+    handlers.getComplaintsHandler,
+  );
+router
+  .route('/crm/:id/close')
+  .patch(isauthorized(PERMISSIONS.closeComplaint), val.close, handlers.closeComplaintHandler);
+router
+  .route('/crm/:id')
+  .get(isauthorized(PERMISSIONS.listComplaints), val.getOne, handlers.getComplaintHandler)
+  .patch(
+    isauthorized(PERMISSIONS.updateComplaint),
+    val.updateComplaint,
+    handlers.updateComplaintHandler,
+  );
 
 router
   .route('/')
@@ -32,6 +52,4 @@ router
     handlers.getComplaintsHandler,
   );
 
-router.post('/:contractId/close', val.close, handlers.closeComplaintHandler);
-
-export const complaintRoutes = router;
+router.route('/:id').get(val.getOne, handlers.getComplaintHandler);

@@ -1,37 +1,31 @@
 import {
   Channels,
-  ContractReports,
+  SuccessResponse,
+  Notification,
   MODELS,
   NotFound,
-  Notification,
-  SuccessResponse,
   Users,
+  ContractReports,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 import { NewNotificationPublisher } from '../../event/publisher/newNotification.publisher';
 import { natsWrapper } from '../../nats-wrapper';
 
-export const closeComplaintHandler: RequestHandler<
+export const updateComplaintHandler: RequestHandler<
   { id: string },
   SuccessResponse,
-  { feedback?: string; sendNotification?: boolean }
+  { feedback: string; sendNotification?: boolean }
 > = async (req, res, next) => {
   const complaint = await ContractReports.findByIdAndUpdate(
     req.params.id,
     {
-      ...(req.body.feedback
-        ? {
-            $push: {
-              state: {
-                addedBy: req.loggedUser?.id,
-                feedback: req.body.feedback,
-              },
-            },
-          }
-        : {}),
-      isClosed: true,
-      closedBy: req.loggedUser?.id,
+      state: {
+        $push: {
+          addedBy: req.loggedUser?.id,
+          feedback: req.body.feedback,
+        },
+      },
     },
     { new: true },
   );
@@ -46,8 +40,8 @@ export const closeComplaintHandler: RequestHandler<
       targetUser: complaint.reporter,
       type: 'complaint',
       target: MODELS.contractReports,
-      message: 'complaint closed',
-      title: `${user?.name} has closed a complaint`,
+      message: 'complaint updated',
+      title: `${user?.name} has updated a complaint with feedback ${req.body.feedback}`,
     });
 
     const populatedNotification = await (
@@ -62,5 +56,5 @@ export const closeComplaintHandler: RequestHandler<
     });
   }
 
-  return res.status(200).json({ message: 'success' });
+  res.status(200).json({ message: 'success' });
 };
