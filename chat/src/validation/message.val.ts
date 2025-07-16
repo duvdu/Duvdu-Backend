@@ -54,3 +54,10 @@ export const gelLoggedUserVal = [
   check('page').optional().isInt({ min: 1 }).withMessage('pageInvalid'),
   globalValidatorMiddleware,
 ];
+
+export const getUserChatsVal = [
+  check('userId').isMongoId().withMessage('userIdInvalid'),
+  check('limit').optional().isInt({ min: 1 }).withMessage('limitInvalid'),
+  check('page').optional().isInt({ min: 1 }).withMessage('pageInvalid'),
+  globalValidatorMiddleware,
+];

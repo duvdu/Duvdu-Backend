@@ -36,6 +36,14 @@ router
     handler.sendMessageHandler,
   )
   .get(globalPaginationMiddleware, val.gelLoggedUserVal, handler.getLoggedUserChatsHandler);
+router.get(
+  '/:userId/chats',
+  isauthenticated,
+  isauthorized(PERMISSIONS.listMessagesFromTo),
+  globalPaginationMiddleware,
+  val.getUserChatsVal,
+  handler.getUserChatsHandler,
+);
 
 router
   .route('/:receiver/chat')

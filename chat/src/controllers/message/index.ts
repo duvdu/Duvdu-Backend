@@ -7,3 +7,4 @@ export * from './getChatFromTo.controller';
 export * from './markMessageAswatched.controller';
 export * from './gitLoggedUserChats.controller';
 export * from './getAvaliableUserCanChat.controller';
+export * from './getUserChats.controller';

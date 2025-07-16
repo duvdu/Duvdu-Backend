@@ -1,4 +1,9 @@
-import { globalPaginationMiddleware, isauthenticated, isauthorized, PERMISSIONS } from '@duvdu-v1/duvdu';
+import {
+  globalPaginationMiddleware,
+  isauthenticated,
+  isauthorized,
+  PERMISSIONS,
+} from '@duvdu-v1/duvdu';
 import express from 'express';
 
 import * as handler from '../controllers/notification';
@@ -10,7 +15,11 @@ router.use(isauthenticated);
 
 router
   .route('/users')
-  .post(isauthorized(PERMISSIONS.sendNotificationToUsers), val.sendMultiNotificationVal, handler.sendNotificationToMultiUserHandler);
+  .post(
+    isauthorized(PERMISSIONS.sendNotificationToUsers),
+    val.sendMultiNotificationVal,
+    handler.sendNotificationToMultiUserHandler,
+  );
 router
   .route('/')
   .get(
@@ -19,7 +28,11 @@ router
     handler.getLoggedUserNotificationHandler,
   )
   .patch(handler.updateWatchNotificationHandler)
-  .post(isauthorized(PERMISSIONS.sendNotificationToUsers), val.sendTopicNotificationVal, handler.sendTopicNotificationHandler);
+  .post(
+    isauthorized(PERMISSIONS.sendNotificationToUsers),
+    val.sendTopicNotificationVal,
+    handler.sendTopicNotificationHandler,
+  );
 
 router.get(
   '/crm',
