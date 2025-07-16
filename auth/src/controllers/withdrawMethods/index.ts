@@ -5,3 +5,4 @@ export * from './getMethodsCrm.controller';
 export * from './getMethodCrm.controller';
 export * from './updateMethod.controller';
 export * from './deleteMethod.controller';
+export * from './updateMethodCrm.controller';

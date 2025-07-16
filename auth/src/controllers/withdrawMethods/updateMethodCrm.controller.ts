@@ -11,7 +11,7 @@ import { RequestHandler } from 'express';
 
 import { sendNotification } from '../favourites/sendNotification';
 
-export const updateMethod: RequestHandler<
+export const updateMethodCrm: RequestHandler<
   { id: string },
   SuccessResponse<{ data: IWithdrawMethod }>,
   { status: WithdrawMethodStatus }
