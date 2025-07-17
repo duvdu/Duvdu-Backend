@@ -40,20 +40,26 @@ export const getComplaintHandler: RequestHandler<
       },
     },
     {
+      $addFields: {
+        stateUserIds: {
+          $map: {
+            input: { $ifNull: ['$state', []] },
+            as: 'stateItem',
+            in: '$$stateItem.addedBy'
+          }
+        }
+      }
+    },
+    {
       $lookup: {
         from: MODELS.user,
-        let: { stateArray: { $ifNull: ['$state', []] } },
-        pipeline: [
-          {
-            $match: {
-              $expr: {
-                $in: ['$_id', { $map: { input: '$$stateArray', as: 'item', in: '$$item.addedBy' } }]
-              }
-            }
-          }
-        ],
+        localField: 'stateUserIds',
+        foreignField: '_id',
         as: 'stateUsers'
       }
+    },
+    {
+      $unset: ['stateUserIds']
     },
     {
       $project: {
@@ -92,7 +98,7 @@ export const getComplaintHandler: RequestHandler<
                       $arrayElemAt: [
                         {
                           $filter: {
-                            input: '$stateUsers',
+                            input: { $ifNull: ['$stateUsers', []] },
                             cond: { $eq: ['$$this._id', '$$stateItem.addedBy'] }
                           }
                         },
