@@ -43,7 +43,13 @@ export const getComplaintHandler: RequestHandler<
       $addFields: {
         stateUserIds: {
           $map: {
-            input: { $ifNull: ['$state', []] },
+            input: {
+              $cond: {
+                if: { $and: [{ $ne: ['$state', null] }, { $isArray: '$state' }] },
+                then: '$state',
+                else: []
+              }
+            },
             as: 'stateItem',
             in: '$$stateItem.addedBy'
           }
@@ -81,14 +87,26 @@ export const getComplaintHandler: RequestHandler<
         },
         attachments: {
           $map: {
-            input: { $ifNull: ['$attachments', []] },
+            input: {
+              $cond: {
+                if: { $and: [{ $ne: ['$attachments', null] }, { $isArray: '$attachments' }] },
+                then: '$attachments',
+                else: []
+              }
+            },
             as: 'attachment',
             in: { $concat: [process.env.BUCKET_HOST, '/', '$$attachment'] },
           },
         },
         state: {
           $map: {
-            input: { $ifNull: ['$state', []] },
+            input: {
+              $cond: {
+                if: { $and: [{ $ne: ['$state', null] }, { $isArray: '$state' }] },
+                then: '$state',
+                else: []
+              }
+            },
             as: 'stateItem',
             in: {
               addedBy: {
@@ -98,7 +116,13 @@ export const getComplaintHandler: RequestHandler<
                       $arrayElemAt: [
                         {
                           $filter: {
-                            input: { $ifNull: ['$stateUsers', []] },
+                            input: {
+                              $cond: {
+                                if: { $and: [{ $ne: ['$stateUsers', null] }, { $isArray: '$stateUsers' }] },
+                                then: '$stateUsers',
+                                else: []
+                              }
+                            },
                             cond: { $eq: ['$$this._id', '$$stateItem.addedBy'] }
                           }
                         },
