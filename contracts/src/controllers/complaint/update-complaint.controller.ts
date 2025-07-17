@@ -2,7 +2,6 @@ import {
   Channels,
   SuccessResponse,
   Notification,
-  MODELS,
   NotFound,
   Users,
   ContractReports,
@@ -39,7 +38,7 @@ export const updateComplaintHandler: RequestHandler<
       sourceUser: req.loggedUser.id,
       targetUser: complaint.reporter,
       type: 'complaint',
-      target: MODELS.contractReports,
+      target: complaint._id,
       message: 'complaint updated',
       title: `${user?.name} has updated a complaint with feedback ${req.body.feedback}`,
     });

@@ -1,7 +1,6 @@
 import {
   Channels,
   ContractReports,
-  MODELS,
   NotFound,
   Notification,
   SuccessResponse,
@@ -22,13 +21,13 @@ export const closeComplaintHandler: RequestHandler<
     {
       ...(req.body.feedback
         ? {
-            $push: {
-              state: {
-                addedBy: req.loggedUser?.id,
-                feedback: req.body.feedback,
-              },
+          $push: {
+            state: {
+              addedBy: req.loggedUser?.id,
+              feedback: req.body.feedback,
             },
-          }
+          },
+        }
         : {}),
       isClosed: true,
       closedBy: req.loggedUser?.id,
@@ -45,7 +44,7 @@ export const closeComplaintHandler: RequestHandler<
       sourceUser: req.loggedUser.id,
       targetUser: complaint.reporter,
       type: 'complaint',
-      target: MODELS.contractReports,
+      target: complaint._id,
       message: 'complaint closed',
       title: `${user?.name} has closed a complaint`,
     });
