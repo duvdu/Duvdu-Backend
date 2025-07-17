@@ -19,8 +19,8 @@ export const updateComplaintHandler: RequestHandler<
   const complaint = await ContractReports.findByIdAndUpdate(
     req.params.id,
     {
-      state: {
-        $push: {
+      $push: {
+        state: {
           addedBy: req.loggedUser.id,
           feedback: req.body.feedback,
         },
