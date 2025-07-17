@@ -1,5 +1,5 @@
 import 'express-async-errors';
-import { ContractReports, IcontractReport, NotFound, SuccessResponse } from '@duvdu-v1/duvdu';
+import { ContractReports, IcontractReport, MODELS, NotFound, SuccessResponse } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import { Types } from 'mongoose';
 
@@ -13,7 +13,7 @@ export const getComplaintHandler: RequestHandler<
     },
     {
       $lookup: {
-        from: 'users',
+        from: MODELS.user,
         localField: 'reporter',
         foreignField: '_id',
         as: 'reporter',
@@ -21,7 +21,7 @@ export const getComplaintHandler: RequestHandler<
     },
     {
       $lookup: {
-        from: 'users',
+        from: MODELS.user,
         localField: 'closedBy',
         foreignField: '_id',
         as: 'closedBy',
@@ -41,8 +41,8 @@ export const getComplaintHandler: RequestHandler<
     },
     {
       $lookup: {
-        from: 'users',
-        let: { stateArray: '$state' },
+        from: MODELS.user,
+        let: { stateArray: { $ifNull: ['$state', []] } },
         pipeline: [
           {
             $match: {
