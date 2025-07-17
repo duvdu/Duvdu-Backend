@@ -80,7 +80,13 @@ export const getComplaintHandler: RequestHandler<
               _id: '$reporter._id',
               name: '$reporter.name',
               username: '$reporter.username',
-              profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$reporter.profileImage'] },
+              profileImage: {
+                $cond: {
+                  if: { $and: [{ $ne: ['$reporter.profileImage', null] }, { $ne: ['$reporter.profileImage', ''] }] },
+                  then: { $concat: [process.env.BUCKET_HOST, '/', '$reporter.profileImage'] },
+                  else: null
+                }
+              },
               isOnline: '$reporter.isOnline',
             },
           },
@@ -123,7 +129,7 @@ export const getComplaintHandler: RequestHandler<
                                 else: []
                               }
                             },
-                            cond: { $eq: ['$$this._id', '$$stateItem.addedBy'] }
+                            cond: { $eq: [{ $toString: '$$this._id' }, { $toString: '$$stateItem.addedBy' }] }
                           }
                         },
                         0
@@ -137,7 +143,13 @@ export const getComplaintHandler: RequestHandler<
                         _id: '$$user._id',
                         name: '$$user.name',
                         username: '$$user.username',
-                        profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$$user.profileImage'] },
+                        profileImage: {
+                          $cond: {
+                            if: { $and: [{ $ne: ['$$user.profileImage', null] }, { $ne: ['$$user.profileImage', ''] }] },
+                            then: { $concat: [process.env.BUCKET_HOST, '/', '$$user.profileImage'] },
+                            else: null
+                          }
+                        },
                         isOnline: '$$user.isOnline',
                       },
                       else: null
@@ -161,7 +173,13 @@ export const getComplaintHandler: RequestHandler<
               _id: '$closedBy._id',
               name: '$closedBy.name',
               username: '$closedBy.username',
-              profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$closedBy.profileImage'] },
+              profileImage: {
+                $cond: {
+                  if: { $and: [{ $ne: ['$closedBy.profileImage', null] }, { $ne: ['$closedBy.profileImage', ''] }] },
+                  then: { $concat: [process.env.BUCKET_HOST, '/', '$closedBy.profileImage'] },
+                  else: null
+                }
+              },
               isOnline: '$closedBy.isOnline',
             },
             else: null,

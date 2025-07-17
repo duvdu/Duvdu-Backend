@@ -181,7 +181,7 @@ export const getComplaintsHandler: RequestHandler<
                                 else: []
                               }
                             },
-                            cond: { $eq: ['$$this._id', '$$stateItem.addedBy'] }
+                            cond: { $eq: [{ $toString: '$$this._id' }, { $toString: '$$stateItem.addedBy' }] }
                           }
                         },
                         0
@@ -195,7 +195,13 @@ export const getComplaintsHandler: RequestHandler<
                         _id: '$$user._id',
                         name: '$$user.name',
                         username: '$$user.username',
-                        profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$$user.profileImage'] },
+                        profileImage: {
+                          $cond: {
+                            if: { $and: [{ $ne: ['$$user.profileImage', null] }, { $ne: ['$$user.profileImage', ''] }] },
+                            then: { $concat: [process.env.BUCKET_HOST, '/', '$$user.profileImage'] },
+                            else: null
+                          }
+                        },
                         isOnline: '$$user.isOnline',
                       },
                       else: null
@@ -204,8 +210,6 @@ export const getComplaintsHandler: RequestHandler<
                 }
               },
               feedback: '$$stateItem.feedback',
-              createdAt: '$$stateItem.createdAt',
-              updatedAt: '$$stateItem.updatedAt',
             },
           },
         },

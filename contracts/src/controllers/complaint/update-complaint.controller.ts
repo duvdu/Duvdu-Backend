@@ -21,7 +21,7 @@ export const updateComplaintHandler: RequestHandler<
     {
       state: {
         $push: {
-          addedBy: req.loggedUser?.id,
+          addedBy: req.loggedUser.id,
           feedback: req.body.feedback,
         },
       },
