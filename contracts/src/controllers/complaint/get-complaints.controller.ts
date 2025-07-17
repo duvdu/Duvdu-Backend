@@ -85,14 +85,6 @@ export const getComplaintsHandler: RequestHandler<
       },
     },
     {
-      $lookup: {
-        from: 'users',
-        localField: 'state.addedBy',
-        foreignField: '_id',
-        as: 'state.addedBy',
-      },
-    },
-    {
       $unwind: {
         path: '$reporter',
         preserveNullAndEmptyArrays: true
@@ -105,10 +97,20 @@ export const getComplaintsHandler: RequestHandler<
       },
     },
     {
-      $unwind: {
-        path: '$state.addedBy',
-        preserveNullAndEmptyArrays: true
-      },
+      $lookup: {
+        from: 'users',
+        let: { stateArray: '$state' },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $in: ['$_id', { $map: { input: '$$stateArray', as: 'item', in: '$$item.addedBy' } }]
+              }
+            }
+          }
+        ],
+        as: 'stateUsers'
+      }
     },
     {
       $project: {
@@ -137,27 +139,42 @@ export const getComplaintsHandler: RequestHandler<
         },
         state: {
           $map: {
-            input: '$state',
-            as: 'state',
+            input: { $ifNull: ['$state', []] },
+            as: 'stateItem',
             in: {
               addedBy: {
-                $cond: {
-                  if: { $eq: ['$$state.addedBy', null] },
-                  then: null,
-                  else: {
-                    _id: '$$state.addedBy._id',
-                    name: '$$state.addedBy.name',
-                    username: '$$state.addedBy.username',
-                    profileImage: {
-                      $concat: [process.env.BUCKET_HOST, '/', '$$state.addedBy.profileImage'],
-                    },
-                    isOnline: '$$state.addedBy.isOnline',
+                $let: {
+                  vars: {
+                    user: {
+                      $arrayElemAt: [
+                        {
+                          $filter: {
+                            input: '$stateUsers',
+                            cond: { $eq: ['$$this._id', '$$stateItem.addedBy'] }
+                          }
+                        },
+                        0
+                      ]
+                    }
                   },
-                },
+                  in: {
+                    $cond: {
+                      if: { $ne: ['$$user', null] },
+                      then: {
+                        _id: '$$user._id',
+                        name: '$$user.name',
+                        username: '$$user.username',
+                        profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$$user.profileImage'] },
+                        isOnline: '$$user.isOnline',
+                      },
+                      else: null
+                    }
+                  }
+                }
               },
-              feedback: '$$state.feedback',
-              createdAt: '$$state.createdAt',
-              updatedAt: '$$state.updatedAt',
+              feedback: '$$stateItem.feedback',
+              createdAt: '$$stateItem.createdAt',
+              updatedAt: '$$stateItem.updatedAt',
             },
           },
         },
