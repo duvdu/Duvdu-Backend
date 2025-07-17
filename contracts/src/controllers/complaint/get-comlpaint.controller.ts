@@ -36,13 +36,22 @@ export const getComplaintHandler: RequestHandler<
       },
     },
     {
-      $unwind: '$reporter',
+      $unwind: {
+        path: '$reporter',
+        preserveNullAndEmptyArrays: true
+      },
     },
     {
-      $unwind: '$closedBy',
+      $unwind: {
+        path: '$closedBy',
+        preserveNullAndEmptyArrays: true
+      },
     },
     {
-      $unwind: '$state.addedBy',
+      $unwind: {
+        path: '$state.addedBy',
+        preserveNullAndEmptyArrays: true
+      },
     },
     {
       $project: {
@@ -76,7 +85,7 @@ export const getComplaintHandler: RequestHandler<
             in: {
               addedBy: {
                 $cond: {
-                  if: { $eq: ['$state.addedBy', null] },
+                  if: { $eq: ['$$state.addedBy', null] },
                   then: null,
                   else: {
                     _id: '$$state.addedBy._id',
@@ -88,10 +97,10 @@ export const getComplaintHandler: RequestHandler<
                     isOnline: '$$state.addedBy.isOnline',
                   },
                 },
-                feedback: '$$state.feedback',
-                createdAt: '$$state.createdAt',
-                updatedAt: '$$state.updatedAt',
               },
+              feedback: '$$state.feedback',
+              createdAt: '$$state.createdAt',
+              updatedAt: '$$state.updatedAt',
             },
           },
         },

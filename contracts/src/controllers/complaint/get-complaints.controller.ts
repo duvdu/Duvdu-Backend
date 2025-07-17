@@ -28,7 +28,7 @@ export const getComplaintsPagination: RequestHandler<
 
   if (req.query.ticketNumber) req.pagination.filter.ticketNumber = req.query.ticketNumber;
   if (req.query.addedBy)
-    req.pagination.filter.state['addedBy'] = new Types.ObjectId(req.query.addedBy);
+    req.pagination.filter['state.addedBy'] = new Types.ObjectId(req.query.addedBy);
 
   if (req.query.closedBy) req.pagination.filter.closedBy = new Types.ObjectId(req.query.closedBy);
 
@@ -43,7 +43,7 @@ export const getComplaintsPagination: RequestHandler<
     };
   }
   if (req.query.isClosed !== undefined) {
-    req.pagination.filter['state.isClosed'] = req.query.isClosed;
+    req.pagination.filter.isClosed = req.query.isClosed;
   }
 
   next();
@@ -93,13 +93,22 @@ export const getComplaintsHandler: RequestHandler<
       },
     },
     {
-      $unwind: '$reporter',
+      $unwind: {
+        path: '$reporter',
+        preserveNullAndEmptyArrays: true
+      },
     },
     {
-      $unwind: '$closedBy',
+      $unwind: {
+        path: '$closedBy',
+        preserveNullAndEmptyArrays: true
+      },
     },
     {
-      $unwind: '$state.addedBy',
+      $unwind: {
+        path: '$state.addedBy',
+        preserveNullAndEmptyArrays: true
+      },
     },
     {
       $project: {
@@ -133,7 +142,7 @@ export const getComplaintsHandler: RequestHandler<
             in: {
               addedBy: {
                 $cond: {
-                  if: { $eq: ['$state.addedBy', null] },
+                  if: { $eq: ['$$state.addedBy', null] },
                   then: null,
                   else: {
                     _id: '$$state.addedBy._id',
@@ -145,10 +154,10 @@ export const getComplaintsHandler: RequestHandler<
                     isOnline: '$$state.addedBy.isOnline',
                   },
                 },
-                feedback: '$$state.feedback',
-                createdAt: '$$state.createdAt',
-                updatedAt: '$$state.updatedAt',
               },
+              feedback: '$$state.feedback',
+              createdAt: '$$state.createdAt',
+              updatedAt: '$$state.updatedAt',
             },
           },
         },
