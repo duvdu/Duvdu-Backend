@@ -86,7 +86,7 @@ export const getComplaintsHandler: RequestHandler<
     },
     {
       $unwind: {
-        path: '$state.addedBy',
+        path: '$reporter',
         preserveNullAndEmptyArrays: true
       },
     },
