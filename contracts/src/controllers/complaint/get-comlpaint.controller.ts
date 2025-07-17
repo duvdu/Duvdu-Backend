@@ -75,7 +75,7 @@ export const getComplaintHandler: RequestHandler<
         },
         attachments: {
           $map: {
-            input: '$attachments',
+            input: { $ifNull: ['$attachments', []] },
             as: 'attachment',
             in: { $concat: [process.env.BUCKET_HOST, '/', '$$attachment'] },
           },
