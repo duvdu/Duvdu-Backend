@@ -1,33 +1,30 @@
-import { Contracts, SuccessResponse, MODELS } from '@duvdu-v1/duvdu';
+import { Contracts, MODELS, PaginationResponse } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import mongoose from 'mongoose';
 
 export const getContractsCrm: RequestHandler<
   unknown,
-  SuccessResponse<{ data: any }>,
+  PaginationResponse<{ data: any }>,
   unknown,
-  { filter: 'i_created' | 'i_received' , ref: string , user: string }
+  { filter: 'i_created' | 'i_received'; cycle: string; user: string }
 > = async (req, res) => {
-
   const filter: any = {};
 
   if (req.query.user) {
     const user = new mongoose.Types.ObjectId(req.query.user);
-        
+
     if (req.query.filter === 'i_created') filter.customer = user;
     else if (req.query.filter === 'i_received') filter.sp = user;
-    else filter.$or = [{ customer: user }, { sp: user }]; 
+    else filter.$or = [{ customer: user }, { sp: user }];
   }
 
-  if (req.query.ref) 
-    filter.ref = req.query.ref;
-  
-
-
+  if (req.query.cycle) filter.cycle = req.query.cycle;
 
   const contracts = await Contracts.aggregate([
     { $match: filter },
     { $sort: { createdAt: -1 } },
+    { $skip: req.pagination.skip },
+    { $limit: req.pagination.limit },
     {
       $lookup: {
         from: MODELS.copyrightContract,
@@ -249,8 +246,15 @@ export const getContractsCrm: RequestHandler<
     },
   ]);
 
+  const resultCount = await Contracts.countDocuments(filter);
+
   res.status(200).json({
     message: 'success',
+    pagination: {
+      currentPage: req.pagination.page,
+      resultCount,
+      totalPages: Math.ceil(resultCount / req.pagination.limit),
+    },
     data: contracts,
   });
 };

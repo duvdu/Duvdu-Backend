@@ -1,4 +1,9 @@
-import { isauthenticated, isauthorized, PERMISSIONS } from '@duvdu-v1/duvdu';
+import {
+  globalPaginationMiddleware,
+  isauthenticated,
+  isauthorized,
+  PERMISSIONS,
+} from '@duvdu-v1/duvdu';
 import express from 'express';
 
 import * as controllers from '../controllers';
@@ -9,9 +14,20 @@ export const router = express.Router();
 
 router.use(isauthenticated);
 
-router.get('/crm', isauthorized(PERMISSIONS.listContracts), val.getContractsCrm, controllers.getContractsCrm);
+router.get(
+  '/crm',
+  isauthorized(PERMISSIONS.listContracts),
+  globalPaginationMiddleware,
+  val.getContractsCrm,
+  controllers.getContractsCrm,
+);
 router.get('/crm/analysis', isauthorized(PERMISSIONS.listContractsAnalysis), contractAnalysis);
-router.get('/crm/:contractId', isauthorized(PERMISSIONS.listContracts), val.getContract, controllers.getContractCrm);
+router.get(
+  '/crm/:contractId',
+  isauthorized(PERMISSIONS.listContracts),
+  val.getContract,
+  controllers.getContractCrm,
+);
 
 router.route('/').get(val.getContracts, controllers.getContracts);
 router
