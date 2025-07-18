@@ -2,7 +2,7 @@ import 'express-async-errors';
 
 import { MODELS, NotAllowedError, Project, ProjectCycle } from '@duvdu-v1/duvdu';
 
-import { DeleteProjectHandler } from '../../types/project.endoints';
+import { DeleteProjectHandler } from '../../../types/project.endoints';
 
 export const deleteProjectHandler: DeleteProjectHandler = async (req, res, next) => {
   const project = await ProjectCycle.findOneAndUpdate(

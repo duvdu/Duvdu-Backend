@@ -11,7 +11,7 @@ import {
 import { RequestHandler } from 'express';
 
 import 'express-async-errors';
-import { sendNotification } from '../book/sendNotification';
+import { sendNotification } from '../../book/sendNotification';
 
 export const invitationActionHandler: RequestHandler<
   { projectId: string },

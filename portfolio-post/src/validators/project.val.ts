@@ -211,10 +211,12 @@ export const update = [
 
 export const getProject = [
   param('projectId').isMongoId().withMessage('projectId'),
+  query('forceLang').optional().isBoolean().toBoolean(),
   globalValidatorMiddleware,
 ];
 
 export const getAll = [
+  query('forceLang').optional().isBoolean().toBoolean(),
   query('inviteStatus')
     .optional()
     .isIn([InviteStatus.accepted, InviteStatus.pending])
@@ -280,6 +282,7 @@ export const getAll = [
       }
       return true;
     }),
+  query('sortOrder').optional().isIn(['asc', 'desc']).withMessage('sortOrder'),
   globalValidatorMiddleware,
 ];
 

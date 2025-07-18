@@ -14,7 +14,9 @@ export interface GetProjectsHandler
     unknown,
     PaginationResponse<{ data: IprojectCycle[] }>,
     unknown,
-    unknown
+    {
+      sortOrder?: 'asc' | 'desc';
+    }
   > {}
 
 export interface DeleteProjectHandler

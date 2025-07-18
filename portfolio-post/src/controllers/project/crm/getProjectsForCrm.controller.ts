@@ -1,71 +1,21 @@
 import 'express-async-errors';
 
-import {
-  InviteStatus,
-  IprojectCycle,
-  MODELS,
-  PaginationResponse,
-  ProjectCycle,
-} from '@duvdu-v1/duvdu';
-import { RequestHandler } from 'express';
-import { PipelineStage, Types } from 'mongoose';
+import { InviteStatus, MODELS, ProjectCycle } from '@duvdu-v1/duvdu';
 
-import { GetProjectsHandler } from '../../types/project.endoints';
+import { GetProjectsForCrmHandler } from '../../../types/project.endoints';
 
-export const getUserTaggedProjectsHandler: RequestHandler<
-  unknown,
-  PaginationResponse<{ data: IprojectCycle[] }>,
-  GetProjectsHandler,
-  { inviteStatus: InviteStatus }
-> = async (req, res) => {
-  const userId = req.loggedUser?.id;
-
-  const countPipeline = [
+export const getProjetcsCrm: GetProjectsForCrmHandler = async (req, res) => {
+  const projects = await ProjectCycle.aggregate([
     {
-      $match: {
-        isDeleted: false,
-        creatives: {
-          $elemMatch: {
-            creative: new Types.ObjectId(userId),
-            inviteStatus: req.query.inviteStatus,
-          },
-        },
-      },
-    },
-    {
-      $lookup: {
-        from: MODELS.user,
-        localField: 'user',
-        foreignField: '_id',
-        as: 'user',
-      },
-    },
-    { $unwind: '$user' },
-    {
-      $count: 'totalCount',
-    },
-  ];
-
-  const countResult = await ProjectCycle.aggregate(countPipeline);
-  const resultCount = countResult.length > 0 ? countResult[0].totalCount : 0;
-
-  const pipelines: PipelineStage[] = [];
-
-  pipelines.push(
-    {
-      $match: {
-        isDeleted: false,
-        creatives: {
-          $elemMatch: {
-            creative: new Types.ObjectId(userId),
-            inviteStatus: req.query.inviteStatus,
-          },
-        },
-      },
+      $match: { ...req.pagination.filter },
     },
     { $sort: { createdAt: -1 } },
-    { $skip: req.pagination.skip },
-    { $limit: req.pagination.limit },
+    {
+      $skip: req.pagination.skip,
+    },
+    {
+      $limit: req.pagination.limit,
+    },
     {
       $lookup: {
         from: MODELS.user,
@@ -74,10 +24,9 @@ export const getUserTaggedProjectsHandler: RequestHandler<
         as: 'user',
       },
     },
-    { $unwind: '$user' },
-  );
-
-  pipelines.push(
+    {
+      $unwind: '$user',
+    },
     {
       $lookup: {
         from: MODELS.category,
@@ -88,7 +37,19 @@ export const getUserTaggedProjectsHandler: RequestHandler<
     },
     { $unwind: '$category' },
 
+    // Unwind creatives array to handle each creative individually
     { $unwind: { path: '$creatives', preserveNullAndEmptyArrays: true } },
+
+    // Populate the creative field within each creative object in the array
+    {
+      $lookup: {
+        from: MODELS.user,
+        localField: 'creatives.creative',
+        foreignField: '_id',
+        as: 'creativeDetails',
+      },
+    },
+    { $unwind: { path: '$creativeDetails', preserveNullAndEmptyArrays: true } },
 
     {
       $lookup: {
@@ -126,7 +87,13 @@ export const getUserTaggedProjectsHandler: RequestHandler<
         creatives: {
           $push: {
             $cond: [
-              { $eq: ['$creatives.inviteStatus', req.query.inviteStatus] },
+              {
+                $and: [
+                  { $eq: ['$creatives.inviteStatus', InviteStatus.accepted] },
+                  { $ne: ['$creativeDetails', null] },
+                  { $ne: [{ $type: '$creativeDetails' }, 'missing'] },
+                ],
+              },
               {
                 _id: '$creativeDetails._id',
                 profileImage: {
@@ -147,7 +114,6 @@ export const getUserTaggedProjectsHandler: RequestHandler<
                 isAvaliableToInstantProjects: '$creativeDetails.isAvaliableToInstantProjects',
                 pricePerHour: '$creativeDetails.pricePerHour',
                 hasVerificationBadge: '$creativeDetails.hasVerificationBadge',
-                haveInvitation: '$creativeDetails.haveInvitation',
                 likes: '$creativeDetails.likes',
                 followCount: '$creativeDetails.followCount',
                 address: '$creativeDetails.address',
@@ -347,37 +313,23 @@ export const getUserTaggedProjectsHandler: RequestHandler<
       },
     },
 
+    // Continue with the favourite lookup and project stages
     {
       $lookup: {
-        from: MODELS.favourites,
-        let: { projectId: '$_id' },
-        pipeline: [
-          {
-            $match: {
-              $expr: {
-                $and: [
-                  { $eq: ['$project', '$$projectId'] },
-                  {
-                    $eq: ['$user', userId ? new Types.ObjectId(userId) : null],
-                  },
-                ],
-              },
-            },
-          },
-        ],
-        as: 'userFavourite',
+        from: 'favourites',
+        localField: '_id',
+        foreignField: 'project',
+        as: 'favourite',
       },
     },
-
     {
-      $lookup: {
-        from: MODELS.category,
-        localField: 'relatedCategory.category',
-        foreignField: '_id',
-        as: 'relatedCategoryData',
+      $addFields: {
+        favouriteCount: { $size: '$favourite' },
       },
     },
-
+    {
+      $unwind: { path: '$favourite', preserveNullAndEmptyArrays: true },
+    },
     {
       $project: {
         _id: 1,
@@ -442,13 +394,10 @@ export const getUserTaggedProjectsHandler: RequestHandler<
           $filter: {
             input: '$creatives',
             as: 'creative',
-            cond: { $ne: ['$$creative', null] },
+            cond: { $ne: ['$$creative', null] }, // Filter out null values
           },
         },
-        location: {
-          lng: { $arrayElemAt: ['$location.coordinates', 0] },
-          lat: { $arrayElemAt: ['$location.coordinates', 1] },
-        },
+        location: 1,
         address: 1,
         searchKeyWords: 1,
         duration: 1,
@@ -457,172 +406,11 @@ export const getUserTaggedProjectsHandler: RequestHandler<
         rate: 1,
         updatedAt: 1,
         createdAt: 1,
-        isFavourite: {
-          $cond: {
-            if: { $gt: [{ $size: '$userFavourite' }, 0] },
-            then: true,
-            else: false,
-          },
-        },
         favouriteCount: 1,
-        relatedCategory: {
-          $cond: {
-            if: { $eq: [{ $ifNull: ['$relatedCategory', []] }, []] },
-            then: [],
-            else: {
-              $filter: {
-                input: {
-                  $map: {
-                    input: { $ifNull: ['$relatedCategory', []] },
-                    as: 'related',
-                    in: {
-                      $let: {
-                        vars: {
-                          categoryData: {
-                            $arrayElemAt: [
-                              {
-                                $filter: {
-                                  input: '$relatedCategoryData',
-                                  cond: { $eq: ['$$this._id', '$$related.category'] },
-                                },
-                              },
-                              0,
-                            ],
-                          },
-                        },
-                        in: {
-                          $cond: {
-                            if: { $eq: ['$$categoryData', null] },
-                            then: null,
-                            else: {
-                              category: {
-                                _id: '$$categoryData._id',
-                                title: '$$categoryData.title.' + req.lang,
-                                image: {
-                                  $cond: {
-                                    if: { $eq: ['$$categoryData.image', null] },
-                                    then: null,
-                                    else: {
-                                      $concat: [
-                                        process.env.BUCKET_HOST,
-                                        '/',
-                                        '$$categoryData.image',
-                                      ],
-                                    },
-                                  },
-                                },
-                                subCategories: {
-                                  $filter: {
-                                    input: {
-                                      $map: {
-                                        input: { $ifNull: ['$$related.subCategories', []] },
-                                        as: 'sub',
-                                        in: {
-                                          $let: {
-                                            vars: {
-                                              subCatData: {
-                                                $arrayElemAt: [
-                                                  {
-                                                    $filter: {
-                                                      input: {
-                                                        $ifNull: [
-                                                          '$$categoryData.subCategories',
-                                                          [],
-                                                        ],
-                                                      },
-                                                      cond: {
-                                                        $eq: ['$$this._id', '$$sub.subCategory'],
-                                                      },
-                                                    },
-                                                  },
-                                                  0,
-                                                ],
-                                              },
-                                            },
-                                            in: {
-                                              $cond: {
-                                                if: { $eq: ['$$subCatData', null] },
-                                                then: null,
-                                                else: {
-                                                  _id: '$$sub.subCategory',
-                                                  title: '$$subCatData.title.' + req.lang,
-                                                  tags: {
-                                                    $filter: {
-                                                      input: {
-                                                        $map: {
-                                                          input: { $ifNull: ['$$sub.tags', []] },
-                                                          as: 'tagItem',
-                                                          in: {
-                                                            $let: {
-                                                              vars: {
-                                                                tagData: {
-                                                                  $arrayElemAt: [
-                                                                    {
-                                                                      $filter: {
-                                                                        input: {
-                                                                          $ifNull: [
-                                                                            '$$subCatData.tags',
-                                                                            [],
-                                                                          ],
-                                                                        },
-                                                                        cond: {
-                                                                          $eq: [
-                                                                            '$$this._id',
-                                                                            '$$tagItem.tag',
-                                                                          ],
-                                                                        },
-                                                                      },
-                                                                    },
-                                                                    0,
-                                                                  ],
-                                                                },
-                                                              },
-                                                              in: {
-                                                                $cond: {
-                                                                  if: { $eq: ['$$tagData', null] },
-                                                                  then: null,
-                                                                  else: {
-                                                                    _id: '$$tagItem.tag',
-                                                                    title:
-                                                                      '$$tagItem.title.' + req.lang,
-                                                                  },
-                                                                },
-                                                              },
-                                                            },
-                                                          },
-                                                        },
-                                                      },
-                                                      cond: { $ne: ['$$this', null] },
-                                                    },
-                                                  },
-                                                },
-                                              },
-                                            },
-                                          },
-                                        },
-                                      },
-                                    },
-                                    cond: { $ne: ['$$this', null] },
-                                  },
-                                },
-                              },
-                            },
-                          },
-                        },
-                      },
-                    },
-                  },
-                },
-                cond: { $ne: ['$$this', null] },
-              },
-            },
-          },
-        },
       },
     },
-  );
-
-  const projects = await ProjectCycle.aggregate(pipelines);
+  ]);
+  const resultCount = await ProjectCycle.countDocuments(req.pagination.filter);
 
   res.status(200).json({
     message: 'success',

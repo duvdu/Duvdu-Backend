@@ -120,7 +120,11 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
       const delay = contract.stageExpiration * 3600 * 1000;
       const firstPaymentQueue = getFirstPaymentQueue();
       if (firstPaymentQueue) {
-        await firstPaymentQueue.add('first_payment_expiration_job', { contractId: contract._id.toString() }, { delay });
+        await firstPaymentQueue.add(
+          'first_payment_expiration_job',
+          { contractId: contract._id.toString() },
+          { delay },
+        );
       }
     } else if (
       req.body.action === 'reject' &&
@@ -206,7 +210,11 @@ export const contractActionHandler: ContractActionHandler = async (req, res, nex
       const delay = contract.stageExpiration * 3600 * 1000;
       const secondPaymentQueue = getSecondPaymentQueue();
       if (secondPaymentQueue) {
-        await secondPaymentQueue.add('second_payment_expiration_job', { contractId: contract._id.toString() }, { delay });
+        await secondPaymentQueue.add(
+          'second_payment_expiration_job',
+          { contractId: contract._id.toString() },
+          { delay },
+        );
       }
     } else
       return next(

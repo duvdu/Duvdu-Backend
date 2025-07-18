@@ -15,19 +15,13 @@ export const createPortfolioQueues = async () => {
     connection: bullRedis,
   });
 
-  const firstPayMentQueue = new Queue<IcontarctQueue>(
-    'firstPayment-contract-pending',
-    {
-      connection: bullRedis,
-    },
-  );
+  const firstPayMentQueue = new Queue<IcontarctQueue>('firstPayment-contract-pending', {
+    connection: bullRedis,
+  });
 
-  const secondPayMentQueue = new Queue<IcontarctQueue>(
-    'secondPayment-contract-pending',
-    {
-      connection: bullRedis,
-    },
-  );
+  const secondPayMentQueue = new Queue<IcontarctQueue>('secondPayment-contract-pending', {
+    connection: bullRedis,
+  });
 
   const updateAfterFirstPaymentQueeu = new Queue<IcontarctQueue>(
     'updateAfterFirstPayment-contract-pending',

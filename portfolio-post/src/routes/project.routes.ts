@@ -36,10 +36,40 @@ router
   .get(
     isauthenticated,
     isauthorized(PERMISSIONS.listProjects),
-    val.getAll,
     globalPaginationMiddleware,
+    val.getAll,
     handler.getProjectsPagination,
     handler.getProjetcsCrm,
+  );
+
+router
+  .route('/crm/:projectId')
+  .get(
+    isauthenticated,
+    isauthorized(PERMISSIONS.listProjects),
+    globalPaginationMiddleware,
+    val.getProject,
+    handler.getProjectCrmHandler,
+  )
+  .patch(
+    isauthenticated,
+    isauthorized(PERMISSIONS.updateProject),
+    globalUploadMiddleware(FOLDERS.portfolio_post, {
+      maxSize: 400 * 1024 * 1024,
+      fileTypes: ['video/*', 'image/*', 'audio/*', 'application/*'],
+    }).fields([
+      { name: 'attachments', maxCount: 10 },
+      { name: 'cover', maxCount: 1 },
+      { name: 'audioCover', maxCount: 1 },
+    ]),
+    val.update,
+    handler.updateProjectCrmHandler,
+  )
+  .delete(
+    isauthenticated,
+    isauthorized(PERMISSIONS.removeProject),
+    val.getProject,
+    handler.deleteProjectCrmHandler,
   );
 
 router
@@ -82,9 +112,5 @@ router
     handler.updateProjectHandler,
   )
   .get(optionalAuthenticated, val.getProject, handler.getProjectHandler)
-  .delete(
-    isauthenticated,
-    val.getProject,
-    handler.deleteProjectHandler,
-  )
+  .delete(isauthenticated, val.getProject, handler.deleteProjectHandler)
   .post(isauthenticated, val.acceptAction, handler.invitationActionHandler);

@@ -15,6 +15,7 @@ declare global {
       loggedUser: IjwtPayload;
       pagination: Ipagination;
       lang: 'ar' | 'en';
+      forceLang: true | false;
     }
   }
 }

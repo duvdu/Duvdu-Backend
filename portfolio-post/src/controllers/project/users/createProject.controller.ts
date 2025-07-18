@@ -18,8 +18,8 @@ import {
 import { RequestHandler } from 'express';
 import { Document, Types } from 'mongoose';
 
-import { inviteCreatives, validateCreative } from '../../services/inviteCreative.service';
-import { sendNotification } from '../book/sendNotification';
+import { inviteCreatives, validateCreative } from '../../../services/inviteCreative.service';
+import { sendNotification } from '../../book/sendNotification';
 
 interface ProjectRequestBody
   extends Pick<

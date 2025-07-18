@@ -33,7 +33,6 @@ export const payContract: RequestHandler<
     );
 
   if (contract.status === ProjectContractStatus.waitingForFirstPayment) {
-
     // check if the service provider have avaliable contracts
     const sp = await Users.findById(contract.sp);
     if (sp && sp.avaliableContracts === 0) {
