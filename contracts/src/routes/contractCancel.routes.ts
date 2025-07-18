@@ -16,7 +16,7 @@ router
   .route('/')
   .post(validations.createContractCancelValidation, controllers.createContractCancel)
   .get(
-    isauthorized(PERMISSIONS.getContractsCancel),
+    isauthorized(PERMISSIONS.listCancelContracts),
     globalPaginationMiddleware,
     validations.getContractsCancelValidation,
     controllers.getContractsCancel,
@@ -25,17 +25,17 @@ router
 router
   .route('/:contractCancelId')
   .get(
-    isauthorized(PERMISSIONS.getContractsCancel),
+    isauthorized(PERMISSIONS.listCancelContracts),
     validations.getContractCancelValidation,
     controllers.getContractCancel,
   )
   .delete(
-    isauthorized(PERMISSIONS.deleteContractCancel),
+    isauthorized(PERMISSIONS.deleteCancelContract),
     validations.deleteContractCancelValidation,
     controllers.deleteContractCancel,
   )
   .patch(
-    isauthorized(PERMISSIONS.acceptContractCancel),
+    isauthorized(PERMISSIONS.acceptCancelContract),
     validations.acceptContractCancelValidation,
     controllers.acceptContractCancel,
   );

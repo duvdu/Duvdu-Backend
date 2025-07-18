@@ -22,6 +22,7 @@ export const getComplaintsPagination: RequestHandler<
   if (req.query.search) {
     req.pagination.filter.$or = [
       { 'state.feedback': { $regex: req.query.search, $options: 'i' } },
+      { ticketNumber: { $regex: req.query.search, $options: 'i' } },
       { desc: { $regex: req.query.search, $options: 'i' } },
     ];
   }
@@ -87,13 +88,13 @@ export const getComplaintsHandler: RequestHandler<
     {
       $unwind: {
         path: '$reporter',
-        preserveNullAndEmptyArrays: true
+        preserveNullAndEmptyArrays: true,
       },
     },
     {
       $unwind: {
         path: '$closedBy',
-        preserveNullAndEmptyArrays: true
+        preserveNullAndEmptyArrays: true,
       },
     },
     {
@@ -104,25 +105,25 @@ export const getComplaintsHandler: RequestHandler<
               $cond: {
                 if: { $and: [{ $ne: ['$state', null] }, { $isArray: '$state' }] },
                 then: '$state',
-                else: []
-              }
+                else: [],
+              },
             },
             as: 'stateItem',
-            in: '$$stateItem.addedBy'
-          }
-        }
-      }
+            in: '$$stateItem.addedBy',
+          },
+        },
+      },
     },
     {
       $lookup: {
         from: MODELS.user,
         localField: 'stateUserIds',
         foreignField: '_id',
-        as: 'stateUsers'
-      }
+        as: 'stateUsers',
+      },
     },
     {
-      $unset: ['stateUserIds']
+      $unset: ['stateUserIds'],
     },
     {
       $project: {
@@ -149,8 +150,8 @@ export const getComplaintsHandler: RequestHandler<
               $cond: {
                 if: { $and: [{ $ne: ['$attachments', null] }, { $isArray: '$attachments' }] },
                 then: '$attachments',
-                else: []
-              }
+                else: [],
+              },
             },
             as: 'attachment',
             in: { $concat: [process.env.BUCKET_HOST, '/', '$$attachment'] },
@@ -162,8 +163,8 @@ export const getComplaintsHandler: RequestHandler<
               $cond: {
                 if: { $and: [{ $ne: ['$state', null] }, { $isArray: '$state' }] },
                 then: '$state',
-                else: []
-              }
+                else: [],
+              },
             },
             as: 'stateItem',
             in: {
@@ -176,17 +177,27 @@ export const getComplaintsHandler: RequestHandler<
                           $filter: {
                             input: {
                               $cond: {
-                                if: { $and: [{ $ne: ['$stateUsers', null] }, { $isArray: '$stateUsers' }] },
+                                if: {
+                                  $and: [
+                                    { $ne: ['$stateUsers', null] },
+                                    { $isArray: '$stateUsers' },
+                                  ],
+                                },
                                 then: '$stateUsers',
-                                else: []
-                              }
+                                else: [],
+                              },
                             },
-                            cond: { $eq: [{ $toString: '$$this._id' }, { $toString: '$$stateItem.addedBy' }] }
-                          }
+                            cond: {
+                              $eq: [
+                                { $toString: '$$this._id' },
+                                { $toString: '$$stateItem.addedBy' },
+                              ],
+                            },
+                          },
                         },
-                        0
-                      ]
-                    }
+                        0,
+                      ],
+                    },
                   },
                   in: {
                     $cond: {
@@ -197,17 +208,24 @@ export const getComplaintsHandler: RequestHandler<
                         username: '$$user.username',
                         profileImage: {
                           $cond: {
-                            if: { $and: [{ $ne: ['$$user.profileImage', null] }, { $ne: ['$$user.profileImage', ''] }] },
-                            then: { $concat: [process.env.BUCKET_HOST, '/', '$$user.profileImage'] },
-                            else: null
-                          }
+                            if: {
+                              $and: [
+                                { $ne: ['$$user.profileImage', null] },
+                                { $ne: ['$$user.profileImage', ''] },
+                              ],
+                            },
+                            then: {
+                              $concat: [process.env.BUCKET_HOST, '/', '$$user.profileImage'],
+                            },
+                            else: null,
+                          },
                         },
                         isOnline: '$$user.isOnline',
                       },
-                      else: null
-                    }
-                  }
-                }
+                      else: null,
+                    },
+                  },
+                },
               },
               feedback: '$$stateItem.feedback',
             },

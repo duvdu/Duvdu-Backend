@@ -14,6 +14,21 @@ export const getContracts = [
   globalValidatorMiddleware,
 ];
 
+export const getContractsCrm = [
+  query('filter')
+    .optional()
+    .isString()
+    .withMessage('invalidFilter')
+    .bail()
+    .custom((val) => {
+      if (['i_created', 'i_received'].includes(val)) return true;
+      throw new Error('invalidFilterValue');
+    }),
+  query('ref').optional().isString().withMessage('invalidRef'),
+  query('user').optional().isMongoId().withMessage('invalidUser'),
+  globalValidatorMiddleware,
+];
+
 export const getContract = [
   param('contractId').isMongoId().withMessage('invalidContractId'),
   globalValidatorMiddleware,
