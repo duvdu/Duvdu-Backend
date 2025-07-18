@@ -131,7 +131,7 @@ export const getProjetcsCrm: GetProjectsForCrmHandler = async (req, res) => {
                       then: null,
                       else: {
                         _id: '$mainCategoryDetails._id',
-                        title: '$mainCategoryDetails.title.' + req.lang,
+                        title: req.forceLang? '$mainCategoryDetails.title.' + req.lang : '$mainCategoryDetails.title',
                       },
                     },
                   },
@@ -162,7 +162,13 @@ export const getProjetcsCrm: GetProjectsForCrmHandler = async (req, res) => {
                           else: {
                             subCategory: {
                               _id: '$$subCat._id',
-                              title: { $getField: { field: req.lang, input: '$$subCat.title' } },
+                              title: {
+                                $cond: {
+                                  if: req.forceLang,
+                                  then: { $getField: { field: req.lang, input: '$$subCat.title' } },
+                                  else: '$$subCat.title',
+                                },
+                              },
                             },
                             tags: {
                               $cond: {
@@ -190,7 +196,11 @@ export const getProjetcsCrm: GetProjectsForCrmHandler = async (req, res) => {
                                         in: {
                                           _id: '$$tag.tag',
                                           title: {
-                                            $getField: { field: req.lang, input: '$$tagData' },
+                                            $cond: {
+                                              if: req.forceLang,
+                                              then: { $getField: { field: req.lang, input: '$$tagData' } },
+                                              else: '$$tagData',
+                                            },
                                           },
                                         },
                                       },
@@ -217,7 +227,9 @@ export const getProjetcsCrm: GetProjectsForCrmHandler = async (req, res) => {
                         then: null,
                         else: {
                           _id: '$relatedCategoryDetails._id',
-                          title: '$relatedCategoryDetails.title.' + req.lang,
+                          title: req.forceLang
+                            ? '$relatedCategoryDetails.title.' + req.lang
+                            : '$relatedCategoryDetails.title',
                         },
                       },
                     },
@@ -248,7 +260,13 @@ export const getProjetcsCrm: GetProjectsForCrmHandler = async (req, res) => {
                             else: {
                               subCategory: {
                                 _id: '$$subCat._id',
-                                title: { $getField: { field: req.lang, input: '$$subCat.title' } },
+                                title: {
+                                  $cond: {
+                                    if: req.forceLang,
+                                    then: { $getField: { field: req.lang, input: '$$subCat.title' } },
+                                    else: '$$subCat.title',
+                                  },
+                                },
                               },
                               tags: {
                                 $cond: {
@@ -282,7 +300,11 @@ export const getProjetcsCrm: GetProjectsForCrmHandler = async (req, res) => {
                                           in: {
                                             _id: '$$tag.tag',
                                             title: {
-                                              $getField: { field: req.lang, input: '$$tagData' },
+                                              $cond: {
+                                                if: req.forceLang,
+                                                then: { $getField: { field: req.lang, input: '$$tagData' } },
+                                                else: '$$tagData',
+                                              },
                                             },
                                           },
                                         },
@@ -354,11 +376,11 @@ export const getProjetcsCrm: GetProjectsForCrmHandler = async (req, res) => {
           address: '$user.address',
         },
         category: {
-          title: '$category.title.' + req.lang,
+          title: req.forceLang ? '$category.title.' + req.lang : '$category.title',
           _id: '$category._id',
         },
         subCategory: {
-          title: '$subCategory.' + req.lang,
+          title: req.forceLang ? '$subCategory.' + req.lang : '$subCategory',
           _id: '$subCategory._id',
         },
         tags: {
@@ -368,9 +390,9 @@ export const getProjetcsCrm: GetProjectsForCrmHandler = async (req, res) => {
             in: {
               title: {
                 $cond: {
-                  if: { $eq: [req.lang, 'en'] },
-                  then: '$$tag.en',
-                  else: '$$tag.ar',
+                  if: req.forceLang,
+                  then: { $getField: { field: req.lang, input: '$$tag' } },
+                  else: '$$tag',
                 },
               },
               _id: '$$tag._id',

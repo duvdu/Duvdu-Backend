@@ -151,7 +151,9 @@ export const getProjectCrmHandler: GetProjectHandler = async (req, res, next) =>
                         then: null,
                         else: {
                           _id: '$mainCategoryDetails._id',
-                          title: '$mainCategoryDetails.title.' + req.lang,
+                          title: req.forceLang
+                            ? '$mainCategoryDetails.title.' + req.lang
+                            : '$mainCategoryDetails.title',
                           media: '$mainCategoryDetails.media',
                         },
                       },
@@ -183,7 +185,13 @@ export const getProjectCrmHandler: GetProjectHandler = async (req, res, next) =>
                             else: {
                               subCategory: {
                                 _id: '$$subCat._id',
-                                title: { $getField: { field: req.lang, input: '$$subCat.title' } },
+                                title: {
+                                  $cond: {
+                                    if: req.forceLang,
+                                    then: { $getField: { field: req.lang, input: '$$subCat.title' } },
+                                    else: '$$subCat.title',
+                                  },
+                                },
                               },
                               tags: {
                                 $cond: {
@@ -211,7 +219,11 @@ export const getProjectCrmHandler: GetProjectHandler = async (req, res, next) =>
                                           in: {
                                             _id: '$$tag.tag',
                                             title: {
-                                              $getField: { field: req.lang, input: '$$tagData' },
+                                              $cond: {
+                                                if: req.forceLang,
+                                                then: { $getField: { field: req.lang, input: '$$tagData' } },
+                                                else: '$$tagData',
+                                              },
                                             },
                                           },
                                         },
@@ -238,7 +250,9 @@ export const getProjectCrmHandler: GetProjectHandler = async (req, res, next) =>
                           then: null,
                           else: {
                             _id: '$relatedCategoryDetails._id',
-                            title: '$relatedCategoryDetails.title.' + req.lang,
+                            title: req.forceLang
+                              ? '$relatedCategoryDetails.title.' + req.lang
+                              : '$relatedCategoryDetails.title',
                           },
                         },
                       },
@@ -270,7 +284,11 @@ export const getProjectCrmHandler: GetProjectHandler = async (req, res, next) =>
                                 subCategory: {
                                   _id: '$$subCat._id',
                                   title: {
-                                    $getField: { field: req.lang, input: '$$subCat.title' },
+                                    $cond: {
+                                      if: req.forceLang,
+                                      then: { $getField: { field: req.lang, input: '$$subCat.title' } },
+                                      else: '$$subCat.title',
+                                    },
                                   },
                                 },
                                 tags: {
@@ -305,7 +323,11 @@ export const getProjectCrmHandler: GetProjectHandler = async (req, res, next) =>
                                             in: {
                                               _id: '$$tag.tag',
                                               title: {
-                                                $getField: { field: req.lang, input: '$$tagData' },
+                                                $cond: {
+                                                  if: req.forceLang,
+                                                  then: { $getField: { field: req.lang, input: '$$tagData' } },
+                                                  else: '$$tagData',
+                                                },
                                               },
                                             },
                                           },
@@ -439,12 +461,12 @@ export const getProjectCrmHandler: GetProjectHandler = async (req, res, next) =>
             address: '$user.address',
           },
           category: {
-            title: '$category.title.' + req.lang,
+            title: req.forceLang ? '$category.title.' + req.lang : '$category.title',
             _id: '$category._id',
             media: '$category.media',
           },
           subCategory: {
-            title: '$subCategory.' + req.lang,
+            title: req.forceLang ? '$subCategory.' + req.lang : '$subCategory',
             _id: '$subCategory._id',
           },
           tags: {
@@ -454,9 +476,9 @@ export const getProjectCrmHandler: GetProjectHandler = async (req, res, next) =>
               in: {
                 title: {
                   $cond: {
-                    if: { $eq: [req.lang, 'en'] },
-                    then: '$$tag.en',
-                    else: '$$tag.ar',
+                    if: req.forceLang,
+                    then: { $getField: { field: req.lang, input: '$$tag' } },
+                    else: '$$tag',
                   },
                 },
                 _id: '$$tag._id',
@@ -537,7 +559,9 @@ export const getProjectCrmHandler: GetProjectHandler = async (req, res, next) =>
                               else: {
                                 category: {
                                   _id: '$$categoryData._id',
-                                  title: '$$categoryData.title.' + req.lang,
+                                  title: req.forceLang
+                                    ? '$$categoryData.title.' + req.lang
+                                    : '$$categoryData.title',
                                   image: {
                                     $cond: {
                                       if: { $eq: ['$$categoryData.image', null] },
@@ -585,7 +609,9 @@ export const getProjectCrmHandler: GetProjectHandler = async (req, res, next) =>
                                                   then: null,
                                                   else: {
                                                     _id: '$$sub.subCategory',
-                                                    title: '$$subCatData.title.' + req.lang,
+                                                    title: req.forceLang
+                                                      ? '$$subCatData.title.' + req.lang
+                                                      : '$$subCatData.title',
                                                     tags: {
                                                       $filter: {
                                                         input: {
@@ -625,9 +651,9 @@ export const getProjectCrmHandler: GetProjectHandler = async (req, res, next) =>
                                                                     then: null,
                                                                     else: {
                                                                       _id: '$$tagItem.tag',
-                                                                      title:
-                                                                        '$$tagItem.title.' +
-                                                                        req.lang,
+                                                                      title: req.forceLang
+                                                                        ? '$$tagItem.title.' + req.lang
+                                                                        : '$$tagItem.title',
                                                                     },
                                                                   },
                                                                 },

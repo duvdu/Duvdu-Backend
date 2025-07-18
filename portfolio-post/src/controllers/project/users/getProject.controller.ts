@@ -151,9 +151,7 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
                         then: null,
                         else: {
                           _id: '$mainCategoryDetails._id',
-                          title: req.forceLang
-                            ? '$mainCategoryDetails.title.' + req.lang
-                            : '$mainCategoryDetails.title',
+                          title: '$mainCategoryDetails.title.' + req.lang,
                           media: '$mainCategoryDetails.media',
                         },
                       },
@@ -186,13 +184,7 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
                               subCategory: {
                                 _id: '$$subCat._id',
                                 title: {
-                                  $cond: {
-                                    if: req.forceLang,
-                                    then: {
-                                      $getField: { field: req.lang, input: '$$subCat.title' },
-                                    },
-                                    else: '$$subCat.title',
-                                  },
+                                  $getField: { field: req.lang, input: '$$subCat.title' }
                                 },
                               },
                               tags: {
@@ -220,18 +212,7 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
                                           },
                                           in: {
                                             _id: '$$tag.tag',
-                                            title: {
-                                              $cond: {
-                                                if: req.forceLang,
-                                                then: {
-                                                  $getField: {
-                                                    field: req.lang,
-                                                    input: '$$tagData',
-                                                  },
-                                                },
-                                                else: '$$tagData',
-                                              },
-                                            },
+                                            title: { $getField: { field: req.lang, input: '$$tagData' } },
                                           },
                                         },
                                       },
@@ -257,9 +238,7 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
                           then: null,
                           else: {
                             _id: '$relatedCategoryDetails._id',
-                            title: req.forceLang
-                              ? '$relatedCategoryDetails.title.' + req.lang
-                              : '$relatedCategoryDetails.title',
+                            title: '$relatedCategoryDetails.title.' + req.lang,
                           },
                         },
                       },
@@ -290,15 +269,7 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
                               else: {
                                 subCategory: {
                                   _id: '$$subCat._id',
-                                  title: {
-                                    $cond: {
-                                      if: req.forceLang,
-                                      then: {
-                                        $getField: { field: req.lang, input: '$$subCat.title' },
-                                      },
-                                      else: '$$subCat.title',
-                                    },
-                                  },
+                                  title: { $getField: { field: req.lang, input: '$$subCat.title' } },
                                 },
                                 tags: {
                                   $cond: {
@@ -331,18 +302,7 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
                                             },
                                             in: {
                                               _id: '$$tag.tag',
-                                              title: {
-                                                $cond: {
-                                                  if: req.forceLang,
-                                                  then: {
-                                                    $getField: {
-                                                      field: req.lang,
-                                                      input: '$$tagData',
-                                                    },
-                                                  },
-                                                  else: '$$tagData',
-                                                },
-                                              },
+                                              title: { $getField: { field: req.lang, input: '$$tagData' } },
                                             },
                                           },
                                         },
@@ -475,12 +435,12 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
             address: '$user.address',
           },
           category: {
-            title: req.forceLang ? '$category.title.' + req.lang : '$category.title',
+            title: '$category.title.' + req.lang,
             _id: '$category._id',
             media: '$category.media',
           },
           subCategory: {
-            title: req.forceLang ? '$subCategory.' + req.lang : '$subCategory',
+            title: '$subCategory.' + req.lang,
             _id: '$subCategory._id',
           },
           tags: {
@@ -488,7 +448,7 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
               input: '$tags',
               as: 'tag',
               in: {
-                title: req.forceLang ? '$$tag.title.' + req.lang : '$$tag.title',
+                title: '$$tag.title.' + req.lang,
                 _id: '$$tag._id',
               },
             },
@@ -567,9 +527,7 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
                               else: {
                                 category: {
                                   _id: '$$categoryData._id',
-                                  title: req.forceLang
-                                    ? '$$categoryData.title.' + req.lang
-                                    : '$$categoryData.title',
+                                  title: '$$categoryData.title.' + req.lang,
                                   image: {
                                     $cond: {
                                       if: { $eq: ['$$categoryData.image', null] },
@@ -617,9 +575,7 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
                                                   then: null,
                                                   else: {
                                                     _id: '$$sub.subCategory',
-                                                    title: req.forceLang
-                                                      ? '$$subCatData.title.' + req.lang
-                                                      : '$$subCatData.title',
+                                                    title: '$$subCatData.title.' + req.lang,
                                                     tags: {
                                                       $filter: {
                                                         input: {
@@ -659,10 +615,7 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
                                                                     then: null,
                                                                     else: {
                                                                       _id: '$$tagItem.tag',
-                                                                      title: req.forceLang
-                                                                        ? '$$tagItem.title.' +
-                                                                          req.lang
-                                                                        : '$$tagItem.title',
+                                                                      title: '$$tagItem.title.' + req.lang,
                                                                     },
                                                                   },
                                                                 },
