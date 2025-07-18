@@ -39,6 +39,13 @@ export enum PERMISSIONS {
   listComplaints = 'list-complaints',
   updateComplaint = 'update-complaint',
   closeComplaint = 'close-complaint',
+
+  // contract
+  listContracts = 'list-contracts',
+  listContractsAnalysis = 'list-contracts-analysis',
+  listCancelContracts = 'list-cancel-contracts',
+  acceptCancelContract = 'accept-cancel-contract',
+  deleteCancelContract = 'delete-cancel-contract',
   
 
 
@@ -111,10 +118,6 @@ export enum PERMISSIONS {
   updatePlatform = 'update producer platform',
   getPlatform = 'get producer platform',
 
-  // contract cancel
-  getContractsCancel = 'get contracts cancel',
-  deleteContractCancel = 'delete contract cancel',
-  acceptContractCancel = 'accept contract cancel',
 }
 
 export const permissions = {
@@ -147,6 +150,11 @@ export const permissions = {
     PERMISSIONS.listComplaints,
     PERMISSIONS.updateComplaint,
     PERMISSIONS.closeComplaint,
+    PERMISSIONS.listContracts,
+    PERMISSIONS.listContractsAnalysis,
+    PERMISSIONS.listCancelContracts,
+    PERMISSIONS.acceptCancelContract,
+    PERMISSIONS.deleteCancelContract,
   ],
   category: [
     PERMISSIONS.createCategory,
@@ -189,6 +197,13 @@ export const permissions = {
     PERMISSIONS.listComplaints,
     PERMISSIONS.updateComplaint,
     PERMISSIONS.closeComplaint,
+  ],
+  contract: [
+    PERMISSIONS.listContracts,
+    PERMISSIONS.listContractsAnalysis,
+    PERMISSIONS.listCancelContracts,
+    PERMISSIONS.acceptCancelContract,
+    PERMISSIONS.deleteCancelContract,
   ],
 
 
@@ -251,9 +266,5 @@ export const permissions = {
     PERMISSIONS.createPlatform,
     PERMISSIONS.updatePlatform,
   ],
-  contractCancel: [
-    PERMISSIONS.getContractsCancel,
-    PERMISSIONS.deleteContractCancel,
-    PERMISSIONS.acceptContractCancel,
-  ],
+
 };
