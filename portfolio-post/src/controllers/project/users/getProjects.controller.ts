@@ -102,12 +102,11 @@ export const getProjectsPagination: RequestHandler<
   }
 
   if (req.query.startDate || req.query.endDate) {
-    req.pagination.filter['projectScale'] = {};
     if (req.query.startDate) {
-      req.pagination.filter['projectScale.minimum'] = { $gte: req.query.startDate };
+      req.pagination.filter.createdAt = { $gte: req.query.startDate };
     }
     if (req.query.endDate) {
-      req.pagination.filter['projectScale.maximum'] = { $lte: req.query.endDate };
+      req.pagination.filter.createdAt = { $lte: req.query.endDate };
     }
   }
 
