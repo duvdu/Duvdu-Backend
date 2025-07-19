@@ -216,6 +216,7 @@ export const getProject = [
 ];
 
 export const getAll = [
+  query('user').optional().isMongoId().withMessage('user'),
   query('forceLang').optional().isBoolean().toBoolean(),
   query('inviteStatus')
     .optional()

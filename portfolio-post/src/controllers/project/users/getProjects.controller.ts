@@ -36,8 +36,12 @@ export const getProjectsPagination: RequestHandler<
     relatedSubCategory?: Types.ObjectId[];
     relatedTags?: Types.ObjectId[];
     sortOrder?: 'asc' | 'desc';
+    user?: string;
   }
 > = async (req, res, next) => {
+  if (req.query.user) {
+    req.pagination.filter.user = new mongoose.Types.ObjectId(req.query.user);
+  }
   req.query.maxDistance = +(req.query.maxDistance || 1000);
   if (req.query.duration) req.pagination.filter.duration = { $eq: req.query.duration };
   if (req.query.instant != undefined) req.pagination.filter.instant = req.query.instant;

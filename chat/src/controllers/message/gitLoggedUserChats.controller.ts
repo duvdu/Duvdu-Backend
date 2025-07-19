@@ -202,11 +202,17 @@ export const getLoggedUserChatsHandler: GetLoggedUserChatsHandler = async (req, 
   // Add pagination
   mainPipeline.push(
     {
+      $sort: {
+        createdAt: -1,
+      },
+    },
+    {
       $skip: req.pagination.skip,
     },
     {
       $limit: req.pagination.limit,
     },
+
   );
 
   const allChats = await Message.aggregate(mainPipeline);
