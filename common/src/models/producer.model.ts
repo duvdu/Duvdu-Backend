@@ -1,5 +1,6 @@
 import { model, Schema, Types } from 'mongoose';
 
+import { generateTicketNumber } from './all-contracts.model';
 import { IProducerPlatform } from './producerPlatform.model';
 import { Icategory } from '../types/Category';
 import { MODELS } from '../types/model-names';
@@ -13,6 +14,7 @@ export interface Iproducer {
   minBudget: number;
   searchKeywords: string[];
   platforms: Types.ObjectId[] | IProducerPlatform[];
+  ticketNumber: string;
 }
 
 export const Producer = model<Iproducer>(
@@ -23,6 +25,7 @@ export const Producer = model<Iproducer>(
         type: Schema.Types.ObjectId,
         ref: MODELS.user,
       },
+      ticketNumber: { type: String, default: generateTicketNumber, unique: true, sparse: true },
       category: {
         type: Schema.Types.ObjectId,
         ref: MODELS.category,
