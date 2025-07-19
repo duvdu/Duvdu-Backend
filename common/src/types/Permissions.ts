@@ -59,6 +59,15 @@ export enum PERMISSIONS {
   updateTicket = 'update-ticket',
   removeTicket = 'remove-ticket',
 
+  // report
+  listReports = 'list-reports',
+  getReport = 'get-report',
+  updateReport = 'update-report',
+  deleteReport = 'delete-report',
+
+
+
+
   bookmarks = 'bookmarks',
 
   createTicket = 'create ticket',
@@ -165,6 +174,10 @@ export const permissions = {
     PERMISSIONS.listTickets,
     PERMISSIONS.updateTicket,
     PERMISSIONS.removeTicket,
+    PERMISSIONS.listReports,
+    PERMISSIONS.getReport,
+    PERMISSIONS.updateReport,
+    PERMISSIONS.deleteReport,
   ],
   category: [
     PERMISSIONS.createCategory,
@@ -217,6 +230,12 @@ export const permissions = {
     PERMISSIONS.listTickets,
     PERMISSIONS.updateTicket,
     PERMISSIONS.removeTicket,
+  ],
+  reports: [
+    PERMISSIONS.listReports,
+    PERMISSIONS.getReportHandler,
+    PERMISSIONS.updateReportHandler,
+    PERMISSIONS.deleteReportHandler,
   ],
 
   
