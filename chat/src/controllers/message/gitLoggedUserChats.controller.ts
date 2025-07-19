@@ -203,7 +203,7 @@ export const getLoggedUserChatsHandler: GetLoggedUserChatsHandler = async (req, 
   mainPipeline.push(
     {
       $sort: {
-        createdAt: -1,
+        'newestMessage.createdAt': -1,
       },
     },
     {

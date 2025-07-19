@@ -171,7 +171,7 @@ export const update = [
     .isLength({ min: 3 })
     .withMessage('searchKeywords'),
   body('duration').optional().isInt({ min: 1 }).withMessage('insurance'),
-  body('showOnHome').optional().optional().isBoolean().bail().toBoolean().withMessage('showOnHome'),
+  body('showOnHome').optional().optional().isBoolean().toBoolean().withMessage('showOnHome'),
   body('projectScale').optional().isObject().withMessage('projectScale'),
   body('projectScale.unit').optional().isString().bail().trim().withMessage('projectScale'),
   body('projectScale.minimum')

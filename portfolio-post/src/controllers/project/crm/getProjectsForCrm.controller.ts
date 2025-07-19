@@ -35,22 +35,12 @@ export const getProjetcsCrm: GetProjectsForCrmHandler = async (req, res) => {
         as: 'category',
       },
     },
-    { $unwind: '$category' },
+    { $unwind: { path: '$category', preserveNullAndEmptyArrays: true } },
 
     // Unwind creatives array to handle each creative individually
     { $unwind: { path: '$creatives', preserveNullAndEmptyArrays: true } },
 
     // Populate the creative field within each creative object in the array
-    {
-      $lookup: {
-        from: MODELS.user,
-        localField: 'creatives.creative',
-        foreignField: '_id',
-        as: 'creativeDetails',
-      },
-    },
-    { $unwind: { path: '$creativeDetails', preserveNullAndEmptyArrays: true } },
-
     {
       $lookup: {
         from: MODELS.user,
@@ -376,8 +366,14 @@ export const getProjetcsCrm: GetProjectsForCrmHandler = async (req, res) => {
           address: '$user.address',
         },
         category: {
-          title: req.forceLang ? '$category.title.' + req.lang : '$category.title',
-          _id: '$category._id',
+          $cond: {
+            if: { $eq: ['$category', null] },
+            then: null,
+            else: {
+              title: req.forceLang ? '$category.title.' + req.lang : '$category.title',
+              _id: '$category._id',
+            },
+          },
         },
         subCategory: {
           title: req.forceLang ? '$subCategory.' + req.lang : '$subCategory',
