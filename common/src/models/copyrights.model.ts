@@ -1,5 +1,6 @@
 import { Schema, model, Types } from 'mongoose';
 
+import { generateTicketNumber } from './all-contracts.model';
 import { Icategory } from '../types/Category';
 import { CYCLES } from '../types/cycles';
 import { MODELS } from '../types/model-names';
@@ -8,6 +9,7 @@ import { Iuser } from '../types/User';
 export interface IcopyRights {
   id: string;
   user: Types.ObjectId | Iuser;
+  ticketNumber: string;
   category: Types.ObjectId | Icategory;
   price: number;
   duration: { value: number; unit: string };
@@ -34,6 +36,7 @@ export const CopyRights = model<IcopyRights>(
       user: { type: Schema.Types.ObjectId, ref: MODELS.user },
       category: { type: Schema.Types.ObjectId, ref: MODELS.category },
       price: { type: Number, default: 0 },
+      ticketNumber: { type: String, default: generateTicketNumber, unique: true, sparse: true },
       duration: { value: Number, unit: String },
       address: { type: String, default: null },
       searchKeywords: [String],
