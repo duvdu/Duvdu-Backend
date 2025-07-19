@@ -54,12 +54,16 @@ export enum PERMISSIONS {
   listContractsReviews = 'list-contracts-reviews',
   deleteContractsReviews = 'delete-contracts-reviews',
 
+  // ticket
+  listTickets = 'list-tickets',
+  updateTicket = 'update-ticket',
+  removeTicket = 'remove-ticket',
+
   bookmarks = 'bookmarks',
 
   createTicket = 'create ticket',
   getAllTickets = 'get-all-tickets',
-  updateTicket = 'update-ticket',
-  removeTicket = 'remove-ticket',
+
   getTicket = 'get-ticket',
   createTerm = 'create-term',
   updateTerm = 'update-term',
@@ -158,6 +162,9 @@ export const permissions = {
     PERMISSIONS.deleteProjectReviews,
     PERMISSIONS.listContractsReviews,
     PERMISSIONS.deleteContractsReviews,
+    PERMISSIONS.listTickets,
+    PERMISSIONS.updateTicket,
+    PERMISSIONS.removeTicket,
   ],
   category: [
     PERMISSIONS.createCategory,
@@ -205,6 +212,11 @@ export const permissions = {
   contractReview: [
     PERMISSIONS.listContractsReviews,
     PERMISSIONS.deleteContractsReviews,
+  ],
+  tickets: [
+    PERMISSIONS.listTickets,
+    PERMISSIONS.updateTicket,
+    PERMISSIONS.removeTicket,
   ],
 
   
