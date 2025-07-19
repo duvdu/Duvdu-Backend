@@ -46,6 +46,14 @@ export enum PERMISSIONS {
   acceptCancelContract = 'accept-cancel-contract',
   deleteCancelContract = 'delete-cancel-contract',
 
+  // project review
+  listProjectReviews = 'list-project-reviews',
+  deleteProjectReviews = 'delete-project-reviews',
+
+  // contract review
+  listContractsReviews = 'list-contracts-reviews',
+  deleteContractsReviews = 'delete-contracts-reviews',
+
   bookmarks = 'bookmarks',
 
   createTicket = 'create ticket',
@@ -146,6 +154,10 @@ export const permissions = {
     PERMISSIONS.listCancelContracts,
     PERMISSIONS.acceptCancelContract,
     PERMISSIONS.deleteCancelContract,
+    PERMISSIONS.listProjectReviews,
+    PERMISSIONS.deleteProjectReviews,
+    PERMISSIONS.listContractsReviews,
+    PERMISSIONS.deleteContractsReviews,
   ],
   category: [
     PERMISSIONS.createCategory,
@@ -186,6 +198,16 @@ export const permissions = {
     PERMISSIONS.acceptCancelContract,
     PERMISSIONS.deleteCancelContract,
   ],
+  projectReview: [
+    PERMISSIONS.listProjectReviews,
+    PERMISSIONS.deleteProjectReviews,
+  ],
+  contractReview: [
+    PERMISSIONS.listContractsReviews,
+    PERMISSIONS.deleteContractsReviews,
+  ],
+
+  
 
   bookmarks: [PERMISSIONS.bookmarks],
 
