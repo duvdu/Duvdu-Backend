@@ -1,5 +1,4 @@
 export enum PERMISSIONS {
-
   //category
   createCategory = 'create-category',
   updateCategory = 'update-category',
@@ -14,7 +13,7 @@ export enum PERMISSIONS {
   listUsers = 'list-users',
   removeUser = 'remove-user',
 
-    // roles
+  // roles
   createRoleHandler = 'create-role',
   updateRoleHandler = 'update-role',
   listRoles = 'list-roles',
@@ -46,14 +45,8 @@ export enum PERMISSIONS {
   listCancelContracts = 'list-cancel-contracts',
   acceptCancelContract = 'accept-cancel-contract',
   deleteCancelContract = 'delete-cancel-contract',
-  
-
-
-
 
   bookmarks = 'bookmarks',
-
-
 
   createTicket = 'create ticket',
   getAllTickets = 'get-all-tickets',
@@ -62,7 +55,6 @@ export enum PERMISSIONS {
   getTicket = 'get-ticket',
   createTerm = 'create-term',
   updateTerm = 'update-term',
-
 
   // plan
   createPlanHandler = 'create plan',
@@ -117,7 +109,6 @@ export enum PERMISSIONS {
   createPlatform = 'create producer platform',
   updatePlatform = 'update producer platform',
   getPlatform = 'get producer platform',
-
 }
 
 export const permissions = {
@@ -179,25 +170,15 @@ export const permissions = {
     PERMISSIONS.unBlockUser,
     PERMISSIONS.removeUser,
   ],
-  messages: [
-    PERMISSIONS.listMessagesFromTo,
-    PERMISSIONS.sendNotificationToUsers,
-  ],
+  messages: [PERMISSIONS.listMessagesFromTo, PERMISSIONS.sendNotificationToUsers],
   projects: [
     PERMISSIONS.listProjects,
     PERMISSIONS.updateProject,
     PERMISSIONS.removeProject,
     PERMISSIONS.getProjectAnalysis,
   ],
-  withdrawMethods: [
-    PERMISSIONS.listWithdrawMethods,
-    PERMISSIONS.updateWithdrawMethod,
-  ],
-  complaint: [
-    PERMISSIONS.listComplaints,
-    PERMISSIONS.updateComplaint,
-    PERMISSIONS.closeComplaint,
-  ],
+  withdrawMethods: [PERMISSIONS.listWithdrawMethods, PERMISSIONS.updateWithdrawMethod],
+  complaint: [PERMISSIONS.listComplaints, PERMISSIONS.updateComplaint, PERMISSIONS.closeComplaint],
   contract: [
     PERMISSIONS.listContracts,
     PERMISSIONS.listContractsAnalysis,
@@ -205,7 +186,6 @@ export const permissions = {
     PERMISSIONS.acceptCancelContract,
     PERMISSIONS.deleteCancelContract,
   ],
-
 
   bookmarks: [PERMISSIONS.bookmarks],
 
@@ -266,5 +246,4 @@ export const permissions = {
     PERMISSIONS.createPlatform,
     PERMISSIONS.updatePlatform,
   ],
-
 };

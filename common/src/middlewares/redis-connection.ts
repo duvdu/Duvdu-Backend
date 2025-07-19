@@ -19,7 +19,7 @@ const getRedisConfig = () => {
   const host = process.env.REDIS_HOST || 'redis-11177.c9.us-east-1-2.ec2.redns.redis-cloud.com';
   const port = parseInt(process.env.REDIS_PORT || '11177', 10);
   const password = process.env.REDIS_PASS || 'xgThFOa24hvwyVtsiNhIJiAxfhvJCLBU';
-  
+
   return {
     host,
     port,
@@ -30,7 +30,7 @@ const getRedisConfig = () => {
     retryStrategy: (times: number) => {
       if (times > 3) return null;
       return Math.min(times * 100, 3000);
-    }
+    },
   };
 };
 
@@ -52,7 +52,9 @@ const startMonitoring = () => {
     if (connectionPool.length > 0 && activeConnections > 0) {
       try {
         const clientCount = await getClientInfo(connectionPool[0]);
-        console.log(`[REDIS] Stats: Connected clients: ${clientCount}, Pool size: ${connectionPool.length}, Active: ${activeConnections}`);
+        console.log(
+          `[REDIS] Stats: Connected clients: ${clientCount}, Pool size: ${connectionPool.length}, Active: ${activeConnections}`,
+        );
       } catch (error) {
         // Silent error
       }
@@ -65,28 +67,30 @@ const initializePool = async () => {
   if (connectionPool.length === 0 && !isInitializing) {
     isInitializing = true;
     const config = getRedisConfig();
-    
+
     for (let i = 0; i < MAX_CLIENTS; i++) {
       const client = new Redis(config);
       client.setMaxListeners(1000);
-      
+
       // Add connection event listeners
       client.on('connect', () => {
         activeConnections++;
-        console.log(`[REDIS] Client #${i+1} connected successfully (Active: ${activeConnections})`);
+        console.log(
+          `[REDIS] Client #${i + 1} connected successfully (Active: ${activeConnections})`,
+        );
       });
-      
+
       client.on('error', () => {
         // Silent error
       });
-      
+
       client.on('close', () => {
         activeConnections = Math.max(0, activeConnections - 1);
       });
-      
+
       connectionPool.push(client);
     }
-    
+
     // Start monitoring
     startMonitoring();
     isInitializing = false;
@@ -98,16 +102,16 @@ export const getRedisClient = async () => {
   if (connectionPool.length === 0) {
     await initializePool();
   }
-  
+
   // Round-robin selection (though with MAX_CLIENTS=1, this just returns the single client)
   const client = connectionPool[currentConnectionIndex];
   currentConnectionIndex = (currentConnectionIndex + 1) % connectionPool.length;
-  
+
   // Ensure the client is connected
   if (client.status !== 'ready' && client.status !== 'connecting') {
     await client.connect();
   }
-  
+
   return client;
 };
 
@@ -126,7 +130,7 @@ export const sessionStore = async () => {
   if (redisStoreInstance) {
     return redisStoreInstance;
   }
-  
+
   const client = await getRedisClient();
   redisStoreInstance = new RedisStore({ client });
   return redisStoreInstance;
@@ -145,13 +149,6 @@ export const cleanupRedis = async () => {
     redisStoreInstance = null;
   }
 };
-
-
-
-
-
-
-
 
 // import RedisStore from 'connect-redis';
 // import { createClient } from 'redis';

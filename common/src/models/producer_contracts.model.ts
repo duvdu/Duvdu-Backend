@@ -1,5 +1,6 @@
 import { model, Schema, Types } from 'mongoose';
 
+import { generateTicketNumber } from './all-contracts.model';
 import { MODELS } from '../types/model-names';
 import { Iuser } from '../types/User';
 
@@ -13,6 +14,7 @@ export enum ContractStatus {
 }
 
 export interface IproducerContarct {
+  ticketNumber: string;
   producer: Types.ObjectId | Iuser;
   sp: Types.ObjectId | Iuser;
   user: Types.ObjectId | Iuser;
@@ -36,6 +38,7 @@ export const ProducerContract = model<IproducerContarct>(
   MODELS.producerContract,
   new Schema<IproducerContarct>(
     {
+      ticketNumber: { type: String, default: generateTicketNumber, unique: true, sparse: true },
       producer: { type: Schema.Types.ObjectId, ref: MODELS.user },
       sp: { type: Schema.Types.ObjectId, ref: MODELS.user },
       user: { type: Schema.Types.ObjectId, ref: MODELS.user },

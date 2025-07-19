@@ -1,5 +1,6 @@
 import { model, Schema, Types } from 'mongoose';
 
+import { generateTicketNumber } from './all-contracts.model';
 import { RequestedDeadlineStatus, SubmitFilesStatus } from './copyright-contract.model';
 import { IprojectCycle } from './portfolio-post.model';
 import { MODELS } from '../types/model-names';
@@ -19,6 +20,7 @@ export enum ProjectContractStatus {
 
 export interface IprojectContract {
   sp: Types.ObjectId | Iuser;
+  ticketNumber: string;
   customer: Types.ObjectId | Iuser;
   project: Types.ObjectId | IprojectCycle;
   tools: { name: string; unitPrice: number; units: number }[];
@@ -63,6 +65,7 @@ export const ProjectContract = model<IprojectContract>(
   new Schema<IprojectContract>(
     {
       sp: { type: Schema.Types.ObjectId, ref: MODELS.user },
+      ticketNumber: { type: String, default: generateTicketNumber, unique: true, sparse: true },
       customer: { type: Schema.Types.ObjectId, ref: MODELS.user },
       project: { type: Schema.Types.ObjectId, ref: MODELS.portfolioPost },
       tools: [
@@ -125,3 +128,5 @@ export const ProjectContract = model<IprojectContract>(
     { timestamps: true, collection: MODELS.projectContract },
   ),
 );
+
+// i need here add ticket number to the project contract by default

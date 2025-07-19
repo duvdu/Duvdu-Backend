@@ -1,9 +1,11 @@
 import { Schema, Types, model } from 'mongoose';
 
+import { generateTicketNumber } from './all-contracts.model';
 import { MODELS } from '../types/model-names';
 import { Iuser } from '../types/User';
 
 export interface Ireport {
+  ticketNumber: string;
   sourceUser: Types.ObjectId | Iuser;
   project: Types.ObjectId;
   desc: string;
@@ -15,6 +17,7 @@ export const Report = model<Ireport>(
   MODELS.report,
   new Schema<Ireport>(
     {
+      ticketNumber: { type: String, default: generateTicketNumber, unique: true, sparse: true },
       sourceUser: {
         type: Schema.Types.ObjectId,
         ref: MODELS.user,

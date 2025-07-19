@@ -1,5 +1,6 @@
 import { model, Schema, Types } from 'mongoose';
 
+import { generateTicketNumber } from './all-contracts.model';
 import { IprojectContract } from './projectContract.model';
 import { Icategory } from '../types/Category';
 import { CYCLES } from '../types/cycles';
@@ -8,6 +9,7 @@ import { Iuser } from '../types/User';
 
 export interface ITeamProject {
   user: Types.ObjectId | Iuser;
+  ticketNumber: string;
   cover: string;
   title: string;
   desc: string;
@@ -26,6 +28,7 @@ export const TeamProject = model<ITeamProject>(
   new Schema<ITeamProject>(
     {
       user: { type: Schema.Types.ObjectId, ref: MODELS.user },
+      ticketNumber: { type: String, default: generateTicketNumber, unique: true, sparse: true },
       cover: { type: String, default: null },
       title: { type: String, default: null },
       desc: { type: String, default: null },

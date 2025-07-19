@@ -15,7 +15,6 @@
 
 // export { bullRedis };
 
-
 // bullmq-redis.ts
 import { getRedisClient } from './redis-connection';
 

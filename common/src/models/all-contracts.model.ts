@@ -4,7 +4,7 @@ import { MODELS } from '../types/model-names';
 import { Iuser } from '../types/User';
 
 // Function to generate simple unique ticket number
-const generateTicketNumber = (): string => {
+export const generateTicketNumber = (): string => {
   const random = Math.floor(100000 + Math.random() * 900000); // 6-digit random number
   return `TKT${random}`;
 };
@@ -58,14 +58,16 @@ export const ContractReports = model<IcontractReport>(
       ref: String,
       desc: { type: String, default: null },
       attachments: [String],
-      state: [{
-        addedBy: {
-          type: Schema.Types.ObjectId,
-          ref: MODELS.user,
-          default: null,
+      state: [
+        {
+          addedBy: {
+            type: Schema.Types.ObjectId,
+            ref: MODELS.user,
+            default: null,
+          },
+          feedback: { type: String, default: null },
         },
-        feedback: { type: String, default: null },
-      }],
+      ],
       isClosed: {
         type: Boolean,
         default: false,

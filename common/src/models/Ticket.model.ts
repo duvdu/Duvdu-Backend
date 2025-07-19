@@ -1,10 +1,12 @@
 import mongoose, { Schema } from 'mongoose';
 
+import { generateTicketNumber } from './all-contracts.model';
 import { MODELS } from '../types/model-names';
 import { Iticket } from '../types/Ticket';
 
 const ticketSchema = new mongoose.Schema<Iticket>(
   {
+    ticketNumber: { type: String, default: generateTicketNumber, unique: true, sparse: true },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: MODELS.user,

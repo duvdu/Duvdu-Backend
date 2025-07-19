@@ -82,11 +82,11 @@ export const Message = model<ImessageDoc>(
         transform(doc, ret) {
           // Handle media array - transform URLs for each media item
           if (ret.media && Array.isArray(ret.media)) {
-            ret.media = ret.media.map(mediaItem => {
+            ret.media = ret.media.map((mediaItem) => {
               if (mediaItem?.url) {
                 return {
                   ...mediaItem,
-                  url: process.env.BUCKET_HOST + '/' + mediaItem.url
+                  url: process.env.BUCKET_HOST + '/' + mediaItem.url,
                 };
               }
               return mediaItem;

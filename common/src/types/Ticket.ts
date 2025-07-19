@@ -4,6 +4,7 @@ import { Iuser } from './User';
 
 export interface Iticket {
   id: string;
+  ticketNumber: string;
   userId: Types.ObjectId | Iuser;
   name: string;
   phoneNumber: { key: string; number: string };

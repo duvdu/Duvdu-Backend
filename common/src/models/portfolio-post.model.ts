@@ -1,5 +1,6 @@
 import { model, Schema, Types } from 'mongoose';
 
+import { generateTicketNumber } from './all-contracts.model';
 import { MODELS } from '../types/model-names';
 import { Iuser } from '../types/User';
 
@@ -11,6 +12,7 @@ export enum InviteStatus {
 
 export interface IprojectCycle {
   user: Types.ObjectId | Iuser;
+  ticketNumber: string;
   category: Types.ObjectId | Iuser;
   subCategory: { ar: string; en: string; _id: string };
   tags: { ar: string; en: string }[];
@@ -64,6 +66,7 @@ export const ProjectCycle = model<IprojectCycle>(
   new Schema<IprojectCycle>(
     {
       user: { type: Schema.Types.ObjectId, ref: MODELS.user },
+      ticketNumber: { type: String, default: generateTicketNumber, unique: true, sparse: true },
       category: { type: Schema.Types.ObjectId, ref: MODELS.category },
       subCategory: {
         ar: { type: String, default: null },

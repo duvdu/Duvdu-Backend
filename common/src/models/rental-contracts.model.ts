@@ -1,5 +1,6 @@
 import { model, Schema, Types } from 'mongoose';
 
+import { generateTicketNumber } from './all-contracts.model';
 import { Irental } from './rental.model';
 import { MODELS } from '../types/model-names';
 import { Iuser } from '../types/User';
@@ -16,6 +17,7 @@ export enum RentalContractStatus {
 
 export interface IrentalContract {
   id: string;
+  ticketNumber: string;
   customer: Types.ObjectId | Iuser;
   sp: Types.ObjectId | Iuser;
   project: Types.ObjectId | Irental;
@@ -43,6 +45,7 @@ export const RentalContracts = model<IrentalContract>(
   MODELS.rentalContract,
   new Schema<IrentalContract>(
     {
+      ticketNumber: { type: String, default: generateTicketNumber, unique: true, sparse: true },
       customer: { type: Schema.Types.ObjectId, ref: MODELS.user },
       sp: { type: Schema.Types.ObjectId, ref: MODELS.user },
       project: { type: Schema.Types.ObjectId, ref: 'rentals' },
