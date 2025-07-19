@@ -1,5 +1,5 @@
 import { globalValidatorMiddleware } from '@duvdu-v1/duvdu';
-import { check } from 'express-validator';
+import { check, query } from 'express-validator';
 
 export const createTicketVal = [
   check('name').isString().isLength({ min: 4, max: 20 }).withMessage('nameLength'),
@@ -33,5 +33,18 @@ export const updateTicket = [
   check('ticketId').isMongoId().withMessage('ticketIdInvalid'),
   check('state').exists().isObject().withMessage('stateRequired'),
   check('state.feedback').exists().isString().withMessage('feedbackRequired'),
+  globalValidatorMiddleware,
+];
+
+
+export const getTicketsPaginationVal = [
+  query('search').optional().isString().withMessage('searchInvalid'),
+  query('ticketNumber').optional().isString().withMessage('ticketNumberInvalid'),
+  query('name').optional().isString().withMessage('nameInvalid'),
+  query('userId').optional().isMongoId().withMessage('userIdInvalid'),
+  query('isClosed').optional().isBoolean().withMessage('isClosedInvalid'),
+  query('closedBy').optional().isMongoId().withMessage('closedByInvalid'),
+  query('limit').optional().isInt({min: 1}).withMessage('limitInvalid'),
+  query('page').optional().isInt({min: 1}).withMessage('pageInvalid'),
   globalValidatorMiddleware,
 ];
