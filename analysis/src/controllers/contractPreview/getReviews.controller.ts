@@ -11,7 +11,7 @@ export const getProjectsPagination: RequestHandler<
   unknown,
   unknown,
   {
-    searchKeywords?: string[];
+    search?: string;
     contract?: string;
     sp?: string;
     customer?: string;
@@ -19,10 +19,8 @@ export const getProjectsPagination: RequestHandler<
 > = async (req, res, next) => {
   req.pagination.filter = {};
 
-  if (req.query.searchKeywords)
-    req.pagination.filter.$or = req.query.searchKeywords.map((keyword: string) => ({
-      comment: { $regex: keyword, $options: 'i' },
-    }));
+  if (req.query.search)
+    req.pagination.filter.$or = [{ comment: { $regex: req.query.search, $options: 'i' } }];
 
   if (req.query.sp) {
     const user = await Users.findOne({ username: req.query.sp });

@@ -28,8 +28,7 @@ export const getOne = [
 ];
 
 export const getAll = [
-  query('searchKeywords').optional().isArray({ min: 1 }).withMessage('searchKeywordsArray'),
-  query('searchKeywords.*').optional().isString().withMessage('searchKeywordsString'),
+  query('search').optional().isString().withMessage('search'),
   query('project').optional().isMongoId().withMessage('project'),
   query('user').optional().isMongoId().withMessage('user'),
   query('limit').optional().isInt({ min: 1 }).withMessage('limit'),
