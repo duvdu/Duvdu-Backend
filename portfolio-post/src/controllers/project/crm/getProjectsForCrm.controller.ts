@@ -5,9 +5,13 @@ import { InviteStatus, MODELS, ProjectCycle } from '@duvdu-v1/duvdu';
 import { GetProjectsForCrmHandler } from '../../../types/project.endoints';
 
 export const getProjetcsCrm: GetProjectsForCrmHandler = async (req, res) => {
+  console.log('filter');
+  console.log(req.pagination.filter);
+  console.log('showOnHome');
+  
   const projects = await ProjectCycle.aggregate([
     {
-      $match: { ...req.pagination.filter },
+      $match: req.pagination.filter,
     },
     { $sort: { createdAt: -1 } },
     {
