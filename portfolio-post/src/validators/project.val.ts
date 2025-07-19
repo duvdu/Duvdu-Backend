@@ -171,7 +171,7 @@ export const update = [
     .isLength({ min: 3 })
     .withMessage('searchKeywords'),
   body('duration').optional().isInt({ min: 1 }).withMessage('insurance'),
-  body('showOnHome').optional().optional().isBoolean().toBoolean().withMessage('showOnHome'),
+  body('showOnHome').optional().isBoolean().toBoolean().withMessage('showOnHome'),
   body('projectScale').optional().isObject().withMessage('projectScale'),
   body('projectScale.unit').optional().isString().bail().trim().withMessage('projectScale'),
   body('projectScale.minimum')
@@ -233,7 +233,7 @@ export const getAll = [
   query('search').optional().isString().withMessage('searchKeywords'),
   query('location.lat').optional().isFloat().toFloat().withMessage('location'),
   query('location.lng').optional().isFloat().toFloat().withMessage('location'),
-  query('showOnHome').optional().isBoolean().withMessage('showOnHome'),
+  query('showOnHome').optional().isBoolean().toBoolean().withMessage('showOnHome'),
   query('startDate').optional().isISO8601().toDate().withMessage('startDate'),
   query('endDate').optional().isISO8601().toDate().withMessage('endDate'),
   query('duration').optional().isInt({ gt: 0 }).toInt(),
