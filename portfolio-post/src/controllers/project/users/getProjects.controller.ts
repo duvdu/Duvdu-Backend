@@ -102,11 +102,12 @@ export const getProjectsPagination: RequestHandler<
   }
 
   if (req.query.startDate || req.query.endDate) {
+    req.pagination.filter.createdAt = {};
     if (req.query.startDate) {
-      req.pagination.filter.createdAt = { $gte: req.query.startDate };
+      req.pagination.filter.createdAt.$gte = req.query.startDate;
     }
     if (req.query.endDate) {
-      req.pagination.filter.createdAt = { $lte: req.query.endDate };
+      req.pagination.filter.createdAt.$lte = req.query.endDate;
     }
   }
 
