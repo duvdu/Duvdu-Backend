@@ -39,7 +39,10 @@ export const updateUserHandler: RequestHandler<
   const profileImage = <Express.Multer.File[] | undefined>(req.files as any).profileImage || [];
 
   if (req.body.username) {
-    const user = await Users.findOne({ username: req.body.username, _id: { $ne: req.params.userId } });
+    const user = await Users.findOne({
+      username: req.body.username,
+      _id: { $ne: req.params.userId },
+    });
     if (user)
       return next(
         new BadRequestError(
@@ -50,7 +53,10 @@ export const updateUserHandler: RequestHandler<
   }
 
   if (req.body.phoneNumber) {
-    const user = await Users.findOne({ phoneNumber: req.body.phoneNumber, _id: { $ne: req.params.userId } });
+    const user = await Users.findOne({
+      phoneNumber: req.body.phoneNumber,
+      _id: { $ne: req.params.userId },
+    });
     if (user)
       return next(
         new BadRequestError(

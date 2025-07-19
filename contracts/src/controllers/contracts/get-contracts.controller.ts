@@ -177,6 +177,7 @@ export const getContracts: RequestHandler<
         ref: 1,
         cycle: 1,
         contract: 1,
+        ticketNumber: 1,
         customer: {
           _id: '$customer._id',
           name: '$customer.name',

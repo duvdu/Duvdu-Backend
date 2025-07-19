@@ -3,3 +3,5 @@ export * from './deleteReview.controller';
 export * from './getReview.controller';
 export * from './getReviews.controller';
 export * from './updateReview.controller';
+export * from './getCrmContractReview.controller';
+export * from './getCrmContractReviews.controller';

@@ -411,6 +411,7 @@ export const getProjetcsCrm: GetProjectsForCrmHandler = async (req, res) => {
         name: 1,
         description: 1,
         tools: 1,
+        ticketNumber: 1,
         functions: 1,
         creatives: {
           $filter: {

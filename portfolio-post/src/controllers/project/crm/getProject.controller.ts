@@ -520,6 +520,7 @@ export const getProjectCrmHandler: GetProjectHandler = async (req, res, next) =>
           address: 1,
           searchKeyWords: 1,
           duration: 1,
+          ticketNumber: 1,
           showOnHome: 1,
           projectScale: 1,
           rate: 1,

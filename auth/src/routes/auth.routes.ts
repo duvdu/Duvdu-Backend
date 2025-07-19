@@ -60,7 +60,8 @@ router
     // isauthenticated,
     val.getCrmUser,
     handlers.getCrmUser,
-  ).delete(
+  )
+  .delete(
     isauthenticated,
     isauthorized(PERMISSIONS.removeUser),
     val.deleteUser,

@@ -105,10 +105,10 @@ export const createContractHandler: RequestHandler<
   });
 
   const delay = contract.stageExpiration * 3600 * 1000;
-      const pendingQueue = getPendingExpiration();
-    if (pendingQueue) {
-      await pendingQueue.add('update-contract', { contractId: contract._id.toString() }, { delay });
-    }
+  const pendingQueue = getPendingExpiration();
+  if (pendingQueue) {
+    await pendingQueue.add('update-contract', { contractId: contract._id.toString() }, { delay });
+  }
 
   await Contracts.create({
     _id: contract._id,
@@ -117,6 +117,7 @@ export const createContractHandler: RequestHandler<
     contract: contract.id,
     ref: MODELS.rentalContract,
     cycle: CYCLES.studioBooking,
+    ticketNumber: contract.ticketNumber,
   });
 
   const user = await Users.findById(req.loggedUser.id);

@@ -1,4 +1,9 @@
-import { globalPaginationMiddleware, isauthenticated, isauthorized, PERMISSIONS } from '@duvdu-v1/duvdu';
+import {
+  globalPaginationMiddleware,
+  isauthenticated,
+  isauthorized,
+  PERMISSIONS,
+} from '@duvdu-v1/duvdu';
 import express from 'express';
 
 import * as withdrawMethods from '../controllers/withdrawMethods';
@@ -19,8 +24,16 @@ router
   );
 router
   .route('/crm/:id')
-  .get(isauthorized(PERMISSIONS.listWithdrawMethods), withdrawMethodsValidators.getMethodValidator, withdrawMethods.getMethodCrm)
-  .patch(isauthorized(PERMISSIONS.updateWithdrawMethod), withdrawMethodsValidators.updateMethodCrmValidator, withdrawMethods.updateMethodCrm);
+  .get(
+    isauthorized(PERMISSIONS.listWithdrawMethods),
+    withdrawMethodsValidators.getMethodValidator,
+    withdrawMethods.getMethodCrm,
+  )
+  .patch(
+    isauthorized(PERMISSIONS.updateWithdrawMethod),
+    withdrawMethodsValidators.updateMethodCrmValidator,
+    withdrawMethods.updateMethodCrm,
+  );
 
 router
   .route('/')

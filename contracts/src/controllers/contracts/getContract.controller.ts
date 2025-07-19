@@ -179,6 +179,7 @@ export const getContract: RequestHandler<
         _id: 1,
         ref: 1,
         cycle: 1,
+        ticketNumber: 1,
         contract: 1,
         hasReview: 1,
         haveCancelRequest: 1,

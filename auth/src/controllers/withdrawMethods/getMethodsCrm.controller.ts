@@ -2,9 +2,6 @@ import { IWithdrawMethod, PaginationResponse, WithdrawMethodModel } from '@duvdu
 import { RequestHandler } from 'express';
 import { Types } from 'mongoose';
 
-
-
-
 export const getMethodsCrmPagination: RequestHandler<
   unknown,
   unknown,
@@ -16,7 +13,6 @@ export const getMethodsCrmPagination: RequestHandler<
     isDeleted?: boolean;
   }
 > = async (req, res, next) => {
-
   req.pagination.filter = {};
 
   if (req.query.user) {

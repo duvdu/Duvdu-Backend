@@ -6,12 +6,7 @@ import { RequestHandler } from 'express';
 export const updateRankHandler: RequestHandler<
   { rankId: string },
   SuccessResponse<{ data: Irank }>,
-  Partial<
-    Pick<
-      Irank,
-      'actionCount' | 'rank' | 'color' | 'projectsCount' | 'projectsLiked'
-    >
-  >,
+  Partial<Pick<Irank, 'actionCount' | 'rank' | 'color' | 'projectsCount' | 'projectsLiked'>>,
   unknown
 > = async (req, res, next) => {
   const updatedRank = await Rank.findByIdAndUpdate(req.params.rankId, req.body, {

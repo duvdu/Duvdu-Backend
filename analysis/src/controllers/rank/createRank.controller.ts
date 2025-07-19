@@ -6,10 +6,7 @@ import { RequestHandler } from 'express';
 export const createRankHandler: RequestHandler<
   unknown,
   SuccessResponse<{ data: Irank }>,
-  Pick<
-    Irank,
-    'actionCount' | 'rank' | 'color' | 'projectsLiked' | 'projectsCount'
-  >,
+  Pick<Irank, 'actionCount' | 'rank' | 'color' | 'projectsLiked' | 'projectsCount'>,
   unknown
 > = async (req, res) => {
   const rank = await Rank.create(req.body);

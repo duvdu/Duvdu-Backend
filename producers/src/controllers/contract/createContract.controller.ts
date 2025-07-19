@@ -121,6 +121,7 @@ export const createContractHandler: CreateContractHandler = async (req, res, nex
         sp: producer.user,
         cycle: CYCLES.producer,
         ref: MODELS.producerContract,
+        ticketNumber: contract.ticketNumber,
       })
     ]);
 

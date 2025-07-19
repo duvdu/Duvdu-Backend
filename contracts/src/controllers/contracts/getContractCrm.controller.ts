@@ -177,6 +177,7 @@ export const getContractCrm: RequestHandler<
         cycle: 1,
         contract: 1,
         hasReview: 1,
+        ticketNumber: 1,
         haveCancelRequest: 1,
         customer: {
           _id: '$customer._id',

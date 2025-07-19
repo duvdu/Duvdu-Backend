@@ -104,6 +104,7 @@ export const createContractHandler: RequestHandler<
     sp: project.user,
     ref: MODELS.copyrightContract,
     cycle: CYCLES.copyRights,
+    ticketNumber: contract.ticketNumber,
   });
 
   // add to queue

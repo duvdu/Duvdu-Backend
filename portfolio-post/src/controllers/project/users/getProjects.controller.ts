@@ -53,6 +53,7 @@ export const getProjectsPagination: RequestHandler<
         { 'tools.name': { $regex: req.query.search, $options: 'i' } },
         { 'functions.name': { $regex: req.query.search, $options: 'i' } },
         { address: { $regex: req.query.search, $options: 'i' } },
+        { ticketNumber: { $regex: req.query.search, $options: 'i' } },
       ],
     };
   }
@@ -661,6 +662,7 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
         duration: 1,
         showOnHome: 1,
         projectScale: 1,
+        ticketNumber: 1,
         rate: 1,
         updatedAt: 1,
         createdAt: 1,

@@ -28,7 +28,5 @@ export const updateReviewHandler: UpdateReviewHandler = async (req, res, next) =
     await updateUserRate(review.sp.toString(), req.body.rate, true, req.lang);
   }
 
-
-
   res.status(200).json({ message: 'success', data: updatedReview! });
 };

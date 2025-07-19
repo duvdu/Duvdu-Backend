@@ -141,6 +141,7 @@ export const getLoggedProducerHandler: GetLoggedProducerHandler = async (req, re
         maxBudget: 1,
         searchKeywords: 1,
         createdAt: 1,
+        ticketNumber: 1,
         updatedAt: 1,
         'category._id': 1,
         'category.title': 1,

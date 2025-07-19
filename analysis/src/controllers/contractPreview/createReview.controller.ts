@@ -48,7 +48,6 @@ export const createReviewHandler: CreateReviewHandler = async (req, res, next) =
   res.status(201).json({ message: 'success', data: newReview });
 };
 
-
 export async function updateUserRate(
   userId: string,
   rateChange: number,
@@ -60,19 +59,20 @@ export async function updateUserRate(
 
   const currentRaters = user.rate.ratersCounter;
   const currentTotalRates = user.rate.totalRates;
-  
+
   let newAverage: number;
   const ratersDelta = isAdd ? 1 : -1;
   const projectsDelta = isAdd ? 1 : -1;
 
   if (isAdd) {
     // Adding a new review
-    newAverage = ((currentTotalRates * currentRaters) + rateChange) / (currentRaters + 1);
+    newAverage = (currentTotalRates * currentRaters + rateChange) / (currentRaters + 1);
   } else {
     // Removing a review
-    newAverage = currentRaters > 1
-      ? ((currentTotalRates * currentRaters) - rateChange) / (currentRaters - 1)
-      : 0;
+    newAverage =
+      currentRaters > 1
+        ? (currentTotalRates * currentRaters - rateChange) / (currentRaters - 1)
+        : 0;
   }
 
   await Users.findByIdAndUpdate(userId, {
@@ -82,6 +82,6 @@ export async function updateUserRate(
     },
     $set: {
       'rate.totalRates': Number(newAverage.toFixed(1)),
-    }
+    },
   });
 }

@@ -15,6 +15,7 @@ export const getContracts = [
 ];
 
 export const getContractsCrm = [
+  query('ticketNumber').optional().isString().withMessage('invalidTicketNumber'),
   query('filter')
     .optional()
     .isString()

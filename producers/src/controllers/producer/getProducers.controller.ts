@@ -247,6 +247,7 @@ export const getProducersHandler: GetProducersHandler = async (req, res, next) =
           },
           minBudget: 1,
           maxBudget: 1,
+          ticketNumber: 1,
           searchKeywords: 1,
           createdAt: 1,
           updatedAt: 1,

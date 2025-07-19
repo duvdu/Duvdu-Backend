@@ -1,10 +1,40 @@
-import { globalPaginationMiddleware, isauthenticated } from '@duvdu-v1/duvdu';
+import {
+  globalPaginationMiddleware,
+  isauthenticated,
+  isauthorized,
+  PERMISSIONS,
+} from '@duvdu-v1/duvdu';
 import express from 'express';
 
 import * as controllers from '../controllers/projectReview';
 import * as val from '../validators/projectReview.val';
 
 export const router = express.Router();
+
+router.use(
+  '/crm',
+  isauthenticated,
+  isauthorized(PERMISSIONS.listProjectReviews),
+  val.getAll,
+  globalPaginationMiddleware,
+  controllers.getProjectsPagination,
+  controllers.getProjectReviewsCrmHandler,
+);
+
+router
+  .route('/crm/:reviewId')
+  .get(
+    isauthenticated,
+    isauthorized(PERMISSIONS.listProjectReviews),
+    val.getOne,
+    controllers.getProjectReviewCrmHandler,
+  )
+  .delete(
+    isauthenticated,
+    isauthorized(PERMISSIONS.deleteProjectReviews),
+    val.getOne,
+    controllers.deleteReviewHandler,
+  );
 
 router
   .route('/')
@@ -19,5 +49,4 @@ router
 router
   .route('/:reviewId')
   .patch(isauthenticated, val.update, controllers.updateProjectReviewHandler)
-  .get(isauthenticated, val.getOne, controllers.getProjectReviewHandler)
-  .delete(isauthenticated, val.getOne, controllers.deleteReviewHandler);
+  .get(isauthenticated, val.getOne, controllers.getProjectReviewHandler);
