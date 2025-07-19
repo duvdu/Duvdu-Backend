@@ -13,7 +13,7 @@ export const getReportsPagination: RequestHandler<
     startDate?: Date;
     endDate?: Date;
     isClosed?: boolean;
-    closedById?: string;
+    closedBy?: string;
     feedback?: string;
     sourceUser?: string;
   }
@@ -31,8 +31,8 @@ export const getReportsPagination: RequestHandler<
   if (req.query.isClosed !== undefined) {
     req.pagination.filter['state.isClosed'] = req.query.isClosed;
   }
-  if (req.query.closedById) {
-    req.pagination.filter['state.closedBy'] = req.query.closedById;
+  if (req.query.closedBy) {
+    req.pagination.filter['state.closedBy'] = req.query.closedBy;
   }
   if (req.query.feedback) {
     req.pagination.filter['state.feedback'] = req.query.feedback;
@@ -56,6 +56,14 @@ export const getReportsHandler: GetReportsHandler = async (req, res) => {
       populate: {
         path: 'project.type',
       },
+    })
+    .populate({
+      path: 'sourceUser',
+      select: 'name email phoneNumber username profileImage',
+    })
+    .populate({
+      path: 'state.closedBy',
+      select: 'name email phoneNumber username profileImage',
     });
 
   // Send response with paginated data and metadata

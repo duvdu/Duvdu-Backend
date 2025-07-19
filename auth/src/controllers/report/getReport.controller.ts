@@ -9,6 +9,12 @@ export const getReportHandler: GetReportHandler = async (req, res, next) => {
     populate: {
       path: 'project.type',
     },
+  }).populate({
+    path: 'sourceUser',
+    select: 'name email phoneNumber username profileImage',
+  }).populate({
+    path: 'state.closedBy',
+    select: 'name email phoneNumber username profileImage',
   });
 
   if (!report) return next(new NotFound(undefined, req.lang));

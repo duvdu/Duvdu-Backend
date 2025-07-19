@@ -12,7 +12,7 @@ export const getAllReportsVal = [
   check('startDate').optional().isISO8601().toDate().withMessage('startDateISO8601'),
   check('endDate').optional().isISO8601().toDate().withMessage('endDateISO8601'),
   check('isClosed').optional().isBoolean().withMessage('isClosedBoolean'),
-  check('closedById').optional().isMongoId().withMessage('closedByIdInvalid'),
+  check('closedBy').optional().isMongoId().withMessage('closedByInvalid'),
   check('sourceUser').optional().isMongoId().withMessage('sourceUserInvalid'),
   check('feedback').optional().isString().withMessage('feedbackLength'),
   check('limit').optional().isInt({ min: 1 }).withMessage('limitInt'),
