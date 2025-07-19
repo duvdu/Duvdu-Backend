@@ -23,7 +23,7 @@ router
   )
   .get(
     isauthenticated,
-    isauthorized(PERMISSIONS.getAllReportsHandler),
+    isauthorized(PERMISSIONS.listReports),
     val.getAllReportsVal,
     globalPaginationMiddleware,
     handler.getReportsPagination,

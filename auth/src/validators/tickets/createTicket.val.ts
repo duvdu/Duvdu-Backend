@@ -36,7 +36,6 @@ export const updateTicket = [
   globalValidatorMiddleware,
 ];
 
-
 export const getTicketsPaginationVal = [
   query('search').optional().isString().withMessage('searchInvalid'),
   query('ticketNumber').optional().isString().withMessage('ticketNumberInvalid'),
@@ -44,7 +43,7 @@ export const getTicketsPaginationVal = [
   query('userId').optional().isMongoId().withMessage('userIdInvalid'),
   query('isClosed').optional().isBoolean().withMessage('isClosedInvalid'),
   query('closedBy').optional().isMongoId().withMessage('closedByInvalid'),
-  query('limit').optional().isInt({min: 1}).withMessage('limitInvalid'),
-  query('page').optional().isInt({min: 1}).withMessage('pageInvalid'),
+  query('limit').optional().isInt({ min: 1 }).withMessage('limitInvalid'),
+  query('page').optional().isInt({ min: 1 }).withMessage('pageInvalid'),
   globalValidatorMiddleware,
 ];

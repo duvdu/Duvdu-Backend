@@ -1,4 +1,10 @@
-import { isauthenticated, isauthorized, PERMISSIONS, optionalAuthenticated, globalPaginationMiddleware } from '@duvdu-v1/duvdu';
+import {
+  isauthenticated,
+  isauthorized,
+  PERMISSIONS,
+  optionalAuthenticated,
+  globalPaginationMiddleware,
+} from '@duvdu-v1/duvdu';
 import express from 'express';
 
 import * as handler from '../controllers/ticket';
@@ -9,7 +15,14 @@ router.get('/loggedUserTicket', isauthenticated, handler.getUserTickets);
 router
   .route('/')
   .post(optionalAuthenticated, val.createTicketVal, handler.createTicketHandler)
-  .get(isauthenticated, isauthorized(PERMISSIONS.listTickets) , globalPaginationMiddleware, val.getTicketsPaginationVal, handler.getTicketsPagination, handler.getTicketsHandler);
+  .get(
+    isauthenticated,
+    isauthorized(PERMISSIONS.listTickets),
+    globalPaginationMiddleware,
+    val.getTicketsPaginationVal,
+    handler.getTicketsPagination,
+    handler.getTicketsHandler,
+  );
 
 // router.post('/visitor', val.createTicketVal, handler.createTicketHandler);
 router

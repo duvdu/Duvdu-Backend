@@ -9,7 +9,7 @@ export const getReportsPagination: RequestHandler<
   unknown,
   unknown,
   {
-    searchKeywords?: string[];
+    search?: string;
     startDate?: Date;
     endDate?: Date;
     isClosed?: boolean;
@@ -19,10 +19,8 @@ export const getReportsPagination: RequestHandler<
   }
 > = async (req, res, next) => {
   req.pagination.filter = {};
-  if (req.query.searchKeywords) {
-    req.pagination.filter.$or = req.query.searchKeywords.map((keyword: string) => ({
-      desc: { $regex: keyword, $options: 'i' },
-    }));
+  if (req.query.search) {
+    req.pagination.filter.$or = [{ desc: { $regex: req.query.search, $options: 'i' } }];
   }
   if (req.query.startDate || req.query.endDate) {
     req.pagination.filter.createdAt = {
