@@ -218,7 +218,7 @@ export const updateProjectCrmHandler: RequestHandler<
     // Update project and clean up old files in parallel
     const [updatedProject] = await Promise.all([
       ProjectCycle.findOneAndUpdate(
-        { _id: req.params.projectId, user: req.loggedUser.id },
+        { _id: req.params.projectId },
         req.body,
         { new: true },
       ),
