@@ -20,7 +20,6 @@ export const getProjectCrmHandler: GetProjectHandler = async (req, res, next) =>
       {
         $match: {
           _id: new mongoose.Types.ObjectId(req.params.projectId),
-          isDeleted: { $ne: true },
         },
       },
       {
