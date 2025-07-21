@@ -65,6 +65,12 @@ export enum PERMISSIONS {
   updateReport = 'update-report',
   deleteReport = 'delete-report',
 
+  // pages
+  createPage = 'create-page',
+  updatePage = 'update-page',
+  deletePage = 'delete-page',
+  listPages = 'list-pages',
+
 
 
 
@@ -178,6 +184,10 @@ export const permissions = {
     PERMISSIONS.getReport,
     PERMISSIONS.updateReport,
     PERMISSIONS.deleteReport,
+    PERMISSIONS.createPage,
+    PERMISSIONS.updatePage,
+    PERMISSIONS.deletePage,
+    PERMISSIONS.listPages,
   ],
   category: [
     PERMISSIONS.createCategory,
@@ -236,6 +246,12 @@ export const permissions = {
     PERMISSIONS.getReportHandler,
     PERMISSIONS.updateReportHandler,
     PERMISSIONS.deleteReportHandler,
+  ],
+  pages: [
+    PERMISSIONS.createPage,
+    PERMISSIONS.updatePage,
+    PERMISSIONS.deletePage,
+    PERMISSIONS.listPages,
   ],
 
   
