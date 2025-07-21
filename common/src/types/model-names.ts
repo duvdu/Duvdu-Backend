@@ -40,4 +40,5 @@ export enum MODELS {
   contractCancel = 'contract_cancel',
   withdrawMethod = 'withdraw-methods',
   transaction = 'transactions',
+  page = 'pages',
 }
