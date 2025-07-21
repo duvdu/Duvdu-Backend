@@ -9,6 +9,7 @@ import { authRoutes } from './auth.routes';
 import { bookmarksRoutes } from './bookmarks.routes';
 import { favouriteRoutes } from './favourites.routes';
 import { router as followRouter } from './follow.routes';
+import { router as pagesRoutes } from './pages.routes';
 import { planRoutes } from './plan.routes';
 import { router as reportRoutes } from './report.routes';
 import { roleRoutes } from './role.routes';
@@ -31,6 +32,7 @@ router.use('/follow', followRouter);
 router.use('/splash', splashRoutes);
 router.use('/favourites', favouriteRoutes);
 router.use('/withdraw', withdrawRoutes);
+router.use('/pages', pagesRoutes);
 router.get('/logs', (req, res, next) => {
   const filename = req.query.filename?.toString();
 
