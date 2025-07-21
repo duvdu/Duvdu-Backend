@@ -30,3 +30,8 @@ export const getReportVal = [
   check('reportId').isMongoId().withMessage('reportIdInvalid'),
   globalValidatorMiddleware,
 ];
+
+export const deleteReportVal = [
+  check('reportId').isMongoId().withMessage('reportIdInvalid'),
+  globalValidatorMiddleware,
+];

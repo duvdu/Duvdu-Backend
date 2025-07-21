@@ -47,6 +47,6 @@ router
   .delete(
     isauthenticated,
     isauthorized(PERMISSIONS.deleteReportHandler),
-    val.updateReportVal,
+    val.deleteReportVal,
     handler.removeReportHandler,
   );
