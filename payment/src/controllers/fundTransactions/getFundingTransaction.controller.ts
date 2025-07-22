@@ -1,12 +1,5 @@
-import {
-  FundedTransaction,
-  IFundedTransaction,
-  NotFound,
-  SuccessResponse,
-} from '@duvdu-v1/duvdu';
+import { FundedTransaction, IFundedTransaction, NotFound, SuccessResponse } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
-
-
 
 export const getFundingTransaction: RequestHandler<
   { transactionId: string },

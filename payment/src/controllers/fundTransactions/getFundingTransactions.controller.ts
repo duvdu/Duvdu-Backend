@@ -1,9 +1,11 @@
-import { FundedTransaction, FundedTransactionStatus, IFundedTransaction, PaginationResponse } from '@duvdu-v1/duvdu';
+import {
+  FundedTransaction,
+  FundedTransactionStatus,
+  IFundedTransaction,
+  PaginationResponse,
+} from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import { Types } from 'mongoose';
-
-
-
 
 export const getFundingTransactionPagination: RequestHandler<
   unknown,
@@ -45,8 +47,6 @@ export const getFundingTransactionPagination: RequestHandler<
 
   next();
 };
-
-
 
 export const getFundingTransactions: RequestHandler<
   unknown,

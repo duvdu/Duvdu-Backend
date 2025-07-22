@@ -1,4 +1,5 @@
 import {
+  checkRequiredFields,
   FOLDERS,
   globalPaginationMiddleware,
   globalUploadMiddleware,
@@ -22,6 +23,7 @@ router
       maxSize: 400 * 1024 * 1024,
       fileTypes: ['video/*', 'image/*', 'audio/*', 'application/*'],
     }).fields([{ name: 'fundAttachment', maxCount: 1 }]),
+    checkRequiredFields({ fields: ['fundAttachment'] }),
     validation.createFundedTransactionValidation,
     controller.createFundTransactions,
   )
