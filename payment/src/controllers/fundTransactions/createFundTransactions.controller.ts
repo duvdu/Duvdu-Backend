@@ -8,16 +8,26 @@ import {
   NotFound,
   SuccessResponse,
   Users,
+  WithdrawMethodModel,
+  WithdrawMethodStatus,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 export const createFundTransactions: RequestHandler<
   { transactionId: string },
   SuccessResponse<{ data: IFundedTransaction }>,
-  Pick<IFundedTransaction, 'fundAmount' | 'fundAttachment' | 'user'>
+  Pick<IFundedTransaction, 'fundAmount' | 'fundAttachment' | 'user' | 'withdrawMethod'>
 > = async (req, res) => {
   const user = await Users.findById(req.params.transactionId);
   if (!user) throw new NotFound({ ar: 'المستخدم غير موجود', en: 'User not found' }, req.lang);
+
+  const withdrawMethod = await WithdrawMethodModel.findOne({
+    _id: req.body.withdrawMethod,
+    user: user._id,
+    status: WithdrawMethodStatus.ACTIVE,
+  });
+  if (!withdrawMethod)
+    throw new NotFound({ ar: 'الطريقة غير موجودة', en: 'Withdraw method not found' }, req.lang);
 
   const attachment = <Express.Multer.File[] | undefined>(req.files as any).fundAttachment || [];
   if (!attachment.length)

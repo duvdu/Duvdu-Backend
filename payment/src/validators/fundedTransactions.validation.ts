@@ -2,8 +2,9 @@ import { FundedTransactionStatus, globalValidatorMiddleware } from '@duvdu-v1/du
 import { body, param, query } from 'express-validator';
 
 export const createFundedTransactionValidation = [
-  body('fundAmount').isInt().withMessage('fundAmount must be a number'),
+  body('fundAmount').isFloat().toFloat().withMessage('fundAmount must be a number'),
   body('user').isMongoId().withMessage('user must be a valid MongoDB ID'),
+  body('withdrawMethod').isMongoId().withMessage('withdrawMethod must be a valid MongoDB ID'),
   globalValidatorMiddleware,
 ];
 

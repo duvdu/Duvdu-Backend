@@ -8,6 +8,7 @@ export const getFundingTransaction: RequestHandler<
   const transaction = await FundedTransaction.findById(req.params.transactionId).populate([
     { path: 'user', select: 'name username email profileImage phoneNumber' },
     { path: 'createdBy', select: 'name username email profileImage phoneNumber' },
+    { path: 'withdrawMethod' },
   ]);
 
   if (!transaction)
