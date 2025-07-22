@@ -14,6 +14,7 @@ export interface IFundedTransaction {
   fundAttachment: string;
   status: FundedTransactionStatus;
   createdBy: Types.ObjectId;
+  withdrawMethod: Types.ObjectId;
 }
 
 export const FundedTransaction = model<IFundedTransaction>(
@@ -25,6 +26,7 @@ export const FundedTransaction = model<IFundedTransaction>(
       fundAmount: { type: Number, default: 0 },
       fundAttachment: { type: String, default: null },
       status: { type: String, default: FundedTransactionStatus.PENDING },
+      withdrawMethod: { type: Schema.Types.ObjectId, ref:MODELS.withdrawMethod },
     },
     { timestamps: true, collection: MODELS.fundedTransaction },
   ),
