@@ -71,6 +71,10 @@ export enum PERMISSIONS {
   deletePage = 'delete-page',
   listPages = 'list-pages',
 
+  // transactions
+  listTransactions = 'list-transactions',
+  fundTransactions = 'fund-transactions',
+
   bookmarks = 'bookmarks',
 
   createTicket = 'create ticket',
