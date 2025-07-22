@@ -13,7 +13,6 @@ export interface IFundedTransaction {
   fundAmount: number;
   fundAttachment: string;
   fundingAmount: number;
-  transaction: Types.ObjectId;
   status: FundedTransactionStatus;
   createdBy: Types.ObjectId;
 }
@@ -27,7 +26,6 @@ export const FundedTransaction = model<IFundedTransaction>(
       fundAmount: { type: Number, default: 0 },
       fundAttachment: { type: String, default: null },
       fundingAmount: { type: Number, default: 0 },
-      transaction: { type: Schema.Types.ObjectId, ref: MODELS.transaction },
       status: { type: String, default: FundedTransactionStatus.PENDING },
     },
     { timestamps: true, collection: MODELS.fundedTransaction },

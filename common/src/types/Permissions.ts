@@ -74,6 +74,8 @@ export enum PERMISSIONS {
   // transactions
   listTransactions = 'list-transactions',
   fundTransactions = 'fund-transactions',
+  createFundTransactions = 'create-fund-transactions',
+  listFundTransactions = 'list-fund-transactions',
 
   bookmarks = 'bookmarks',
 

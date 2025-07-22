@@ -27,6 +27,7 @@ export interface ITransaction {
   fundedAt: Date;
   fundAttachment: string[];
   fundingAmount: number;
+  fundedBy: Types.ObjectId;
 }
 
 export const Transaction = model<ITransaction>(
@@ -44,5 +45,6 @@ export const Transaction = model<ITransaction>(
     fundedAt: { type: Date, default: null },
     fundAttachment: { type: [String], default: [] },
     fundingAmount: { type: Number, default: 0 },
+    fundedBy: { type: Schema.Types.ObjectId, ref: MODELS.user },
   }),
 );
