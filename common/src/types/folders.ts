@@ -8,4 +8,5 @@ export enum FOLDERS {
   copyrights = 'copyrights',
   team_project = 'team_project',
   producer = 'producer',
+  transactions = 'transactions',
 }
