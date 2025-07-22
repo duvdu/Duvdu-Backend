@@ -25,7 +25,7 @@ export interface ITransaction {
   isSubscription: boolean;
   type: TransactionType;
   fundedAt: Date;
-  fundAttachment: string;
+  fundAttachment: string[];
   fundingAmount: number;
 }
 
@@ -42,7 +42,7 @@ export const Transaction = model<ITransaction>(
     isSubscription: { type: Boolean, default: false },
     type: { type: String, default: TransactionType.DEPOSIT },
     fundedAt: { type: Date, default: null },
-    fundAttachment: { type: String, default: null },
+    fundAttachment: { type: [String], default: [] },
     fundingAmount: { type: Number, default: 0 },
   }),
 );
