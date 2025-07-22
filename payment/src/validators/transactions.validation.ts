@@ -4,7 +4,7 @@ import {
   TransactionStatus,
   TransactionType,
 } from '@duvdu-v1/duvdu';
-import { param, query } from 'express-validator';
+import { body, param, query } from 'express-validator';
 
 export const transactionPaginationValidation = [
   query('user').optional().isMongoId().withMessage('User ID is required'),
@@ -40,5 +40,11 @@ export const userTransactionPaginationValidation = [
   query('to').optional().isISO8601().toDate().withMessage('Invalid to date'),
   query('page').optional().isInt({ min: 1 }).toInt().withMessage('Invalid page'),
   query('limit').optional().isInt({ min: 1 }).toInt().withMessage('Invalid limit'),
+  globalValidatorMiddleware,
+];
+
+export const fundTransactionValidation = [
+  param('transactionId').isMongoId().withMessage('Invalid transaction ID'),
+  body('fundingAmount').isFloat({ min: 0 }).toFloat().withMessage('Invalid funding amount'),
   globalValidatorMiddleware,
 ];

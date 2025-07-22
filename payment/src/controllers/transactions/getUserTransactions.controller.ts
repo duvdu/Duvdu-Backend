@@ -58,10 +58,10 @@ export const getUserTransactions: RequestHandler<
   unknown,
   PaginationResponse<{ data: ITransaction[] }>
 > = async (req, res) => {
-  const transactions = await Transaction.find(req.pagination.filter).populate(
-    'user',
-    'name email phoneNumber profileImage',
-  );
+  const transactions = await Transaction.find(req.pagination.filter).populate([
+    { path: 'user', select: 'name email phoneNumber profileImage' },
+    { path: 'fundedBy', select: 'name email phoneNumber profileImage' },
+  ]);
 
   const resultCount = await Transaction.countDocuments(req.pagination.filter);
 

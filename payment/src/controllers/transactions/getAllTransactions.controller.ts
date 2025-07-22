@@ -63,7 +63,10 @@ export const getAllTransactions: RequestHandler<
   PaginationResponse<{ data: ITransaction[] }>
 > = async (req, res) => {
   const transactions = await Transaction.find(req.pagination.filter)
-    .populate({ path: 'user', select: 'name email phoneNumber profileImage' })
+    .populate([
+      { path: 'user', select: 'name email phoneNumber profileImage' },
+      { path: 'fundedBy', select: 'name email phoneNumber profileImage' },
+    ])
     .sort({ createdAt: -1 })
     .skip(req.pagination.skip)
     .limit(req.pagination.limit);

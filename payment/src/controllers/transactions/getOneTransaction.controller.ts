@@ -5,10 +5,10 @@ export const getOneTransaction: RequestHandler<
   { transactionId: string },
   SuccessResponse<{ data: ITransaction }>
 > = async (req, res) => {
-  const transaction = await Transaction.findById(req.params.transactionId).populate(
-    'user',
-    'name email phoneNumber profileImage',
-  );
+  const transaction = await Transaction.findById(req.params.transactionId).populate([
+    { path: 'user', select: 'name email phoneNumber profileImage' },
+    { path: 'fundedBy', select: 'name email phoneNumber profileImage' },
+  ]);
   if (!transaction)
     throw new NotFound({ ar: 'المعاملة غير موجودة', en: 'Transaction not found' }, req.lang);
 
