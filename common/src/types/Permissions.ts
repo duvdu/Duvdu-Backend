@@ -71,9 +71,6 @@ export enum PERMISSIONS {
   deletePage = 'delete-page',
   listPages = 'list-pages',
 
-
-
-
   bookmarks = 'bookmarks',
 
   createTicket = 'create ticket',
@@ -228,19 +225,9 @@ export const permissions = {
     PERMISSIONS.acceptCancelContract,
     PERMISSIONS.deleteCancelContract,
   ],
-  projectReview: [
-    PERMISSIONS.listProjectReviews,
-    PERMISSIONS.deleteProjectReviews,
-  ],
-  contractReview: [
-    PERMISSIONS.listContractsReviews,
-    PERMISSIONS.deleteContractsReviews,
-  ],
-  tickets: [
-    PERMISSIONS.listTickets,
-    PERMISSIONS.updateTicket,
-    PERMISSIONS.removeTicket,
-  ],
+  projectReview: [PERMISSIONS.listProjectReviews, PERMISSIONS.deleteProjectReviews],
+  contractReview: [PERMISSIONS.listContractsReviews, PERMISSIONS.deleteContractsReviews],
+  tickets: [PERMISSIONS.listTickets, PERMISSIONS.updateTicket, PERMISSIONS.removeTicket],
   reports: [
     PERMISSIONS.listReports,
     PERMISSIONS.getReportHandler,
@@ -253,8 +240,6 @@ export const permissions = {
     PERMISSIONS.deletePage,
     PERMISSIONS.listPages,
   ],
-
-  
 
   bookmarks: [PERMISSIONS.bookmarks],
 

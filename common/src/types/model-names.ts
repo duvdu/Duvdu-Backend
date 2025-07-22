@@ -41,4 +41,5 @@ export enum MODELS {
   withdrawMethod = 'withdraw-methods',
   transaction = 'transactions',
   page = 'pages',
+  fundedTransaction = 'funded_transactions',
 }

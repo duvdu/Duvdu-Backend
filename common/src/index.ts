@@ -89,6 +89,7 @@ export * from './models/Bookmark-projects.model';
 export * from './models/contractCancel.model';
 export * from './models/transactions.model';
 export * from './models/pages.model';
+export * from './models/fundedTransactions.model';
 
 export * from './services/category.service';
 export * from './services/projectView.service';

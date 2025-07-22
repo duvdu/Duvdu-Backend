@@ -6,6 +6,7 @@ export enum TransactionStatus {
   PENDING = 'pending',
   SUCCESS = 'success',
   FAILED = 'failed',
+  FUNDED = 'funded',
 }
 
 export enum TransactionType {
@@ -23,6 +24,9 @@ export interface ITransaction {
   model: string;
   isSubscription: boolean;
   type: TransactionType;
+  fundedAt: Date;
+  fundAttachment: string;
+  fundingAmount: number;
 }
 
 export const Transaction = model<ITransaction>(
@@ -37,5 +41,8 @@ export const Transaction = model<ITransaction>(
     model: { type: String, default: null },
     isSubscription: { type: Boolean, default: false },
     type: { type: String, default: TransactionType.DEPOSIT },
+    fundedAt: { type: Date, default: null },
+    fundAttachment: { type: String, default: null },
+    fundingAmount: { type: Number, default: 0 },
   }),
 );

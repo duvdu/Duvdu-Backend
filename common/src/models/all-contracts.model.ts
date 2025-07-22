@@ -30,7 +30,7 @@ export const Contracts = model<Icontract>(
       ref: String,
       cycle: { type: String, default: null },
       coupons: [{ type: Schema.Types.ObjectId, ref: MODELS.coupon }],
-      ticketNumber: { type: String, default:null },
+      ticketNumber: { type: String, default: null },
     },
     { timestamps: true, collection: MODELS.allContracts },
   ),
