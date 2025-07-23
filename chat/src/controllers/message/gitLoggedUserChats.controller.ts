@@ -1,5 +1,5 @@
 import 'express-async-errors';
-import { Message, MODELS, Contracts, Users } from '@duvdu-v1/duvdu';
+import { Message, MODELS, Contracts } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import { Types } from 'mongoose';
 
@@ -22,142 +22,137 @@ export const getLoggedUserChatsHandler: GetLoggedUserChatsHandler = async (req, 
   const userId = new Types.ObjectId(req.loggedUser?.id);
   const searchTerm = req.pagination.filter.search;
 
-  // First, let's get all conversations with their latest message using a simpler approach
-  const conversationsAggregation: any[] = [
-    // Match messages where user is sender or receiver
+  // Build the main aggregation pipeline
+  const mainPipeline: any[] = [
     {
       $match: {
         $or: [{ sender: userId }, { receiver: userId }],
       },
     },
-    // Sort by creation time descending (newest first)
     {
-      $sort: { createdAt: -1 },
+      $sort: {
+        createdAt: -1,
+      },
     },
-    // Add field to identify the other user in conversation
     {
-      $addFields: {
-        otherUserId: {
+      $project: {
+        sender: 1,
+        receiver: 1,
+        otherUser: {
           $cond: {
             if: { $eq: ['$sender', userId] },
             then: '$receiver',
             else: '$sender',
           },
         },
+        message: '$$ROOT',
       },
     },
-    // Group by other user and get the first (newest) message
     {
       $group: {
-        _id: '$otherUserId',
-        latestMessage: { $first: '$$ROOT' },
-        allMessages: { $push: '$$ROOT' },
+        _id: '$otherUser',
+        newestMessage: { $first: '$message' },
+        allMessages: { $push: '$message' },
       },
     },
-    // Sort conversations by latest message time
     {
-      $sort: { 'latestMessage.createdAt': -1 },
-    },
-    // Lookup sender details
-    {
-      $lookup: {
-        from: MODELS.user,
-        localField: 'latestMessage.sender',
-        foreignField: '_id',
-        as: 'senderInfo',
+      $match: {
+        newestMessage: { $exists: true },
       },
     },
-    // Lookup receiver details
+    {
+      $sort: {
+        'newestMessage.createdAt': -1,
+      },
+    },
     {
       $lookup: {
         from: MODELS.user,
-        localField: 'latestMessage.receiver',
+        localField: 'newestMessage.sender',
         foreignField: '_id',
-        as: 'receiverInfo',
+        as: 'senderDetails',
       },
     },
-    // Project final structure
+    {
+      $lookup: {
+        from: MODELS.user,
+        localField: 'newestMessage.receiver',
+        foreignField: '_id',
+        as: 'receiverDetails',
+      },
+    },
     {
       $project: {
-        _id: '$latestMessage._id', // Use the message ID as the main ID
-        latestMessageTime: '$latestMessage.createdAt',
-        // Flatten all message fields to top level
-        sender: {
-          _id: { $arrayElemAt: ['$senderInfo._id', 0] },
-          name: { $arrayElemAt: ['$senderInfo.name', 0] },
-          username: { $arrayElemAt: ['$senderInfo.username', 0] },
-          profileImage: {
-            $cond: {
-              if: { $arrayElemAt: ['$senderInfo.profileImage', 0] },
-              then: {
-                $concat: [
-                  process.env.BUCKET_HOST,
-                  '/',
-                  { $arrayElemAt: ['$senderInfo.profileImage', 0] },
-                ],
+        _id: 1,
+        sender: '$newestMessage.sender',
+        receiver: '$newestMessage.receiver',
+        newestMessage: {
+          $mergeObjects: [
+            '$newestMessage',
+            {
+              sender: {
+                _id: { $ifNull: [{ $arrayElemAt: ['$senderDetails._id', 0] }, null] },
+                profileImage: {
+                  $ifNull: [
+                    {
+                      $concat: [
+                        process.env.BUCKET_HOST,
+                        '/',
+                        { $arrayElemAt: ['$senderDetails.profileImage', 0] },
+                      ],
+                    },
+                    null,
+                  ],
+                },
+                isOnline: { $ifNull: [{ $arrayElemAt: ['$senderDetails.isOnline', 0] }, null] },
+                username: { $ifNull: [{ $arrayElemAt: ['$senderDetails.username', 0] }, null] },
+                name: { $ifNull: [{ $arrayElemAt: ['$senderDetails.name', 0] }, null] },
               },
-              else: null,
-            },
-          },
-          isOnline: { $arrayElemAt: ['$senderInfo.isOnline', 0] },
-          rank: { $arrayElemAt: ['$senderInfo.rank', 0] },
-          projectsView: { $arrayElemAt: ['$senderInfo.projectsView', 0] },
-        },
-        receiver: {
-          _id: { $arrayElemAt: ['$receiverInfo._id', 0] },
-          name: { $arrayElemAt: ['$receiverInfo.name', 0] },
-          username: { $arrayElemAt: ['$receiverInfo.username', 0] },
-          profileImage: {
-            $cond: {
-              if: { $arrayElemAt: ['$receiverInfo.profileImage', 0] },
-              then: {
-                $concat: [
-                  process.env.BUCKET_HOST,
-                  '/',
-                  { $arrayElemAt: ['$receiverInfo.profileImage', 0] },
-                ],
+              receiver: {
+                _id: { $ifNull: [{ $arrayElemAt: ['$receiverDetails._id', 0] }, null] },
+                profileImage: {
+                  $ifNull: [
+                    {
+                      $concat: [
+                        process.env.BUCKET_HOST,
+                        '/',
+                        { $arrayElemAt: ['$receiverDetails.profileImage', 0] },
+                      ],
+                    },
+                    null,
+                  ],
+                },
+                isOnline: { $ifNull: [{ $arrayElemAt: ['$receiverDetails.isOnline', 0] }, null] },
+                username: { $ifNull: [{ $arrayElemAt: ['$receiverDetails.username', 0] }, null] },
+                name: { $ifNull: [{ $arrayElemAt: ['$receiverDetails.name', 0] }, null] },
               },
-              else: null,
             },
-          },
-          isOnline: { $arrayElemAt: ['$receiverInfo.isOnline', 0] },
-          rank: { $arrayElemAt: ['$receiverInfo.rank', 0] },
-          projectsView: { $arrayElemAt: ['$receiverInfo.projectsView', 0] },
+          ],
         },
-        content: '$latestMessage.content',
-        watchers: '$latestMessage.watchers',
-        updated: '$latestMessage.updated',
-        reactions: '$latestMessage.reactions',
-        media: '$latestMessage.media',
-        createdAt: '$latestMessage.createdAt',
-        updatedAt: '$latestMessage.updatedAt',
-        __v: '$latestMessage.__v',
-        // Calculate unread message count
         unreadMessageCount: {
           $size: {
             $filter: {
               input: '$allMessages',
-              as: 'msg',
+              as: 'message',
               cond: {
                 $and: [
-                  { $eq: ['$$msg.receiver', userId] },
+                  { $eq: ['$$message.receiver', userId] },
                   {
-                    $eq: [
+                    $in: [
+                      false,
                       {
-                        $size: {
-                          $filter: {
-                            input: '$$msg.watchers',
-                            as: 'watcher',
-                            cond: {
-                              $and: [
-                                { $eq: ['$$watcher.user', userId] },
-                                { $eq: ['$$watcher.watched', true] },
-                              ],
+                        $map: {
+                          input: {
+                            $filter: {
+                              input: '$$message.watchers',
+                              as: 'watcher',
+                              cond: { $eq: ['$$watcher.user', userId] },
                             },
                           },
+                          as: 'watcher',
+                          in: '$$watcher.watched',
                         },
                       },
-                      0,
                     ],
                   },
                 ],
@@ -165,23 +160,23 @@ export const getLoggedUserChatsHandler: GetLoggedUserChatsHandler = async (req, 
             },
           },
         },
-        // Get other user details for search
+        // Add fields for easier search access
         otherUserDetails: {
           $cond: {
-            if: { $eq: ['$latestMessage.sender', userId] },
+            if: { $eq: ['$sender', userId] },
             then: {
-              _id: { $arrayElemAt: ['$receiverInfo._id', 0] },
-              name: { $arrayElemAt: ['$receiverInfo.name', 0] },
-              username: { $arrayElemAt: ['$receiverInfo.username', 0] },
-              email: { $arrayElemAt: ['$receiverInfo.email', 0] },
-              about: { $arrayElemAt: ['$receiverInfo.about', 0] },
+              _id: { $ifNull: [{ $arrayElemAt: ['$receiverDetails._id', 0] }, null] },
+              name: { $ifNull: [{ $arrayElemAt: ['$receiverDetails.name', 0] }, null] },
+              username: { $ifNull: [{ $arrayElemAt: ['$receiverDetails.username', 0] }, null] },
+              email: { $ifNull: [{ $arrayElemAt: ['$receiverDetails.email', 0] }, null] },
+              about: { $ifNull: [{ $arrayElemAt: ['$receiverDetails.about', 0] }, null] },
             },
             else: {
-              _id: { $arrayElemAt: ['$senderInfo._id', 0] },
-              name: { $arrayElemAt: ['$senderInfo.name', 0] },
-              username: { $arrayElemAt: ['$senderInfo.username', 0] },
-              email: { $arrayElemAt: ['$senderInfo.email', 0] },
-              about: { $arrayElemAt: ['$senderInfo.about', 0] },
+              _id: { $ifNull: [{ $arrayElemAt: ['$senderDetails._id', 0] }, null] },
+              name: { $ifNull: [{ $arrayElemAt: ['$senderDetails.name', 0] }, null] },
+              username: { $ifNull: [{ $arrayElemAt: ['$senderDetails.username', 0] }, null] },
+              email: { $ifNull: [{ $arrayElemAt: ['$senderDetails.email', 0] }, null] },
+              about: { $ifNull: [{ $arrayElemAt: ['$senderDetails.about', 0] }, null] },
             },
           },
         },
@@ -191,56 +186,139 @@ export const getLoggedUserChatsHandler: GetLoggedUserChatsHandler = async (req, 
 
   // Add search filter if search term exists
   if (searchTerm) {
-    conversationsAggregation.push({
+    mainPipeline.push({
       $match: {
         $or: [
           { 'otherUserDetails.name': { $regex: searchTerm, $options: 'i' } },
           { 'otherUserDetails.username': { $regex: searchTerm, $options: 'i' } },
           { 'otherUserDetails.email': { $regex: searchTerm, $options: 'i' } },
           { 'otherUserDetails.about': { $regex: searchTerm, $options: 'i' } },
-          { 'content': { $regex: searchTerm, $options: 'i' } },
+          { 'newestMessage.content': { $regex: searchTerm, $options: 'i' } },
         ],
       },
     });
   }
 
-  // Add final sort to ensure consistent ordering by latest message time
-  conversationsAggregation.push({
-    $sort: { latestMessageTime: -1 },
-  });
-
-  // Get total count for pagination
-  const countPipeline = [...conversationsAggregation, { $count: 'total' }];
-  const totalResult = await Message.aggregate(countPipeline);
-  const resultCount = totalResult.length > 0 ? totalResult[0].total : 0;
-
   // Add pagination
-  conversationsAggregation.push(
-    { $skip: req.pagination.skip },
-    { $limit: req.pagination.limit },
-    // Clean up projection - remove temporary fields
+  mainPipeline.push(
     {
-      $project: {
-        _id: 1,
-        sender: 1,
-        receiver: 1,
-        content: 1,
-        watchers: 1,
-        updated: 1,
-        reactions: 1,
-        media: 1,
-        createdAt: 1,
-        updatedAt: 1,
-        __v: 1,
-        unreadMessageCount: 1,
-        otherUserDetails: 1,
+      $sort: {
+        'newestMessage.createdAt': -1,
       },
     },
+    {
+      $skip: req.pagination.skip,
+    },
+    {
+      $limit: req.pagination.limit,
+    },
+
   );
 
-  const allChats = await Message.aggregate(conversationsAggregation);
+  const allChats = await Message.aggregate(mainPipeline);
 
-  // Check if users can chat (contract validation)
+  // Count pipeline with search support
+  const countPipeline: any[] = [
+    {
+      $match: {
+        $or: [{ sender: userId }, { receiver: userId }],
+      },
+    },
+    {
+      $sort: {
+        createdAt: -1,
+      },
+    },
+    {
+      $project: {
+        sender: 1,
+        receiver: 1,
+        otherUser: {
+          $cond: {
+            if: { $eq: ['$sender', userId] },
+            then: '$receiver',
+            else: '$sender',
+          },
+        },
+        message: '$$ROOT',
+      },
+    },
+    {
+      $group: {
+        _id: '$otherUser',
+        newestMessage: { $first: '$message' },
+      },
+    },
+    {
+      $match: {
+        newestMessage: { $exists: true },
+      },
+    },
+  ];
+
+  // Add search functionality to count pipeline if needed
+  if (searchTerm) {
+    countPipeline.push(
+      {
+        $lookup: {
+          from: MODELS.user,
+          localField: 'newestMessage.sender',
+          foreignField: '_id',
+          as: 'senderDetails',
+        },
+      },
+      {
+        $lookup: {
+          from: MODELS.user,
+          localField: 'newestMessage.receiver',
+          foreignField: '_id',
+          as: 'receiverDetails',
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          newestMessage: 1,
+          otherUserDetails: {
+            $cond: {
+              if: { $eq: ['$newestMessage.sender', userId] },
+              then: {
+                name: { $ifNull: [{ $arrayElemAt: ['$receiverDetails.name', 0] }, null] },
+                username: { $ifNull: [{ $arrayElemAt: ['$receiverDetails.username', 0] }, null] },
+                email: { $ifNull: [{ $arrayElemAt: ['$receiverDetails.email', 0] }, null] },
+                about: { $ifNull: [{ $arrayElemAt: ['$receiverDetails.about', 0] }, null] },
+              },
+              else: {
+                name: { $ifNull: [{ $arrayElemAt: ['$senderDetails.name', 0] }, null] },
+                username: { $ifNull: [{ $arrayElemAt: ['$senderDetails.username', 0] }, null] },
+                email: { $ifNull: [{ $arrayElemAt: ['$senderDetails.email', 0] }, null] },
+                about: { $ifNull: [{ $arrayElemAt: ['$senderDetails.about', 0] }, null] },
+              },
+            },
+          },
+        },
+      },
+      {
+        $match: {
+          $or: [
+            { 'otherUserDetails.name': { $regex: searchTerm, $options: 'i' } },
+            { 'otherUserDetails.username': { $regex: searchTerm, $options: 'i' } },
+            { 'otherUserDetails.email': { $regex: searchTerm, $options: 'i' } },
+            { 'otherUserDetails.about': { $regex: searchTerm, $options: 'i' } },
+            { 'newestMessage.content': { $regex: searchTerm, $options: 'i' } },
+          ],
+        },
+      },
+    );
+  }
+
+  countPipeline.push({
+    $count: 'totalCount',
+  });
+
+  const totalCount = await Message.aggregate(countPipeline);
+  const resultCount = totalCount.length > 0 ? totalCount[0].totalCount : 0;
+
   const chatsWithCanChat = await Promise.all(
     allChats.map(async (chat) => {
       const canChat = !!(await Contracts.findOne({
@@ -259,20 +337,6 @@ export const getLoggedUserChatsHandler: GetLoggedUserChatsHandler = async (req, 
     }),
   );
 
-  // Get logged-in user details
-  const loggedUserDetails = await Users.findOne({ _id: userId });
-
-  const user = loggedUserDetails ? {
-    _id: loggedUserDetails._id,
-    name: loggedUserDetails.name,
-    username: loggedUserDetails.username,
-    profileImage: loggedUserDetails.profileImage ? `${process.env.BUCKET_HOST}/${loggedUserDetails.profileImage}` : null,
-    isOnline: loggedUserDetails.isOnline,
-    rank: loggedUserDetails.rank,
-    projectsView: loggedUserDetails.projectsView,
-    canChat: false, // Default value as shown in the example
-  } : null;
-
   res.status(200).json({
     message: 'success',
     pagination: {
@@ -281,6 +345,5 @@ export const getLoggedUserChatsHandler: GetLoggedUserChatsHandler = async (req, 
       totalPages: Math.ceil(resultCount / req.pagination.limit),
     },
     data: chatsWithCanChat,
-    user,
-  } as any);
+  });
 };
