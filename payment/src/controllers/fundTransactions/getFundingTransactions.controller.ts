@@ -58,7 +58,7 @@ export const getFundingTransactions: RequestHandler<
   unknown,
   PaginationResponse<{ data: IFundedTransaction[] }>
 > = async (req, res) => {
-  const transactions = await FundedTransaction.find()
+  const transactions = await FundedTransaction.find(req.pagination.filter)
     .sort({ createdAt: -1 })
     .skip(req.pagination.skip)
     .limit(req.pagination.limit)
