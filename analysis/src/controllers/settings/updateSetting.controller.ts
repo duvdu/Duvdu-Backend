@@ -42,5 +42,6 @@ export const updateSettingHandler: RequestHandler<
     new: true,
   });
 
+  
   res.status(200).json({ message: 'success', data: updatedSetting });
 };
