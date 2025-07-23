@@ -11,6 +11,7 @@ export const getUserChatsHandler: RequestHandler<
 > = async (req, res) => {
   const userId = new Types.ObjectId(req.params.userId);
 
+  // Get all chats ordered by newest message first
   const allChats = await Message.aggregate([
     {
       $match: {
@@ -18,6 +19,7 @@ export const getUserChatsHandler: RequestHandler<
       },
     },
     {
+      // Sort all messages by creation time (newest first)
       $sort: {
         createdAt: -1,
       },
@@ -39,7 +41,7 @@ export const getUserChatsHandler: RequestHandler<
     {
       $group: {
         _id: '$otherUser',
-        newestMessage: { $first: '$message' },
+        newestMessage: { $first: '$message' }, // Gets the newest message due to sort above
         allMessages: { $push: '$message' },
       },
     },
@@ -49,6 +51,7 @@ export const getUserChatsHandler: RequestHandler<
       },
     },
     {
+      // Sort conversations by newest message timestamp (newest conversations first)
       $sort: {
         'newestMessage.createdAt': -1,
       },
@@ -155,6 +158,12 @@ export const getUserChatsHandler: RequestHandler<
     },
     {
       $limit: req.pagination.limit,
+    },
+    {
+      // Final sort to ensure newest messages are first after pagination
+      $sort: {
+        'newestMessage.createdAt': -1,
+      },
     },
   ]);
 
