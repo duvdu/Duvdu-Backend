@@ -83,14 +83,14 @@ export enum PERMISSIONS {
   deleteSetting = 'delete-setting',
   listSettings = 'list-settings',
 
+  // rank
+  createRank = 'create-rank',
+  updateRank = 'update-rank',
+  deleteRank = 'delete-rank',
+  listRanks = 'list-ranks',
+
   bookmarks = 'bookmarks',
 
-  createTicket = 'create ticket',
-  getAllTickets = 'get-all-tickets',
-
-  getTicket = 'get-ticket',
-  createTerm = 'create-term',
-  updateTerm = 'update-term',
 
   // plan
   createPlanHandler = 'create plan',
@@ -128,15 +128,6 @@ export enum PERMISSIONS {
   deleteTeamProjectHandler = 'delete team project',
   // producer
   getProducerAnalysis = 'get producer analysis',
-  // rank
-  createRankHandler = 'create rank',
-  updateRankHandler = 'update rank',
-  deleteRankHandler = 'delete rank',
-
-  //setting
-  createSettingHandler = 'create setting',
-  updateSettingHandler = 'update setting',
-  deleteSettingHandler = 'delete setting',
 
   // dashboard
   accessDashboard = 'access dashboard',
@@ -197,6 +188,14 @@ export const permissions = {
     PERMISSIONS.updatePage,
     PERMISSIONS.deletePage,
     PERMISSIONS.listPages,
+    PERMISSIONS.createSetting,
+    PERMISSIONS.updateSetting,
+    PERMISSIONS.deleteSetting,
+    PERMISSIONS.listSettings,
+    PERMISSIONS.createRank,
+    PERMISSIONS.updateRank,
+    PERMISSIONS.deleteRank,
+    PERMISSIONS.listRanks,
   ],
   category: [
     PERMISSIONS.createCategory,
@@ -252,17 +251,22 @@ export const permissions = {
     PERMISSIONS.deletePage,
     PERMISSIONS.listPages,
   ],
+  settings: [
+    PERMISSIONS.createSetting,
+    PERMISSIONS.updateSetting,
+    PERMISSIONS.deleteSetting,
+    PERMISSIONS.listSettings,
+  ],
+  ranks: [
+    PERMISSIONS.createRank,
+    PERMISSIONS.updateRank,
+    PERMISSIONS.deleteRank,
+    PERMISSIONS.listRanks,
+  ],
 
   bookmarks: [PERMISSIONS.bookmarks],
 
-  ticket: [
-    PERMISSIONS.createTicket,
-    PERMISSIONS.getTicket,
-    PERMISSIONS.getAllTickets,
-    PERMISSIONS.removeTicket,
-    PERMISSIONS.updateTicket,
-  ],
-  terms: [PERMISSIONS.createTerm, PERMISSIONS.updateTerm],
+
   plans: [
     PERMISSIONS.getPlanHandler,
     PERMISSIONS.createPlanHandler,
@@ -294,16 +298,6 @@ export const permissions = {
     PERMISSIONS.updateTeamProjectCreativeHandler,
     PERMISSIONS.deleteTeamProjectHandler,
     PERMISSIONS.updateTeamProjectHandler,
-  ],
-  rank: [
-    PERMISSIONS.createRankHandler,
-    PERMISSIONS.updateRankHandler,
-    PERMISSIONS.deleteRankHandler,
-  ],
-  setting: [
-    PERMISSIONS.createSettingHandler,
-    PERMISSIONS.updateSettingHandler,
-    PERMISSIONS.deleteSettingHandler,
   ],
   producer: [PERMISSIONS.getProducerAnalysis],
   dashboard: [PERMISSIONS.accessDashboard],
