@@ -48,7 +48,7 @@ export const removeRoleHandler: RemoveRoleHandler = async (req, res, next) => {
 };
 
 export const getRolesHandler: GetRolesHandler = async (req, res) => {
-  const roles = await Roles.find({ key: { $ne: 'admin' } }).select('key permissions');
+  const roles = await Roles.find({ system: { $ne: true } }).select('key permissions');
   res.status(200).json({ message: 'success', data: roles });
 };
 
