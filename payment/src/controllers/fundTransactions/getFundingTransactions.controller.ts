@@ -21,6 +21,7 @@ export const getFundingTransactionPagination: RequestHandler<
     createdAtFrom?: string;
     createdAtTo?: string;
     contract?: string;
+    ticketNumber?: string;
   }
 > = async (req, res, next) => {
   const {
@@ -33,6 +34,7 @@ export const getFundingTransactionPagination: RequestHandler<
     createdAtFrom,
     createdAtTo,
     contract,
+    ticketNumber,
   } = req.query;
 
   req.pagination.filter = {};
@@ -47,6 +49,7 @@ export const getFundingTransactionPagination: RequestHandler<
   if (createdAtFrom) req.pagination.filter.createdAt = { $gte: createdAtFrom };
   if (createdAtTo) req.pagination.filter.createdAt = { $lte: createdAtTo };
   if (contract) req.pagination.filter.contract = new Types.ObjectId(contract);
+  if (ticketNumber) req.pagination.filter.ticketNumber = ticketNumber;
 
   next();
 };

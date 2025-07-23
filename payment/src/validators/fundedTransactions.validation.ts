@@ -28,6 +28,7 @@ export const getFundingTransactionPaginationValidation = [
   query('createdAtTo').optional().isISO8601().withMessage('createdAtTo must be a valid date'),
   query('limit').optional().isInt().withMessage('limit must be a number'),
   query('page').optional().isInt().withMessage('page must be a number'),
+  query('ticketNumber').optional().isString().withMessage('ticketNumber must be a valid string'),
   globalValidatorMiddleware,
 ];
 
