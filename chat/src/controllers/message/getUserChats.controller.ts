@@ -28,6 +28,7 @@ export const getUserChatsHandler: RequestHandler<
       $project: {
         sender: 1,
         receiver: 1,
+        createdAt: 1, // Include createdAt for explicit sorting
         otherUser: {
           $cond: {
             if: { $eq: ['$sender', userId] },
@@ -43,6 +44,7 @@ export const getUserChatsHandler: RequestHandler<
         _id: '$otherUser',
         newestMessage: { $first: '$message' }, // Gets the newest message due to sort above
         allMessages: { $push: '$message' },
+        latestCreatedAt: { $first: '$createdAt' }, // Capture the latest timestamp explicitly
       },
     },
     {
@@ -51,9 +53,9 @@ export const getUserChatsHandler: RequestHandler<
       },
     },
     {
-      // Sort conversations by newest message timestamp (newest conversations first)
+      // Sort conversations by latest message timestamp (newest conversations first)
       $sort: {
-        'newestMessage.createdAt': -1,
+        latestCreatedAt: -1,
       },
     },
     {
@@ -159,6 +161,12 @@ export const getUserChatsHandler: RequestHandler<
     },
     {
       $limit: req.pagination.limit,
+    },
+    {
+      // Final sort to guarantee newest messages first in paginated results
+      $sort: {
+        'newestMessage.createdAt': -1,
+      },
     },
   ]);
 

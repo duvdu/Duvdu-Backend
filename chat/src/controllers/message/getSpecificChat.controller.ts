@@ -19,6 +19,9 @@ export const getSpecificChatHandler: GetSpecificChatHandler = async (req, res) =
       },
     },
     {
+      $sort: { createdAt: -1 },
+    },
+    {
       $group: {
         _id: null,
         allMessages: { $push: '$$ROOT' },
@@ -146,9 +149,7 @@ export const getSpecificChatHandler: GetSpecificChatHandler = async (req, res) =
         newRoot: { $mergeObjects: ['$allMessages', { unreadMessageCount: '$unreadMessageCount' }] },
       },
     },
-    {
-      $sort: { createdAt: 1 },
-    },
+
     {
       $skip: req.pagination.skip,
     },
@@ -205,12 +206,12 @@ export const getSpecificChatHandler: GetSpecificChatHandler = async (req, res) =
     data: chat,
     user: user
       ? {
-          ...user,
-          profileImage: user?.profileImage
-            ? `${process.env.BUCKET_HOST}/${user.profileImage}`
-            : null,
-          canChat,
-        }
+        ...user,
+        profileImage: user?.profileImage
+          ? `${process.env.BUCKET_HOST}/${user.profileImage}`
+          : null,
+        canChat,
+      }
       : null,
   });
 };
