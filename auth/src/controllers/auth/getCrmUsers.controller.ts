@@ -6,6 +6,9 @@ export const getCrmUsers: RequestHandler<unknown, PaginationResponse<{ data: Ius
   req,
   res,
 ) => {
+
+
+
   const currentUser = await Users.findById(req.loggedUser?.id, { location: 1 });
 
   const aggregationPipeline: PipelineStage[] = [];

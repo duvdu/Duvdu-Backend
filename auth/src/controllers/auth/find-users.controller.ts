@@ -54,12 +54,17 @@ export const filterUsers: RequestHandler<
     req.pagination.filter['isBlocked.value'] = req.query.isBlocked;
   if (req.query.isOnline !== undefined) req.pagination.filter.isOnline = req.query.isOnline;
 
-  if (req.query.isAdmin != false && req.query.isAdmin != undefined) {
-    const unverifiedRole = await Roles.findOne({ key: SystemRoles.unverified }).select('_id');
-    const verifiedRole = await Roles.findOne({ key: SystemRoles.verified }).select('_id');
-    req.pagination.filter.role = {
-      $nin: [unverifiedRole?._id, verifiedRole?._id],
-    };
+  if (req.query.isAdmin != undefined) {
+    const roles = await Roles.find({key:{ $in: [SystemRoles.unverified , SystemRoles.verified] }});
+    if (req.query.isAdmin) {
+      req.pagination.filter.role = {
+        $nin: roles.map((role) => role._id),
+      };
+    }else{
+      req.pagination.filter.role = {
+        $in: roles.map((role) => role._id),
+      };
+    }
   }
 
   if (req.query.role) req.pagination.filter.role = new mongoose.Types.ObjectId(req.query.role);
