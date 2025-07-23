@@ -9,11 +9,11 @@ import { router as subscribeRoutes } from './subscribe.routes';
 
 const router = Router();
 
-router.use('/', contractRoutes);
 router.use('/subscribe', subscribeRoutes);
 router.use('/complaints', complaintRoutes);
 router.use('/coupons', couponRoutes);
 router.use('/contractFiles', contractFilesRoutes);
 router.use('/contractCancel', contractCancelRoutes);
+router.use('/', contractRoutes);
 
 export const apiRoutes = router;
