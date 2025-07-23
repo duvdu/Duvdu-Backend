@@ -77,6 +77,12 @@ export enum PERMISSIONS {
   createFundTransactions = 'create-fund-transactions',
   listFundTransactions = 'list-fund-transactions',
 
+  // settings
+  createSetting = 'create-setting',
+  updateSetting = 'update-setting',
+  deleteSetting = 'delete-setting',
+  listSettings = 'list-settings',
+
   bookmarks = 'bookmarks',
 
   createTicket = 'create ticket',
