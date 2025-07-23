@@ -1,5 +1,6 @@
 import { model, Schema, Types } from 'mongoose';
 
+import { generateTicketNumber } from './all-contracts.model';
 import { MODELS } from '../types/model-names';
 
 export enum TransactionStatus {
@@ -28,6 +29,7 @@ export interface ITransaction {
   fundAttachment: string[];
   fundingAmount: number;
   fundedBy: Types.ObjectId;
+  ticketNumber: string;
 }
 
 export const Transaction = model<ITransaction>(
@@ -46,5 +48,6 @@ export const Transaction = model<ITransaction>(
     fundAttachment: { type: [String], default: [] },
     fundingAmount: { type: Number, default: 0 },
     fundedBy: { type: Schema.Types.ObjectId, ref: MODELS.user },
+    ticketNumber: { type: String, default: generateTicketNumber, unique: true, sparse: true },
   }),
 );
