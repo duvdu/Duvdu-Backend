@@ -16,6 +16,7 @@ export interface IFundedTransaction {
   createdBy: Types.ObjectId;
   withdrawMethod: Types.ObjectId;
   contract: Types.ObjectId;
+  ticketNumber: string;
 }
 
 export const FundedTransaction = model<IFundedTransaction>(
@@ -29,6 +30,7 @@ export const FundedTransaction = model<IFundedTransaction>(
       contract: { type: Schema.Types.ObjectId },
       status: { type: String, default: FundedTransactionStatus.PENDING },
       withdrawMethod: { type: Schema.Types.ObjectId, ref:MODELS.withdrawMethod },
+      ticketNumber: { type: String, default: null },
     },
     { timestamps: true, collection: MODELS.fundedTransaction },
   ),
