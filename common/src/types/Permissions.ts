@@ -76,6 +76,7 @@ export enum PERMISSIONS {
   fundTransactions = 'fund-transactions',
   createFundTransactions = 'create-fund-transactions',
   listFundTransactions = 'list-fund-transactions',
+  updateFundTransactions = 'update-fund-transactions',
 
   // settings
   createSetting = 'create-setting',
@@ -200,6 +201,7 @@ export const permissions = {
     PERMISSIONS.listFundTransactions,
     PERMISSIONS.fundTransactions,
     PERMISSIONS.listTransactions,
+    PERMISSIONS.updateFundTransactions,
   ],
   category: [
     PERMISSIONS.createCategory,
@@ -266,6 +268,12 @@ export const permissions = {
     PERMISSIONS.updateRank,
     PERMISSIONS.deleteRank,
     PERMISSIONS.listRanks,
+  ],
+  fundTransactions: [
+    PERMISSIONS.createFundTransactions,
+    PERMISSIONS.listFundTransactions,
+    PERMISSIONS.fundTransactions,
+    PERMISSIONS.updateFundTransactions,
   ],
 
   bookmarks: [PERMISSIONS.bookmarks],
