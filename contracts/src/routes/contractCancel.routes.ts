@@ -19,6 +19,7 @@ router
     isauthorized(PERMISSIONS.listCancelContracts),
     globalPaginationMiddleware,
     validations.getContractsCancelValidation,
+    controllers.getContractCancelFilter,
     controllers.getContractsCancel,
   );
 
