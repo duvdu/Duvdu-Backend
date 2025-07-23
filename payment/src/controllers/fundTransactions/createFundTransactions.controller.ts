@@ -14,11 +14,11 @@ import {
 import { RequestHandler } from 'express';
 
 export const createFundTransactions: RequestHandler<
-  { transactionId: string },
+  unknown,
   SuccessResponse<{ data: IFundedTransaction }>,
   Pick<IFundedTransaction, 'fundAmount' | 'fundAttachment' | 'user' | 'withdrawMethod'>
 > = async (req, res) => {
-  const user = await Users.findById(req.params.transactionId);
+  const user = await Users.findById(req.body.user);
   if (!user) throw new NotFound({ ar: 'المستخدم غير موجود', en: 'User not found' }, req.lang);
 
   const withdrawMethod = await WithdrawMethodModel.findOne({
