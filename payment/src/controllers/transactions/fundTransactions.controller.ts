@@ -29,9 +29,8 @@ const validateTransactionForFunding = (
   const allowedStatuses = [
     TransactionStatus.PENDING,
     TransactionStatus.FAILED,
-    TransactionStatus.FUNDED,
   ];
-  if (!allowedStatuses.includes(transaction.status as TransactionStatus)) {
+  if (allowedStatuses.includes(transaction.status as TransactionStatus)) {
     throw new BadRequestError(
       { ar: 'حالة المعاملة غير صالحة للتمويل', en: 'Invalid transaction status for funding' },
       lang,
