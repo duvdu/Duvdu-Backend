@@ -20,6 +20,7 @@ export const transactionPaginationValidation = [
   query('to').optional().isISO8601().toDate().withMessage('Invalid to date'),
   query('page').optional().isInt({ min: 1 }).toInt().withMessage('Invalid page'),
   query('limit').optional().isInt({ min: 1 }).toInt().withMessage('Invalid limit'),
+  query('ticketNumber').optional().isString().withMessage('Invalid ticketNumber'),
   globalValidatorMiddleware,
 ];
 

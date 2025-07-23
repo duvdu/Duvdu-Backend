@@ -24,9 +24,13 @@ export const transactionPagination: RequestHandler<
     amount?: number;
     from?: string;
     to?: string;
+    ticketNumber?: string;
   }
+
 > = async (req, res, next) => {
   req.pagination.filter = {};
+
+  if (req.query.ticketNumber) req.pagination.filter.ticketNumber = req.query.ticketNumber;
 
   if (req.query.user) req.pagination.filter.user = new Types.ObjectId(req.query.user);
 
