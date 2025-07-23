@@ -193,6 +193,7 @@ export const getComplaintHandler: RequestHandler<
         },
         isClosed: 1,
         createdAt: 1,
+        desc:1,
         updatedAt: 1,
         closedBy: {
           $cond: {

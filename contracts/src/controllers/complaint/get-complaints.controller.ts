@@ -232,6 +232,7 @@ export const getComplaintsHandler: RequestHandler<
           },
         },
         isClosed: 1,
+        desc:1,
         createdAt: 1,
         updatedAt: 1,
         closedBy: {
