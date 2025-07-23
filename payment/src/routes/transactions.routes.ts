@@ -30,25 +30,7 @@ router
   );
 
 router
-  .route('/crm/:transactionId')
-  .get(
-    isauthorized(PERMISSIONS.listTransactions),
-    transactionsValidators.getOneTransaction,
-    transactionsControllers.getOneTransaction,
-  )
-  .patch(
-    isauthorized(PERMISSIONS.fundTransactions),
-    globalUploadMiddleware(FOLDERS.transactions, {
-      maxSize: 400 * 1024 * 1024,
-      fileTypes: ['video/*', 'image/*', 'audio/*', 'application/*'],
-    }).fields([{ name: 'fundAttachment', maxCount: 1 }]),
-    checkRequiredFields({ fields: ['fundAttachment'] }),
-    transactionsValidators.fundTransactionValidation,
-    transactionsControllers.fundTransactions,
-  );
-
-router
-  .route('/funding-transactions/crm')
+  .route('/crm/funding-transactions')
   .post(
     isauthorized(PERMISSIONS.createFundTransactions),
     globalUploadMiddleware(FOLDERS.transactions, {
@@ -67,7 +49,27 @@ router
   );
 
 router
-  .route('/funding-transactions/crm/:transactionId')
+  .route('/crm/:transactionId')
+  .get(
+    isauthorized(PERMISSIONS.listTransactions),
+    transactionsValidators.getOneTransaction,
+    transactionsControllers.getOneTransaction,
+  )
+  .patch(
+    isauthorized(PERMISSIONS.fundTransactions),
+    globalUploadMiddleware(FOLDERS.transactions, {
+      maxSize: 400 * 1024 * 1024,
+      fileTypes: ['video/*', 'image/*', 'audio/*', 'application/*'],
+    }).fields([{ name: 'fundAttachment', maxCount: 1 }]),
+    checkRequiredFields({ fields: ['fundAttachment'] }),
+    transactionsValidators.fundTransactionValidation,
+    transactionsControllers.fundTransactions,
+  );
+
+
+
+router
+  .route('/crm/:transactionId/funding-transactions')
   .get(
     isauthorized(PERMISSIONS.listFundTransactions),
     validation.getFundingTransactionValidation,
