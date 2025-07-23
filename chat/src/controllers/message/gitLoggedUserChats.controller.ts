@@ -1,5 +1,5 @@
 import 'express-async-errors';
-import { Message, MODELS, Contracts } from '@duvdu-v1/duvdu';
+import { Message, MODELS, Contracts, Users } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import { Types } from 'mongoose';
 
@@ -79,55 +79,59 @@ export const getLoggedUserChatsHandler: GetLoggedUserChatsHandler = async (req, 
     // Project final structure
     {
       $project: {
-        _id: '$_id', // This is the other user's ID
+        _id: '$latestMessage._id', // Use the message ID as the main ID
         latestMessageTime: '$latestMessage.createdAt',
-        newestMessage: {
-          _id: '$latestMessage._id',
-          content: '$latestMessage.content',
-          createdAt: '$latestMessage.createdAt',
-          updatedAt: '$latestMessage.updatedAt',
-          media: '$latestMessage.media',
-          reactions: '$latestMessage.reactions',
-          watchers: '$latestMessage.watchers',
-          sender: {
-            _id: { $arrayElemAt: ['$senderInfo._id', 0] },
-            name: { $arrayElemAt: ['$senderInfo.name', 0] },
-            username: { $arrayElemAt: ['$senderInfo.username', 0] },
-            profileImage: {
-              $cond: {
-                if: { $arrayElemAt: ['$senderInfo.profileImage', 0] },
-                then: {
-                  $concat: [
-                    process.env.BUCKET_HOST,
-                    '/',
-                    { $arrayElemAt: ['$senderInfo.profileImage', 0] },
-                  ],
-                },
-                else: null,
+        // Flatten all message fields to top level
+        sender: {
+          _id: { $arrayElemAt: ['$senderInfo._id', 0] },
+          name: { $arrayElemAt: ['$senderInfo.name', 0] },
+          username: { $arrayElemAt: ['$senderInfo.username', 0] },
+          profileImage: {
+            $cond: {
+              if: { $arrayElemAt: ['$senderInfo.profileImage', 0] },
+              then: {
+                $concat: [
+                  process.env.BUCKET_HOST,
+                  '/',
+                  { $arrayElemAt: ['$senderInfo.profileImage', 0] },
+                ],
               },
+              else: null,
             },
-            isOnline: { $arrayElemAt: ['$senderInfo.isOnline', 0] },
           },
-          receiver: {
-            _id: { $arrayElemAt: ['$receiverInfo._id', 0] },
-            name: { $arrayElemAt: ['$receiverInfo.name', 0] },
-            username: { $arrayElemAt: ['$receiverInfo.username', 0] },
-            profileImage: {
-              $cond: {
-                if: { $arrayElemAt: ['$receiverInfo.profileImage', 0] },
-                then: {
-                  $concat: [
-                    process.env.BUCKET_HOST,
-                    '/',
-                    { $arrayElemAt: ['$receiverInfo.profileImage', 0] },
-                  ],
-                },
-                else: null,
-              },
-            },
-            isOnline: { $arrayElemAt: ['$receiverInfo.isOnline', 0] },
-          },
+          isOnline: { $arrayElemAt: ['$senderInfo.isOnline', 0] },
+          rank: { $arrayElemAt: ['$senderInfo.rank', 0] },
+          projectsView: { $arrayElemAt: ['$senderInfo.projectsView', 0] },
         },
+        receiver: {
+          _id: { $arrayElemAt: ['$receiverInfo._id', 0] },
+          name: { $arrayElemAt: ['$receiverInfo.name', 0] },
+          username: { $arrayElemAt: ['$receiverInfo.username', 0] },
+          profileImage: {
+            $cond: {
+              if: { $arrayElemAt: ['$receiverInfo.profileImage', 0] },
+              then: {
+                $concat: [
+                  process.env.BUCKET_HOST,
+                  '/',
+                  { $arrayElemAt: ['$receiverInfo.profileImage', 0] },
+                ],
+              },
+              else: null,
+            },
+          },
+          isOnline: { $arrayElemAt: ['$receiverInfo.isOnline', 0] },
+          rank: { $arrayElemAt: ['$receiverInfo.rank', 0] },
+          projectsView: { $arrayElemAt: ['$receiverInfo.projectsView', 0] },
+        },
+        content: '$latestMessage.content',
+        watchers: '$latestMessage.watchers',
+        updated: '$latestMessage.updated',
+        reactions: '$latestMessage.reactions',
+        media: '$latestMessage.media',
+        createdAt: '$latestMessage.createdAt',
+        updatedAt: '$latestMessage.updatedAt',
+        __v: '$latestMessage.__v',
         // Calculate unread message count
         unreadMessageCount: {
           $size: {
@@ -194,7 +198,7 @@ export const getLoggedUserChatsHandler: GetLoggedUserChatsHandler = async (req, 
           { 'otherUserDetails.username': { $regex: searchTerm, $options: 'i' } },
           { 'otherUserDetails.email': { $regex: searchTerm, $options: 'i' } },
           { 'otherUserDetails.about': { $regex: searchTerm, $options: 'i' } },
-          { 'newestMessage.content': { $regex: searchTerm, $options: 'i' } },
+          { 'content': { $regex: searchTerm, $options: 'i' } },
         ],
       },
     });
@@ -218,9 +222,16 @@ export const getLoggedUserChatsHandler: GetLoggedUserChatsHandler = async (req, 
     {
       $project: {
         _id: 1,
-        sender: '$newestMessage.sender._id',
-        receiver: '$newestMessage.receiver._id',
-        newestMessage: 1,
+        sender: 1,
+        receiver: 1,
+        content: 1,
+        watchers: 1,
+        updated: 1,
+        reactions: 1,
+        media: 1,
+        createdAt: 1,
+        updatedAt: 1,
+        __v: 1,
         unreadMessageCount: 1,
         otherUserDetails: 1,
       },
@@ -248,6 +259,20 @@ export const getLoggedUserChatsHandler: GetLoggedUserChatsHandler = async (req, 
     }),
   );
 
+  // Get logged-in user details
+  const loggedUserDetails = await Users.findOne({ _id: userId });
+
+  const user = loggedUserDetails ? {
+    _id: loggedUserDetails._id,
+    name: loggedUserDetails.name,
+    username: loggedUserDetails.username,
+    profileImage: loggedUserDetails.profileImage ? `${process.env.BUCKET_HOST}/${loggedUserDetails.profileImage}` : null,
+    isOnline: loggedUserDetails.isOnline,
+    rank: loggedUserDetails.rank,
+    projectsView: loggedUserDetails.projectsView,
+    canChat: false, // Default value as shown in the example
+  } : null;
+
   res.status(200).json({
     message: 'success',
     pagination: {
@@ -256,5 +281,6 @@ export const getLoggedUserChatsHandler: GetLoggedUserChatsHandler = async (req, 
       totalPages: Math.ceil(resultCount / req.pagination.limit),
     },
     data: chatsWithCanChat,
-  });
+    user,
+  } as any);
 };
