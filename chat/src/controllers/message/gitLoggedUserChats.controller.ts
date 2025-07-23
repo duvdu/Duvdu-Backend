@@ -38,6 +38,10 @@ export const getLoggedUserChatsHandler: GetLoggedUserChatsHandler = async (req, 
       $project: {
         sender: 1,
         receiver: 1,
+        content: 1,
+        createdAt: 1,
+        updatedAt: 1,
+        watchers: 1,
         otherUser: {
           $cond: {
             if: { $eq: ['$sender', userId] },
@@ -53,16 +57,12 @@ export const getLoggedUserChatsHandler: GetLoggedUserChatsHandler = async (req, 
         _id: '$otherUser',
         newestMessage: { $first: '$message' },
         allMessages: { $push: '$message' },
+        lastMessageTime: { $first: '$createdAt' }, // Add this to help with sorting
       },
     },
     {
       $match: {
         newestMessage: { $exists: true },
-      },
-    },
-    {
-      $sort: {
-        'newestMessage.createdAt': -1,
       },
     },
     {
@@ -86,6 +86,7 @@ export const getLoggedUserChatsHandler: GetLoggedUserChatsHandler = async (req, 
         _id: 1,
         sender: '$newestMessage.sender',
         receiver: '$newestMessage.receiver',
+        lastMessageTime: 1, // Keep this for sorting
         newestMessage: {
           $mergeObjects: [
             '$newestMessage',
@@ -199,11 +200,11 @@ export const getLoggedUserChatsHandler: GetLoggedUserChatsHandler = async (req, 
     });
   }
 
-  // Add pagination
+  // Add pagination with explicit sorting by newest message time
   mainPipeline.push(
     {
       $sort: {
-        'newestMessage.createdAt': -1,
+        lastMessageTime: -1, // Sort by the actual time of the last message
       },
     },
     {
@@ -212,7 +213,17 @@ export const getLoggedUserChatsHandler: GetLoggedUserChatsHandler = async (req, 
     {
       $limit: req.pagination.limit,
     },
-
+    {
+      $project: {
+        _id: 1,
+        sender: 1,
+        receiver: 1,
+        newestMessage: 1,
+        unreadMessageCount: 1,
+        otherUserDetails: 1,
+        // Remove lastMessageTime from final output
+      },
+    },
   );
 
   const allChats = await Message.aggregate(mainPipeline);
@@ -233,6 +244,8 @@ export const getLoggedUserChatsHandler: GetLoggedUserChatsHandler = async (req, 
       $project: {
         sender: 1,
         receiver: 1,
+        content: 1,
+        createdAt: 1,
         otherUser: {
           $cond: {
             if: { $eq: ['$sender', userId] },
