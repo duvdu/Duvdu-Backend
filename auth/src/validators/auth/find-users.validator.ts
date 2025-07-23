@@ -40,7 +40,7 @@ export const findUsers = [
   query('maxDistance').optional().isInt({ min: 1, max: 1000 }).bail().toInt(),
   query('isBlocked').optional().isBoolean().toBoolean(),
   query('isDeleted').optional().isBoolean().toBoolean(),
-  query('from').optional().isDate().toDate(),
-  query('to').optional().isDate().toDate(),
+  query('from').optional().isISO8601().toDate(),
+  query('to').optional().isISO8601().toDate(),
   globalValidatorMiddleware,
 ];
