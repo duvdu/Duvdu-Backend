@@ -1,13 +1,15 @@
 import 'express-async-errors';
 
-import { Bucket, FOLDERS, Isetting, NotFound, Setting } from '@duvdu-v1/duvdu';
+import { Bucket, Isetting, NotFound, Setting, Users } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 export const updateSettingHandler: RequestHandler<
   { settingId: string },
   unknown,
   Pick<Isetting, 'contractSubscriptionPercentage' | 'default_profile' | 'default_cover'>
-> = async (req, res, next) => {
+> = async (req, res) => {
+  const setting = await Setting.findById(req.params.settingId);
+  if (!setting) throw new NotFound({ en: 'setting not found', ar: 'الإعدادات غير موجودة' }, req.lang);
   const default_profile =
     <Express.Multer.File[] | undefined>(req.files as any).default_profile || [];
 
@@ -15,19 +17,30 @@ export const updateSettingHandler: RequestHandler<
 
   const bucket = new Bucket();
   if (default_profile.length > 0) {
-    await bucket.saveBucketFiles(FOLDERS.auth, default_profile[0]);
-    req.body.default_profile = default_profile[0].filename;
+    await bucket.saveBucketFiles('defaults', default_profile[0]);
+    req.body.default_profile = 'defaults/' + default_profile[0].filename;
+    if (setting?.default_profile && !setting.default_profile.startsWith('defaults')) {
+      await bucket.removeBucketFiles(setting.default_profile);
+    }
+    await Users.updateMany(
+      { profileImage: req.body.default_profile },
+    );
   }
 
   if (default_cover.length > 0) {
-    await bucket.saveBucketFiles(FOLDERS.auth, default_cover[0]);
-    req.body.default_cover = default_cover[0].filename;
+    await bucket.saveBucketFiles('defaults', default_cover[0]);
+    req.body.default_cover = 'defaults/' + default_cover[0].filename;
+    if (setting?.default_cover && !setting.default_cover.startsWith('defaults')) {
+      await bucket.removeBucketFiles(setting.default_cover);
+    }
+    await Users.updateMany(
+      { coverImage: req.body.default_cover },
+    );
   }
 
-  const setting = await Setting.findByIdAndUpdate(req.params.settingId, req.body, { new: true });
+  const updatedSetting = await Setting.findByIdAndUpdate(req.params.settingId, req.body, {
+    new: true,
+  });
 
-  if (!setting)
-    return next(new NotFound({ en: 'setting not found', ar: 'الإعدادات غير موجودة' }, req.lang));
-
-  res.status(200).json({ message: 'success', data: setting });
+  res.status(200).json({ message: 'success', data: updatedSetting });
 };

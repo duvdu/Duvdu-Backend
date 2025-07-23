@@ -1,5 +1,4 @@
 import {
-  FOLDERS,
   globalUploadMiddleware,
   isauthenticated,
   isauthorized,
@@ -33,7 +32,7 @@ router
   )
   .put(
     isauthorized(PERMISSIONS.updateSetting),
-    globalUploadMiddleware(FOLDERS.auth, {
+    globalUploadMiddleware('defaults' as any, {
       maxSize: 400 * 1024 * 1024,
       fileTypes: ['video/*', 'image/*', 'audio/*', 'application/*'],
     }).fields([

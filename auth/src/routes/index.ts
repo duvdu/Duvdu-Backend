@@ -14,7 +14,6 @@ import { planRoutes } from './plan.routes';
 import { router as reportRoutes } from './report.routes';
 import { roleRoutes } from './role.routes';
 import { splashRoutes } from './splash.routes';
-import { termsRoutes } from './term.routes';
 import { ticketsRoutes } from './ticket.routes';
 import { router as withdrawRoutes } from './withdraw.routes';
 
@@ -23,7 +22,6 @@ const router = Router();
 router.use('/auth', authRoutes);
 // router.use('/saved-projects', bookmarkRoutes);
 router.use('/bookmarks', bookmarksRoutes);
-router.use('/terms', termsRoutes);
 router.use('/tickets', ticketsRoutes);
 router.use('/plans', planRoutes);
 router.use('/roles', roleRoutes);

@@ -257,7 +257,7 @@ export const getContractCancel: RequestHandler<
     throw new NotFound({ en: 'contract not found', ar: 'العقد غير موجود' }, req.lang);
 
   const contractCancelData: IContractCancel = {
-    ...contractCancel,
+    ...contractCancel.toObject(),
     contract: contract?.[0],
   };
 

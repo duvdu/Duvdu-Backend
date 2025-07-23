@@ -10,7 +10,6 @@ export * from './update-phone-numbers.controller';
 export * from './forget-password.controller';
 export * from './verify.controller';
 export * from './find-users.controller';
-export * from './update-default-profile-crm.controller';
 export * from './get-logged-user-projects.controller';
 export * from './logOut.controller';
 export * from './createUser.controller';

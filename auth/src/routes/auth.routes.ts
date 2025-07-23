@@ -133,13 +133,6 @@ router
     ]),
     val.updateProfileVal,
     handlers.updateProfileHandler,
-  )
-  .put(
-    globalUploadMiddleware('defaults' as any).fields([
-      { name: 'profileImage', maxCount: 1 },
-      { name: 'coverImage', maxCount: 1 },
-    ]),
-    handlers.updateDefaultImagesCrm,
   );
 
 router.get('/profile/projects', isauthenticated, handlers.getLoggedUserProjects);
