@@ -113,6 +113,18 @@ export const findUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser
         _id: { $ne: new mongoose.Types.ObjectId(req.loggedUser?.id) },
       },
     },
+    // populate role
+    {
+      $lookup: {
+        from: MODELS.role,
+        localField: 'role',
+        foreignField: '_id',
+        as: 'roleDetails',
+      },
+    },
+    {
+      $unwind: '$roleDetails',
+    },
     {
       $project: {
         _id: 1,
@@ -127,6 +139,7 @@ export const findUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser
         pricePerHour: 1,
         hasVerificationBadge: 1,
         rate: 1,
+        role: 1,
         followCount: 1,
         invalidAddress: 1,
         likes: 1,
