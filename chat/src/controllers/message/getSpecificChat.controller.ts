@@ -149,7 +149,9 @@ export const getSpecificChatHandler: GetSpecificChatHandler = async (req, res) =
         newRoot: { $mergeObjects: ['$allMessages', { unreadMessageCount: '$unreadMessageCount' }] },
       },
     },
-
+    {
+      $sort: { createdAt: 1 },
+    },
     {
       $skip: req.pagination.skip,
     },
