@@ -23,7 +23,8 @@ export const updateSettingHandler: RequestHandler<
       await bucket.removeBucketFiles(setting.default_profile);
     }
     await Users.updateMany(
-      { profileImage: req.body.default_profile },
+      { profileImage: setting.default_profile },
+      { profileImage: req.body.default_profile }
     );
   }
 
@@ -34,7 +35,8 @@ export const updateSettingHandler: RequestHandler<
       await bucket.removeBucketFiles(setting.default_cover);
     }
     await Users.updateMany(
-      { coverImage: req.body.default_cover },
+      { coverImage: setting.default_cover },
+      { coverImage: req.body.default_cover }
     );
   }
 
