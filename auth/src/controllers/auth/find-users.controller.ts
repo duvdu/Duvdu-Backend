@@ -76,7 +76,8 @@ export const filterUsers: RequestHandler<
   if (req.query.isDeleted !== undefined) req.pagination.filter.isDeleted = req.query.isDeleted;
 
   if (req.query.from) req.pagination.filter.createdAt = { $gte: new Date(req.query.from) };
-  if (req.query.to) req.pagination.filter.createdAt = { $lte: new Date(req.query.to) };
+  if (req.query.to)
+    req.pagination.filter.createdAt = { ...req.pagination.filter.createdAt, $lte: new Date(req.query.to) };
 
   next();
 };
