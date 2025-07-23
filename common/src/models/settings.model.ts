@@ -33,10 +33,10 @@ export const Setting = model<Isetting>(
     },
     { timestamps: true, collection: MODELS.setting , toJSON: { transform: (doc, ret) => {
       if (ret.default_profile) {
-        ret.default_profile = `${process.env.BUCKET_URL}/${ret.default_profile}`;
+        ret.default_profile = `${process.env.BUCKET_HOST}/${ret.default_profile}`;
       }
       if (ret.default_cover) {
-        ret.default_cover = `${process.env.BUCKET_URL}/${ret.default_cover}`;
+        ret.default_cover = `${process.env.BUCKET_HOST}/${ret.default_cover}`;
       }
     } } },
   ),
