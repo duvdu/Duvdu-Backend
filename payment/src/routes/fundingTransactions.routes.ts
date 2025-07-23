@@ -41,7 +41,7 @@ router
 
 
 router
-  .route('/:transactionId')
+  .route('/crm/:transactionId')
   .get(
     isauthorized(PERMISSIONS.listFundTransactions),
     validation.getFundingTransactionValidation,

@@ -26,9 +26,6 @@ router
     transactionsControllers.transactionPagination,
     transactionsControllers.getAllTransactions,
   );
-
-
-
 router
   .route('/crm/:transactionId')
   .get(
