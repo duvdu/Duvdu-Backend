@@ -5,6 +5,9 @@ export const createSettingVal = [
   body('expirationTime').isArray({ min: 1 }).withMessage('expirationTimeArray'),
   body('expirationTime.*').isObject().withMessage('expirationTimeObject'),
   body('expirationTime.*.time').isInt({ min: 1 }).withMessage('expirationTimeInt'),
+  body('contractSubscriptionPercentage')
+    .isInt({ min: 1, max: 100 })
+    .withMessage('contractSubscriptionPercentageInt'),
   globalValidatorMiddleware,
 ];
 
@@ -35,6 +38,7 @@ export const addExpirationVal = [
 export const updateSettingVal = [
   param('settingId').isMongoId().withMessage('settingIdMongoId'),
   body('contractSubscriptionPercentage')
+    .optional()
     .isInt({ min: 1, max: 100 })
     .withMessage('contractSubscriptionPercentageInt'),
   globalValidatorMiddleware,

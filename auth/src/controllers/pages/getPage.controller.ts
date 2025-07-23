@@ -21,7 +21,8 @@ export const getPageController: RequestHandler<
     },
   ]);
 
-  if (page.length === 0) throw new NotFound({ ar: 'الصفحة غير موجودة', en: 'Page not found' }, req.lang);
+  if (page.length === 0)
+    throw new NotFound({ ar: 'الصفحة غير موجودة', en: 'Page not found' }, req.lang);
 
   res.status(200).json({
     message: 'success',

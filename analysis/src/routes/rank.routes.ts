@@ -13,8 +13,9 @@ export const router = express.Router();
 router.use(isauthenticated);
 router
   .route('/')
-  .post(isauthorized(PERMISSIONS.createRankHandler), val.createRankVal, handler.createRankHandler)
+  .post(isauthorized(PERMISSIONS.createRank), val.createRankVal, handler.createRankHandler)
   .get(
+    isauthorized(PERMISSIONS.listRanks),
     val.validateRanksQuery,
     globalPaginationMiddleware,
     handler.getRanksPagination,
@@ -23,10 +24,6 @@ router
 
 router
   .route('/:rankId')
-  .get(val.getRankVal, handler.getRankHandler)
-  .patch(isauthorized(PERMISSIONS.updateRankHandler), val.updateRankVal, handler.updateRankHandler)
-  .delete(
-    isauthorized(PERMISSIONS.deleteRankHandler),
-    val.deleteRankVal,
-    handler.deleteRankHandler,
-  );
+  .get(isauthorized(PERMISSIONS.listRanks), val.getRankVal, handler.getRankHandler)
+  .patch(isauthorized(PERMISSIONS.updateRank), val.updateRankVal, handler.updateRankHandler)
+  .delete(isauthorized(PERMISSIONS.deleteRank), val.deleteRankVal, handler.deleteRankHandler);

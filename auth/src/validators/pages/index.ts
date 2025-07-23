@@ -11,30 +11,50 @@ export const createPageValidator = [
 
 export const updatePageValidator = [
   param('id').isMongoId().withMessage('id is required'),
-  body('title.ar').optional().isString().notEmpty().withMessage('title is required').custom((value , {req})=>{
-    if (!req.body.title.en) {
-      throw new Error('title.en is required');
-    }
-    return true;
-  }),
-  body('title.en').optional().isString().notEmpty().withMessage('title is required').custom((value , {req})=>{
-    if (!req.body.title.ar) {
-      throw new Error('title.ar is required');
-    }
-    return true;
-  }),
-  body('content.ar').optional().isString().notEmpty().withMessage('content is required').custom((value , {req})=>{
-    if (!req.body.content.en) {
-      throw new Error('content.en is required');
-    }
-    return true;
-  }),
-  body('content.en').optional().isString().notEmpty().withMessage('content is required').custom((value , {req})=>{
-    if (!req.body.content.ar) {
-      throw new Error('content.ar is required');
-    }
-    return true;
-  }),
+  body('title.ar')
+    .optional()
+    .isString()
+    .notEmpty()
+    .withMessage('title is required')
+    .custom((value, { req }) => {
+      if (!req.body.title.en) {
+        throw new Error('title.en is required');
+      }
+      return true;
+    }),
+  body('title.en')
+    .optional()
+    .isString()
+    .notEmpty()
+    .withMessage('title is required')
+    .custom((value, { req }) => {
+      if (!req.body.title.ar) {
+        throw new Error('title.ar is required');
+      }
+      return true;
+    }),
+  body('content.ar')
+    .optional()
+    .isString()
+    .notEmpty()
+    .withMessage('content is required')
+    .custom((value, { req }) => {
+      if (!req.body.content.en) {
+        throw new Error('content.en is required');
+      }
+      return true;
+    }),
+  body('content.en')
+    .optional()
+    .isString()
+    .notEmpty()
+    .withMessage('content is required')
+    .custom((value, { req }) => {
+      if (!req.body.content.ar) {
+        throw new Error('content.ar is required');
+      }
+      return true;
+    }),
   globalValidatorMiddleware,
 ];
 

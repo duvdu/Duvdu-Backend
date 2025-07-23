@@ -1,4 +1,9 @@
-import { globalPaginationMiddleware, isauthenticated, isauthorized, PERMISSIONS } from '@duvdu-v1/duvdu';
+import {
+  globalPaginationMiddleware,
+  isauthenticated,
+  isauthorized,
+  PERMISSIONS,
+} from '@duvdu-v1/duvdu';
 import { Router } from 'express';
 
 import * as controller from '../controllers/pages';
@@ -41,5 +46,7 @@ router
     controller.deletePageController,
   );
 
-router.route('/').get(globalPaginationMiddleware, validator.getPagesValidator, controller.getPagesController);
-router.route('/:id').get( validator.getPageValidator, controller.getPageController);
+router
+  .route('/')
+  .get(globalPaginationMiddleware, validator.getPagesValidator, controller.getPagesController);
+router.route('/:id').get(validator.getPageValidator, controller.getPageController);
