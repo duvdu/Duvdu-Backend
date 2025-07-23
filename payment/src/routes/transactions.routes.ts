@@ -48,7 +48,7 @@ router
   );
 
 router
-  .route('/crm')
+  .route('/funding-transactions/crm')
   .post(
     isauthorized(PERMISSIONS.createFundTransactions),
     globalUploadMiddleware(FOLDERS.transactions, {
@@ -67,7 +67,7 @@ router
   );
 
 router
-  .route('/crm/:transactionId')
+  .route('/funding-transactions/crm/:transactionId')
   .get(
     isauthorized(PERMISSIONS.listFundTransactions),
     validation.getFundingTransactionValidation,
