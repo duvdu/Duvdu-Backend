@@ -177,7 +177,18 @@ export const getContractCrm: RequestHandler<
         cycle: 1,
         contract: 1,
         hasReview: 1,
-        ticketNumber: 1,
+        ticketNumber: {
+          $cond: {
+            if: {
+              $or: [
+                { $eq: ['$ticketNumber', null] },
+                { $eq: [{ $type: '$ticketNumber' }, 'missing'] }
+              ]
+            },
+            then: null,
+            else: '$ticketNumber'
+          }
+        },
         haveCancelRequest: 1,
         customer: {
           _id: '$customer._id',
