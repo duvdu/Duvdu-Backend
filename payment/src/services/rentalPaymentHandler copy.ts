@@ -21,6 +21,7 @@ export const handleRentalPayment = async (
   },
 ) => {
   // Check if payment was successful
+  const contract = await RentalContracts.findById(contractId);
   if (!transactionData.success) {
     console.log('Payment failed');
     await Transaction.create({
@@ -34,7 +35,7 @@ export const handleRentalPayment = async (
     });
 
     await FundedTransaction.create({
-      user: userId,
+      user: contract?.sp,
       fundAmount: transactionData.amount,
       contract: contractId,
     });
@@ -55,7 +56,6 @@ export const handleRentalPayment = async (
     };
   }
 
-  const contract = await RentalContracts.findById(contractId);
 
   if (!contract) {
     return {
@@ -128,7 +128,7 @@ export const handleRentalPayment = async (
     });
 
     await FundedTransaction.create({
-      user: userId,
+      user: contract.sp,
       fundAmount: contract.totalPrice,
       contract: contract._id.toString(),
     });

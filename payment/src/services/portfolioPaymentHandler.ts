@@ -128,7 +128,7 @@ export const handlePortfolioPayment = async (
     });
 
     await FundedTransaction.create({
-      user: userId,
+      user: contract.sp,
       fundAmount: contract.firstPaymentAmount,
       contract: contract._id.toString(),
     });
@@ -187,7 +187,7 @@ export const handlePortfolioPayment = async (
     });
 
     await FundedTransaction.create({
-      user: userId,
+      user: contract.sp,
       fundAmount: contract.secondPaymentAmount,
       contract: contract._id.toString(),
     });

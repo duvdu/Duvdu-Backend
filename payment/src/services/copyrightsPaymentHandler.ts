@@ -124,7 +124,7 @@ export const handleCopyrightsPayment = async (
     });
 
     await FundedTransaction.create({
-      user: userId,
+      user: contract.sp,
       fundAmount: contract.firstPaymentAmount,
       contract: contract._id.toString(),
     });
@@ -180,6 +180,12 @@ export const handleCopyrightsPayment = async (
       model: MODELS.portfolioPost,
       currency: 'EGP',
       timeStamp: new Date(),
+    });
+
+    await FundedTransaction.create({
+      user: contract.sp,
+      fundAmount: contract.secondPaymentAmount,
+      contract: contract._id.toString(),
     });
 
     return {
