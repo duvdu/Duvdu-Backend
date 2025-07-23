@@ -5,7 +5,15 @@ export const getPagesController: RequestHandler<
   unknown,
   PaginationResponse<{ data: IPage[] }>
 > = async (req, res) => {
-  const page = await Pages.find();
+  const page = await Pages.aggregate([
+    {
+      $project: {
+        _id: 1,
+        title: `$title.${req.lang}`,
+        content: `$content.${req.lang}`,
+      },
+    },
+  ]);
 
   const result = await Pages.countDocuments();
 

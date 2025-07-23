@@ -18,7 +18,7 @@ router
     isauthorized(PERMISSIONS.listPages),
     globalPaginationMiddleware,
     validator.getPagesValidator,
-    controller.getPagesController,
+    controller.getCrmPagesController,
   );
 router
   .route('/crm/:id')
@@ -26,7 +26,7 @@ router
     isauthenticated,
     isauthorized(PERMISSIONS.listPages),
     validator.getPageValidator,
-    controller.getPageController,
+    controller.getCrmPageController,
   )
   .put(
     isauthenticated,
