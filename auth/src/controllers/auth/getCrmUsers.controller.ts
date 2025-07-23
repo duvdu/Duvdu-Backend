@@ -37,6 +37,20 @@ export const getCrmUsers: RequestHandler<unknown, PaginationResponse<{ data: Ius
       },
     },
     {
+      $lookup: {
+        from: MODELS.role,
+        localField: 'role',
+        foreignField: '_id',
+        as: 'roleDetails',
+      },
+    },
+    {
+      $unwind: {
+        path: '$roleDetails',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
       $project: {
         _id: 1,
         googleId: 1,
@@ -56,7 +70,13 @@ export const getCrmUsers: RequestHandler<unknown, PaginationResponse<{ data: Ius
         isOnline: 1,
         isAvaliableToInstantProjects: 1,
         pricePerHour: 1,
-        role: 1,
+        role: {
+          $cond: {
+            if: { $eq: ['$roleDetails.system', null] },
+            then: null,
+            else: '$roleDetails',
+          },
+        },
         hasVerificationBadge: 1,
         avaliableContracts: 1,
         rate: 1,
