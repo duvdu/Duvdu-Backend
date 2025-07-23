@@ -20,6 +20,7 @@ export const getFundingTransactionPagination: RequestHandler<
     fundAmount?: number;
     createdAtFrom?: string;
     createdAtTo?: string;
+    contract?: string;
   }
 > = async (req, res, next) => {
   const {
@@ -31,6 +32,7 @@ export const getFundingTransactionPagination: RequestHandler<
     fundAmount,
     createdAtFrom,
     createdAtTo,
+    contract,
   } = req.query;
 
   req.pagination.filter = {};
@@ -44,6 +46,7 @@ export const getFundingTransactionPagination: RequestHandler<
 
   if (createdAtFrom) req.pagination.filter.createdAt = { $gte: createdAtFrom };
   if (createdAtTo) req.pagination.filter.createdAt = { $lte: createdAtTo };
+  if (contract) req.pagination.filter.contract = new Types.ObjectId(contract);
 
   next();
 };

@@ -21,6 +21,7 @@ export const getFundingTransactionPaginationValidation = [
     .isFloat()
     .toFloat()
     .withMessage('fundAmountFrom must be a number'),
+  query('contract').optional().isMongoId().withMessage('contract must be a valid MongoDB ID'),
   query('fundAmountTo').optional().isFloat().toFloat().withMessage('fundAmountTo must be a number'),
   query('fundAmount').optional().isFloat().toFloat().withMessage('fundAmount must be a number'),
   query('createdAtFrom').optional().isISO8601().withMessage('createdAtFrom must be a valid date'),
