@@ -19,12 +19,13 @@ router
     isauthorized(PERMISSIONS.createSetting),
     val.createSettingVal,
     handler.createSettingHandler,
-  );
+  )
+  .get(isauthorized(PERMISSIONS.listSettings) ,handler.getSettingHandler);
+
 
 router
   .route('/:settingId')
   .post(isauthorized(PERMISSIONS.createSetting), val.addExpirationVal, handler.addSettingHandler)
-  .get(isauthorized(PERMISSIONS.listSettings), val.getExpirationVal, handler.getSettingHandler)
   .patch(
     isauthorized(PERMISSIONS.updateSetting),
     val.updateExpirationVal,

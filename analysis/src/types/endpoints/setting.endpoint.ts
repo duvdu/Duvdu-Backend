@@ -27,7 +27,7 @@ export interface DeleteExpirationHandler
 
 export interface GetSettingHandler
   extends RequestHandler<
-    { settingId: string },
+    unknown,
     SuccessResponse<{ data: Isetting }>,
     unknown,
     unknown
