@@ -1,6 +1,7 @@
 import {
   BadRequestError,
   Bucket,
+  Contracts,
   FOLDERS,
   FundedTransaction,
   FundedTransactionStatus,
@@ -16,7 +17,7 @@ import { RequestHandler } from 'express';
 export const createFundTransactions: RequestHandler<
   unknown,
   SuccessResponse<{ data: IFundedTransaction }>,
-  Pick<IFundedTransaction, 'fundAmount' | 'fundAttachment' | 'user' | 'withdrawMethod'>
+  Pick<IFundedTransaction, 'fundAmount' | 'fundAttachment' | 'user' | 'withdrawMethod' | 'contract'>
 > = async (req, res) => {
   const user = await Users.findById(req.body.user);
   if (!user) throw new NotFound({ ar: 'المستخدم غير موجود', en: 'User not found' }, req.lang);
@@ -28,6 +29,12 @@ export const createFundTransactions: RequestHandler<
   });
   if (!withdrawMethod)
     throw new NotFound({ ar: 'الطريقة غير موجودة', en: 'Withdraw method not found' }, req.lang);
+
+  if (req.body.contract) {
+    const contract = await Contracts.findById(req.body.contract);
+    if (!contract)
+      throw new NotFound({ ar: 'العقد غير موجود', en: 'Contract not found' }, req.lang);
+  }
 
   const attachment = <Express.Multer.File[] | undefined>(req.files as any).fundAttachment || [];
   if (!attachment.length)

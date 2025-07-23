@@ -5,6 +5,7 @@ export const createFundedTransactionValidation = [
   body('fundAmount').isFloat().toFloat().withMessage('fundAmount must be a number'),
   body('user').isMongoId().withMessage('user must be a valid MongoDB ID'),
   body('withdrawMethod').isMongoId().withMessage('withdrawMethod must be a valid MongoDB ID'),
+  body('contract').optional().isMongoId().withMessage('contract must be a valid MongoDB ID'),
   globalValidatorMiddleware,
 ];
 
@@ -31,5 +32,11 @@ export const getFundingTransactionPaginationValidation = [
 
 export const getFundingTransactionValidation = [
   param('transactionId').isMongoId().withMessage('transactionId must be a valid MongoDB ID'),
+  globalValidatorMiddleware,
+];
+
+export const updateFundingTransactionValidation = [
+  param('transactionId').isMongoId().withMessage('transactionId must be a valid MongoDB ID'),
+  body('withdrawMethod').isMongoId().withMessage('withdrawMethod must be a valid MongoDB ID'),
   globalValidatorMiddleware,
 ];

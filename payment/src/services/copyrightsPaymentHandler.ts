@@ -2,6 +2,7 @@ import {
   Channels,
   CopyrightContracts,
   CopyrightContractStatus,
+  FundedTransaction,
   MODELS,
   Transaction,
   TransactionStatus,
@@ -120,6 +121,12 @@ export const handleCopyrightsPayment = async (
       model: MODELS.portfolioPost,
       currency: 'EGP',
       timeStamp: new Date(),
+    });
+
+    await FundedTransaction.create({
+      user: userId,
+      fundAmount: contract.firstPaymentAmount,
+      contract: contract._id.toString(),
     });
 
     return {

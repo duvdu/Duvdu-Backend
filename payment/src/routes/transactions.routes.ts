@@ -12,7 +12,6 @@ import express from 'express';
 import * as transactionsControllers from '../controllers/transactions';
 import * as transactionsValidators from '../validators/transactions.validation';
 
-
 export const router = express.Router();
 
 router.use(isauthenticated);
@@ -43,8 +42,6 @@ router
     transactionsValidators.fundTransactionValidation,
     transactionsControllers.fundTransactions,
   );
-
-
 
 router
   .route('/')

@@ -26,10 +26,7 @@ const validateTransactionForFunding = (
     throw new NotFound({ ar: 'المعاملة غير موجودة', en: 'Transaction not found' }, lang);
   }
 
-  const allowedStatuses = [
-    TransactionStatus.PENDING,
-    TransactionStatus.FAILED,
-  ];
+  const allowedStatuses = [TransactionStatus.PENDING, TransactionStatus.FAILED];
   if (allowedStatuses.includes(transaction.status as TransactionStatus)) {
     throw new BadRequestError(
       { ar: 'حالة المعاملة غير صالحة للتمويل', en: 'Invalid transaction status for funding' },

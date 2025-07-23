@@ -1,5 +1,6 @@
 import {
   Channels,
+  FundedTransaction,
   MODELS,
   RentalContracts,
   RentalContractStatus,
@@ -30,6 +31,12 @@ export const handleRentalPayment = async (
       model: MODELS.studioBooking,
       currency: 'EGP',
       timeStamp: new Date(),
+    });
+
+    await FundedTransaction.create({
+      user: userId,
+      fundAmount: transactionData.amount,
+      contract: contractId,
     });
 
     await sendNotification(
@@ -118,6 +125,12 @@ export const handleRentalPayment = async (
       model: MODELS.studioBooking,
       currency: 'EGP',
       timeStamp: new Date(),
+    });
+
+    await FundedTransaction.create({
+      user: userId,
+      fundAmount: contract.totalPrice,
+      contract: contract._id.toString(),
     });
 
     return {

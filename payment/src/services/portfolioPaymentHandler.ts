@@ -1,5 +1,6 @@
 import {
   Channels,
+  FundedTransaction,
   MODELS,
   ProjectContract,
   ProjectContractStatus,
@@ -74,16 +75,11 @@ export const handlePortfolioPayment = async (
     });
 
     // decrement the user contracts count
-    const x = await Users.findOneAndUpdate(
+    await Users.findOneAndUpdate(
       { _id: contract.sp },
       { $inc: { avaliableContracts: -1 } },
       { new: true },
     );
-
-    console.log('=====================');
-    console.log(x);
-
-    console.log('=====================');
 
     const delay = contract.stageExpiration * 3600 * 1000;
     const updateQueue = getUpdateAfterFirstPaymentQueue();
@@ -129,6 +125,12 @@ export const handlePortfolioPayment = async (
       model: MODELS.portfolioPost,
       currency: 'EGP',
       timeStamp: new Date(),
+    });
+
+    await FundedTransaction.create({
+      user: userId,
+      fundAmount: contract.firstPaymentAmount,
+      contract: contract._id.toString(),
     });
 
     return {
@@ -182,6 +184,12 @@ export const handlePortfolioPayment = async (
       model: MODELS.portfolioPost,
       currency: 'EGP',
       timeStamp: new Date(),
+    });
+
+    await FundedTransaction.create({
+      user: userId,
+      fundAmount: contract.secondPaymentAmount,
+      contract: contract._id.toString(),
     });
 
     return {

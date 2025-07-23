@@ -38,7 +38,8 @@ export const transactionPagination: RequestHandler<
 
   if (req.query.model) req.pagination.filter.model = req.query.model;
 
-  if (req.query.isSubscription !== undefined) req.pagination.filter.isSubscription = req.query.isSubscription;
+  if (req.query.isSubscription !== undefined)
+    req.pagination.filter.isSubscription = req.query.isSubscription;
 
   // Handle amount range properly
   if (req.query.amountFrom || req.query.amountTo) {
