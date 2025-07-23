@@ -196,6 +196,10 @@ export const permissions = {
     PERMISSIONS.updateRank,
     PERMISSIONS.deleteRank,
     PERMISSIONS.listRanks,
+    PERMISSIONS.createFundTransactions,
+    PERMISSIONS.listFundTransactions,
+    PERMISSIONS.fundTransactions,
+    PERMISSIONS.listTransactions,
   ],
   category: [
     PERMISSIONS.createCategory,
