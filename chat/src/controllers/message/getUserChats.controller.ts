@@ -154,16 +154,11 @@ export const getUserChatsHandler: RequestHandler<
       },
     },
     {
+      // Final pagination after all processing
       $skip: req.pagination.skip,
     },
     {
       $limit: req.pagination.limit,
-    },
-    {
-      // Final sort to ensure newest messages are first after pagination
-      $sort: {
-        'newestMessage.createdAt': -1,
-      },
     },
   ]);
 
