@@ -36,7 +36,7 @@ router
     globalPaginationMiddleware,
     validation.getFundingTransactionPaginationValidation,
     controller.getFundingTransactionPagination,
-    
+    controller.getFundingTransactions,
   );
 
 
