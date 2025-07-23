@@ -28,6 +28,8 @@ export const filterUsers: RequestHandler<
     role?: string;
     isOnline?: boolean;
     isDeleted?: boolean;
+    from?:Date;
+    to?:Date;
   }
 > = async (req, res, next) => {
   if (req.query.search) {
@@ -72,6 +74,9 @@ export const filterUsers: RequestHandler<
   req.query.maxDistance = +(req.query.maxDistance || 1000);
 
   if (req.query.isDeleted !== undefined) req.pagination.filter.isDeleted = req.query.isDeleted;
+
+  if (req.query.from) req.pagination.filter.createdAt = { $gte: new Date(req.query.from) };
+  if (req.query.to) req.pagination.filter.createdAt = { $lte: new Date(req.query.to) };
 
   next();
 };
