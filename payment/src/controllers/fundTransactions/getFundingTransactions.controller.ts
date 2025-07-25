@@ -73,7 +73,7 @@ export const getFundingTransactions: RequestHandler<
       },
     },
     {
-      $unwind: '$user',
+      $unwind: { path: '$user', preserveNullAndEmptyArrays: true },
     },
     {
       $lookup: {
@@ -84,7 +84,7 @@ export const getFundingTransactions: RequestHandler<
       },
     },
     {
-      $unwind: '$createdBy',
+      $unwind: { path: '$createdBy', preserveNullAndEmptyArrays: true },
     },
     {
       $lookup: {
@@ -95,7 +95,7 @@ export const getFundingTransactions: RequestHandler<
       },
     },
     {
-      $unwind: '$withdrawMethod',
+      $unwind: { path: '$withdrawMethod', preserveNullAndEmptyArrays: true },
     },
     {
       $project: {
@@ -149,13 +149,7 @@ export const getFundingTransactions: RequestHandler<
           },
         },
         contract: 1,
-        ticketNumber: {
-          $cond: {
-            if: { $eq: ['$ticketNumber', null] },
-            then: null,
-            else: '$ticketNumber',
-          },
-        },
+        ticketNumber: { $ifNull: ['$ticketNumber', null] },
         status: 1,
       },
     },

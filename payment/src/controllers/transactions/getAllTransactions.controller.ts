@@ -129,13 +129,7 @@ export const getAllTransactions: RequestHandler<
         type: 1,
         model: 1,
         isSubscription: 1,
-        ticketNumber: {
-          $cond: {
-            if: { $eq: ['$ticketNumber', null] },
-            then: null,
-            else: '$ticketNumber',
-          },
-        },
+        ticketNumber: { $ifNull: ['$ticketNumber', null] },
         currency: 1,
         fundingAmount: 1,
         fundedAt: 1,

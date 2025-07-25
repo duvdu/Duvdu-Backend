@@ -17,7 +17,7 @@ export const getFundingTransaction: RequestHandler<
       },
     },
     {
-      $unwind: '$user',
+      $unwind: { path: '$user', preserveNullAndEmptyArrays: true },
     },
     {
       $lookup: {
@@ -28,7 +28,7 @@ export const getFundingTransaction: RequestHandler<
       },
     },
     {
-      $unwind: '$createdBy',
+      $unwind: { path: '$createdBy', preserveNullAndEmptyArrays: true },
     },
     {
       $lookup: {
@@ -39,7 +39,7 @@ export const getFundingTransaction: RequestHandler<
       },
     },
     {
-      $unwind: '$withdrawMethod',
+      $unwind: { path: '$withdrawMethod', preserveNullAndEmptyArrays: true },
     },
     {
       $project: {
@@ -93,18 +93,11 @@ export const getFundingTransaction: RequestHandler<
           },
         },
         contract: 1,
-        ticketNumber: {
-          $cond: {
-            if: { $eq: ['$ticketNumber', null] },
-            then: null,
-            else: '$ticketNumber',
-          },
-        },
+        ticketNumber: { $ifNull: ['$ticketNumber', null] },
         status: 1,
       },
     },
   ]);
-
   if (transactions.length === 0)
     throw new NotFound({ ar: 'المعاملة غير موجودة', en: 'Transaction not found' }, req.lang);
 
