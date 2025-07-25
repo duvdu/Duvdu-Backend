@@ -61,6 +61,14 @@ interface UserAnalysisResponse {
       followers: number;
       rank: { title: string; color: string };
     }>;
+    byContracts: Array<{
+      _id: string;
+      name: string;
+      username: string;
+      profileImage: string;
+      contractsCount: number;
+      rank: { title: string; color: string };
+    }>;
   };
   contractStats: {
     totalContracts: number;
@@ -151,7 +159,13 @@ export const userAnalysisCrmHandler: RequestHandler<
       newUserFilter.createdAt = dateFilter;
     }
 
-    const [totalUsers, onlineUsers, newUsers, usersByRank, allRanks, topUsersByProjects, topUsersByRating, topUsersByLikes, topUsersByFollowers] = await Promise.all([
+    // 3. Contract filter for top users by contracts
+    const contractFilter: any = {};
+    if (Object.keys(dateFilter).length > 0) {
+      contractFilter.createdAt = dateFilter;
+    }
+
+    const [totalUsers, onlineUsers, newUsers, usersByRank, allRanks, topUsersByProjects, topUsersByRating, topUsersByLikes, topUsersByFollowers, topUsersByContracts] = await Promise.all([
       Users.countDocuments(userFilter),
       Users.countDocuments({ ...userFilter, isOnline: true }),
       Users.countDocuments(newUserFilter),
@@ -229,24 +243,61 @@ export const userAnalysisCrmHandler: RequestHandler<
             rank: 1
           }
         }
-      ]),
-      
-      // Top users by followers
-      Users.aggregate([
-        { $match: userFilter },
-        { $sort: { 'followCount.followers': -1 } },
-        { $limit: 10 },
-        {
-          $project: {
-            _id: 1,
-            name: 1,
-            username: 1,
-            profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$profileImage'] },
-            followers: '$followCount.followers',
-            rank: 1
+              ]),
+        
+        // Top users by followers
+        Users.aggregate([
+          { $match: userFilter },
+          { $sort: { 'followCount.followers': -1 } },
+          { $limit: 10 },
+          {
+            $project: {
+              _id: 1,
+              name: 1,
+              username: 1,
+              profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$profileImage'] },
+              followers: '$followCount.followers',
+              rank: 1
+            }
           }
-        }
-      ])
+        ]),
+        
+        // Top users by contracts as service provider (SP)
+        Contracts.aggregate([
+          { $match: contractFilter },
+          {
+            $group: {
+              _id: '$sp',
+              contractsCount: { $sum: 1 }
+            }
+          },
+          { $sort: { contractsCount: -1 } },
+          { $limit: 10 },
+          {
+            $lookup: {
+              from: 'users',
+              localField: '_id',
+              foreignField: '_id',
+              as: 'userDetails'
+            }
+          },
+          { $unwind: '$userDetails' },
+          {
+            $match: {
+              'userDetails.isDeleted': { $ne: true }
+            }
+          },
+          {
+            $project: {
+              _id: '$userDetails._id',
+              name: '$userDetails.name',
+              username: '$userDetails.username',
+              profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$userDetails.profileImage'] },
+              contractsCount: 1,
+              rank: '$userDetails.rank'
+            }
+          }
+        ])
     ]);
 
     // Merge ranks with zero counts for missing ranks
@@ -257,11 +308,7 @@ export const userAnalysisCrmHandler: RequestHandler<
       color: rank.color
     }));
 
-    // 3. Contract Statistics
-    const contractFilter: any = {};
-    if (Object.keys(dateFilter).length > 0) {
-      contractFilter.createdAt = dateFilter;
-    }
+    // 4. Contract Statistics
 
     // Get total contracts count
     const totalContracts = await Contracts.countDocuments(contractFilter);
@@ -308,7 +355,8 @@ export const userAnalysisCrmHandler: RequestHandler<
         byProjects: topUsersByProjects,
         byRating: topUsersByRating,
         byLikes: topUsersByLikes,
-        byFollowers: topUsersByFollowers
+        byFollowers: topUsersByFollowers,
+        byContracts: topUsersByContracts
       },
       contractStats: {
         totalContracts,
