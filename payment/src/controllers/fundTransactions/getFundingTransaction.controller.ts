@@ -8,7 +8,7 @@ export const getFundingTransaction: RequestHandler<
 > = async (req, res) => {
   const transactions = await FundedTransaction.aggregate([
     { $match: { _id: new Types.ObjectId(req.params.transactionId) } },
-    { 
+    {
       $lookup: {
         from: MODELS.user,
         localField: 'user',
@@ -68,39 +68,39 @@ export const getFundingTransaction: RequestHandler<
               phoneNumber: '$createdBy.phoneNumber',
             },
           },
-          createdAt: 1,
-          fundAmount: 1,
-          fundAttachment: {
-            $map: {
-              input: '$fundAttachment',
-              as: 'fundAttachment',
-              in: { $concat: [process.env.BUCKET_HOST, '/', '$$fundAttachment'] },
-            },
-          },
-          withdrawMethod: {
-            $cond: {
-              if: { $eq: ['$withdrawMethod', null] },
-              then: null,
-              else: {
-                method: '$withdrawMethod.method',
-                number: '$withdrawMethod.number',
-                name: '$withdrawMethod.name',
-                status: '$withdrawMethod.status',
-                default: '$withdrawMethod.default',
-                isDeleted: '$withdrawMethod.isDeleted',
-              },
-            },
-          },
-          contract: 1,
-          ticketNumber: {
-            $cond: {
-              if: { $eq: ['$ticketNumber', null] },
-              then: null,
-              else: '$ticketNumber',
-            },
-          },
-          status: 1,
         },
+        createdAt: 1,
+        fundAmount: 1,
+        fundAttachment: {
+          $map: {
+            input: '$fundAttachment',
+            as: 'fundAttachment',
+            in: { $concat: [process.env.BUCKET_HOST, '/', '$$fundAttachment'] },
+          },
+        },
+        withdrawMethod: {
+          $cond: {
+            if: { $eq: ['$withdrawMethod', null] },
+            then: null,
+            else: {
+              method: '$withdrawMethod.method',
+              number: '$withdrawMethod.number',
+              name: '$withdrawMethod.name',
+              status: '$withdrawMethod.status',
+              default: '$withdrawMethod.default',
+              isDeleted: '$withdrawMethod.isDeleted',
+            },
+          },
+        },
+        contract: 1,
+        ticketNumber: {
+          $cond: {
+            if: { $eq: ['$ticketNumber', null] },
+            then: null,
+            else: '$ticketNumber',
+          },
+        },
+        status: 1,
       },
     },
   ]);
