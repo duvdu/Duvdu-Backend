@@ -48,6 +48,6 @@ export const Transaction = model<ITransaction>(
     fundAttachment: { type: [String], default: [] },
     fundingAmount: { type: Number, default: 0 },
     fundedBy: { type: Schema.Types.ObjectId, ref: MODELS.user },
-    ticketNumber: { type: String, default: generateTicketNumber, unique: true },
+    ticketNumber: { type: String, default: generateTicketNumber, unique: true, sparse: true },
   }),
 );
