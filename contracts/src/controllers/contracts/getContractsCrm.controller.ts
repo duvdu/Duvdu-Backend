@@ -6,7 +6,7 @@ export const getContractsCrm: RequestHandler<
   unknown,
   PaginationResponse<{ data: any }>,
   unknown,
-  { filter?: 'i_created' | 'i_received'; cycle?: string; user?: string; ticketNumber?: string }
+  { filter?: 'i_created' | 'i_received'; cycle?: string; user?: string; ticketNumber?: string; from?: Date; to?: Date }
 > = async (req, res) => {
   const filter: any = {};
 
@@ -20,6 +20,8 @@ export const getContractsCrm: RequestHandler<
 
   if (req.query.cycle) filter.cycle = req.query.cycle;
   if (req.query.ticketNumber) filter.ticketNumber = req.query.ticketNumber;
+  if (req.query.from) filter.createdAt = { $gte: req.query.from };
+  if (req.query.to) filter.createdAt = { ...filter.createdAt, $lte: req.query.to };
 
   const contracts = await Contracts.aggregate([
     { $match: filter },

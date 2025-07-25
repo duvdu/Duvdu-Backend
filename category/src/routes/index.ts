@@ -17,8 +17,8 @@ router.get(
   '/crm',
   isauthenticated,
   isauthorized(PERMISSIONS.listCategories),
-  val.getCategoriesForCrmVal,
   globalPaginationMiddleware,
+  val.getCategoriesForCrmVal,
   handler.getCategoriesAdminPagination,
   handler.getCatogriesAdminHandler,
 );

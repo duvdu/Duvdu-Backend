@@ -29,6 +29,8 @@ export const getContractsCrm = [
   query('user').optional().isMongoId().withMessage('invalidUser'),
   query('cycle').optional().isString().withMessage('invalidCycle'),
   query('limit').optional().isInt({ min: 1 }).withMessage('invalidLimit'),
+  query('from').optional().isISO8601().toDate().withMessage('invalidFrom'),
+  query('to').optional().isISO8601().toDate().withMessage('invalidTo'),
   query('page').optional().isInt({ min: 1 }).withMessage('invalidPage'),
   globalValidatorMiddleware,
 ];
