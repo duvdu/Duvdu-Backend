@@ -101,7 +101,11 @@ export const getFundingTransactions: RequestHandler<
       $project: {
         user: {
           $cond: {
-            if: { $eq: ['$user', null] },
+            if: { $or: [
+              { $eq: ['$user', null] },
+              { $eq: [{ $type: '$user' }, 'missing'] },
+              { $eq: [{ $objectToArray: '$user' }, []] },
+            ],},
             then: null,
             else: {
               name: '$user.name',
@@ -114,7 +118,11 @@ export const getFundingTransactions: RequestHandler<
         },
         createdBy: {
           $cond: {
-            if: { $eq: ['$createdBy', null] },
+            if: { $or: [
+              { $eq: ['$createdBy', null] },
+              { $eq: [{ $type: '$createdBy' }, 'missing'] },
+              { $eq: [{ $objectToArray: '$createdBy' }, []] },
+            ],},
             then: null,
             else: {
               name: '$createdBy.name',
@@ -136,7 +144,11 @@ export const getFundingTransactions: RequestHandler<
         },
         withdrawMethod: {
           $cond: {
-            if: { $eq: ['$withdrawMethod', null] },
+            if: { $or: [
+              { $eq: ['$withdrawMethod', null] },
+              { $eq: [{ $type: '$withdrawMethod' }, 'missing'] },
+              { $eq: [{ $objectToArray: '$withdrawMethod' }, []] },
+            ],},
             then: null,
             else: {
               method: '$withdrawMethod.method',

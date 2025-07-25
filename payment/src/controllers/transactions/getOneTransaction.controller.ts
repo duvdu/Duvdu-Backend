@@ -35,7 +35,11 @@ export const getOneTransaction: RequestHandler<
       $project: {
         user: {
           $cond: {
-            if: { $eq: ['$user', null] },
+            if: { $or: [
+              { $eq: ['$user', null] },
+              { $eq: [{ $type: '$user' }, 'missing'] },
+              { $eq: [{ $objectToArray: '$user' }, []] },
+            ], },
             then: null,
             else: {
               name: '$user.name',
@@ -48,7 +52,11 @@ export const getOneTransaction: RequestHandler<
         },
         fundedBy: {
           $cond: {
-            if: { $eq: ['$fundedBy', null] },
+            if: { $or: [
+              { $eq: ['$fundedBy', null] },
+              { $eq: [{ $type: '$fundedBy' }, 'missing'] },
+              { $eq: [{ $objectToArray: '$fundedBy' }, []] },
+            ], },
             then: null,
             else: {
               name: '$fundedBy.name',
