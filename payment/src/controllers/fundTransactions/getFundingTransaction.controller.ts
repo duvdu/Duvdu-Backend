@@ -81,7 +81,7 @@ export const getFundingTransaction: RequestHandler<
         },
         createdAt: 1,
         fundAmount: 1,
-        fundAttachment: { $concat: [process.env.BUCKET_HOST, '/', '$$fundAttachment'] },
+        fundAttachment: { $concat: [process.env.BUCKET_HOST, '/', '$fundAttachment'] },
         withdrawMethod: {
           $cond: {
             if: { $or: [
