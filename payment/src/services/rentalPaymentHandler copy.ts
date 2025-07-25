@@ -56,7 +56,6 @@ export const handleRentalPayment = async (
     };
   }
 
-
   if (!contract) {
     return {
       success: false,

@@ -1,21 +1,115 @@
-import { FundedTransaction, IFundedTransaction, NotFound, SuccessResponse } from '@duvdu-v1/duvdu';
+import { FundedTransaction, IFundedTransaction, MODELS, NotFound, SuccessResponse } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
+import { Types } from 'mongoose';
 
 export const getFundingTransaction: RequestHandler<
   { transactionId: string },
   SuccessResponse<{ data: IFundedTransaction }>
 > = async (req, res) => {
-  const transaction = await FundedTransaction.findById(req.params.transactionId).populate([
-    { path: 'user', select: 'name username email profileImage phoneNumber' },
-    { path: 'createdBy', select: 'name username email profileImage phoneNumber' },
-    { path: 'withdrawMethod' },
+  const transactions = await FundedTransaction.aggregate([
+    { $match: { _id: new Types.ObjectId(req.params.transactionId) } },
+    { 
+      $lookup: {
+        from: MODELS.user,
+        localField: 'user',
+        foreignField: '_id',
+        as: 'user',
+      },
+    },
+    {
+      $unwind: '$user',
+    },
+    {
+      $lookup: {
+        from: MODELS.user,
+        localField: 'createdBy',
+        foreignField: '_id',
+        as: 'createdBy',
+      },
+    },
+    {
+      $unwind: '$createdBy',
+    },
+    {
+      $lookup: {
+        from: MODELS.withdrawMethod,
+        localField: 'withdrawMethod',
+        foreignField: '_id',
+        as: 'withdrawMethod',
+      },
+    },
+    {
+      $unwind: '$withdrawMethod',
+    },
+    {
+      $project: {
+        user: {
+          $cond: {
+            if: { $eq: ['$user', null] },
+            then: null,
+            else: {
+              name: '$user.name',
+              username: '$user.username',
+              email: '$user.email',
+              profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$user.profileImage'] },
+              phoneNumber: '$user.phoneNumber',
+            },
+          },
+        },
+        createdBy: {
+          $cond: {
+            if: { $eq: ['$createdBy', null] },
+            then: null,
+            else: {
+              name: '$createdBy.name',
+              username: '$createdBy.username',
+              email: '$createdBy.email',
+              profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$createdBy.profileImage'] },
+              phoneNumber: '$createdBy.phoneNumber',
+            },
+          },
+          createdAt: 1,
+          fundAmount: 1,
+          fundAttachment: {
+            $map: {
+              input: '$fundAttachment',
+              as: 'fundAttachment',
+              in: { $concat: [process.env.BUCKET_HOST, '/', '$$fundAttachment'] },
+            },
+          },
+          withdrawMethod: {
+            $cond: {
+              if: { $eq: ['$withdrawMethod', null] },
+              then: null,
+              else: {
+                method: '$withdrawMethod.method',
+                number: '$withdrawMethod.number',
+                name: '$withdrawMethod.name',
+                status: '$withdrawMethod.status',
+                default: '$withdrawMethod.default',
+                isDeleted: '$withdrawMethod.isDeleted',
+              },
+            },
+          },
+          contract: 1,
+          ticketNumber: {
+            $cond: {
+              if: { $eq: ['$ticketNumber', null] },
+              then: null,
+              else: '$ticketNumber',
+            },
+          },
+          status: 1,
+        },
+      },
+    },
   ]);
 
-  if (!transaction)
+  if (transactions.length === 0)
     throw new NotFound({ ar: 'المعاملة غير موجودة', en: 'Transaction not found' }, req.lang);
 
   res.status(200).json({
     message: 'success',
-    data: transaction,
+    data: transactions[0],
   });
 };

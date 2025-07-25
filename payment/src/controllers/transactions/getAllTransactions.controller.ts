@@ -26,7 +26,6 @@ export const transactionPagination: RequestHandler<
     to?: string;
     ticketNumber?: string;
   }
-
 > = async (req, res, next) => {
   req.pagination.filter = {};
 

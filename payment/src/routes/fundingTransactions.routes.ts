@@ -41,7 +41,8 @@ router
     isauthorized(PERMISSIONS.listFundTransactions),
     validation.getFundingTransactionValidation,
     controller.getFundingTransaction,
-  ).patch(
+  )
+  .patch(
     isauthorized(PERMISSIONS.updateFundTransactions),
     globalUploadMiddleware(FOLDERS.transactions, {
       maxSize: 400 * 1024 * 1024,
