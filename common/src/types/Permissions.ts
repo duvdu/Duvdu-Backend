@@ -90,6 +90,9 @@ export enum PERMISSIONS {
   deleteRank = 'delete-rank',
   listRanks = 'list-ranks',
 
+  // user analysis
+  listUserAnalysis = 'list-user-analysis',
+
   bookmarks = 'bookmarks',
 
 
@@ -202,6 +205,7 @@ export const permissions = {
     PERMISSIONS.fundTransactions,
     PERMISSIONS.listTransactions,
     PERMISSIONS.updateFundTransactions,
+    PERMISSIONS.listUserAnalysis,
   ],
   category: [
     PERMISSIONS.createCategory,
@@ -275,6 +279,7 @@ export const permissions = {
     PERMISSIONS.fundTransactions,
     PERMISSIONS.updateFundTransactions,
   ],
+  userAnalysis: [PERMISSIONS.listUserAnalysis],
 
   bookmarks: [PERMISSIONS.bookmarks],
 
