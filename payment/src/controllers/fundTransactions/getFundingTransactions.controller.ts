@@ -161,7 +161,7 @@ export const getFundingTransactions: RequestHandler<
     },
   ]);
 
-  const resultCount = await FundedTransaction.countDocuments();
+  const resultCount = await FundedTransaction.countDocuments(req.pagination.filter);
 
   res.status(200).json({
     message: 'success',
