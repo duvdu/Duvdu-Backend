@@ -27,6 +27,41 @@ interface UserAnalysisResponse {
     newUsers: number;
     usersByRank: Array<{ rank: string; count: number; color: string }>;
   };
+  topUsers: {
+    byProjects: Array<{
+      _id: string;
+      name: string;
+      username: string;
+      profileImage: string;
+      acceptedProjectsCounter: number;
+      rank: { title: string; color: string };
+    }>;
+    byRating: Array<{
+      _id: string;
+      name: string;
+      username: string;
+      profileImage: string;
+      averageRating: number;
+      totalRaters: number;
+      rank: { title: string; color: string };
+    }>;
+    byLikes: Array<{
+      _id: string;
+      name: string;
+      username: string;
+      profileImage: string;
+      likes: number;
+      rank: { title: string; color: string };
+    }>;
+    byFollowers: Array<{
+      _id: string;
+      name: string;
+      username: string;
+      profileImage: string;
+      followers: number;
+      rank: { title: string; color: string };
+    }>;
+  };
   contractStats: {
     totalContracts: number;
     contractsByStatus: Array<{ status: string; count: number }>;
@@ -116,7 +151,7 @@ export const userAnalysisCrmHandler: RequestHandler<
       newUserFilter.createdAt = dateFilter;
     }
 
-    const [totalUsers, onlineUsers, newUsers, usersByRank, allRanks] = await Promise.all([
+    const [totalUsers, onlineUsers, newUsers, usersByRank, allRanks, topUsersByProjects, topUsersByRating, topUsersByLikes, topUsersByFollowers] = await Promise.all([
       Users.countDocuments(userFilter),
       Users.countDocuments({ ...userFilter, isOnline: true }),
       Users.countDocuments(newUserFilter),
@@ -131,7 +166,87 @@ export const userAnalysisCrmHandler: RequestHandler<
         },
         { $project: { rank: '$_id', count: 1, color: 1, _id: 0 } }
       ]),
-      Rank.find({}, { rank: 1, color: 1, _id: 0 })
+      Rank.find({}, { rank: 1, color: 1, _id: 0 }),
+      
+      // Top users by accepted projects
+      Users.aggregate([
+        { $match: userFilter },
+        { $sort: { acceptedProjectsCounter: -1 } },
+        { $limit: 10 },
+        {
+          $project: {
+            _id: 1,
+            name: 1,
+            username: 1,
+            profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$profileImage'] },
+            acceptedProjectsCounter: 1,
+            rank: 1
+          }
+        }
+      ]),
+      
+      // Top users by rating
+      Users.aggregate([
+        { $match: { ...userFilter, 'rate.ratersCounter': { $gt: 0 } } },
+        {
+          $addFields: {
+            averageRating: {
+              $cond: {
+                if: { $gt: ['$rate.ratersCounter', 0] },
+                then: { $divide: ['$rate.totalRates', '$rate.ratersCounter'] },
+                else: 0
+              }
+            }
+          }
+        },
+        { $sort: { averageRating: -1, 'rate.ratersCounter': -1 } },
+        { $limit: 10 },
+        {
+          $project: {
+            _id: 1,
+            name: 1,
+            username: 1,
+            profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$profileImage'] },
+            averageRating: 1,
+            totalRaters: '$rate.ratersCounter',
+            rank: 1
+          }
+        }
+      ]),
+      
+      // Top users by likes
+      Users.aggregate([
+        { $match: userFilter },
+        { $sort: { likes: -1 } },
+        { $limit: 10 },
+        {
+          $project: {
+            _id: 1,
+            name: 1,
+            username: 1,
+            profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$profileImage'] },
+            likes: 1,
+            rank: 1
+          }
+        }
+      ]),
+      
+      // Top users by followers
+      Users.aggregate([
+        { $match: userFilter },
+        { $sort: { 'followCount.followers': -1 } },
+        { $limit: 10 },
+        {
+          $project: {
+            _id: 1,
+            name: 1,
+            username: 1,
+            profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$profileImage'] },
+            followers: '$followCount.followers',
+            rank: 1
+          }
+        }
+      ])
     ]);
 
     // Merge ranks with zero counts for missing ranks
@@ -188,6 +303,12 @@ export const userAnalysisCrmHandler: RequestHandler<
         onlineUsers,
         newUsers,
         usersByRank: completeUsersByRank
+      },
+      topUsers: {
+        byProjects: topUsersByProjects,
+        byRating: topUsersByRating,
+        byLikes: topUsersByLikes,
+        byFollowers: topUsersByFollowers
       },
       contractStats: {
         totalContracts,
