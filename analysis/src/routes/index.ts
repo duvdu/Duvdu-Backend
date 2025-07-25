@@ -2,6 +2,7 @@ import { Application } from 'express';
 
 import { router as contractRoutes } from './contract.routes';
 import { router as homeRoutes } from './home.routes';
+import { router as paymentRoutes } from './payment.routes';
 import { router as projectReview } from './projectReviews.routes';
 import { router as rankRoutes } from './rank.routes';
 import { router as settingRoutes } from './setting.routes';
@@ -14,4 +15,5 @@ export const mountRoutes = (app: Application) => {
   app.use('/api/analysis/contract-review', contractRoutes);
   app.use('/api/analysis/project-review', projectReview);
   app.use('/api/analysis/user', userAnalysisRoutes);
+  app.use('/api/analysis/payment', paymentRoutes);
 };

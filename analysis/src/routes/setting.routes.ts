@@ -15,13 +15,8 @@ router.use(isauthenticated);
 
 router
   .route('/')
-  .post(
-    isauthorized(PERMISSIONS.createSetting),
-    val.createSettingVal,
-    handler.createSettingHandler,
-  )
-  .get(isauthorized(PERMISSIONS.listSettings) ,handler.getSettingHandler);
-
+  .post(isauthorized(PERMISSIONS.createSetting), val.createSettingVal, handler.createSettingHandler)
+  .get(isauthorized(PERMISSIONS.listSettings), handler.getSettingHandler);
 
 router
   .route('/:settingId')

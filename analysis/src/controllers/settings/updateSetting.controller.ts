@@ -9,7 +9,8 @@ export const updateSettingHandler: RequestHandler<
   Pick<Isetting, 'contractSubscriptionPercentage' | 'default_profile' | 'default_cover'>
 > = async (req, res) => {
   const setting = await Setting.findById(req.params.settingId);
-  if (!setting) throw new NotFound({ en: 'setting not found', ar: 'الإعدادات غير موجودة' }, req.lang);
+  if (!setting)
+    throw new NotFound({ en: 'setting not found', ar: 'الإعدادات غير موجودة' }, req.lang);
   const default_profile =
     <Express.Multer.File[] | undefined>(req.files as any).default_profile || [];
 
@@ -24,7 +25,7 @@ export const updateSettingHandler: RequestHandler<
     }
     await Users.updateMany(
       { profileImage: setting.default_profile },
-      { profileImage: req.body.default_profile }
+      { profileImage: req.body.default_profile },
     );
   }
 
@@ -36,7 +37,7 @@ export const updateSettingHandler: RequestHandler<
     }
     await Users.updateMany(
       { coverImage: setting.default_cover },
-      { coverImage: req.body.default_cover }
+      { coverImage: req.body.default_cover },
     );
   }
 
@@ -44,6 +45,5 @@ export const updateSettingHandler: RequestHandler<
     new: true,
   });
 
-  
   res.status(200).json({ message: 'success', data: updatedSetting });
 };
