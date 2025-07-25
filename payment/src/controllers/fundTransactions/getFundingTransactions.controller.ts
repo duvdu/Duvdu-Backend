@@ -108,6 +108,7 @@ export const getFundingTransactions: RequestHandler<
             ],},
             then: null,
             else: {
+              _id: '$user._id',
               name: '$user.name',
               username: '$user.username',
               email: '$user.email',
@@ -125,6 +126,7 @@ export const getFundingTransactions: RequestHandler<
             ],},
             then: null,
             else: {
+              _id: '$createdBy._id',
               name: '$createdBy.name',
               username: '$createdBy.username',
               email: '$createdBy.email',
@@ -151,6 +153,7 @@ export const getFundingTransactions: RequestHandler<
             ],},
             then: null,
             else: {
+              _id: '$withdrawMethod._id',
               method: '$withdrawMethod.method',
               number: '$withdrawMethod.number',
               name: '$withdrawMethod.name',
