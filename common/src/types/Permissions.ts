@@ -93,6 +93,9 @@ export enum PERMISSIONS {
   // user analysis
   listUserAnalysis = 'list-user-analysis',
 
+  // payment analysis
+  listPaymentAnalysis = 'list-payment-analysis',
+
   bookmarks = 'bookmarks',
 
 
