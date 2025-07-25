@@ -97,6 +97,11 @@ export const updateUser = [
     })
     .withMessage('passwordInvalid'),
   body('address').optional().exists().isString().withMessage('invalidAddress'),
+  body('avaliableContracts')
+    .optional()
+    .isInt({ min: 1 })
+    .toInt()
+    .withMessage('invalidAvaliableContracts'),
   body('role').isMongoId(),
   globalValidatorMiddleware,
 ];

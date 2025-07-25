@@ -28,6 +28,7 @@ export const updateUserHandler: RequestHandler<
     | 'phoneNumber'
     | 'role'
     | 'categories'
+    | 'avaliableContracts'
   >,
   unknown
 > = async (req, res, next) => {

@@ -102,7 +102,7 @@ export const subscriptionAnalysisController: RequestHandler<
     // Build date filter based on interval
     const dateFilter: any = {};
     const now = new Date();
-    
+
     if (interval === 'today') {
       const startOfDay = new Date(now.setHours(0, 0, 0, 0));
       const endOfDay = new Date(now.setHours(23, 59, 59, 999));
@@ -121,14 +121,14 @@ export const subscriptionAnalysisController: RequestHandler<
     }
 
     // Build subscription transaction filter
-    const subscriptionFilter: any = { 
-      isSubscription: true 
+    const subscriptionFilter: any = {
+      isSubscription: true,
     };
-    
+
     if (Object.keys(dateFilter).length > 0) {
       subscriptionFilter.timeStamp = dateFilter;
     }
-    
+
     if (currency) {
       subscriptionFilter.currency = currency;
     }
@@ -136,10 +136,10 @@ export const subscriptionAnalysisController: RequestHandler<
     // Previous period filter for growth calculations
     const previousPeriodFilter = { ...subscriptionFilter };
     if (Object.keys(dateFilter).length > 0) {
-      const periodLength = dateFilter.$lte ? 
-        new Date(dateFilter.$lte).getTime() - new Date(dateFilter.$gte).getTime() : 
-        30 * 24 * 60 * 60 * 1000; // 30 days default
-      
+      const periodLength = dateFilter.$lte
+        ? new Date(dateFilter.$lte).getTime() - new Date(dateFilter.$gte).getTime()
+        : 30 * 24 * 60 * 60 * 1000; // 30 days default
+
       const prevStart = new Date(new Date(dateFilter.$gte).getTime() - periodLength);
       const prevEnd = new Date(dateFilter.$gte);
       previousPeriodFilter.timeStamp = { $gte: prevStart, $lt: prevEnd };
@@ -149,35 +149,35 @@ export const subscriptionAnalysisController: RequestHandler<
     const [
       // Main subscription summary
       subscriptionSummary,
-      
+
       // Revenue analysis by type
       depositAnalysis,
       withdrawAnalysis,
-      
+
       // Subscription tiers analysis
       subscriptionTiers,
-      
+
       // Time series data
       timeSeriesData,
-      
+
       // Currency breakdown
       currencyData,
-      
+
       // User metrics
       totalUsers,
       subscribedUsers,
       newSubscribedUsers,
-      
+
       // Top metrics
       topSubscriptionMetrics,
       subscriptionDurations,
-      
+
       // Previous period for growth
       previousPeriodStats,
-      
+
       // Cohort analysis
       cohortData,
-      
+
       // Most common subscription amount
       commonSubscriptionAmount,
     ] = await Promise.all([
@@ -191,22 +191,18 @@ export const subscriptionAnalysisController: RequestHandler<
             totalSubscriptions: { $sum: 1 },
             averageAmount: { $avg: '$amount' },
             activeSubscriptions: {
-              $sum: { 
+              $sum: {
                 $cond: [
-                  { $in: ['$status', [TransactionStatus.SUCCESS, TransactionStatus.FUNDED]] }, 
-                  1, 
-                  0
-                ] 
-              }
+                  { $in: ['$status', [TransactionStatus.SUCCESS, TransactionStatus.FUNDED]] },
+                  1,
+                  0,
+                ],
+              },
             },
             cancelledSubscriptions: {
-              $sum: { 
-                $cond: [
-                  { $eq: ['$status', TransactionStatus.FAILED] }, 
-                  1, 
-                  0
-                ] 
-              }
+              $sum: {
+                $cond: [{ $eq: ['$status', TransactionStatus.FAILED] }, 1, 0],
+              },
             },
           },
         },
@@ -265,22 +261,18 @@ export const subscriptionAnalysisController: RequestHandler<
             _id: { $dateToString: { format: '%Y-%m-%d', date: '$timeStamp' } },
             subscriptionRevenue: { $sum: '$amount' },
             newSubscriptions: {
-              $sum: { 
+              $sum: {
                 $cond: [
-                  { $in: ['$status', [TransactionStatus.SUCCESS, TransactionStatus.FUNDED]] }, 
-                  1, 
-                  0
-                ] 
-              }
+                  { $in: ['$status', [TransactionStatus.SUCCESS, TransactionStatus.FUNDED]] },
+                  1,
+                  0,
+                ],
+              },
             },
             cancelledSubscriptions: {
-              $sum: { 
-                $cond: [
-                  { $eq: ['$status', TransactionStatus.FAILED] }, 
-                  1, 
-                  0
-                ] 
-              }
+              $sum: {
+                $cond: [{ $eq: ['$status', TransactionStatus.FAILED] }, 1, 0],
+              },
             },
           },
         },
@@ -325,11 +317,11 @@ export const subscriptionAnalysisController: RequestHandler<
 
       // Subscribed users (users with successful subscription transactions)
       Transaction.aggregate([
-        { 
-          $match: { 
+        {
+          $match: {
             isSubscription: true,
-            status: { $in: [TransactionStatus.SUCCESS, TransactionStatus.FUNDED] }
-          } 
+            status: { $in: [TransactionStatus.SUCCESS, TransactionStatus.FUNDED] },
+          },
         },
         { $group: { _id: '$user' } },
         { $count: 'subscribedUsers' },
@@ -337,11 +329,11 @@ export const subscriptionAnalysisController: RequestHandler<
 
       // New subscribed users in current period
       Transaction.aggregate([
-        { 
-          $match: { 
+        {
+          $match: {
             ...subscriptionFilter,
-            status: { $in: [TransactionStatus.SUCCESS, TransactionStatus.FUNDED] }
-          } 
+            status: { $in: [TransactionStatus.SUCCESS, TransactionStatus.FUNDED] },
+          },
         },
         { $group: { _id: '$user' } },
         { $count: 'newSubscribedUsers' },
@@ -361,11 +353,11 @@ export const subscriptionAnalysisController: RequestHandler<
 
       // Average subscription duration (mock calculation based on transaction patterns)
       Transaction.aggregate([
-        { 
-          $match: { 
+        {
+          $match: {
             isSubscription: true,
-            status: { $in: [TransactionStatus.SUCCESS, TransactionStatus.FUNDED] }
-          } 
+            status: { $in: [TransactionStatus.SUCCESS, TransactionStatus.FUNDED] },
+          },
         },
         {
           $group: {
@@ -377,11 +369,11 @@ export const subscriptionAnalysisController: RequestHandler<
         },
         {
           $project: {
-            duration: { 
+            duration: {
               $divide: [
                 { $subtract: ['$lastSubscription', '$firstSubscription'] },
-                1000 * 60 * 60 * 24 // Convert to days
-              ]
+                1000 * 60 * 60 * 24, // Convert to days
+              ],
             },
           },
         },
@@ -402,13 +394,13 @@ export const subscriptionAnalysisController: RequestHandler<
             totalRevenue: { $sum: '$amount' },
             totalSubscriptions: { $sum: 1 },
             activeSubscriptions: {
-              $sum: { 
+              $sum: {
                 $cond: [
-                  { $in: ['$status', [TransactionStatus.SUCCESS, TransactionStatus.FUNDED]] }, 
-                  1, 
-                  0
-                ] 
-              }
+                  { $in: ['$status', [TransactionStatus.SUCCESS, TransactionStatus.FUNDED]] },
+                  1,
+                  0,
+                ],
+              },
             },
           },
         },
@@ -416,11 +408,11 @@ export const subscriptionAnalysisController: RequestHandler<
 
       // Cohort analysis (monthly retention)
       Transaction.aggregate([
-        { 
-          $match: { 
+        {
+          $match: {
             isSubscription: true,
-            status: { $in: [TransactionStatus.SUCCESS, TransactionStatus.FUNDED] }
-          } 
+            status: { $in: [TransactionStatus.SUCCESS, TransactionStatus.FUNDED] },
+          },
         },
         {
           $group: {
@@ -477,14 +469,16 @@ export const subscriptionAnalysisController: RequestHandler<
     const annualRecurringRevenue = monthlyRecurringRevenue * 12;
 
     // Calculate churn and retention rates
-    const churnRate = mainSummary.totalSubscriptions > 0 ? 
-      (mainSummary.cancelledSubscriptions / mainSummary.totalSubscriptions) * 100 : 0;
+    const churnRate =
+      mainSummary.totalSubscriptions > 0
+        ? (mainSummary.cancelledSubscriptions / mainSummary.totalSubscriptions) * 100
+        : 0;
     const retentionRate = 100 - churnRate;
 
     // Process deposit/withdraw analysis
     const processRevenueAnalysis = (data: any[]) => {
       const result = { total: 0, pending: 0, success: 0, failed: 0, funded: 0 };
-      data.forEach(item => {
+      data.forEach((item) => {
         result.total += item.total;
         if (item._id === TransactionStatus.PENDING) result.pending = item.total;
         if (item._id === TransactionStatus.SUCCESS) result.success = item.total;
@@ -496,13 +490,13 @@ export const subscriptionAnalysisController: RequestHandler<
 
     // Process subscription tiers with percentages
     const totalTierRevenue = subscriptionTiers.reduce((sum, tier) => sum + tier.revenue, 0);
-    const tiersWithPercentage = subscriptionTiers.map(tier => ({
+    const tiersWithPercentage = subscriptionTiers.map((tier) => ({
       ...tier,
       percentage: totalTierRevenue > 0 ? (tier.revenue / totalTierRevenue) * 100 : 0,
     }));
 
     // Add MRR calculation to time series data
-    const enhancedTimeSeriesData = timeSeriesData.map(day => ({
+    const enhancedTimeSeriesData = timeSeriesData.map((day) => ({
       ...day,
       mrr: day.subscriptionRevenue, // Simplified MRR calculation
     }));
@@ -511,26 +505,33 @@ export const subscriptionAnalysisController: RequestHandler<
     const totalUserCount = totalUsers;
     const subscribedUserCount = subscribedUsers[0]?.subscribedUsers || 0;
     const newSubscribedUserCount = newSubscribedUsers[0]?.newSubscribedUsers || 0;
-    
-    const subscriptionPenetration = totalUserCount > 0 ? 
-      (subscribedUserCount / totalUserCount) * 100 : 0;
-    
-    const averageLifetimeValue = subscribedUserCount > 0 ? 
-      mainSummary.totalRevenue / subscribedUserCount : 0;
+
+    const subscriptionPenetration =
+      totalUserCount > 0 ? (subscribedUserCount / totalUserCount) * 100 : 0;
+
+    const averageLifetimeValue =
+      subscribedUserCount > 0 ? mainSummary.totalRevenue / subscribedUserCount : 0;
 
     // Growth metrics calculations
-    const previousStats = previousPeriodStats[0] || { 
-      totalRevenue: 0, 
-      totalSubscriptions: 0, 
-      activeSubscriptions: 0 
+    const previousStats = previousPeriodStats[0] || {
+      totalRevenue: 0,
+      totalSubscriptions: 0,
+      activeSubscriptions: 0,
     };
-    
-    const revenueGrowth = previousStats.totalRevenue > 0 ? 
-      ((mainSummary.totalRevenue - previousStats.totalRevenue) / previousStats.totalRevenue) * 100 : 0;
-    
-    const subscriptionGrowth = previousStats.totalSubscriptions > 0 ? 
-      ((mainSummary.totalSubscriptions - previousStats.totalSubscriptions) / previousStats.totalSubscriptions) * 100 : 0;
-    
+
+    const revenueGrowth =
+      previousStats.totalRevenue > 0
+        ? ((mainSummary.totalRevenue - previousStats.totalRevenue) / previousStats.totalRevenue) *
+          100
+        : 0;
+
+    const subscriptionGrowth =
+      previousStats.totalSubscriptions > 0
+        ? ((mainSummary.totalSubscriptions - previousStats.totalSubscriptions) /
+            previousStats.totalSubscriptions) *
+          100
+        : 0;
+
     const mrrGrowth = revenueGrowth; // Simplified calculation
     const churnGrowthRate = subscriptionGrowth < 0 ? Math.abs(subscriptionGrowth) : 0;
 

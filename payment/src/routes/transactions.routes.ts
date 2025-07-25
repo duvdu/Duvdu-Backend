@@ -44,7 +44,7 @@ router
   );
 
 router
-  .route('/')
+  .route('/user')
   .get(
     globalPaginationMiddleware,
     transactionsValidators.userTransactionPaginationValidation,

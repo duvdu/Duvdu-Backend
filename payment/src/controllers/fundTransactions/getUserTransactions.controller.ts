@@ -1,66 +1,13 @@
-import {
-  FundedTransaction,
-  FundedTransactionStatus,
-  IFundedTransaction,
-  MODELS,
-  PaginationResponse,
-} from '@duvdu-v1/duvdu';
+import { FundedTransaction, IFundedTransaction, MODELS, PaginationResponse } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import { Types } from 'mongoose';
 
-export const getFundingTransactionPagination: RequestHandler<
-  unknown,
-  unknown,
-  unknown,
-  {
-    user?: string;
-    status?: FundedTransactionStatus;
-    createdBy?: string;
-    fundAmountFrom?: number;
-    fundAmountTo?: number;
-    fundAmount?: number;
-    createdAtFrom?: string;
-    createdAtTo?: string;
-    contract?: string;
-    ticketNumber?: string;
-  }
-> = async (req, res, next) => {
-  const {
-    user,
-    status,
-    createdBy,
-    fundAmountFrom,
-    fundAmountTo,
-    fundAmount,
-    createdAtFrom,
-    createdAtTo,
-    contract,
-    ticketNumber,
-  } = req.query;
-
-  req.pagination.filter = {};
-  if (user) req.pagination.filter.user = new Types.ObjectId(user);
-  if (status) req.pagination.filter.status = status;
-  if (createdBy) req.pagination.filter.createdBy = new Types.ObjectId(createdBy);
-
-  if (fundAmountFrom) req.pagination.filter.fundAmount = { $gte: fundAmountFrom };
-  if (fundAmountTo) req.pagination.filter.fundAmount = { $lte: fundAmountTo };
-  if (fundAmount) req.pagination.filter.fundAmount = fundAmount;
-
-  if (createdAtFrom) req.pagination.filter.createdAt = { $gte: createdAtFrom };
-  if (createdAtTo) req.pagination.filter.createdAt = { $lte: createdAtTo };
-  if (contract) req.pagination.filter.contract = new Types.ObjectId(contract);
-  if (ticketNumber) req.pagination.filter.ticketNumber = ticketNumber;
-
-  next();
-};
-
-export const getFundingTransactions: RequestHandler<
+export const getUserTransactions: RequestHandler<
   unknown,
   PaginationResponse<{ data: IFundedTransaction[] }>
 > = async (req, res) => {
   const transactions = await FundedTransaction.aggregate([
-    { $match: req.pagination.filter },
+    { $match: { ...req.pagination.filter, user: new Types.ObjectId(req.loggedUser.id) } },
     { $sort: { createdAt: -1 } },
     { $skip: req.pagination.skip },
     { $limit: req.pagination.limit },

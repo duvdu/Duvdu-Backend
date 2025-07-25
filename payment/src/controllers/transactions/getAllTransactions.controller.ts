@@ -67,7 +67,6 @@ export const getAllTransactions: RequestHandler<
   unknown,
   PaginationResponse<{ data: ITransaction[] }>
 > = async (req, res) => {
-
   const transactions = await Transaction.aggregate([
     { $match: req.pagination.filter },
     { $sort: { createdAt: -1 } },
@@ -99,11 +98,13 @@ export const getAllTransactions: RequestHandler<
       $project: {
         user: {
           $cond: {
-            if: { $or: [
-              { $eq: ['$user', null] },
-              { $eq: [{ $type: '$user' }, 'missing'] },
-              { $eq: [{ $objectToArray: '$user' }, []] },
-            ], },
+            if: {
+              $or: [
+                { $eq: ['$user', null] },
+                { $eq: [{ $type: '$user' }, 'missing'] },
+                { $eq: [{ $objectToArray: '$user' }, []] },
+              ],
+            },
             then: null,
             else: {
               name: '$user.name',
@@ -116,11 +117,13 @@ export const getAllTransactions: RequestHandler<
         },
         fundedBy: {
           $cond: {
-            if: { $or: [
-              { $eq: ['$fundedBy', null] },
-              { $eq: [{ $type: '$fundedBy' }, 'missing'] },
-              { $eq: [{ $objectToArray: '$fundedBy' }, []] },
-            ], },
+            if: {
+              $or: [
+                { $eq: ['$fundedBy', null] },
+                { $eq: [{ $type: '$fundedBy' }, 'missing'] },
+                { $eq: [{ $objectToArray: '$fundedBy' }, []] },
+              ],
+            },
             then: null,
             else: {
               name: '$fundedBy.name',

@@ -52,3 +52,11 @@ router
     validation.updateFundingTransactionValidation,
     controller.updateFundingTransaction,
   );
+
+router.get(
+  '/user',
+  globalPaginationMiddleware,
+  validation.getFundingTransactionPaginationValidation,
+  controller.getFundingTransactionPagination,
+  controller.getUserTransactions,
+);

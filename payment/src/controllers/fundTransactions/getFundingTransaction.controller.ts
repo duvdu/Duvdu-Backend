@@ -1,4 +1,10 @@
-import { FundedTransaction, IFundedTransaction, MODELS, NotFound, SuccessResponse } from '@duvdu-v1/duvdu';
+import {
+  FundedTransaction,
+  IFundedTransaction,
+  MODELS,
+  NotFound,
+  SuccessResponse,
+} from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import { Types } from 'mongoose';
 
@@ -45,11 +51,13 @@ export const getFundingTransaction: RequestHandler<
       $project: {
         user: {
           $cond: {
-            if: { $or: [
-              { $eq: ['$user', null] },
-              { $eq: [{ $type: '$user' }, 'missing'] },
-              { $eq: [{ $objectToArray: '$user' }, []] },
-            ],},
+            if: {
+              $or: [
+                { $eq: ['$user', null] },
+                { $eq: [{ $type: '$user' }, 'missing'] },
+                { $eq: [{ $objectToArray: '$user' }, []] },
+              ],
+            },
             then: null,
             else: {
               _id: '$user._id',
@@ -63,11 +71,13 @@ export const getFundingTransaction: RequestHandler<
         },
         createdBy: {
           $cond: {
-            if: { $or: [
-              { $eq: ['$createdBy', null] },
-              { $eq: [{ $type: '$createdBy' }, 'missing'] },
-              { $eq: [{ $objectToArray: '$createdBy' }, []] },
-            ],},
+            if: {
+              $or: [
+                { $eq: ['$createdBy', null] },
+                { $eq: [{ $type: '$createdBy' }, 'missing'] },
+                { $eq: [{ $objectToArray: '$createdBy' }, []] },
+              ],
+            },
             then: null,
             else: {
               _id: '$createdBy._id',
@@ -84,11 +94,13 @@ export const getFundingTransaction: RequestHandler<
         fundAttachment: { $concat: [process.env.BUCKET_HOST, '/', '$fundAttachment'] },
         withdrawMethod: {
           $cond: {
-            if: { $or: [
-              { $eq: ['$withdrawMethod', null] },
-              { $eq: [{ $type: '$withdrawMethod' }, 'missing'] },
-              { $eq: [{ $objectToArray: '$withdrawMethod' }, []] },
-            ],},
+            if: {
+              $or: [
+                { $eq: ['$withdrawMethod', null] },
+                { $eq: [{ $type: '$withdrawMethod' }, 'missing'] },
+                { $eq: [{ $objectToArray: '$withdrawMethod' }, []] },
+              ],
+            },
             then: null,
             else: {
               _id: '$withdrawMethod._id',
