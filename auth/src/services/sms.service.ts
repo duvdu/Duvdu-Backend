@@ -31,7 +31,7 @@ export class SmsService {
         recipient: formattedTo,
         sender_id: this.senderId,
         type: 'plain',
-        message: `Your otp is ${otpCode}`
+        message: `duvdu: Your otp is ${otpCode}`
       };
 
       const response = await axios.post(this.apiUrl, payload, {
