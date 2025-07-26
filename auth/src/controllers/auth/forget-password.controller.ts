@@ -13,6 +13,7 @@ import {
 import { RequestHandler } from 'express';
 
 import { createOrUpdateSessionAndGenerateTokens } from './../../utils/createOrUpdateSessionAndGenerateTokens';
+import { smsService } from '../../services/sms.service';
 import { hashPassword } from '../../utils/bcrypt';
 import { hashVerificationCode } from '../../utils/crypto';
 import { generateRandom6Digit } from '../../utils/gitRandom6Dugut';
@@ -120,12 +121,7 @@ export const askForgetPasswordHandler: RequestHandler<
     reason: VerificationReason.forgetPassword,
   };
   await user.save();
-  // TODO: send OTP to email or phone
-  if (sendEmailOtp) {
-    console.log('send otp to email');
-  } else {
-    console.log('send otp to phone');
-  }
+  await smsService.sendOtp(user.phoneNumber.number, code);
 
   res.status(200).json(<any>{ message: 'success', code });
 };

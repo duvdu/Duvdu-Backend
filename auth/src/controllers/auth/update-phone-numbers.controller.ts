@@ -8,6 +8,7 @@ import {
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
+import { smsService } from '../../services/sms.service';
 import { AskUpdatePhoneNumberHandler } from '../../types/endpoints/user.endpoints';
 import { hashVerificationCode } from '../../utils/crypto';
 import { generateRandom6Digit } from '../../utils/gitRandom6Dugut';
@@ -26,7 +27,7 @@ export const askUpdatePhoneNumberHandler: AskUpdatePhoneNumberHandler = async (r
   };
   await currentUser.save();
 
-  //TODO: send OTP
+  await smsService.sendOtp(currentUser.phoneNumber.number, randomCode);
   res.status(200).json(<any>{ message: 'success', code: randomCode });
 };
 
@@ -60,7 +61,7 @@ export const updatePhoneNumberHandler: RequestHandler<
   req.session.destroy((err) => {
     if (err) throw new Error('Error destroying session');
   });
-  //TODO: send OTP
+  await smsService.sendOtp(currentUser.phoneNumber.number, verificationCode);
 
   res.status(200).json(<any>{ message: 'success', code: verificationCode });
 };

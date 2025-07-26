@@ -1,5 +1,6 @@
 import { BadRequestError, NotFound, UnauthorizedError, Users } from '@duvdu-v1/duvdu';
 
+import { smsService } from '../../services/sms.service';
 import { ResendVerificationCodeHandler } from '../../types/endpoints/user.endpoints';
 import { hashVerificationCode } from '../../utils/crypto';
 import { generateRandom6Digit } from '../../utils/gitRandom6Dugut';
@@ -38,6 +39,6 @@ export const resendVerificationCodeHandler: ResendVerificationCodeHandler = asyn
   };
   await user.save();
 
-  //TODO: send OTP
+  await smsService.sendOtp(user.phoneNumber.number, code);
   res.status(200).json(<any>{ message: 'success', code });
 };

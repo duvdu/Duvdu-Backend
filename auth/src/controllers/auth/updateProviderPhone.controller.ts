@@ -9,6 +9,7 @@ import {
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
+import { smsService } from '../../services/sms.service';
 import { hashVerificationCode } from '../../utils/crypto';
 import { generateRandom6Digit } from '../../utils/gitRandom6Dugut';
 
@@ -63,7 +64,7 @@ export const updateProviderPhoneNumberHandler: RequestHandler<
   req.session.destroy((err) => {
     if (err) throw new Error('Error destroying session');
   });
-  //TODO: send OTP
+  await smsService.sendOtp(currentUser.phoneNumber.number, verificationCode);
 
   res.status(200).json(<any>{ message: 'success', code: verificationCode });
 };

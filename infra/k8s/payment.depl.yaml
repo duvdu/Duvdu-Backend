@@ -114,6 +114,11 @@ spec:
               value: "http://nats-srv:4222"
             - name : NATS_CLUSTER_ID
               value: "duvdu"
+            - name: SMS_BEARER_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: sms-bearer-token
+                  key: SMS_BEARER_TOKEN
 
 ---
 apiVersion: v1

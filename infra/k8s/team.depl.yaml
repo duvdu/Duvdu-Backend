@@ -124,6 +124,11 @@ spec:
                 secretKeyRef:
                   name: paymob-public-key
                   key: PAYMOB_PUBLIC_KEY
+            - name: SMS_BEARER_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: sms-bearer-token
+                  key: SMS_BEARER_TOKEN
 
 
 ---

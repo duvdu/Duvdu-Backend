@@ -2,14 +2,14 @@ import axios from 'axios';
 
 export class SmsService {
   private static instance: SmsService;
-  private apiToken: string;
-  private fromPhone: string;
+  private bearerToken: string;
+  private senderId: string;
   private apiUrl: string;
 
   private constructor() {
-    this.apiToken = 'eBDLMlZddbBha031';
-    this.fromPhone = 'Main Street';
-    this.apiUrl = 'https://api2.smsala.com/SendSmsV2';
+    this.bearerToken = process.env.SMS_BEARER_TOKEN || '';
+    this.senderId = 'Duvdu';
+    this.apiUrl = 'https://bulk.whysms.com/api/v3/sms/send';
   }
 
   public static getInstance(): SmsService {
@@ -22,22 +22,24 @@ export class SmsService {
   async sendOtp(to: string, otpCode: string): Promise<void> {
     try {
       // Format the recipient number if needed
-      const formattedTo = to.trim().replace(/\s+/g, '');
+      const cleanedNumber = to.trim().replace(/\s+/g, '');
+      const formattedTo = `2${cleanedNumber}`;
 
-      console.log(`Sending OTP from ${this.fromPhone} to ${formattedTo}`);
+      console.log(`Sending OTP from ${this.senderId} to ${formattedTo}`);
 
-      const payload = [
-        {
-          apiToken: this.apiToken,
-          messageType: '3',
-          messageEncoding: '1',
-          destinationAddress: formattedTo,
-          sourceAddress: this.fromPhone,
-          messageText: `Your OTP code is: ${otpCode}`,
-        },
-      ];
+      const payload = {
+        recipient: formattedTo,
+        sender_id: this.senderId,
+        type: 'plain',
+        message: `Your otp is ${otpCode}`
+      };
 
-      const response = await axios.post(this.apiUrl, payload);
+      const response = await axios.post(this.apiUrl, payload, {
+        headers: {
+          'Authorization': `Bearer ${this.bearerToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
 
       if (response.status !== 200) {
         throw new Error('Failed to send OTP: API request failed');

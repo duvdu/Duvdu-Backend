@@ -9,6 +9,7 @@ import {
 } from '@duvdu-v1/duvdu';
 
 import { getRankProgress } from './loginWithProvider.controller';
+import { smsService } from '../../services/sms.service';
 import { SignupHandler } from '../../types/endpoints/user.endpoints';
 import { hashPassword } from '../../utils/bcrypt';
 import { hashVerificationCode } from '../../utils/crypto';
@@ -67,6 +68,6 @@ export const signupHandler: SignupHandler = async (req, res, next) => {
 
   await Sessions.create({ user: newUser.id });
 
-  //TODO: send OTP
+  await smsService.sendOtp(newUser.phoneNumber.number, verificationCode);
   res.status(201).json(<any>{ message: 'success', code: verificationCode });
 };
