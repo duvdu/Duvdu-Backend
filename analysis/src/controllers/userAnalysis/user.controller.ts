@@ -155,6 +155,8 @@ export const userAnalysisCrmHandler: RequestHandler<unknown, any, unknown, Analy
 
     if (Object.keys(dateFilter).length > 0) {
       newUserFilter.createdAt = dateFilter;
+      // Apply date filter to user statistics when date range is specified
+      userFilter.createdAt = dateFilter;
     }
 
     // 3. Contract filter for top users by contracts
@@ -294,6 +296,8 @@ export const userAnalysisCrmHandler: RequestHandler<unknown, any, unknown, Analy
         {
           $match: {
             'userDetails.isDeleted': { $ne: true },
+            // Apply user date filter if specified
+            ...(Object.keys(dateFilter).length > 0 && { 'userDetails.createdAt': dateFilter }),
           },
         },
         {
