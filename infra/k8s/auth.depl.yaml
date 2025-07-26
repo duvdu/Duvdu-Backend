@@ -129,6 +129,7 @@ spec:
                 secretKeyRef:
                   name: sms-bearer-token
                   key: SMS_BEARER_TOKEN
+                  
 
 
 
