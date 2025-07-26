@@ -123,7 +123,7 @@ export const askForgetPasswordHandler: RequestHandler<
   await user.save();
   await smsService.sendOtp(user.phoneNumber.number, code);
 
-  res.status(200).json(<any>{ message: 'success', code });
+  res.status(200).json(<any>{ message: 'success' });
 };
 
 export const updateForgetenPasswordHandler: RequestHandler<

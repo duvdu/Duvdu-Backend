@@ -66,5 +66,5 @@ export const updateProviderPhoneNumberHandler: RequestHandler<
   });
   await smsService.sendOtp(currentUser.phoneNumber.number, verificationCode);
 
-  res.status(200).json(<any>{ message: 'success', code: verificationCode });
+  res.status(200).json(<any>{ message: 'success' });
 };

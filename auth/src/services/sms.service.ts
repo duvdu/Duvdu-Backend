@@ -40,6 +40,7 @@ export class SmsService {
           'Content-Type': 'application/json'
         }
       });
+      console.log(response.data);
 
       if (response.status !== 200) {
         throw new Error('Failed to send OTP: API request failed');

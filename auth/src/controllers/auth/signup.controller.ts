@@ -69,5 +69,5 @@ export const signupHandler: SignupHandler = async (req, res, next) => {
   await Sessions.create({ user: newUser.id });
 
   await smsService.sendOtp(newUser.phoneNumber.number, verificationCode);
-  res.status(201).json(<any>{ message: 'success', code: verificationCode });
+  res.status(201).json(<any>{ message: 'success' });
 };

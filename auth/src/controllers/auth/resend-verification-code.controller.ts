@@ -40,5 +40,5 @@ export const resendVerificationCodeHandler: ResendVerificationCodeHandler = asyn
   await user.save();
 
   await smsService.sendOtp(user.phoneNumber.number, code);
-  res.status(200).json(<any>{ message: 'success', code });
+  res.status(200).json(<any>{ message: 'success' });
 };

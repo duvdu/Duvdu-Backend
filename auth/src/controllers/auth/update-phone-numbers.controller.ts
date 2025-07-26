@@ -28,7 +28,7 @@ export const askUpdatePhoneNumberHandler: AskUpdatePhoneNumberHandler = async (r
   await currentUser.save();
 
   await smsService.sendOtp(currentUser.phoneNumber.number, randomCode);
-  res.status(200).json(<any>{ message: 'success', code: randomCode });
+  res.status(200).json(<any>{ message: 'success' });
 };
 
 export const updatePhoneNumberHandler: RequestHandler<
@@ -63,5 +63,5 @@ export const updatePhoneNumberHandler: RequestHandler<
   });
   await smsService.sendOtp(currentUser.phoneNumber.number, verificationCode);
 
-  res.status(200).json(<any>{ message: 'success', code: verificationCode });
+  res.status(200).json(<any>{ message: 'success' });
 };
