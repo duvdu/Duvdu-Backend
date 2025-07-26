@@ -34,10 +34,12 @@ export class SmsService {
         message: `${this.senderId}: Your otp is ${otpCode}`
       };
 
+      console.log(this.bearerToken);
       const response = await axios.post(this.apiUrl, payload, {
         headers: {
           'Authorization': `Bearer ${this.bearerToken}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
         }
       });
       console.log(response.data);
