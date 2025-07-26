@@ -25,8 +25,6 @@ export class SmsService {
       const cleanedNumber = to.trim().replace(/\s+/g, '');
       const formattedTo = `2${cleanedNumber}`;
 
-      console.log(`Sending OTP from ${this.senderId} to ${formattedTo}`);
-
       const payload = {
         recipient: formattedTo,
         sender_id: this.senderId,
@@ -34,7 +32,6 @@ export class SmsService {
         message: `${this.senderId}: Your otp is ${otpCode}`
       };
 
-      console.log(this.bearerToken);
       const response = await axios.post(this.apiUrl, payload, {
         headers: {
           'Authorization': `Bearer ${this.bearerToken}`,
