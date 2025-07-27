@@ -39,7 +39,7 @@ export const signinHandler: SigninHandler = async (req, res, next) => {
       ),
     );
 
-  const user = await Users.findOne(query).populate('role');
+  const user = await Users.findOne({ ...query, isDeleted: false }).populate('role');
 
   if (!user || !(await comparePassword(password, user.password || '')))
     return next(

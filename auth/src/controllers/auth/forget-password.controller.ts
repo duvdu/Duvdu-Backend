@@ -51,7 +51,7 @@ export const askForgetPasswordHandler: RequestHandler<
       ),
     );
 
-  const user = await Users.findOne(query).populate('role');
+  const user = await Users.findOne({ ...query, isDeleted: false }).populate('role');
   if (!user) return next(new NotFound(undefined, req.lang));
 
   const origin = req.headers?.origin;

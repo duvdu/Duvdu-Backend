@@ -22,6 +22,19 @@ export const signupHandler: SignupHandler = async (req, res, next) => {
   if (!role) return next(new NotFound(undefined, req.lang));
   const verificationCode = generateRandom6Digit();
 
+  // check if user is deleted
+  const user = await Users.findOne({
+    'phoneNumber.number': req.body.phoneNumber.number,
+    isDeleted: true,
+  });
+  if (user) {
+    user.isDeleted = false;
+    await user.save();
+    await Sessions.create({ user: user.id });
+    await smsService.sendOtp(user.phoneNumber.number, verificationCode);
+    return res.status(200).json({ message: 'success' });
+  }
+
   // handle invention users
   let newUser = await Users.findOne({
     'phoneNumber.number': req.body.phoneNumber.number,
