@@ -13,6 +13,7 @@ import {
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
+import { smsService } from '../../services/sms.service';
 import { createOrUpdateSessionAndGenerateTokens } from '../../utils/createOrUpdateSessionAndGenerateTokens';
 import { hashVerificationCode } from '../../utils/crypto';
 import { generateRandom6Digit } from '../../utils/gitRandom6Dugut';
@@ -120,8 +121,22 @@ export const loginWithProviderHandler: RequestHandler<
     });
   }
 
+  if (user.isDeleted) {
+    throw new NotFound({ ar: 'الحساب عفواً غير موجود', en: 'user not found' }, req.lang);
+  }
+
+  // check if user is blocked
+  if (user.isBlocked.value)
+    return next(
+      new UnauthenticatedError(
+        { en: `your account is blocked for reason of ${user.isBlocked.reason}`, ar: `حسابك محظور بسبب ${user.isBlocked.reason}` },
+        req.lang,
+      ),
+    );
+
   if (!user.isVerified) {
     const verificationCode = generateRandom6Digit();
+    await smsService.sendOtp(user.phoneNumber.number, verificationCode);
 
     user.verificationCode = {
       reason: VerificationReason.signup,
@@ -133,7 +148,7 @@ export const loginWithProviderHandler: RequestHandler<
 
     return res
       .status(403)
-      .json(<any>{ message: 'success', code: verificationCode, username: user.username });
+      .json(<any>{ message: 'success', username: user.username });
   }
 
   const { accessToken, refreshToken } = await createOrUpdateSessionAndGenerateTokens(

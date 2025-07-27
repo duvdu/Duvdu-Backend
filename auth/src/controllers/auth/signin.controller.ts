@@ -49,6 +49,18 @@ export const signinHandler: SigninHandler = async (req, res, next) => {
       ),
     );
 
+  // check if user is blocked
+  if (user.isBlocked.value)
+    return next(
+      new UnauthenticatedError(
+        {
+          en: `your account is blocked for reason of ${user.isBlocked.reason}`,
+          ar: `حسابك محظور بسبب ${user.isBlocked.reason}`,
+        },
+        req.lang,
+      ),
+    );
+
   const origin = req.headers?.origin;
   const isDashboard = origin?.includes('dashboard.duvdu.com') || origin?.includes('localhost:3000');
   const isMobileApp = req.headers['x-app-version'] || req.headers['x-platform'];
