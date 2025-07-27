@@ -57,7 +57,8 @@ router
     handlers.updateUserHandler,
   )
   .get(
-    // isauthenticated,
+    isauthenticated,
+    isauthorized(PERMISSIONS.listUsers),
     val.getCrmUser,
     handlers.getCrmUser,
   )

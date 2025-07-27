@@ -102,7 +102,7 @@ export const updateUser = [
     .isInt({ min: 1 })
     .toInt()
     .withMessage('invalidAvaliableContracts'),
-  body('role').isMongoId(),
+  body('role').optional().isMongoId(),
   globalValidatorMiddleware,
 ];
 
