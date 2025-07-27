@@ -112,8 +112,8 @@ router.patch(
 );
 router
   .route('/update-phone')
-  .get(handlers.askUpdatePhoneNumberHandler)
-  .patch(val.updatePhoneNumberVal, handlers.updatePhoneNumberHandler);
+  .get(isauthenticated, handlers.askUpdatePhoneNumberHandler)
+  .patch(isauthenticated, val.updatePhoneNumberVal, handlers.updatePhoneNumberHandler);
 
 router
   .route('/reset-password')
