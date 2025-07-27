@@ -9,11 +9,34 @@ import {
   PERMISSIONS,
 } from '@duvdu-v1/duvdu';
 import { Router } from 'express';
+import Stripe from 'stripe';
+
+
+
 
 import * as handlers from '../controllers/auth';
 import * as val from '../validators/auth';
 
 const router = Router();
+
+router.get('/', (req, res) => {
+
+
+  console.log('webhook received' , req.body);
+  console.log('webhook received' , req.headers);
+  console.log('webhook received' , req.params);
+
+  const sig = req.headers['stripe-signature'] as string;
+  let event: Stripe.Event;
+
+  try {
+    event = Stripe.webhooks.constructEvent(req.body, sig, 'sk_test_51RpXBxQiuZRY9Cf9HMd4htjkeD15EIos5jfbV9isnuhbJIGgqGOSSEOwUkFhzUlGTmhQovSOUispwYCA5taJcAWB00eJOCU4XH');
+    console.log(event);
+    res.status(200).send('Webhook received');
+  } catch (err) {
+    return res.status(400).send(`Webhook Error: ${err}`);
+  }
+});
 
 router.post(
   '/face-recognition',
