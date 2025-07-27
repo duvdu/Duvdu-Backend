@@ -19,7 +19,7 @@ import * as val from '../validators/auth';
 
 const router = Router();
 
-router.get('/', (req, res) => {
+router.post('/webhook', (req, res) => {
 
 
   console.log('webhook received' , req.body);
