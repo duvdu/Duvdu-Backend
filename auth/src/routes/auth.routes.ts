@@ -30,7 +30,7 @@ router.post('/webhook', (req, res) => {
   let event: Stripe.Event;
 
   try {
-    event = Stripe.webhooks.constructEvent(req.body, sig, 'sk_test_51RpXBxQiuZRY9Cf9HMd4htjkeD15EIos5jfbV9isnuhbJIGgqGOSSEOwUkFhzUlGTmhQovSOUispwYCA5taJcAWB00eJOCU4XH');
+    event = Stripe.webhooks.constructEvent(req.body, sig, 'whsec_T2OFyRpnCU8uoEjYyqfaJZZv2lWaLyQa');
     console.log(event);
     res.status(200).send('Webhook received');
   } catch (err) {

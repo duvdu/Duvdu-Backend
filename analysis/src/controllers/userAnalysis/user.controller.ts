@@ -177,8 +177,8 @@ export const userAnalysisCrmHandler: RequestHandler<unknown, any, unknown, Analy
       topUsersByFollowers,
       topUsersByContracts,
     ] = await Promise.all([
-      Users.countDocuments(userFilter),
-      Users.countDocuments({ ...userFilter, isOnline: true }),
+      Users.countDocuments(),
+      Users.countDocuments({ isOnline: true }),
       Users.countDocuments(newUserFilter),
       Users.aggregate([
         { $match: userFilter },
