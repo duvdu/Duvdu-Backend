@@ -32,7 +32,7 @@ export const Contracts = model<Icontract>(
       cycle: { type: String, default: null },
       coupons: [{ type: Schema.Types.ObjectId, ref: MODELS.coupon }],
       ticketNumber: { type: String, default: null },
-      project: { type: Schema.Types.ObjectId, ref: MODELS.projectCycle },
+      project: { type: Schema.Types.ObjectId},
     },
     { timestamps: true, collection: MODELS.allContracts },
   ),
