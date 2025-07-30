@@ -13,7 +13,7 @@ export const getProjetcsCrm: GetProjectsForCrmHandler = async (req, res) => {
     {
       $match: req.pagination.filter,
     },
-    { $sort: { createdAt: -1 } },
+    { $sort: { createdAt: req.pagination.filter.sortOrder === 'asc' ? 1 : -1 } },
     {
       $skip: req.pagination.skip,
     },
@@ -430,6 +430,7 @@ export const getProjetcsCrm: GetProjectsForCrmHandler = async (req, res) => {
         updatedAt: 1,
         createdAt: 1,
         favouriteCount: 1,
+        isDeleted: 1,
       },
     },
   ]);

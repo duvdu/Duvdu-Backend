@@ -183,6 +183,9 @@ export const getProjectsPagination: RequestHandler<
   next();
 };
 
+
+
+
 export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
   let isInstant = undefined;
   if (req.pagination.filter.instant != undefined) isInstant = req.pagination.filter.instant;
