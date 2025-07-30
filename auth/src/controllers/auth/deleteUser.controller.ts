@@ -17,30 +17,32 @@ export const deleteUser: RequestHandler<{ userId: string }> = async (req, res) =
       req.lang,
     );
 
-  const canDelete = await Contracts.findOne({
-    $or: [
-      { sp: req.loggedUser?.id, customer: user._id },
-      { customer: req.loggedUser?.id, sp: user._id },
-    ],
-  }).populate({
-    path: 'contract',
-    match: {
-      status: {
-        $nin: ['canceled', 'pending', 'rejected', 'reject', 'cancel'],
+  if (!user.isDeleted) {
+    const canDelete = await Contracts.findOne({
+      $or: [
+        { sp: req.loggedUser?.id, customer: user._id },
+        { customer: req.loggedUser?.id, sp: user._id },
+      ],
+    }).populate({
+      path: 'contract',
+      match: {
+        status: {
+          $nin: ['canceled', 'pending', 'rejected', 'reject', 'cancel'],
+        },
       },
-    },
-  });
+    });
+    
+    if (canDelete)
+      throw new BadRequestError(
+        {
+          ar: 'لا يمكن حذف المستخدم لأنه لديه عقود',
+          en: 'user cannot be deleted because he has contracts',
+        },
+        req.lang,
+      );
+  }
 
-  if (canDelete)
-    throw new BadRequestError(
-      {
-        ar: 'لا يمكن حذف المستخدم لأنه لديه عقود',
-        en: 'user cannot be deleted because he has contracts',
-      },
-      req.lang,
-    );
-
-  user.isDeleted = true;
+  user.isDeleted = !user.isDeleted;
   await user.save();
 
   res.status(200).json({
