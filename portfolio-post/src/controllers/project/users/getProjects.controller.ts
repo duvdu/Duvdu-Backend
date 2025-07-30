@@ -37,6 +37,7 @@ export const getProjectsPagination: RequestHandler<
     relatedTags?: Types.ObjectId[];
     sortOrder?: 'asc' | 'desc';
     user?: string;
+    isDeleted?: boolean;
   }
 > = async (req, res, next) => {
   if (req.query.user) {
@@ -56,6 +57,10 @@ export const getProjectsPagination: RequestHandler<
         { ticketNumber: { $regex: req.query.search, $options: 'i' } },
       ],
     };
+  }
+
+  if (req.query.isDeleted !== undefined) {
+    req.pagination.filter.isDeleted = req.query.isDeleted;
   }
 
   if (req.query.location) {

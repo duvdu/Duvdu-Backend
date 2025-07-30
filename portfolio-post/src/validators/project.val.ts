@@ -240,6 +240,7 @@ export const getAll = [
   query('projectScaleMin').optional().isInt({ gt: 0 }).toInt().withMessage('projectScale'),
   query('projectScaleMax').optional().isInt({ gt: 0 }).toInt().withMessage('projectScale'),
   query('limit').optional().isInt({ min: 1 }).withMessage('limit'),
+  query('isDeleted').optional().isBoolean().toBoolean().withMessage('isDeleted'),
   query('page').optional().isInt({ min: 1 }).withMessage('page'),
   query('category')
     .optional()
