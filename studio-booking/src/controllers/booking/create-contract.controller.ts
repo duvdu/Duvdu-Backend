@@ -118,6 +118,7 @@ export const createContractHandler: RequestHandler<
     ref: MODELS.rentalContract,
     cycle: CYCLES.studioBooking,
     ticketNumber: contract.ticketNumber,
+    project: project._id,
   });
 
   const user = await Users.findById(req.loggedUser.id);

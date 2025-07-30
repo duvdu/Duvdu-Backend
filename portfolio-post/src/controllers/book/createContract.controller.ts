@@ -136,6 +136,7 @@ export const createContractHandler: CreateContractHandler = async (req, res, nex
         ref: MODELS.projectContract,
         cycle: CYCLES.portfolioPost,
         ticketNumber: contract.ticketNumber,
+        project: project._id,
       }),
       sendNotification(
         req.loggedUser.id,

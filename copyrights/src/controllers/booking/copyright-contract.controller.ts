@@ -68,6 +68,7 @@ export const createContractHandler: RequestHandler<
     contract: contract.id,
     ref: MODELS.copyrightContract,
     cycle: CYCLES.copyRights,
+    project: project._id,
   });
 
   // TODO: send notification
