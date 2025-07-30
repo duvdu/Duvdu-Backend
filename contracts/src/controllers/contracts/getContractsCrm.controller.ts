@@ -6,7 +6,7 @@ export const getContractsCrm: RequestHandler<
   unknown,
   PaginationResponse<{ data: any }>,
   unknown,
-  { filter?: 'i_created' | 'i_received'; cycle?: string; user?: string; ticketNumber?: string; from?: Date; to?: Date , project?: string }
+  { filter?: 'i_created' | 'i_received'; cycle?: string; user?: string; ticketNumber?: string; from?: Date; to?: Date , project?: string , status?: string }
 > = async (req, res) => {
   const filter: any = {};
 
@@ -23,6 +23,8 @@ export const getContractsCrm: RequestHandler<
   if (req.query.from) filter.createdAt = { $gte: req.query.from };
   if (req.query.to) filter.createdAt = { ...filter.createdAt, $lte: req.query.to };
   if (req.query.project) filter.project = new mongoose.Types.ObjectId(req.query.project);
+
+  // Note: status filtering will be applied after contract lookup
 
   
 
@@ -123,6 +125,12 @@ export const getContractsCrm: RequestHandler<
         },
       },
     },
+    // Filter by contract status if provided
+    ...(req.query.status ? [{
+      $match: {
+        'contract.status': req.query.status
+      }
+    }] : []),
     {
       $lookup: {
         from: MODELS.user,
@@ -183,6 +191,7 @@ export const getContractsCrm: RequestHandler<
         _id: 1,
         ref: 1,
         cycle: 1,
+        status: 1,
         contract: 1,
         ticketNumber: {
           $cond: {
@@ -264,7 +273,117 @@ export const getContractsCrm: RequestHandler<
     },
   ]);
 
-  const resultCount = await Contracts.countDocuments(filter);
+  // Count documents with the same filtering logic
+  let resultCount;
+  if (req.query.status) {
+    // If filtering by contract status, use aggregation to count
+    const countResult = await Contracts.aggregate([
+      { $match: filter },
+      {
+        $lookup: {
+          from: MODELS.copyrightContract,
+          localField: 'contract',
+          foreignField: '_id',
+          as: 'copyright_contract',
+        },
+      },
+      {
+        $lookup: {
+          from: MODELS.rentalContract,
+          localField: 'contract',
+          foreignField: '_id',
+          as: 'rental_contract',
+        },
+      },
+      {
+        $lookup: {
+          from: MODELS.producerContract,
+          localField: 'contract',
+          foreignField: '_id',
+          as: 'producer_contract',
+        },
+      },
+      {
+        $lookup: {
+          from: MODELS.projectContract,
+          localField: 'contract',
+          foreignField: '_id',
+          as: 'project_contracts',
+        },
+      },
+      {
+        $lookup: {
+          from: MODELS.teamContract,
+          localField: 'contract',
+          foreignField: '_id',
+          as: 'team_contracts',
+        },
+      },
+      {
+        $unwind: {
+          path: '$producer_contract',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $unwind: {
+          path: '$team_contracts',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $unwind: {
+          path: '$project_contracts',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $unwind: {
+          path: '$rental_contract',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $unwind: {
+          path: '$copyright_contract',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $set: {
+          contract: {
+            $ifNull: [
+              {
+                $ifNull: [
+                  '$copyright_contract',
+                  {
+                    $ifNull: [
+                      '$producer_contract',
+                      '$rental_contract',
+                      '$project_contracts',
+                      '$team_contracts',
+                    ],
+                  },
+                ],
+              },
+              null,
+            ],
+          },
+        },
+      },
+      {
+        $match: {
+          'contract.status': req.query.status
+        }
+      },
+      {
+        $count: "total"
+      }
+    ]);
+    resultCount = countResult.length > 0 ? countResult[0].total : 0;
+  } else {
+    resultCount = await Contracts.countDocuments(filter);
+  }
 
   res.status(200).json({
     message: 'success',
