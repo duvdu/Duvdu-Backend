@@ -6,9 +6,6 @@ export const getCrmUsers: RequestHandler<unknown, PaginationResponse<{ data: Ius
   req,
   res,
 ) => {
-
-
-
   const currentUser = await Users.findById(req.loggedUser?.id, { location: 1 });
 
   const aggregationPipeline: PipelineStage[] = [];
@@ -89,6 +86,7 @@ export const getCrmUsers: RequestHandler<unknown, PaginationResponse<{ data: Ius
         projectsView: 1,
         haveInvitation: 1,
         projectsCount: 1,
+        actualProjectsCount: 1,
         categories: 1,
         createdAt: 1,
         updatedAt: 1,
@@ -146,10 +144,41 @@ export const getCrmUsers: RequestHandler<unknown, PaginationResponse<{ data: Ius
         isFollow: { $gt: [{ $size: '$isFollow' }, 0] },
       },
     },
+    // Lookup to get actual project count from Project model
+    {
+      $lookup: {
+        from: MODELS.projects,
+        let: { userId: '$_id' },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ['$user', '$$userId'] },
+              ref: 'portfolioPost', // Filter for portfolio-post projects
+            },
+          },
+          {
+            $count: 'projectCount',
+          },
+        ],
+        as: 'actualProjectCount',
+      },
+    },
+    {
+      $addFields: {
+        actualProjectsCount: {
+          $cond: {
+            if: { $gt: [{ $size: '$actualProjectCount' }, 0] },
+            then: { $arrayElemAt: ['$actualProjectCount.projectCount', 0] },
+            else: 0,
+          },
+        },
+      },
+    },
     {
       $project: {
         canChatDetails: 0,
         categoryDetails: 0,
+        actualProjectCount: 0, // Remove the temporary lookup field
       },
     },
     {

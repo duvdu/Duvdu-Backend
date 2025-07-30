@@ -1,6 +1,7 @@
 import 'express-async-errors';
 import { Report } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
+import mongoose from 'mongoose';
 
 import { GetReportsHandler } from '../../types/endpoints/report.endpoints';
 
@@ -16,6 +17,7 @@ export const getReportsPagination: RequestHandler<
     closedBy?: string;
     feedback?: string;
     sourceUser?: string;
+    project?: string;
   }
 > = async (req, res, next) => {
   req.pagination.filter = {};
@@ -39,6 +41,9 @@ export const getReportsPagination: RequestHandler<
   }
   if (req.query.sourceUser) {
     req.pagination.filter['sourceUser'] = req.query.sourceUser;
+  }
+  if (req.query.project) {
+    req.pagination.filter['project.type'] = new mongoose.Types.ObjectId(req.query.project);
   }
   next();
 };

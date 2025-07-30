@@ -17,6 +17,7 @@ export const getAllReportsVal = [
   check('feedback').optional().isString().withMessage('feedbackLength'),
   check('limit').optional().isInt({ min: 1 }).withMessage('limitInt'),
   check('page').optional().isInt({ min: 1 }).withMessage('pageInt'),
+  check('project').optional().isMongoId().withMessage('projectInvalid'),
   globalValidatorMiddleware,
 ];
 
