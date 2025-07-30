@@ -20,6 +20,7 @@ export const getAll = [
   query('startDate').optional().isDate().toDate(),
   query('endDate').optional().isDate().toDate(),
   query('ticketNumber').optional().isString(),
+  query('isClosed').optional().isBoolean().toBoolean(),
   globalValidatorMiddleware,
 ];
 

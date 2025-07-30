@@ -6,24 +6,8 @@ export const getCrmUsers: RequestHandler<unknown, PaginationResponse<{ data: Ius
   req,
   res,
 ) => {
-  const currentUser = await Users.findById(req.loggedUser?.id, { location: 1 });
 
   const aggregationPipeline: PipelineStage[] = [];
-
-  // Add $geoNear if user location exists
-  if (currentUser?.location?.coordinates) {
-    aggregationPipeline.push({
-      $geoNear: {
-        near: {
-          type: 'Point',
-          coordinates: currentUser.location.coordinates,
-        },
-        distanceField: 'distance', // Rename 'string' to 'distance'
-        maxDistance: (req.query.maxDistance as unknown as number) * 1000, // Convert km to meters
-        spherical: true,
-      },
-    });
-  }
 
   // Add filtering and matching stages
   aggregationPipeline.push(
@@ -144,41 +128,10 @@ export const getCrmUsers: RequestHandler<unknown, PaginationResponse<{ data: Ius
         isFollow: { $gt: [{ $size: '$isFollow' }, 0] },
       },
     },
-    // Lookup to get actual project count from Project model
-    {
-      $lookup: {
-        from: MODELS.projects,
-        let: { userId: '$_id' },
-        pipeline: [
-          {
-            $match: {
-              $expr: { $eq: ['$user', '$$userId'] },
-              ref: 'portfolioPost', // Filter for portfolio-post projects
-            },
-          },
-          {
-            $count: 'projectCount',
-          },
-        ],
-        as: 'actualProjectCount',
-      },
-    },
-    {
-      $addFields: {
-        actualProjectsCount: {
-          $cond: {
-            if: { $gt: [{ $size: '$actualProjectCount' }, 0] },
-            then: { $arrayElemAt: ['$actualProjectCount.projectCount', 0] },
-            else: 0,
-          },
-        },
-      },
-    },
     {
       $project: {
         canChatDetails: 0,
         categoryDetails: 0,
-        actualProjectCount: 0, // Remove the temporary lookup field
       },
     },
     {

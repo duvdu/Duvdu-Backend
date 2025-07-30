@@ -20,6 +20,7 @@ router
   .get(
     isauthorized(PERMISSIONS.listComplaints),
     globalPaginationMiddleware,
+    val.getAll,
     handlers.getComplaintsPagination,
     handlers.getComplaintsHandler,
   );
