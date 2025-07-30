@@ -18,6 +18,7 @@ export interface Icontract {
   cycle: string;
   coupons: Types.ObjectId[];
   ticketNumber: string;
+  project: Types.ObjectId;
 }
 
 export const Contracts = model<Icontract>(
@@ -31,6 +32,7 @@ export const Contracts = model<Icontract>(
       cycle: { type: String, default: null },
       coupons: [{ type: Schema.Types.ObjectId, ref: MODELS.coupon }],
       ticketNumber: { type: String, default: null },
+      project: { type: Schema.Types.ObjectId, ref: MODELS.projectCycle },
     },
     { timestamps: true, collection: MODELS.allContracts },
   ),
