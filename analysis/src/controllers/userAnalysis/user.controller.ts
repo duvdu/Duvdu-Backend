@@ -72,6 +72,7 @@ interface UserAnalysisResponse {
   };
   contractStats: {
     totalContracts: number;
+    contractsByDate: Array<{ date: string; count: number }>;
     contractsByStatus: Array<{ status: string; count: number }>;
     contractsByCycle: Array<{
       cycle: string;
@@ -323,8 +324,21 @@ export const userAnalysisCrmHandler: RequestHandler<unknown, any, unknown, Analy
 
     // 4. Contract Statistics
 
-    // Get total contracts count
-    const totalContracts = await Contracts.countDocuments(contractFilter);
+    // Get total contracts count and contracts by date
+    const [totalContracts, contractsByDate] = await Promise.all([
+      Contracts.countDocuments(contractFilter),
+      Contracts.aggregate([
+        { $match: contractFilter },
+        {
+          $group: {
+            _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+            count: { $sum: 1 },
+          },
+        },
+        { $sort: { _id: 1 } },
+        { $project: { date: '$_id', count: 1, _id: 0 } },
+      ]),
+    ]);
 
     // Get contracts by cycle with status breakdown
     const contractsByCycle = await Promise.all([
@@ -391,6 +405,7 @@ export const userAnalysisCrmHandler: RequestHandler<unknown, any, unknown, Analy
       },
       contractStats: {
         totalContracts,
+        contractsByDate,
         contractsByStatus,
         contractsByCycle: contractsByCycle.filter((cycle) => cycle.count > 0),
       },
