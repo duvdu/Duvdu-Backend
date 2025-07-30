@@ -22,6 +22,7 @@ export const getContractsCrm: RequestHandler<
   if (req.query.ticketNumber) filter.ticketNumber = req.query.ticketNumber;
   if (req.query.from) filter.createdAt = { $gte: req.query.from };
   if (req.query.to) filter.createdAt = { ...filter.createdAt, $lte: req.query.to };
+  if (req.query.project) filter.project = new mongoose.Types.ObjectId(req.query.project);
 
   
 
