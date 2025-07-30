@@ -32,6 +32,7 @@ export const getContractsCrm = [
   query('from').optional().isISO8601().toDate().withMessage('invalidFrom'),
   query('to').optional().isISO8601().toDate().withMessage('invalidTo'),
   query('page').optional().isInt({ min: 1 }).withMessage('invalidPage'),
+  query('project').optional().isMongoId().withMessage('invalidProject'),
   globalValidatorMiddleware,
 ];
 
