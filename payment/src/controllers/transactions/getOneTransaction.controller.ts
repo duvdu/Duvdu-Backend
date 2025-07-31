@@ -43,6 +43,7 @@ export const getOneTransaction: RequestHandler<
             },
             then: null,
             else: {
+              id: '$user._id',
               name: '$user.name',
               username: '$user.username',
               email: '$user.email',
@@ -62,6 +63,7 @@ export const getOneTransaction: RequestHandler<
             },
             then: null,
             else: {
+              id: '$fundedBy._id',
               name: '$fundedBy.name',
               username: '$fundedBy.username',
               email: '$fundedBy.email',
