@@ -14,7 +14,7 @@ import * as transactionsValidators from '../validators/transactions.validation';
 
 export const router = express.Router();
 
-router.use(isauthenticated);
+// router.use(isauthenticated);
 
 router
   .route('/crm')

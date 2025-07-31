@@ -67,7 +67,7 @@ export const getAllTransactions: RequestHandler<
   unknown,
   PaginationResponse<{ data: ITransaction[] }>
 > = async (req, res) => {
-  console.log(await Transaction.find(req.pagination.filter));
+  
 
   const transactions = await Transaction.aggregate([
     { $match: req.pagination.filter },
@@ -160,7 +160,7 @@ export const getAllTransactions: RequestHandler<
 
   const resultCount = await Transaction.countDocuments(req.pagination.filter);
 
-  res.status(200).json({
+  res.status(200).json(<any>{
     message: 'success',
     pagination: {
       currentPage: req.pagination.page,
@@ -168,5 +168,6 @@ export const getAllTransactions: RequestHandler<
       totalPages: Math.ceil(resultCount / req.pagination.limit),
     },
     data: transactions,
+    test: await Transaction.find(req.pagination.filter),
   });
 };
