@@ -1,6 +1,5 @@
 import { model, Schema, Types } from 'mongoose';
 
-import { generateTicketNumber } from './all-contracts.model';
 import { MODELS } from '../types/model-names';
 
 export enum FundedTransactionStatus {
@@ -8,6 +7,11 @@ export enum FundedTransactionStatus {
   SUCCESS = 'success',
   FAILED = 'failed',
 }
+
+const generateFundedTransactionTicketNumber = (): string => {
+  const random = Math.floor(100000 + Math.random() * 900000); // 6-digit random number
+  return `FND${random}`;
+};
 
 export interface IFundedTransaction {
   user: Types.ObjectId;
@@ -31,7 +35,7 @@ export const FundedTransaction = model<IFundedTransaction>(
       contract: { type: Schema.Types.ObjectId },
       status: { type: String, default: FundedTransactionStatus.PENDING },
       withdrawMethod: { type: Schema.Types.ObjectId, ref:MODELS.withdrawMethod },
-      ticketNumber: { type: String, default: generateTicketNumber, unique: true, sparse: true },
+      ticketNumber: { type: String, default: generateFundedTransactionTicketNumber, unique: true, sparse: true },
     },
     { timestamps: true, collection: MODELS.fundedTransaction },
   ),

@@ -1,4 +1,5 @@
 import { model, Schema, Types } from 'mongoose';
+
 import { MODELS } from '../types/model-names';
 
 export interface IbookmarkProject {

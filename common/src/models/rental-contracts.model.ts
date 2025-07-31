@@ -1,6 +1,5 @@
 import { model, Schema, Types } from 'mongoose';
 
-import { generateTicketNumber } from './all-contracts.model';
 import { Irental } from './rental.model';
 import { MODELS } from '../types/model-names';
 import { Iuser } from '../types/User';
@@ -14,6 +13,11 @@ export enum RentalContractStatus {
   rejected = 'rejected',
   complaint = 'complaint',
 }
+
+const generateTicketNumber = (): string => {
+  const random = Math.floor(100000 + Math.random() * 900000); // 6-digit random number
+  return `RNTC${random}`;
+};
 
 export interface IrentalContract {
   id: string;

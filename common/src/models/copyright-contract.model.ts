@@ -1,6 +1,6 @@
 import { model, Schema, Types } from 'mongoose';
 
-import { generateTicketNumber } from './all-contracts.model';
+import { generateContractTicketNumber } from './all-contracts.model';
 import { IcopyRights } from './copyrights.model';
 import { MODELS } from '../types/model-names';
 import { Iuser } from '../types/User';
@@ -77,7 +77,7 @@ export const CopyrightContracts = model<IcopyrightContract>(
       sp: { type: Schema.Types.ObjectId, ref: MODELS.user },
       project: { type: Schema.Types.ObjectId, ref: 'rentals' },
       details: { type: String, default: null },
-      ticketNumber: { type: String, default: generateTicketNumber, unique: true, sparse: true },
+      ticketNumber: { type: String, default: generateContractTicketNumber, unique: true, sparse: true },
       attachments: [String],
       location: { lat: Number, lng: Number },
       address: { type: String, default: null },

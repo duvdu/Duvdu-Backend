@@ -1,8 +1,12 @@
 import mongoose, { Schema } from 'mongoose';
 
-import { generateTicketNumber } from './all-contracts.model';
 import { MODELS } from '../types/model-names';
 import { Iticket } from '../types/Ticket';
+
+const generateTicketNumber = (): string => {
+  const random = Math.floor(100000 + Math.random() * 900000); // 6-digit random number
+  return `TKT${random}`;
+};
 
 const ticketSchema = new mongoose.Schema<Iticket>(
   {

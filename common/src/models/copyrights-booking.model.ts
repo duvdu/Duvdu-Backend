@@ -1,6 +1,6 @@
 import { model, Schema, Types } from 'mongoose';
 
-import { generateTicketNumber } from './all-contracts.model';
+import { generateContractTicketNumber } from './all-contracts.model';
 import { IcopyRights } from './copyrights.model';
 import { BookingState } from '../types/booking-states';
 import { MODELS } from '../types/model-names';
@@ -32,7 +32,7 @@ export const CopyrightsBooking = model<IcopyrightsBooking>(
       project: { type: Schema.Types.ObjectId, ref: MODELS.user, required: true },
       jobDetails: { type: String, default: null },
       deadline: { type: Date, required: true },
-      ticketNumber: { type: String, default: generateTicketNumber, unique: true, sparse: true },
+      ticketNumber: { type: String, default: generateContractTicketNumber, unique: true, sparse: true },
       totalPrice: { type: Number, required: true },
       address: { type: String, default: null },
       location: { lat: { type: String, required: true }, lng: { type: String, required: true } },

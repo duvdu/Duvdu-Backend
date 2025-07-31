@@ -1,6 +1,5 @@
 import { model, Schema, Types } from 'mongoose';
 
-import { generateTicketNumber } from './all-contracts.model';
 import { RequestedDeadlineStatus, SubmitFilesStatus } from './copyright-contract.model';
 import { IprojectCycle } from './portfolio-post.model';
 import { MODELS } from '../types/model-names';
@@ -17,6 +16,11 @@ export enum ProjectContractStatus {
   rejected = 'rejected',
   complaint = 'complaint',
 }
+
+const generateTicketNumber = (): string => {
+  const random = Math.floor(100000 + Math.random() * 900000); // 6-digit random number
+  return `PRJC${random}`;
+};
 
 export interface IprojectContract {
   sp: Types.ObjectId | Iuser;

@@ -1,6 +1,5 @@
 import { model, Schema, Types } from 'mongoose';
 
-import { generateTicketNumber } from './all-contracts.model';
 import { MODELS } from '../types/model-names';
 import { Iuser } from '../types/User';
 
@@ -12,6 +11,11 @@ export enum ContractStatus {
   acceptedWithUpdate = 'accepted with update',
   complaint = 'complaint',
 }
+
+const generateTicketNumber = (): string => {
+  const random = Math.floor(100000 + Math.random() * 900000); // 6-digit random number
+  return `PRC${random}`;
+};
 
 export interface IproducerContarct {
   ticketNumber: string;

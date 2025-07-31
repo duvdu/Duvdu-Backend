@@ -1,6 +1,5 @@
 import { model, Schema, Types } from 'mongoose';
 
-import { generateTicketNumber } from './all-contracts.model';
 import { MODELS } from '../types/model-names';
 
 export enum TransactionStatus {
@@ -14,6 +13,11 @@ export enum TransactionType {
   DEPOSIT = 'deposit',
   WITHDRAW = 'withdraw',
 }
+
+const generateTicketNumber = (): string => {
+  const random = Math.floor(100000 + Math.random() * 900000); // 6-digit random number
+  return `TRN${random}`;
+};
 
 export interface ITransaction {
   currency: string;

@@ -1,6 +1,5 @@
 import { model, Schema, Types } from 'mongoose';
 
-import { generateTicketNumber } from './all-contracts.model';
 import { IProducerPlatform } from './producerPlatform.model';
 import { Icategory } from '../types/Category';
 import { MODELS } from '../types/model-names';
@@ -16,6 +15,11 @@ export interface Iproducer {
   platforms: Types.ObjectId[] | IProducerPlatform[];
   ticketNumber: string;
 }
+
+const generateTicketNumber = (): string => {
+  const random = Math.floor(100000 + Math.random() * 900000); // 6-digit random number
+  return `PRD${random}`;
+};
 
 export const Producer = model<Iproducer>(
   MODELS.producer,

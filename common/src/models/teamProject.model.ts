@@ -1,11 +1,15 @@
 import { model, Schema, Types } from 'mongoose';
 
-import { generateTicketNumber } from './all-contracts.model';
 import { IprojectContract } from './projectContract.model';
 import { Icategory } from '../types/Category';
 import { CYCLES } from '../types/cycles';
 import { MODELS } from '../types/model-names';
 import { Iuser } from '../types/User';
+
+const generateTicketNumber = (): string => {
+  const random = Math.floor(100000 + Math.random() * 900000); // 6-digit random number
+  return `TPT${random}`;
+};
 
 export interface ITeamProject {
   user: Types.ObjectId | Iuser;

@@ -1,6 +1,5 @@
 import { model, Schema, Types } from 'mongoose';
 
-import { generateTicketNumber } from './all-contracts.model';
 import { MODELS } from '../types/model-names';
 import { Iuser } from '../types/User';
 
@@ -9,6 +8,11 @@ export enum InviteStatus {
   rejected = 'rejected',
   pending = 'pending',
 }
+
+const generateTicketNumber = (): string => {
+  const random = Math.floor(100000 + Math.random() * 900000); // 6-digit random number
+  return `PRT${random}`;
+};
 
 export interface IprojectCycle {
   user: Types.ObjectId | Iuser;

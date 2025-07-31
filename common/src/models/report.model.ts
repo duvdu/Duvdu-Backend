@@ -1,6 +1,5 @@
 import { Schema, Types, model } from 'mongoose';
 
-import { generateTicketNumber } from './all-contracts.model';
 import { MODELS } from '../types/model-names';
 import { Iuser } from '../types/User';
 
@@ -12,6 +11,11 @@ export interface Ireport {
   attachments: [string];
   state: { isClosed: boolean; closedBy: Types.ObjectId; feedback: string };
 }
+
+const generateTicketNumber = (): string => {
+  const random = Math.floor(100000 + Math.random() * 900000); // 6-digit random number
+  return `RPT${random}`;
+};
 
 export const Report = model<Ireport>(
   MODELS.report,
