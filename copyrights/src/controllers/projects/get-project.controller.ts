@@ -31,6 +31,7 @@ export const getProjectHandler: RequestHandler<
           'rate',
           'rank',
           'projectsView',
+          'isAvaliableToInstantProjects',
         ],
       },
       {

@@ -282,6 +282,7 @@ export const getProjectsHandler: RequestHandler<
           rank: '$userDetails.rank',
           projectsView: '$userDetails.projectsView',
           rate: '$userDetails.rate',
+          isAvaliableToInstantProjects: '$userDetails.isAvaliableToInstantProjects',
         },
         category: {
           _id: 1,

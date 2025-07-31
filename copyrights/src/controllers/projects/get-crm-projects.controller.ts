@@ -80,6 +80,7 @@ export const getCrmProjectsHandler: RequestHandler<
               rank: { $arrayElemAt: ['$userDetails.rank', 0] },
               projectsView: { $arrayElemAt: ['$userDetails.projectsView', 0] },
               rate: { $arrayElemAt: ['$userDetails.rate', 0] },
+              isAvaliableToInstantProjects: { $arrayElemAt: ['$userDetails.isAvaliableToInstantProjects', 0] },
             },
           },
         },

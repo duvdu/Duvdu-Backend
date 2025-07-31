@@ -1,5 +1,5 @@
 import 'express-async-errors';
-import { Message, MODELS, Contracts } from '@duvdu-v1/duvdu';
+import { Message, MODELS, Contracts, Users, SystemRoles, Irole } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import { Types } from 'mongoose';
 
@@ -318,9 +318,19 @@ export const getLoggedUserChatsHandler: GetLoggedUserChatsHandler = async (req, 
 
   const totalCount = await Message.aggregate(countPipeline);
   const resultCount = totalCount.length > 0 ? totalCount[0].totalCount : 0;
+  
 
   const chatsWithCanChat = await Promise.all(
     allChats.map(async (chat) => {
+      // Get the receiver (other user) with populated role information
+      const receiver = await Users.findById(chat._id).populate('role');
+      
+      // Check if receiver doesn't have verified or unverified role
+      if (receiver && ![SystemRoles.verified, SystemRoles.unverified].includes((receiver.role as Irole).key as SystemRoles)) {
+        return { ...chat, canChat: true };
+      }
+      
+      // If receiver has verified or unverified role, apply current contract logic
       const canChat = !!(await Contracts.findOne({
         $or: [
           { sp: req.loggedUser?.id, customer: chat._id },
