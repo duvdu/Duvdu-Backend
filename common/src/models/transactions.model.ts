@@ -34,20 +34,36 @@ export interface ITransaction {
 
 export const Transaction = model<ITransaction>(
   MODELS.transaction,
-  new Schema<ITransaction>({
-    currency: { type: String, default: 'EGP' },
-    amount: { type: Number, default: 0 },
-    user: { type: Schema.Types.ObjectId, ref: MODELS.user },
-    contract: { type: Schema.Types.ObjectId, ref: MODELS.contracts },
-    status: { type: String, default: TransactionStatus.PENDING },
-    timeStamp: { type: Date, default: Date.now },
-    model: { type: String, default: null },
-    isSubscription: { type: Boolean, default: false },
-    type: { type: String, default: TransactionType.DEPOSIT },
-    fundedAt: { type: Date, default: null },
-    fundAttachment: { type: [String], default: [] },
-    fundingAmount: { type: Number, default: 0 },
-    fundedBy: { type: Schema.Types.ObjectId, ref: MODELS.user },
-    ticketNumber: { type: String, default: generateTicketNumber, unique: true, sparse: true },
-  }),
+  new Schema<ITransaction>(
+    {
+      currency: { type: String, default: 'EGP' },
+      amount: { type: Number, default: 0 },
+      user: { type: Schema.Types.ObjectId, ref: MODELS.user },
+      contract: { type: Schema.Types.ObjectId, ref: MODELS.contracts },
+      status: { type: String, default: TransactionStatus.PENDING },
+      timeStamp: { type: Date, default: Date.now },
+      model: { type: String, default: null },
+      isSubscription: { type: Boolean, default: false },
+      type: { type: String, default: TransactionType.DEPOSIT },
+      fundedAt: { type: Date, default: null },
+      fundAttachment: { type: [String], default: [] },
+      fundingAmount: { type: Number, default: 0 },
+      fundedBy: { type: Schema.Types.ObjectId, ref: MODELS.user },
+      ticketNumber: { type: String, default: generateTicketNumber, unique: true, sparse: true },
+    },
+    {
+      timestamps: true,
+      collection: MODELS.transaction,
+      toJSON: {
+        transform: (doc, ret) => {
+          if (ret.fundAttachment) {
+            ret.fundAttachment = ret.fundAttachment.map((attachment: string) =>
+              `${process.env.BUCKET_HOST}/${attachment}`
+            );
+          }
+          return ret;
+        },
+      },
+    },
+  ),
 );
