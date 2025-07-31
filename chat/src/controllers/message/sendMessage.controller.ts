@@ -9,6 +9,7 @@ import {
   NotFound,
   Notification,
   NotificationType,
+  Irole,
   SystemRoles,
   TeamProject,
   Users,
@@ -20,7 +21,7 @@ import { Channels } from '../../types/socketChannels';
 import { sendNotificationOrFCM } from '../../utils/sendNotificationOrFcm';
 
 export const sendMessageHandler: SendMessageHandler = async (req, res, next) => {
-  const receiver = await Users.findById(req.body.receiver);
+  const receiver = await Users.findById(req.body.receiver).populate('role');
   if (!receiver)
     return next(
       new NotFound(
@@ -32,36 +33,39 @@ export const sendMessageHandler: SendMessageHandler = async (req, res, next) => 
       ),
     );
 
-  const contract = await Contracts.findOne({
-    $or: [
-      { sp: req.loggedUser.id, customer: req.body.receiver },
-      { sp: req.body.receiver, customer: req.loggedUser.id },
-    ],
-  }).populate({
-    path: 'contract',
-    match: {
-      status: {
-        $nin: ['canceled', 'pending', 'rejected', 'reject', 'cancel'],
+  if ([SystemRoles.verified, SystemRoles.unverified].includes((receiver.role as Irole).key as SystemRoles)) {
+    const contract = await Contracts.findOne({
+      $or: [
+        { sp: req.loggedUser.id, customer: req.body.receiver },
+        { sp: req.body.receiver, customer: req.loggedUser.id },
+      ],
+    }).populate({
+      path: 'contract',
+      match: {
+        status: {
+          $nin: ['canceled', 'pending', 'rejected', 'reject', 'cancel'],
+        },
       },
-    },
-  });
-
-  const project = await TeamProject.findOne({
-    isDeleted: false,
-    creatives: {
-      $elemMatch: {
-        'users.user': { $all: [req.loggedUser.id, req.body.receiver] }, // Both should exist in users
+    });
+    
+    const project = await TeamProject.findOne({
+      isDeleted: false,
+      creatives: {
+        $elemMatch: {
+          'users.user': { $all: [req.loggedUser.id, req.body.receiver] }, // Both should exist in users
+        },
       },
-    },
-  });
+    });
+    
+    const isMainUser =
+        project &&
+        (project.user.toString() === req.loggedUser.id.toString() ||
+          project.user.toString() === req.body.receiver!.toString());
+    
+    if (req.loggedUser.role.key === SystemRoles.verified && !contract && !isMainUser) {
+      return next(new NotAllowedError(undefined, req.lang));
+    }
 
-  const isMainUser =
-    project &&
-    (project.user.toString() === req.loggedUser.id.toString() ||
-      project.user.toString() === req.body.receiver!.toString());
-
-  if (req.loggedUser.role.key === SystemRoles.verified && !contract && !isMainUser) {
-    return next(new NotAllowedError(undefined, req.lang));
   }
 
   const attachments = <Express.Multer.File[] | undefined>(req.files as any)?.attachments;
