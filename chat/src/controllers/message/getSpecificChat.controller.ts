@@ -1,6 +1,6 @@
 import 'express-async-errors';
 
-import { Contracts, Message, Users } from '@duvdu-v1/duvdu';
+import { Contracts, Irole, Message, SystemRoles, Users } from '@duvdu-v1/duvdu';
 import { Types } from 'mongoose';
 
 import { GetSpecificChatHandler } from '../../types/endpoints/mesage.endpoints';
@@ -182,7 +182,11 @@ export const getSpecificChatHandler: GetSpecificChatHandler = async (req, res) =
     },
   );
 
-  const canChat = !!(await Contracts.findOne({
+
+
+  let canChat = false;
+
+  canChat = !!(await Contracts.findOne({
     $or: [
       { sp: userTwo, customer: userOne },
       { customer: userTwo, sp: userOne },
@@ -196,7 +200,12 @@ export const getSpecificChatHandler: GetSpecificChatHandler = async (req, res) =
 
   const user = await Users.findById(userOne)
     .select('name projectsView rank username isOnline profileImage')
+    .populate('role')
     .lean();
+
+  if (user && [SystemRoles.verified, SystemRoles.unverified].includes((user.role as Irole).key as SystemRoles)) {
+    canChat = true;
+  }
 
   res.status(200).json(<any>{
     message: 'success',
