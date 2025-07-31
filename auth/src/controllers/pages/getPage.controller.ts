@@ -17,6 +17,7 @@ export const getPageController: RequestHandler<
         _id: 1,
         title: `$title.${req.lang}`,
         content: `$content.${req.lang}`,
+        type: 1,
       },
     },
   ]);
