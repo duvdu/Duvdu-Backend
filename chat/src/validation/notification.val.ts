@@ -25,7 +25,6 @@ export const getNotificationCrmVal = [
 ];
 
 export const sendTopicNotificationVal = [
-  body('topic').isString().withMessage('topicInvalid').exists().withMessage('topicRequired'),
   body('title').isString().withMessage('titleInvalid').exists().withMessage('titleRequired'),
   body('message').isString().withMessage('messageInvalid').exists().withMessage('messageRequired'),
   globalValidatorMiddleware,
