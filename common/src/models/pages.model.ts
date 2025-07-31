@@ -2,10 +2,15 @@ import { model, Schema } from 'mongoose';
 
 import { MODELS } from '../types/model-names';
 
+export enum PageType {
+  terms = 'terms and conditions',
+  privacy = 'privacy policy',
+  refund = 'refund policy',
+}
 export interface IPage {
   title: { ar: string; en: string };
   content: { ar: string; en: string };
-  slug: string;
+  type: PageType | null;
 }
 
 export const Pages = model<IPage>(
@@ -14,7 +19,7 @@ export const Pages = model<IPage>(
     {
       title: { ar: { type: String, default: null }, en: { type: String, default: null } },
       content: { ar: { type: String, default: null }, en: { type: String, default: null } },
-      slug: { type: String, unique: true, sparse: true },
+      type: { type: String, enum: PageType, default: null, unique: true, sparse: true },
     },
     {
       timestamps: true,
