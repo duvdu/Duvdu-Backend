@@ -19,8 +19,8 @@ router.use(isauthenticated);
 router
   .route('/crm')
   .get(
-    globalPaginationMiddleware,
-    isauthorized(PERMISSIONS.listTransactions),
+    // globalPaginationMiddleware,
+    // isauthorized(PERMISSIONS.listTransactions),
     transactionsValidators.transactionPaginationValidation,
     transactionsControllers.transactionPagination,
     transactionsControllers.getAllTransactions,
