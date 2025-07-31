@@ -323,7 +323,7 @@ export const getLoggedUserChatsHandler: GetLoggedUserChatsHandler = async (req, 
   const chatsWithCanChat = await Promise.all(
     allChats.map(async (chat) => {
       // Get the receiver (other user) with populated role information
-      const receiver = await Users.findById(chat._id).populate('role');
+      const receiver = await Users.findById(chat.otherUser).populate('role');
       
       // Check if receiver doesn't have verified or unverified role
       if (receiver && ![SystemRoles.verified, SystemRoles.unverified].includes((receiver.role as Irole).key as SystemRoles)) {
