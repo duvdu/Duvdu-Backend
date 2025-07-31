@@ -19,7 +19,7 @@ export const router = express.Router();
 router
   .route('/crm')
   .get(
-    // globalPaginationMiddleware,
+    globalPaginationMiddleware,
     // isauthorized(PERMISSIONS.listTransactions),
     transactionsValidators.transactionPaginationValidation,
     transactionsControllers.transactionPagination,
