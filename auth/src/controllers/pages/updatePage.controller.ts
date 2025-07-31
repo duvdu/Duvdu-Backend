@@ -4,7 +4,7 @@ import { RequestHandler } from 'express';
 export const updatePageController: RequestHandler<
   { id: string },
   SuccessResponse<{ data: IPage }>,
-  Partial<Pick<IPage, 'title' | 'content'>>
+  Partial<Pick<IPage, 'title' | 'content' | 'type'>>
 > = async (req, res) => {
   const page = await Pages.findByIdAndUpdate(req.params.id, req.body, {
     new: true,

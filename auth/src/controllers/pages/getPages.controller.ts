@@ -1,11 +1,22 @@
-import { IPage, Pages, PaginationResponse } from '@duvdu-v1/duvdu';
+import { IPage, Pages, PageType, PaginationResponse } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 export const getPagesController: RequestHandler<
   unknown,
-  PaginationResponse<{ data: IPage[] }>
+  PaginationResponse<{ data: IPage[] }>,
+  unknown,
+  { type?: PageType }
 > = async (req, res) => {
+  const filter: any = {};
+
+  if (req.query.type) {
+    filter['type'] = req.query.type;
+  }
+
   const page = await Pages.aggregate([
+    {
+      $match: filter,
+    },
     {
       $project: {
         _id: 1,

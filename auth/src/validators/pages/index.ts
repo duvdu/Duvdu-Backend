@@ -6,6 +6,7 @@ export const createPageValidator = [
   body('title.en').isString().notEmpty().withMessage('title is required'),
   body('content.ar').isString().notEmpty().withMessage('content is required'),
   body('content.en').isString().notEmpty().withMessage('content is required'),
+  body('type').optional().isString().withMessage('type must be a string'),
   globalValidatorMiddleware,
 ];
 
@@ -55,6 +56,7 @@ export const updatePageValidator = [
       }
       return true;
     }),
+  body('type').optional().isString().withMessage('type must be a string'),
   globalValidatorMiddleware,
 ];
 
@@ -66,6 +68,7 @@ export const getPageValidator = [
 export const getPagesValidator = [
   query('page').optional().isInt({ min: 1 }).withMessage('page must be an integer'),
   query('limit').optional().isInt({ min: 1 }).withMessage('limit must be an integer'),
+  query('type').optional().isString().withMessage('type must be a string'),
   globalValidatorMiddleware,
 ];
 

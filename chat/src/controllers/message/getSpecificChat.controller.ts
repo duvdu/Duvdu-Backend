@@ -203,7 +203,7 @@ export const getSpecificChatHandler: GetSpecificChatHandler = async (req, res) =
     .populate('role')
     .lean();
 
-  if (user && [SystemRoles.verified, SystemRoles.unverified].includes((user.role as Irole).key as SystemRoles)) {
+  if (user && ![SystemRoles.verified, SystemRoles.unverified].includes((user.role as Irole).key as SystemRoles)) {
     canChat = true;
   }
 
