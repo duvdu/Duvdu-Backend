@@ -199,7 +199,7 @@ export const getSpecificChatHandler: GetSpecificChatHandler = async (req, res) =
   }));
 
   const user = await Users.findById(userOne)
-    .select('name projectsView rank username isOnline profileImage')
+    .select('name projectsView rank username isOnline profileImage role')
     .populate('role')
     .lean();
 
