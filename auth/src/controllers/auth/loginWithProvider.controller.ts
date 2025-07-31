@@ -121,6 +121,56 @@ export const loginWithProviderHandler: RequestHandler<
     });
   }
 
+  const origin = req.headers?.origin;
+  const isDashboard = origin?.includes('dashboard.duvdu.com') || origin?.includes('localhost:3000');
+  const isMobileApp = req.headers['x-app-version'] || req.headers['x-platform'];
+  const userAgent = req.headers['user-agent'] || '';
+  const isPostman = userAgent.includes('Postman');
+
+  // Skip role checks if request is coming from Postman
+  if (!isPostman) {
+    if (isDashboard) {
+      if (
+        [SystemRoles.unverified, SystemRoles.verified].includes(
+          role.key as SystemRoles,
+        )
+      ) {
+        return next(
+          new UnauthenticatedError(
+            { en: 'User not authorized', ar: 'المستخدم غير مصرح له' },
+            req.lang,
+          ),
+        );
+      }
+    } else if (isMobileApp) {
+      if (
+        ![SystemRoles.unverified, SystemRoles.verified].includes(
+          role.key as SystemRoles,
+        )
+      ) {
+        return next(
+          new UnauthenticatedError(
+            { en: 'User not authorized for mobile app', ar: 'المستخدم غير مصرح له للتطبيق' },
+            req.lang,
+          ),
+        );
+      }
+    } else {
+      if (
+        ![SystemRoles.unverified, SystemRoles.verified].includes(
+          role.key as SystemRoles,
+        )
+      ) {
+        return next(
+          new UnauthenticatedError(
+            { en: 'User not authorized', ar: 'المستخدم غير مصرح له' },
+            req.lang,
+          ),
+        );
+      }
+    }
+  }
+
   if (user.isDeleted) {
     throw new NotFound({ ar: 'الحساب عفواً غير موجود', en: 'user not found' }, req.lang);
   }
