@@ -21,13 +21,13 @@ export const closeComplaintHandler: RequestHandler<
     {
       ...(req.body.feedback
         ? {
-            $push: {
-              state: {
-                addedBy: req.loggedUser?.id,
-                feedback: req.body.feedback,
-              },
+          $push: {
+            state: {
+              addedBy: req.loggedUser?.id,
+              feedback: req.body.feedback,
             },
-          }
+          },
+        }
         : {}),
       isClosed: true,
       closedBy: req.loggedUser?.id,
@@ -56,7 +56,7 @@ export const closeComplaintHandler: RequestHandler<
     await new NewNotificationPublisher(natsWrapper.client).publish({
       notificationDetails: { message: notification.message, title: notification.title },
       populatedNotification,
-      socketChannel: Channels.update_contract,
+      socketChannel: Channels.notification,
       targetUser: notification.targetUser.toString(),
     });
   }

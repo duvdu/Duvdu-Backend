@@ -81,7 +81,7 @@ export const getAllTransactions: RequestHandler<
       },
     },
     {
-      $unwind: '$user',
+      $unwind: { path: '$user', preserveNullAndEmptyArrays: true },
     },
     {
       $lookup: {
@@ -92,7 +92,7 @@ export const getAllTransactions: RequestHandler<
       },
     },
     {
-      $unwind: '$fundedBy',
+      $unwind: { path: '$fundedBy', preserveNullAndEmptyArrays: true },
     },
     {
       $project: {

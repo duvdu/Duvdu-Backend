@@ -17,7 +17,7 @@ export const getOneTransaction: RequestHandler<
       },
     },
     {
-      $unwind: '$user',
+      $unwind: { path: '$user', preserveNullAndEmptyArrays: true },
     },
     {
       $lookup: {
@@ -28,7 +28,7 @@ export const getOneTransaction: RequestHandler<
       },
     },
     {
-      $unwind: '$fundedBy',
+      $unwind: { path: '$fundedBy', preserveNullAndEmptyArrays: true },
     },
     {
       $project: {

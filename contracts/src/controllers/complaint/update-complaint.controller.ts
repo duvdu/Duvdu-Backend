@@ -50,7 +50,7 @@ export const updateComplaintHandler: RequestHandler<
     await new NewNotificationPublisher(natsWrapper.client).publish({
       notificationDetails: { message: notification.message, title: notification.title },
       populatedNotification,
-      socketChannel: Channels.update_contract,
+      socketChannel: Channels.notification,
       targetUser: notification.targetUser.toString(),
     });
   }
