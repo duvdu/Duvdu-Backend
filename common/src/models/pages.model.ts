@@ -3,9 +3,9 @@ import { model, Schema } from 'mongoose';
 import { MODELS } from '../types/model-names';
 
 export enum PageType {
-  terms = 'terms and conditions',
-  privacy = 'privacy policy',
-  refund = 'refund policy',
+  terms = 'terms-and-conditions',
+  privacy = 'privacy-policy',
+  refund = 'refund-policy',
 }
 export interface IPage {
   title: { ar: string; en: string };
