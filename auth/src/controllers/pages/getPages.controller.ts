@@ -27,6 +27,13 @@ export const getPagesController: RequestHandler<
     },
   ]);
 
+  if (filter.type) {
+    return res.status(200).json(<any>{
+      message: 'success',
+      data: page[0],
+    });
+  }
+
   const result = await Pages.countDocuments();
 
   res.status(200).json({

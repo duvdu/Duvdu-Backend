@@ -49,4 +49,5 @@ router
 router
   .route('/')
   .get(globalPaginationMiddleware, validator.getPagesValidator, controller.getPagesController);
+
 router.route('/:id').get(validator.getPageValidator, controller.getPageController);
