@@ -14,13 +14,13 @@ import * as transactionsValidators from '../validators/transactions.validation';
 
 export const router = express.Router();
 
-// router.use(isauthenticated);
+router.use(isauthenticated);
 
 router
   .route('/crm')
   .get(
     globalPaginationMiddleware,
-    // isauthorized(PERMISSIONS.listTransactions),
+    isauthorized(PERMISSIONS.listTransactions),
     transactionsValidators.transactionPaginationValidation,
     transactionsControllers.transactionPagination,
     transactionsControllers.getAllTransactions,

@@ -168,6 +168,5 @@ export const getAllTransactions: RequestHandler<
       totalPages: Math.ceil(resultCount / req.pagination.limit),
     },
     data: transactions,
-    test: await Transaction.find(req.pagination.filter),
   });
 };
