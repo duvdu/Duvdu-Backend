@@ -1,5 +1,5 @@
 import 'express-async-errors';
-import { Message, MODELS, Contracts, PaginationResponse, ImessageDoc } from '@duvdu-v1/duvdu';
+import { Message, MODELS, Contracts, PaginationResponse, ImessageDoc, Users, Irole, SystemRoles } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import { Types } from 'mongoose';
 
@@ -200,8 +200,14 @@ export const getUserChatsHandler: RequestHandler<
   const totalCount = await Message.aggregate(countPipeline);
   const resultCount = totalCount.length > 0 ? totalCount[0].totalCount : 0;
 
+  const receiver = await Users.findById(req.params.userId).populate('role');
   const chatsWithCanChat = await Promise.all(
     allChats.map(async (chat) => {
+
+      if (receiver && ![SystemRoles.verified, SystemRoles.unverified].includes((receiver.role as Irole).key as SystemRoles)) {
+        return { ...chat, canChat: true };
+      }
+
       const canChat = !!(await Contracts.findOne({
         $or: [
           { sp: req.loggedUser?.id, customer: chat._id },
