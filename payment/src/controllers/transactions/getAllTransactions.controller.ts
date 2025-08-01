@@ -67,8 +67,6 @@ export const getAllTransactions: RequestHandler<
   unknown,
   PaginationResponse<{ data: ITransaction[] }>
 > = async (req, res) => {
-  
-
   const transactions = await Transaction.aggregate([
     { $match: req.pagination.filter },
     { $sort: { createdAt: -1 } },

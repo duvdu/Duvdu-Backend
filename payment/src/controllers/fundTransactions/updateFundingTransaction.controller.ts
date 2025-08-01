@@ -1,6 +1,7 @@
 import {
   BadRequestError,
   Bucket,
+  Channels,
   FOLDERS,
   FundedTransaction,
   FundedTransactionStatus,
@@ -13,6 +14,8 @@ import {
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import { Types } from 'mongoose';
+
+import { sendNotification } from '../webhook';
 
 export const updateFundingTransaction: RequestHandler<
   { transactionId: string },
@@ -54,6 +57,16 @@ export const updateFundingTransaction: RequestHandler<
   transaction.createdBy = new Types.ObjectId(req.loggedUser.id);
   transaction.status = FundedTransactionStatus.SUCCESS;
   await transaction.save();
+
+  await sendNotification(
+    req.loggedUser.id,
+    user._id.toString(),
+    transaction._id.toString(),
+    'funding',
+    'funding success',
+    `your have new funding success by amount ${transaction.fundAmount}`,
+    Channels.notification,
+  );
 
   res.status(200).json({ message: 'success', data: transaction });
 };

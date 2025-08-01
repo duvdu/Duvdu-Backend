@@ -8,6 +8,7 @@ import {
   Irole,
 } from '@duvdu-v1/duvdu';
 
+import { smsService } from '../../services/sms.service';
 import { SigninHandler } from '../../types/endpoints/user.endpoints';
 import { comparePassword } from '../../utils/bcrypt';
 import { createOrUpdateSessionAndGenerateTokens } from '../../utils/createOrUpdateSessionAndGenerateTokens';
@@ -120,10 +121,11 @@ export const signinHandler: SigninHandler = async (req, res, next) => {
       expireAt: new Date(Date.now() + 60 * 1000).toString(),
     };
 
+    await smsService.sendOtp(user.phoneNumber.number, verificationCode);
     await user.save();
     return res
       .status(403)
-      .json(<any>{ message: 'success', code: verificationCode, username: user.username });
+      .json(<any>{ message: 'success', username: user.username });
   }
 
   const role = await Roles.findById(user.role);

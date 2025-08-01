@@ -37,8 +37,8 @@ export const updateComplaintHandler: RequestHandler<
     const notification = await Notification.create({
       sourceUser: req.loggedUser.id,
       targetUser: complaint.reporter,
-      type: 'complaint',
-      target: complaint._id,
+      type: 'contract',
+      target: complaint.contract.toString(),
       message: 'complaint updated',
       title: `${user?.name} has updated a complaint with feedback ${req.body.feedback}`,
     });

@@ -41,9 +41,7 @@ router.get(
   handler.getNotificationsPagination,
   handler.getNotificationsCrmHandler,
 );
-router.patch(
-  '/:notificationId',
-  val.updateOneNotificationVal,
-  handler.updateOneWatchNotificationHandler,
-);
+router.route('/:notificationId')
+  .patch(val.updateOneNotificationVal, handler.updateOneWatchNotificationHandler)
+  .get(val.getOneNotificationVal, handler.getOneNotificationHandler);
 router.get('/unread-count', handler.getUnReadNotificationAndMessagesCountController);

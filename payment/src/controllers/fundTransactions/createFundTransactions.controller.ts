@@ -1,6 +1,7 @@
 import {
   BadRequestError,
   Bucket,
+  Channels,
   Contracts,
   FOLDERS,
   FundedTransaction,
@@ -13,6 +14,8 @@ import {
   WithdrawMethodStatus,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
+
+import { sendNotification } from '../webhook/sendNotification';
 
 export const createFundTransactions: RequestHandler<
   unknown,
@@ -49,5 +52,15 @@ export const createFundTransactions: RequestHandler<
     createdBy: req.loggedUser.id,
     status: FundedTransactionStatus.SUCCESS,
   });
+
+  await sendNotification(
+    req.loggedUser.id,
+    user._id.toString(),
+    transaction._id.toString(),
+    'funding',
+    'funding success',
+    `your have new funding success by amount ${req.body.fundAmount}`,
+    Channels.notification,
+  );
   res.status(201).json({ message: 'success', data: transaction });
 };

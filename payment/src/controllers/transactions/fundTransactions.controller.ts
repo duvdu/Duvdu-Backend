@@ -7,9 +7,12 @@ import {
   TransactionStatus,
   ITransaction,
   SuccessResponse,
+  Channels,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import { Types } from 'mongoose';
+
+import { sendNotification } from '../webhook';
 
 // Helper function to extract and validate file attachment
 const extractFundAttachment = (req: any): Express.Multer.File[] => {
@@ -126,6 +129,16 @@ export const fundTransactions: RequestHandler<
 
   // Save updated transaction
   await (validatedTransaction as any).save();
+
+  await sendNotification(
+    req.loggedUser.id,
+    validatedTransaction.user!.toString(),
+    transaction!._id.toString(),
+    'transaction',
+    'funding success',
+    `your have new funding success by amount ${validatedTransaction!.fundingAmount}`,
+    Channels.notification,
+  );
 
   // Return success response
   res.status(200).json({

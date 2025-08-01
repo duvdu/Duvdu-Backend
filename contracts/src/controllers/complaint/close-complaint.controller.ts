@@ -43,8 +43,8 @@ export const closeComplaintHandler: RequestHandler<
     const notification = await Notification.create({
       sourceUser: req.loggedUser.id,
       targetUser: complaint.reporter,
-      type: 'complaint',
-      target: complaint._id,
+      type: 'contract',
+      target: complaint.contract.toString(),
       message: 'complaint closed',
       title: `${user?.name} has closed a complaint`,
     });

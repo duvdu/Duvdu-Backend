@@ -1,4 +1,4 @@
-import { Channels, MODELS, Transaction, TransactionStatus, Users } from '@duvdu-v1/duvdu';
+import { Channels, Transaction, TransactionStatus, Users } from '@duvdu-v1/duvdu';
 
 import { sendNotification } from '../controllers/webhook/sendNotification';
 
@@ -13,15 +13,15 @@ export const handleSubscribePayment = async (
   // Check if payment was successful
   if (!transactionData.success) {
     console.log('Payment failed');
-    await Transaction.findByIdAndUpdate(contractId, {
+    const transaction = await Transaction.findByIdAndUpdate(contractId, {
       status: TransactionStatus.FAILED,
     });
 
     await sendNotification(
       userId,
       userId,
-      contractId,
-      MODELS.transaction,
+      transaction!._id!.toString(),
+      'subscription',
       'payment failed',
       'your payment failed for new subscription, please try again',
       Channels.notification,
@@ -44,6 +44,9 @@ export const handleSubscribePayment = async (
     };
   }
 
+  contract.status = TransactionStatus.SUCCESS;
+  await contract.save();
+
   // increment the user contracts count
   const user = await Users.findByIdAndUpdate(
     userId,
@@ -57,7 +60,7 @@ export const handleSubscribePayment = async (
     userId,
     userId,
     contractId,
-    MODELS.transaction,
+    'subscription',
     'payment success',
     `your payment success for new subscription, you now have ${user?.avaliableContracts} contracts`,
     Channels.notification,

@@ -37,3 +37,8 @@ export const sendMultiNotificationVal = [
   body('message').isString().withMessage('messageInvalid').exists().withMessage('messageRequired'),
   globalValidatorMiddleware,
 ];
+
+export const getOneNotificationVal = [
+  check('notificationId').isMongoId().withMessage('notificationIdInvalid'),
+  globalValidatorMiddleware,
+];

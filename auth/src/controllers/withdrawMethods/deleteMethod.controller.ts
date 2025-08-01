@@ -1,4 +1,4 @@
-import { NotFound, SuccessResponse, WithdrawMethodModel } from '@duvdu-v1/duvdu';
+import { BadRequestError, NotFound, SuccessResponse, WithdrawMethodModel } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 export const deleteMethod: RequestHandler<{ id: string }, SuccessResponse, unknown> = async (
@@ -21,6 +21,13 @@ export const deleteMethod: RequestHandler<{ id: string }, SuccessResponse, unkno
     });
     if (anotherMethod) {
       await WithdrawMethodModel.findByIdAndUpdate(anotherMethod._id, { default: true });
+    } else {
+      return next(
+        new BadRequestError(
+          { ar: 'لا يوجد طريقة سحب أخرى', en: 'No other withdraw method found' },
+          req.lang,
+        ),
+      );
     }
   }
 
