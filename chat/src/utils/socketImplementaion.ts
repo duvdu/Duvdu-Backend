@@ -64,6 +64,10 @@ export class SocketServer {
         this.io
           .to(ROOMS.admins)
           .emit(EVENTS.loggedCounterUpdate, { counter: await getLoggedCount() });
+
+        this.io
+          .to(ROOMS.admins)
+          .emit(EVENTS.visitorsCounterUpdate, { counter: await getVisitorCount() });
         next();
       } catch (error) {
         console.error(error);
@@ -82,6 +86,10 @@ export class SocketServer {
       await Users.findByIdAndUpdate(userId, { isOnline: true }, { new: true });
       this.io.sockets.sockets.set(userId, socket);
     } else {
+      await addUserToVisitor();
+      this.io
+        .to(ROOMS.admins)
+        .emit(EVENTS.visitorsCounterUpdate, { counter: await getVisitorCount() });
       console.log('connect guest');
     }
 
