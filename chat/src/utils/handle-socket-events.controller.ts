@@ -6,8 +6,8 @@ import { EVENTS } from '../types/socket-events';
 
 export const handleSocketEvents = (io: Server, socket: Socket) => {
   const userRole = socket.data.role as Irole | undefined;
-  socket.on(EVENTS.getVisitorsCounter, async () => {
-    socket.emit(EVENTS.visitorsCounterUpdate, { counter: await getVisitorCount() });
+  io.on(EVENTS.getVisitorsCounter, async () => {
+    io.emit(EVENTS.visitorsCounterUpdate, { counter: await getVisitorCount() });
   });
 
   socket.on(EVENTS.getLoggedCounter, async () => {

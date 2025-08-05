@@ -94,6 +94,7 @@ export class SocketServer {
     }
 
     if (socket.data.user) await handleUserSession(this.io, socket);
+    
     handleSocketEvents(this.io, socket);
 
     socket.on('disconnect', async () => {
