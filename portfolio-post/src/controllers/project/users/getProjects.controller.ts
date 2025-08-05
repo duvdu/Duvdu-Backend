@@ -35,7 +35,6 @@ export const getProjectsPagination: RequestHandler<
     relatedCategory?: Types.ObjectId[];
     relatedSubCategory?: Types.ObjectId[];
     relatedTags?: Types.ObjectId[];
-    sortOrder?: 'asc' | 'desc';
     user?: string;
     isDeleted?: boolean;
   }
@@ -240,7 +239,7 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
         showOnHome: { $ne: false },
       },
     },
-    // { $sort: { createdAt: -1 } },
+    { $sort: { createdAt: req.query.sortOrder === 'asc' ? 1 : -1 } },
     // { $skip: req.pagination.skip },
     // { $limit: req.pagination.limit },
     {

@@ -27,5 +27,7 @@ export interface GetProjectsForCrmHandler
     unknown,
     PaginationResponse<{ data: IprojectCycle[] }>,
     unknown,
-    unknown
+    {
+      sortOrder?: 'asc' | 'desc';
+    }
   > {}
