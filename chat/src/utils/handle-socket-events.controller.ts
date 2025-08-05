@@ -10,7 +10,7 @@ export const handleSocketEvents = (io: Server, socket: Socket) => {
     console.log(userRole);
     if (userRole?.key !== SystemRoles.admin)
       return socket.emit(EVENTS.error, { message: 'not allowed' });
-    socket.emit(EVENTS.response, { counter: await getVisitorCount() });
+    socket.emit(EVENTS.visitorsCounterUpdate, { counter: await getVisitorCount() });
   });
 
   socket.on(EVENTS.getLoggedCounter, async () => {
