@@ -32,6 +32,8 @@ export const deleteLoggedUser: RequestHandler = async (req, res) => {
     );
 
   user.isDeleted = true;
+  user.phoneNumber.number = null as any;
+  user.email = null as any;
   await user.save();
 
   res.status(200).json({
