@@ -6,6 +6,7 @@ export const createMethodValidator = [
   body('name').isString().withMessage('Name is required'),
   body('number').isString().withMessage('Number is required'),
   body('default').optional().isBoolean().withMessage('Default is required'),
+  body('iban').optional().isString().withMessage('Iban is required'),
   globalValidatorMiddleware,
 ];
 

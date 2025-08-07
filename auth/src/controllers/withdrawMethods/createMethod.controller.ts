@@ -4,7 +4,7 @@ import { RequestHandler } from 'express';
 export const createMethod: RequestHandler<
   unknown,
   SuccessResponse,
-  Pick<IWithdrawMethod, 'method' | 'name' | 'number' | 'default'>
+  Pick<IWithdrawMethod, 'method' | 'name' | 'number' | 'default' | 'iban'>
 > = async (req, res) => {
   const method = await WithdrawMethodModel.create({
     ...req.body,
