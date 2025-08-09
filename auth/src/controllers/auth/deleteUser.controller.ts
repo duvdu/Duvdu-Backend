@@ -17,6 +17,15 @@ export const deleteUser: RequestHandler<{ userId: string }> = async (req, res) =
       req.lang,
     );
 
+  if (user.isDeleted)
+    throw new BadRequestError(
+      {
+        ar: 'المستخدم محذوف مسبقا',
+        en: 'user is already deleted',
+      },
+      req.lang,
+    );
+
   if (!user.isDeleted) {
     const canDelete = await Contracts.findOne({
       $or: [
