@@ -42,7 +42,9 @@ export const deleteUser: RequestHandler<{ userId: string }> = async (req, res) =
       );
   }
 
-  user.isDeleted = !user.isDeleted;
+  user.isDeleted = true;
+  user.refreshTokens = [];
+  user.fcmTokens=[];
   await user.save();
 
   res.status(200).json({
