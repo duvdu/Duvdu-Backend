@@ -28,7 +28,14 @@ export const isauthenticated: RequestHandler = async (req, res, next) => {
   try {
     payload = <IjwtPayload>verify((req as any).session.access, process.env.JWT_KEY!);
     (req as any).loggedUser = payload;
-    if ((req as any).loggedUser.isBlocked.value)
+    const user = await Users.findById(payload.id);
+    if (!user) {
+      return next(
+        new UnauthorizedError({ en: 'user not found', ar: 'لا يوجد مستخدم' }, (req as any).lang),
+      );
+    }
+
+    if (user.isBlocked.value)
       return next(
         new UnauthorizedError(
           {
@@ -38,6 +45,12 @@ export const isauthenticated: RequestHandler = async (req, res, next) => {
           (req as any).lang,
         ),
       );
+
+    if (user.isDeleted)
+      return next(
+        new UnauthorizedError({ en: 'user not found', ar: 'لا يوجد مستخدم' }, (req as any).lang),
+      );
+
     next();
   } catch (error) {
     try {
