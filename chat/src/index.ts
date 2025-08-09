@@ -8,6 +8,7 @@ import { NotificationListener } from './event/listiner/notification.listener';
 import { natsWrapper } from './nats-wrapper';
 import { handleRedisConnection } from './utils/handle-redis-connection';
 import { SocketServer } from './utils/socketImplementaion';
+import { resetTotalVisitorsCount } from './utils/users-counter';
 
 let io: Server | undefined;
 let ioReady: Promise<Server>;
@@ -34,8 +35,16 @@ const start = async () => {
   await dbConnection(env.mongoDb.uri);
 
   const server = app.listen(3000, () => {
+    // set total visitors count to 0
+    resetTotalVisitorsCount();
     console.log('app listen on port 3000');
   });
+
+
+  process.on('SIGTERM', () => {
+    resetTotalVisitorsCount();
+  });
+
 
   const socketServer = new SocketServer(server);
   io = socketServer.io;
@@ -53,5 +62,7 @@ export async function getSocketIOInstance(): Promise<Server> {
   }
   return ioReady;
 }
+
+
 
 start();

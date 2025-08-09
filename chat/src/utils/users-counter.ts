@@ -34,3 +34,8 @@ export const getVisitorCount = async () => {
   const client = await getClient();
   return +((await client.get(totalVisitors)) || 0);
 };
+
+export const resetTotalVisitorsCount = async () => {
+  const client = await getClient();
+  await client.set(totalVisitors, 0);
+};
