@@ -1,6 +1,7 @@
 import { RequestHandler } from 'express';
-import jwt, { verify } from 'jsonwebtoken';
+import { verify } from 'jsonwebtoken';
 
+import { generateAccessToken } from './auth.middleware';
 import { UnauthorizedError } from '../errors/unauthorized-error';
 import { Roles } from '../models/Role.model';
 import { Users } from '../models/User.model';
@@ -88,7 +89,3 @@ export const optionalAuthenticated: RequestHandler = async (req, res, next) => {
   }
 };
 
-export const generateAccessToken = (payload: IjwtPayload) =>
-  jwt.sign(payload, process.env.JWT_KEY!, {
-    expiresIn: process.env.NODE_ENV === 'development' ? '1d' : '1h',
-  });
