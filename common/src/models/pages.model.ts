@@ -19,7 +19,7 @@ export const Pages = model<IPage>(
     {
       title: { ar: { type: String, default: null }, en: { type: String, default: null } },
       content: { ar: { type: String, default: null }, en: { type: String, default: null } },
-      type: { type: String, enum: PageType, default: null, unique: true, sparse: true },
+      type: { type: String, enum: PageType },
     },
     {
       timestamps: true,
