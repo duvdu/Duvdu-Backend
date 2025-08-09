@@ -53,6 +53,8 @@ export const deleteUser: RequestHandler<{ userId: string }> = async (req, res) =
 
   user.isDeleted = true;
   user.refreshTokens = [];
+  user.phoneNumber.number = null as any;
+  user.email = null as any;
   user.fcmTokens=[];
   await user.save();
 
