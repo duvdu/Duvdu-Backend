@@ -99,7 +99,7 @@ export const updateUser = [
   body('address').optional().exists().isString().withMessage('invalidAddress'),
   body('avaliableContracts')
     .optional()
-    .isInt({ min: 1 })
+    .isInt({ min: 0 })
     .toInt()
     .withMessage('invalidAvaliableContracts'),
   body('role').optional().isMongoId(),
