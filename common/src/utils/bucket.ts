@@ -247,7 +247,7 @@ export class Bucket {
       const face = faceResult.FaceDetails[0];
 
       // Enhanced confidence check for liveness
-      if (!face.Confidence || face.Confidence < 90) {
+      if (!face.Confidence || face.Confidence < 75) {
         return {
           isValid: false,
           error: { 
@@ -359,8 +359,9 @@ export class Bucket {
 
       const textResult = await this.rekognition.detectText(textParams).promise();
       
-      // If text is detected around the face area, it might be a printed photo
-      if (textResult.TextDetections && textResult.TextDetections.length > 3) {
+      // If significant text is detected around the face area, it might be a printed photo
+      // Increased threshold to reduce false positives
+      if (textResult.TextDetections && textResult.TextDetections.length > 8) {
         return {
           isLive: false,
           error: {
@@ -385,12 +386,13 @@ export class Bucket {
       const labelResult = await this.rekognition.detectLabels(labelParams).promise();
       
       if (labelResult.Labels) {
-        const suspiciousLabels = ['Screen', 'Monitor', 'Display', 'Computer', 'Laptop', 'Phone', 'Tablet', 'Paper', 'Document', 'Photo', 'Picture'];
+        // Reduced list to only obvious screen/printed content and increased confidence threshold
+        const suspiciousLabels = ['Screen', 'Monitor', 'Display', 'Computer Screen', 'Television'];
         
         for (const label of labelResult.Labels) {
           if (suspiciousLabels.some(suspicious => 
             label.Name?.toLowerCase().includes(suspicious.toLowerCase()) && 
-            (label.Confidence ?? 0) > 75
+            (label.Confidence ?? 0) > 85
           )) {
             return {
               isLive: false,
@@ -407,6 +409,7 @@ export class Bucket {
     } catch (error) {
       console.error('Error in liveness detection:', error);
       // Don't fail the entire validation for liveness detection errors
+      // This prevents AWS service issues from blocking legitimate users
       return { isLive: true };
     }
   }
@@ -416,9 +419,9 @@ export class Bucket {
     error?: { en: string; ar: string };
   }> {
     try {
-      // Check for overly perfect lighting (common in printed photos)
+      // Check for overly perfect lighting (common in printed photos) - relaxed threshold
       const qualityMetrics = face.Quality;
-      if (qualityMetrics?.Brightness && qualityMetrics.Brightness > 95) {
+      if (qualityMetrics?.Brightness && qualityMetrics.Brightness > 98) {
         return {
           isValid: false,
           error: {
@@ -428,8 +431,8 @@ export class Bucket {
         };
       }
 
-      // Check for suspicious sharpness levels (printed photos often have different sharpness)
-      if (qualityMetrics?.Sharpness && (qualityMetrics.Sharpness < 20 || qualityMetrics.Sharpness > 95)) {
+      // Check for suspicious sharpness levels - more lenient range
+      if (qualityMetrics?.Sharpness && (qualityMetrics.Sharpness < 10 || qualityMetrics.Sharpness > 98)) {
         return {
           isValid: false,
           error: {
@@ -470,7 +473,8 @@ export class Bucket {
       return { isValid: true };
     } catch (error) {
       console.error('Error in anti-spoofing checks:', error);
-      return { isValid: true }; // Don't fail validation for anti-spoofing errors
+      // Don't fail validation for anti-spoofing errors to prevent service issues
+      return { isValid: true };
     }
   }
 
@@ -478,9 +482,9 @@ export class Bucket {
     isValid: boolean;
     error?: { en: string; ar: string };
   } {
-    // Enhanced eye validation for liveness detection
+    // Enhanced eye validation for liveness detection - more lenient
     const eyesOpen = face.EyesOpen;
-    if (!eyesOpen?.Value || (eyesOpen.Confidence ?? 0) < 90) {
+    if (!eyesOpen?.Value || (eyesOpen.Confidence ?? 0) < 70) {
       return {
         isValid: false,
         error: {
