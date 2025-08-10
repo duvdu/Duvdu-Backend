@@ -53,8 +53,8 @@ export const deleteUser: RequestHandler<{ userId: string }> = async (req, res) =
 
   user.isDeleted = true;
   user.refreshTokens = [];
-  user.phoneNumber.number = null as any;
-  user.email = null as any;
+  user.phoneNumber.number = `deleted_${user._id}_${Date.now()}`;
+  user.email = `deleted_${user._id}_${Date.now()}@deleted.com`;
   user.fcmTokens=[];
   await user.save();
 
