@@ -54,6 +54,7 @@ export class SocketServer {
 
         const user = await Users.findById(payload.id).populate('role');
         if (!user) return next(new UnauthenticatedError('user not found'));
+        
         if ((user.role as Irole)?.key === SystemRoles.admin) socket.join(ROOMS.admins);
         (socket as any).loggedUser = payload;
         socket.data.user = user;
@@ -62,7 +63,7 @@ export class SocketServer {
 
         next();
       } catch (error) {
-        console.error(error);
+        console.error('Middleware error:', error);
         return next(new UnauthenticatedError('invalid or expired token'));
       }
     });
@@ -92,7 +93,6 @@ export class SocketServer {
         await addUserToVisitor();
         this.io
           .emit(EVENTS.visitorsCounterUpdate, { counter: await getVisitorCount() });
-        console.log('connect guest');
         
         // Mark this socket as having been counted for visitors
         (socket as any).wasCountedAsVisitor = true;

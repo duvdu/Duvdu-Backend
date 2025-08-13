@@ -14,8 +14,11 @@ const getClient = async () => {
 export const addUserToLogged = async (n = 1) => {
   const client = await getClient();
   const count = +((await client.get(totalLogged)) || 0);
-  await client.set(totalLogged, count + n);
-  return count + n;
+  
+  // Prevent count from going negative
+  const newCount = Math.max(0, count + n);
+  await client.set(totalLogged, newCount);
+  return newCount;
 };
 
 // Track unique logged users to prevent double counting
