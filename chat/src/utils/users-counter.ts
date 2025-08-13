@@ -29,7 +29,6 @@ export const addUniqueLoggedUser = async (userId: string) => {
   
   if (!exists) {
     // Set with expiration (24 hours) as a safety measure
-    await client.setEx(key, 86400, '1');
     return await addUserToLogged(1);
   }
   
