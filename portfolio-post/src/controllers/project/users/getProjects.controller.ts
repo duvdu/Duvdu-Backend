@@ -109,18 +109,43 @@ export const getProjectsPagination: RequestHandler<
   if (req.query.startDate || req.query.endDate) {
     req.pagination.filter.createdAt = {};
     
-    if (req.query.startDate) {
-      // Set start date to beginning of the day
+    // Check if both dates are provided and represent the same day
+    if (req.query.startDate && req.query.endDate) {
       const startDate = new Date(req.query.startDate);
-      startDate.setHours(0, 0, 0, 0);
-      req.pagination.filter.createdAt.$gte = startDate;
-    }
-    
-    if (req.query.endDate) {
-      // Set end date to end of the day
       const endDate = new Date(req.query.endDate);
-      endDate.setHours(23, 59, 59, 999);
-      req.pagination.filter.createdAt.$lte = endDate;
+      
+      // Compare dates (ignoring time)
+      if (startDate.toDateString() === endDate.toDateString()) {
+        // Same day: filter for projects created on this specific day only
+        const dayStart = new Date(startDate);
+        dayStart.setHours(0, 0, 0, 0);
+        const dayEnd = new Date(startDate);
+        dayEnd.setHours(23, 59, 59, 999);
+        
+        req.pagination.filter.createdAt.$gte = dayStart;
+        req.pagination.filter.createdAt.$lte = dayEnd;
+      } else {
+        // Different days: use range filtering
+        startDate.setHours(0, 0, 0, 0);
+        endDate.setHours(23, 59, 59, 999);
+        req.pagination.filter.createdAt.$gte = startDate;
+        req.pagination.filter.createdAt.$lte = endDate;
+      }
+    } else {
+      // Only one date provided: use individual date filtering
+      if (req.query.startDate) {
+        // Set start date to beginning of the day
+        const startDate = new Date(req.query.startDate);
+        startDate.setHours(0, 0, 0, 0);
+        req.pagination.filter.createdAt.$gte = startDate;
+      }
+      
+      if (req.query.endDate) {
+        // Set end date to end of the day
+        const endDate = new Date(req.query.endDate);
+        endDate.setHours(23, 59, 59, 999);
+        req.pagination.filter.createdAt.$lte = endDate;
+      }
     }
   }
 

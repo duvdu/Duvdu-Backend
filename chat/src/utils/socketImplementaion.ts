@@ -86,7 +86,6 @@ export class SocketServer {
       // Only count as visitor if explicitly marked as guest (non-authenticated)
       await addUserToVisitor();
       this.io
-        .to(ROOMS.admins)
         .emit(EVENTS.visitorsCounterUpdate, { counter: await getVisitorCount() });
       console.log('connect guest');
     }
@@ -107,7 +106,6 @@ export class SocketServer {
         // Only decrease visitor count if this was a guest connection
         await addUserToVisitor(-1);
         this.io
-          .to(ROOMS.admins)
           .emit(EVENTS.visitorsCounterUpdate, { counter: await getVisitorCount() });
       }
     });
