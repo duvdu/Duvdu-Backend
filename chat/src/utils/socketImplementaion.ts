@@ -60,7 +60,6 @@ export class SocketServer {
         socket.data.role = user.role;
         await addUserToLogged();
         this.io
-          .to(ROOMS.admins)
           .emit(EVENTS.loggedCounterUpdate, { counter: await getLoggedCount() });
 
         next();
@@ -100,7 +99,6 @@ export class SocketServer {
         await Users.findByIdAndUpdate(userId, { isOnline: false }, { new: true });
         await addUserToLogged(-1);
         this.io
-          .to(ROOMS.admins)
           .emit(EVENTS.loggedCounterUpdate, { counter: await getLoggedCount() });
       } else if (isGuest) {
         // Only decrease visitor count if this was a guest connection

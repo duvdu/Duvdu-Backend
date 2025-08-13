@@ -323,19 +323,16 @@ export const getProjetcsCrm: GetProjectsForCrmHandler = async (req, res) => {
     // Continue with the favourite lookup and project stages
     {
       $lookup: {
-        from: 'favourites',
+        from: MODELS.favourites,
         localField: '_id',
         foreignField: 'project',
-        as: 'favourite',
+        as: 'favourites',
       },
     },
     {
       $addFields: {
-        favouriteCount: { $size: '$favourite' },
+        favouriteCount: { $size: '$favourites' },
       },
-    },
-    {
-      $unwind: { path: '$favourite', preserveNullAndEmptyArrays: true },
     },
     {
       $project: {

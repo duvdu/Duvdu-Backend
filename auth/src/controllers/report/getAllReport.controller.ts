@@ -43,7 +43,7 @@ export const getReportsPagination: RequestHandler<
     req.pagination.filter['sourceUser'] = req.query.sourceUser;
   }
   if (req.query.project) {
-    req.pagination.filter['project.type'] = new mongoose.Types.ObjectId(req.query.project);
+    req.pagination.filter['project'] = new mongoose.Types.ObjectId(req.query.project);
   }
   next();
 };
