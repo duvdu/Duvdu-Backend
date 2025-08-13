@@ -8,9 +8,9 @@ import { Server } from 'socket.io';
 import { handleSocketEvents } from './handle-socket-events.controller';
 import { handleEndUserSession, handleUserSession } from './handle-user-session.controller';
 import {
-  addUserToLogged,
   addUserToVisitor,
-  getLoggedCount,
+  addUniqueLoggedUser,
+  removeUniqueLoggedUser,
   getVisitorCount,
 } from './users-counter';
 import { mySession } from '../app';
@@ -58,9 +58,7 @@ export class SocketServer {
         (socket as any).loggedUser = payload;
         socket.data.user = user;
         socket.data.role = user.role;
-        await addUserToLogged();
-        this.io
-          .emit(EVENTS.loggedCounterUpdate, { counter: await getLoggedCount() });
+        // Don't increment here - will be handled in connection handler
 
         next();
       } catch (error) {
@@ -78,34 +76,52 @@ export class SocketServer {
     const userId = (socket as any).loggedUser?.id || null;
     const isGuest = (socket as any).isGuest || false;
     
-    if (userId) {
-      await Users.findByIdAndUpdate(userId, { isOnline: true }, { new: true });
-      this.io.sockets.sockets.set(userId, socket);
-    } else if (isGuest) {
-      // Only count as visitor if explicitly marked as guest (non-authenticated)
-      await addUserToVisitor();
-      this.io
-        .emit(EVENTS.visitorsCounterUpdate, { counter: await getVisitorCount() });
-      console.log('connect guest');
-    }
-
-    if (socket.data.user) await handleUserSession(this.io, socket);
-    
-    handleSocketEvents(this.io, socket);
-
-    socket.on('disconnect', async () => {
-      if (socket.data.user) await handleEndUserSession(this.io, socket);
+    try {
       if (userId) {
-        await Users.findByIdAndUpdate(userId, { isOnline: false }, { new: true });
-        await addUserToLogged(-1);
-        this.io
-          .emit(EVENTS.loggedCounterUpdate, { counter: await getLoggedCount() });
+        await Users.findByIdAndUpdate(userId, { isOnline: true }, { new: true });
+        this.io.sockets.sockets.set(userId, socket);
+        
+        // Use unique user tracking to prevent double counting
+        const newCount = await addUniqueLoggedUser(userId);
+        this.io.emit(EVENTS.loggedCounterUpdate, { counter: newCount });
+        
+        // Mark this socket as having been counted for logged users
+        (socket as any).wasCountedAsLogged = true;
       } else if (isGuest) {
-        // Only decrease visitor count if this was a guest connection
-        await addUserToVisitor(-1);
+        // Only count as visitor if explicitly marked as guest (non-authenticated)
+        await addUserToVisitor();
         this.io
           .emit(EVENTS.visitorsCounterUpdate, { counter: await getVisitorCount() });
+        console.log('connect guest');
+        
+        // Mark this socket as having been counted for visitors
+        (socket as any).wasCountedAsVisitor = true;
       }
-    });
+
+      if (socket.data.user) await handleUserSession(this.io, socket);
+      
+      handleSocketEvents(this.io, socket);
+
+      socket.on('disconnect', async () => {
+        try {
+          if (socket.data.user) await handleEndUserSession(this.io, socket);
+          
+          if (userId && (socket as any).wasCountedAsLogged) {
+            await Users.findByIdAndUpdate(userId, { isOnline: false }, { new: true });
+            const newCount = await removeUniqueLoggedUser(userId);
+            this.io.emit(EVENTS.loggedCounterUpdate, { counter: newCount });
+          } else if (isGuest && (socket as any).wasCountedAsVisitor) {
+            // Only decrease visitor count if this was a guest connection that was counted
+            await addUserToVisitor(-1);
+            this.io
+              .emit(EVENTS.visitorsCounterUpdate, { counter: await getVisitorCount() });
+          }
+        } catch (error) {
+          console.error('Error handling socket disconnect:', error);
+        }
+      });
+    } catch (error) {
+      console.error('Error handling socket connection:', error);
+    }
   }
 }

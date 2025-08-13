@@ -18,6 +18,34 @@ export const addUserToLogged = async (n = 1) => {
   return count + n;
 };
 
+// Track unique logged users to prevent double counting
+export const addUniqueLoggedUser = async (userId: string) => {
+  const client = await getClient();
+  const key = `logged_user_${userId}`;
+  const exists = await client.exists(key);
+  
+  if (!exists) {
+    // Set with expiration (24 hours) as a safety measure
+    await client.setEx(key, 86400, '1');
+    return await addUserToLogged(1);
+  }
+  
+  return await getLoggedCount();
+};
+
+export const removeUniqueLoggedUser = async (userId: string) => {
+  const client = await getClient();
+  const key = `logged_user_${userId}`;
+  const exists = await client.exists(key);
+  
+  if (exists) {
+    await client.del(key);
+    return await addUserToLogged(-1);
+  }
+  
+  return await getLoggedCount();
+};
+
 export const addUserToVisitor = async (n = 1) => {
   const client = await getClient();
   const count = +((await client.get(totalVisitors)) || 0);
