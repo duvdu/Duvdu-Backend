@@ -9,9 +9,8 @@ import { handleSocketEvents } from './handle-socket-events.controller';
 import { handleEndUserSession, handleUserSession } from './handle-user-session.controller';
 import {
   addUserToVisitor,
-  addUniqueLoggedUser,
-  removeUniqueLoggedUser,
   getVisitorCount,
+  addUserToLogged,
 } from './users-counter';
 import { mySession } from '../app';
 import { env } from '../config/env';
@@ -83,7 +82,7 @@ export class SocketServer {
         this.io.sockets.sockets.set(userId, socket);
         
         // Use unique user tracking to prevent double counting
-        const newCount = await addUniqueLoggedUser(userId);
+        const newCount = await addUserToLogged(1);
         this.io.emit(EVENTS.loggedCounterUpdate, { counter: newCount });
         
         // Mark this socket as having been counted for logged users
@@ -108,7 +107,7 @@ export class SocketServer {
           
           if (userId && (socket as any).wasCountedAsLogged) {
             await Users.findByIdAndUpdate(userId, { isOnline: false }, { new: true });
-            const newCount = await removeUniqueLoggedUser(userId);
+            const newCount = await addUserToLogged(-1);
             this.io.emit(EVENTS.loggedCounterUpdate, { counter: newCount });
           } else if (isGuest && (socket as any).wasCountedAsVisitor) {
             // Only decrease visitor count if this was a guest connection that was counted
