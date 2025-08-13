@@ -80,6 +80,53 @@ export const updateRankForUser = async (userId: string) => {
   return user;
 };
 
+export const updateUsersAfterRankDeletion = async (deletedRankTitle: string) => {
+  const BATCH_SIZE = 100;
+  let processedCount = 0;
+
+  try {
+    // Find all users who have the deleted rank
+    const totalUsersWithRank = await Users.countDocuments({
+      'rank.title': deletedRankTitle,
+    });
+
+    if (totalUsersWithRank === 0) {
+      console.log('No users found with the deleted rank:', deletedRankTitle);
+      return;
+    }
+
+    console.log(`Found ${totalUsersWithRank} users with rank "${deletedRankTitle}" that need to be updated`);
+
+    // Process users in batches
+    while (true) {
+      const users = await Users.find({ 'rank.title': deletedRankTitle })
+        .skip(processedCount)
+        .limit(BATCH_SIZE);
+
+      if (users.length === 0) break;
+
+      // Update rank for each user in the batch using the same logic as updateRankForUser
+      await Promise.all(
+        users.map(async (user) => {
+          try {
+            await updateRankForUser(user._id.toString());
+          } catch (error) {
+            console.error(`Failed to update rank for user ${user._id}:`, error);
+          }
+        }),
+      );
+
+      processedCount += users.length;
+      console.log(`Updated ${processedCount}/${totalUsersWithRank} users`);
+    }
+
+    console.log(`Successfully updated all ${processedCount} users after rank deletion`);
+  } catch (error) {
+    console.error('Failed to update users after rank deletion:', error);
+    throw error;
+  }
+};
+
 export const recalculateAllUsersRanks = async () => {
   const BATCH_SIZE = 100;
   let processedCount = 0;
