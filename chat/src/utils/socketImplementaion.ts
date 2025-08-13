@@ -42,10 +42,8 @@ export class SocketServer {
     this.io.use(sharedSession(mySession));
     this.io.use(async (socket: IcustomHandshake, next) => {
       if (!socket.handshake.session.access) {
-        await addUserToVisitor();
-        this.io
-          .to(ROOMS.admins)
-          .emit(EVENTS.visitorsCounterUpdate, { counter: await getVisitorCount() });
+        // Mark socket as non-authenticated for later handling in connection
+        (socket as any).isGuest = true;
         return next();
       }
 
@@ -65,9 +63,6 @@ export class SocketServer {
           .to(ROOMS.admins)
           .emit(EVENTS.loggedCounterUpdate, { counter: await getLoggedCount() });
 
-        this.io
-          .to(ROOMS.admins)
-          .emit(EVENTS.visitorsCounterUpdate, { counter: await getVisitorCount() });
         next();
       } catch (error) {
         console.error(error);
@@ -82,10 +77,13 @@ export class SocketServer {
 
   private async handleConnection(socket: IcustomHandshake) {
     const userId = (socket as any).loggedUser?.id || null;
+    const isGuest = (socket as any).isGuest || false;
+    
     if (userId) {
       await Users.findByIdAndUpdate(userId, { isOnline: true }, { new: true });
       this.io.sockets.sockets.set(userId, socket);
-    } else {
+    } else if (isGuest) {
+      // Only count as visitor if explicitly marked as guest (non-authenticated)
       await addUserToVisitor();
       this.io
         .to(ROOMS.admins)
@@ -105,7 +103,8 @@ export class SocketServer {
         this.io
           .to(ROOMS.admins)
           .emit(EVENTS.loggedCounterUpdate, { counter: await getLoggedCount() });
-      } else {
+      } else if (isGuest) {
+        // Only decrease visitor count if this was a guest connection
         await addUserToVisitor(-1);
         this.io
           .to(ROOMS.admins)
