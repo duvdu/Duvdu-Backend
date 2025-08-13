@@ -357,6 +357,7 @@ export const getProjectCrmHandler: GetProjectHandler = async (req, res, next) =>
         },
       },
 
+      // Lookup for current user's favorite status
       {
         $lookup: {
           from: MODELS.favourites,
@@ -380,14 +381,24 @@ export const getProjectCrmHandler: GetProjectHandler = async (req, res, next) =>
               },
             },
           ],
-          as: 'favourite',
+          as: 'userFavourite',
+        },
+      },
+
+      // Lookup for total favorites count
+      {
+        $lookup: {
+          from: MODELS.favourites,
+          localField: '_id',
+          foreignField: 'project',
+          as: 'allFavourites',
         },
       },
 
       {
         $addFields: {
-          isFavourite: { $gt: [{ $size: '$favourite' }, 0] },
-          favouriteCount: { $size: '$favourite' },
+          isFavourite: { $gt: [{ $size: '$userFavourite' }, 0] },
+          favouriteCount: { $size: '$allFavourites' },
         },
       },
 
