@@ -424,6 +424,18 @@ export const getProjetcsCrm: GetProjectsForCrmHandler = async (req, res) => {
         isDeleted: 1,
       },
     },
+    // Group by _id to ensure no duplicate projects
+    {
+      $group: {
+        _id: '$_id',
+        doc: { $first: '$$ROOT' }
+      }
+    },
+    {
+      $replaceRoot: {
+        newRoot: '$doc'
+      }
+    },
     { $sort: { createdAt: req.query.sortOrder === 'asc' ? 1 : -1 } },
     { $skip: req.pagination.skip },
     { $limit: req.pagination.limit },

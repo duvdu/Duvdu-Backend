@@ -10,10 +10,25 @@ export const getProjectAnalysis: RequestHandler<
 > = async (req, res) => {
   const matchedPeriod: any = {};
   if (req.query.startDate || req.query.endDate) {
-    matchedPeriod.createdAt = {
-      $gte: req.query.startDate || new Date(0),
-      $lte: req.query.endDate || new Date(),
-    };
+    matchedPeriod.createdAt = {};
+    
+    if (req.query.startDate) {
+      // Set start date to beginning of the day
+      const startDate = new Date(req.query.startDate);
+      startDate.setHours(0, 0, 0, 0);
+      matchedPeriod.createdAt.$gte = startDate;
+    } else {
+      matchedPeriod.createdAt.$gte = new Date(0);
+    }
+    
+    if (req.query.endDate) {
+      // Set end date to end of the day
+      const endDate = new Date(req.query.endDate);
+      endDate.setHours(23, 59, 59, 999);
+      matchedPeriod.createdAt.$lte = endDate;
+    } else {
+      matchedPeriod.createdAt.$lte = new Date();
+    }
   }
 
   const totalCount = await ProjectCycle.countDocuments(matchedPeriod);
