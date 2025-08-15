@@ -3,4 +3,5 @@ export interface Ipagination {
   skip: number;
   page: number;
   filter: any;
+  searchTerm?: string;
 }
