@@ -281,117 +281,114 @@ export const getContractsCrm: RequestHandler<
     },
   ]);
 
-  // Count documents with the same filtering logic
-  let resultCount;
-  if (req.query.status) {
-    // If filtering by contract status, use aggregation to count
-    const countResult = await Contracts.aggregate([
-      { $match: filter },
-      {
-        $lookup: {
-          from: MODELS.copyrightContract,
-          localField: 'contract',
-          foreignField: '_id',
-          as: 'copyright_contract',
+  // Count documents with the same filtering logic as the main aggregation
+  const countPipeline = [
+    { $match: filter },
+    {
+      $lookup: {
+        from: MODELS.copyrightContract,
+        localField: 'contract',
+        foreignField: '_id',
+        as: 'copyright_contract',
+      },
+    },
+    {
+      $lookup: {
+        from: MODELS.rentalContract,
+        localField: 'contract',
+        foreignField: '_id',
+        as: 'rental_contract',
+      },
+    },
+    {
+      $lookup: {
+        from: MODELS.producerContract,
+        localField: 'contract',
+        foreignField: '_id',
+        as: 'producer_contract',
+      },
+    },
+    {
+      $lookup: {
+        from: MODELS.projectContract,
+        localField: 'contract',
+        foreignField: '_id',
+        as: 'project_contracts',
+      },
+    },
+    {
+      $lookup: {
+        from: MODELS.teamContract,
+        localField: 'contract',
+        foreignField: '_id',
+        as: 'team_contracts',
+      },
+    },
+    {
+      $unwind: {
+        path: '$producer_contract',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $unwind: {
+        path: '$team_contracts',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $unwind: {
+        path: '$project_contracts',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $unwind: {
+        path: '$rental_contract',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $unwind: {
+        path: '$copyright_contract',
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $set: {
+        contract: {
+          $ifNull: [
+            {
+              $ifNull: [
+                '$copyright_contract',
+                {
+                  $ifNull: [
+                    '$producer_contract',
+                    '$rental_contract',
+                    '$project_contracts',
+                    '$team_contracts',
+                  ],
+                },
+              ],
+            },
+            null,
+          ],
         },
       },
-      {
-        $lookup: {
-          from: MODELS.rentalContract,
-          localField: 'contract',
-          foreignField: '_id',
-          as: 'rental_contract',
-        },
-      },
-      {
-        $lookup: {
-          from: MODELS.producerContract,
-          localField: 'contract',
-          foreignField: '_id',
-          as: 'producer_contract',
-        },
-      },
-      {
-        $lookup: {
-          from: MODELS.projectContract,
-          localField: 'contract',
-          foreignField: '_id',
-          as: 'project_contracts',
-        },
-      },
-      {
-        $lookup: {
-          from: MODELS.teamContract,
-          localField: 'contract',
-          foreignField: '_id',
-          as: 'team_contracts',
-        },
-      },
-      {
-        $unwind: {
-          path: '$producer_contract',
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $unwind: {
-          path: '$team_contracts',
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $unwind: {
-          path: '$project_contracts',
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $unwind: {
-          path: '$rental_contract',
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $unwind: {
-          path: '$copyright_contract',
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $set: {
-          contract: {
-            $ifNull: [
-              {
-                $ifNull: [
-                  '$copyright_contract',
-                  {
-                    $ifNull: [
-                      '$producer_contract',
-                      '$rental_contract',
-                      '$project_contracts',
-                      '$team_contracts',
-                    ],
-                  },
-                ],
-              },
-              null,
-            ],
-          },
-        },
-      },
-      {
-        $match: {
-          'contract.status': req.query.status
-        }
-      },
-      {
-        $count: "total"
+    },
+    // Apply status filter if provided (same as main pipeline)
+    ...(req.query.status ? [{
+      $match: {
+        'contract.status': req.query.status
       }
-    ]);
-    resultCount = countResult.length > 0 ? countResult[0].total : 0;
-  } else {
-    resultCount = await Contracts.countDocuments(filter);
-  }
+    }] : []),
+    {
+      $count: 'total'
+    }
+  ];
+
+  const countResult = await Contracts.aggregate(countPipeline);
+  const resultCount = countResult.length > 0 ? countResult[0].total : 0;
 
   res.status(200).json({
     message: 'success',
