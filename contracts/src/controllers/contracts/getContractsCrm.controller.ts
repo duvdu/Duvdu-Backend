@@ -20,8 +20,16 @@ export const getContractsCrm: RequestHandler<
 
   if (req.query.cycle) filter.cycle = req.query.cycle;
   if (req.query.ticketNumber) filter.ticketNumber = req.query.ticketNumber;
-  if (req.query.from) filter.createdAt = { $gte: req.query.from };
-  if (req.query.to) filter.createdAt = { ...filter.createdAt, $lte: req.query.to };
+  if (req.query.from) {
+    const startDate = new Date(req.query.from);
+    startDate.setHours(0, 0, 0, 0);
+    filter.createdAt = { $gte: startDate };
+  }
+  if (req.query.to) {
+    const endDate = new Date(req.query.to);
+    endDate.setHours(23, 59, 59, 999);
+    filter.createdAt = { ...filter.createdAt, $lte: endDate };
+  }
   if (req.query.project) filter.project = new mongoose.Types.ObjectId(req.query.project);
 
   // Note: status filtering will be applied after contract lookup

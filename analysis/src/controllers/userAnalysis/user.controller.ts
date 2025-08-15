@@ -123,10 +123,14 @@ export const userAnalysisCrmHandler: RequestHandler<unknown, any, unknown, Analy
     // Build date filter
     const dateFilter: any = {};
     if (from) {
-      dateFilter.$gte = new Date(from);
+      const startDate = new Date(from);
+      startDate.setHours(0, 0, 0, 0);
+      dateFilter.$gte = startDate;
     }
     if (to) {
-      dateFilter.$lte = new Date(to);
+      const endDate = new Date(to);
+      endDate.setHours(23, 59, 59, 999);
+      dateFilter.$lte = endDate;
     }
 
     // 1. Project Statistics from portfolio-post

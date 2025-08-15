@@ -75,6 +75,8 @@ export const filterUsers: RequestHandler<
 
   if (req.query.isDeleted !== undefined) req.pagination.filter.isDeleted = req.query.isDeleted;
 
+  // Handle date range filtering (inclusive of both start and end dates)
+  // If start date equals end date, this will return all records from that entire day
   if (req.query.from) {
     const startDate = new Date(req.query.from);
     // Set the time to start of day (00:00:00.000) to include the entire start date
