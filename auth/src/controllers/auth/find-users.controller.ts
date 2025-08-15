@@ -76,8 +76,12 @@ export const filterUsers: RequestHandler<
   if (req.query.isDeleted !== undefined) req.pagination.filter.isDeleted = req.query.isDeleted;
 
   if (req.query.from) req.pagination.filter.createdAt = { $gte: new Date(req.query.from) };
-  if (req.query.to)
-    req.pagination.filter.createdAt = { ...req.pagination.filter.createdAt, $lte: new Date(req.query.to) };
+  if (req.query.to) {
+    const endDate = new Date(req.query.to);
+    // Set the time to end of day (23:59:59.999) to include the entire end date
+    endDate.setHours(23, 59, 59, 999);
+    req.pagination.filter.createdAt = { ...req.pagination.filter.createdAt, $lte: endDate };
+  }
 
   next();
 };
