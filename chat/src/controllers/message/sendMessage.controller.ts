@@ -99,12 +99,6 @@ export const sendMessageHandler: SendMessageHandler = async (req, res, next) => 
     { path: 'reactions.user', select: 'profileImage isOnline username name' },
   ]);
 
-  if (populatedMessage.media && populatedMessage.media.length > 0) {
-    populatedMessage.media = populatedMessage.media.map((item) => ({
-      ...item,
-      url: item.url.startsWith('https') ? item.url : `${process.env.BUCKET_HOST}/${item.url}`,
-    })) as any;
-  }
   const notification = await Notification.create({
     sourceUser: req.loggedUser.id,
     targetUser: req.body.receiver,
