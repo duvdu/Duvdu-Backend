@@ -39,8 +39,6 @@ export const getContractsCrm: RequestHandler<
   const contracts = await Contracts.aggregate([
     { $match: filter },
     { $sort: { createdAt: -1 } },
-    { $skip: req.pagination.skip },
-    { $limit: req.pagination.limit },
     {
       $lookup: {
         from: MODELS.copyrightContract,
@@ -139,6 +137,9 @@ export const getContractsCrm: RequestHandler<
         'contract.status': req.query.status
       }
     }] : []),
+    // Apply pagination after all filtering is complete
+    { $skip: req.pagination.skip },
+    { $limit: req.pagination.limit },
     {
       $lookup: {
         from: MODELS.user,
