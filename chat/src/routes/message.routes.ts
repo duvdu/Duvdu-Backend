@@ -29,7 +29,7 @@ router
   .route('/')
   .post(
     globalUploadMiddleware(FOLDERS.chat, {
-      fileTypes: ['image/*', 'video/*', 'audio/*'],
+      fileTypes: ['image/*', 'video/*', 'audio/*', 'application/pdf'],
       maxSize: 100 * 1024 * 1024,
     }).fields([{ name: 'attachments', maxCount: 10 }]),
     val.sendNessageVal,
