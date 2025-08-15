@@ -45,7 +45,23 @@ export const getContractsCancel: RequestHandler<
     // Build aggregation pipeline for contract cancellations with user search
     const pipeline: any[] = [];
     
-    // Add lookup for user data first
+    // Build initial match conditions (before lookup for performance)
+    const initialMatchConditions: any = {};
+    
+    // Apply existing filters on ObjectId fields before lookup
+    if (req.pagination.filter.user) {
+      initialMatchConditions.user = req.pagination.filter.user;
+    }
+    if (req.pagination.filter.contract) {
+      initialMatchConditions.contract = req.pagination.filter.contract;
+    }
+    
+    // Add initial match stage if we have ObjectId filters
+    if (Object.keys(initialMatchConditions).length > 0) {
+      pipeline.push({ $match: initialMatchConditions });
+    }
+    
+    // Add lookup for user data
     pipeline.push({
       $lookup: {
         from: MODELS.user,
@@ -58,20 +74,12 @@ export const getContractsCancel: RequestHandler<
     // Unwind user array
     pipeline.push({ $unwind: '$user' });
     
-    // Build match conditions
-    const matchConditions: any = {};
-    
-    // Apply existing filters
-    if (req.pagination.filter.user) {
-      matchConditions.user = req.pagination.filter.user;
-    }
-    if (req.pagination.filter.contract) {
-      matchConditions.contract = req.pagination.filter.contract;
-    }
+    // Build search match conditions (after lookup)
+    const searchMatchConditions: any = {};
     
     // Apply search conditions (search in both cancelReason and user fields)
     if (req.pagination.searchTerm) {
-      matchConditions.$or = [
+      searchMatchConditions.$or = [
         { cancelReason: { $regex: req.pagination.searchTerm, $options: 'i' } },
         { 'user.name': { $regex: req.pagination.searchTerm, $options: 'i' } },
         { 'user.email': { $regex: req.pagination.searchTerm, $options: 'i' } },
@@ -80,9 +88,9 @@ export const getContractsCancel: RequestHandler<
       ];
     }
     
-    // Add match stage if we have conditions
-    if (Object.keys(matchConditions).length > 0) {
-      pipeline.push({ $match: matchConditions });
+    // Add search match stage if we have search conditions
+    if (Object.keys(searchMatchConditions).length > 0) {
+      pipeline.push({ $match: searchMatchConditions });
     }
     
     // Add project stage to select required user fields

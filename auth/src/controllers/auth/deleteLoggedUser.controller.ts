@@ -34,6 +34,8 @@ export const deleteLoggedUser: RequestHandler = async (req, res) => {
   user.isDeleted = true;
   user.phoneNumber.number = `deleted_${user._id}_${Date.now()}`;
   user.email = `deleted_${user._id}_${Date.now()}@deleted.com`;
+  user.appleId = null as any;
+  user.googleId = null as any;
   user.refreshTokens = [];
   user.fcmTokens = [];
   await user.save();
