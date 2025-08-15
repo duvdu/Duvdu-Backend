@@ -21,12 +21,16 @@ export const getContractCancelFilter: RequestHandler<
 > = (req, res, next) => {
   req.pagination.filter = {};
 
-  if (req.pagination.filter.user)
-    req.pagination.filter.user = new mongoose.Types.ObjectId(req.pagination.filter.user);
-  if (req.pagination.filter.contract)
-    req.pagination.filter.contract = new mongoose.Types.ObjectId(req.pagination.filter.contract);
-  if (req.pagination.filter.search)
-    req.pagination.filter.cancelReason = { $regex: req.pagination.filter.search, $options: 'i' };
+  if (req.query.user)
+    req.pagination.filter.user = new mongoose.Types.ObjectId(req.query.user);
+  if (req.query.contract)
+    req.pagination.filter.contract = new mongoose.Types.ObjectId(req.query.contract);
+  
+  // Store search term separately for use in aggregation pipeline
+  if (req.query.search) {
+    req.pagination.searchTerm = req.query.search;
+    req.pagination.filter.cancelReason = { $regex: req.query.search, $options: 'i' };
+  }
 
   next();
 };
@@ -38,16 +42,78 @@ export const getContractsCancel: RequestHandler<
   unknown
 > = async (req, res, next) => {
   try {
-    // Get all contract cancellations with populated user data
-    const contractCancels = await ContractCancel.find(req.pagination.filter)
-      .populate({
-        path: 'user',
-        select: 'name profileImage phoneNumber email',
-      })
-      .limit(req.pagination.limit)
-      .skip(req.pagination.skip);
-
-    const resultCount = await ContractCancel.countDocuments(req.pagination.filter);
+    // Build aggregation pipeline for contract cancellations with user search
+    const pipeline: any[] = [];
+    
+    // Add lookup for user data first
+    pipeline.push({
+      $lookup: {
+        from: MODELS.user,
+        localField: 'user',
+        foreignField: '_id',
+        as: 'user',
+      },
+    });
+    
+    // Unwind user array
+    pipeline.push({ $unwind: '$user' });
+    
+    // Build match conditions
+    const matchConditions: any = {};
+    
+    // Apply existing filters
+    if (req.pagination.filter.user) {
+      matchConditions.user = req.pagination.filter.user;
+    }
+    if (req.pagination.filter.contract) {
+      matchConditions.contract = req.pagination.filter.contract;
+    }
+    
+    // Apply search conditions (search in both cancelReason and user fields)
+    if (req.pagination.searchTerm) {
+      matchConditions.$or = [
+        { cancelReason: { $regex: req.pagination.searchTerm, $options: 'i' } },
+        { 'user.name': { $regex: req.pagination.searchTerm, $options: 'i' } },
+        { 'user.email': { $regex: req.pagination.searchTerm, $options: 'i' } },
+        { 'user.username': { $regex: req.pagination.searchTerm, $options: 'i' } },
+        { 'user.phoneNumber.number': { $regex: req.pagination.searchTerm, $options: 'i' } },
+      ];
+    }
+    
+    // Add match stage if we have conditions
+    if (Object.keys(matchConditions).length > 0) {
+      pipeline.push({ $match: matchConditions });
+    }
+    
+    // Add project stage to select required user fields
+    pipeline.push({
+      $project: {
+        user: {
+          _id: '$user._id',
+          name: '$user.name',
+          profileImage: '$user.profileImage',
+          phoneNumber: '$user.phoneNumber',
+          email: '$user.email',
+        },
+        contract: 1,
+        cancelReason: 1,
+        createdAt: 1,
+        updatedAt: 1,
+      },
+    });
+    
+    // Get total count
+    const countPipeline = [...pipeline];
+    countPipeline.push({ $count: 'total' });
+    const countResult = await ContractCancel.aggregate(countPipeline);
+    const resultCount = countResult.length > 0 ? countResult[0].total : 0;
+    
+    // Add pagination
+    pipeline.push({ $skip: req.pagination.skip });
+    pipeline.push({ $limit: req.pagination.limit });
+    
+    // Execute aggregation
+    const contractCancels = await ContractCancel.aggregate(pipeline);
 
     // Get all contract IDs from the cancellations
     const contractIds = contractCancels.map((cancel) => cancel.contract);
@@ -287,11 +353,19 @@ export const getContractsCancel: RequestHandler<
       return map;
     }, {});
 
-    // Combine contract cancels with their contract details
+    // Combine contract cancels with their contract details and handle user image URLs
     const contractCancelsWithDetails = contractCancels.map((cancel) => {
       const contractId = cancel.contract.toString();
+      
+      // Handle user profile image URL
+      if (cancel.user && cancel.user.profileImage) {
+        if (!cancel.user.profileImage.includes(process.env.BUCKET_HOST || '')) {
+          cancel.user.profileImage = `${process.env.BUCKET_HOST}/${cancel.user.profileImage}`;
+        }
+      }
+      
       return {
-        ...cancel.toObject(),
+        ...cancel,
         contract: contractsMap[contractId] || null,
       };
     });
