@@ -2,13 +2,11 @@ import 'express-async-errors';
 
 import {
   Contracts,
-  incrementProjectsView,
   InviteStatus,
   MODELS,
   NotFound,
   ProjectContractStatus,
   ProjectCycle,
-  Users,
 } from '@duvdu-v1/duvdu';
 import mongoose from 'mongoose';
 
@@ -707,13 +705,6 @@ export const getProjectCrmHandler: GetProjectHandler = async (req, res, next) =>
       return next(new NotFound({ en: 'project not found', ar: 'المشروع غير موجود' }, req.lang));
     }
 
-    await incrementProjectsView(
-      projects[0].user._id,
-      MODELS.portfolioPost,
-      projects[0]._id,
-      req.lang,
-    );
-
     const canChat = !!(await Contracts.findOne({
       $or: [
         { sp: req.loggedUser?.id, customer: projects[0].customer },
@@ -727,9 +718,6 @@ export const getProjectCrmHandler: GetProjectHandler = async (req, res, next) =>
     }));
 
     projects[0].user.canChat = canChat;
-
-    // increment the user projects view count
-    await Users.updateOne({ _id: projects[0].user._id }, { $inc: { projectsView: 1 } });
 
     res.status(200).json({ message: 'success', data: projects[0] });
   } catch (error) {
