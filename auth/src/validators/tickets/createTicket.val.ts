@@ -45,5 +45,7 @@ export const getTicketsPaginationVal = [
   query('closedBy').optional().isMongoId().withMessage('closedByInvalid'),
   query('limit').optional().isInt({ min: 1 }).withMessage('limitInvalid'),
   query('page').optional().isInt({ min: 1 }).withMessage('pageInvalid'),
+  query('startDate').optional().isISO8601().toDate().withMessage('startDateInvalid'),
+  query('endDate').optional().isISO8601().toDate().withMessage('endDateInvalid'),
   globalValidatorMiddleware,
 ];

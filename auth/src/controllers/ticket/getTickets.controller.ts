@@ -14,6 +14,8 @@ export const getTicketsPagination: RequestHandler<
     userId?: string;
     isClosed?: boolean;
     closedBy?: string;
+    startDate?: string;
+    endDate?: string;
   }
 > = async (req, res, next) => {
   req.pagination.filter = {};
@@ -47,6 +49,31 @@ export const getTicketsPagination: RequestHandler<
 
   if (req.query.closedBy) {
     req.pagination.filter['state.closedBy'] = new Types.ObjectId(req.query.closedBy);
+  }
+
+  if (req.query.startDate || req.query.endDate) {
+    const startDate = req.query.startDate ? new Date(req.query.startDate) : new Date(0);
+    const endDate = req.query.endDate ? new Date(req.query.endDate) : new Date();
+    
+    // If start and end dates are the same, filter for the entire day
+    if (req.query.startDate && req.query.endDate && 
+        new Date(req.query.startDate).toDateString() === new Date(req.query.endDate).toDateString()) {
+      const dayStart = new Date(startDate);
+      dayStart.setHours(0, 0, 0, 0);
+      
+      const dayEnd = new Date(startDate);
+      dayEnd.setHours(23, 59, 59, 999);
+      
+      req.pagination.filter.createdAt = {
+        $gte: dayStart,
+        $lte: dayEnd,
+      };
+    } else {
+      req.pagination.filter.createdAt = {
+        $gte: startDate,
+        $lte: endDate,
+      };
+    }
   }
 
   next();

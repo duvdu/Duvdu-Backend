@@ -30,6 +30,8 @@ export const sendNotificationToMultiUserHandler: SendNotificationMultiUserHandle
         message: req.body.message,
         sourceUser: req.loggedUser?.id,
         targetUser: user._id,
+        target: user._id,
+        type: 'system',
       });
 
       notificationId = notification._id;
@@ -51,6 +53,8 @@ export const sendNotificationToMultiUserHandler: SendNotificationMultiUserHandle
 
     res.status(200).json({ message: 'success' });
   } catch (error) {
+    console.log(error);
+    
     res.status(500).json(<any>{ message: 'failed to send fcm notification' });
   }
 };
