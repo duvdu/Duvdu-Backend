@@ -28,9 +28,8 @@ export const sendNotificationToMultiUserHandler: SendNotificationMultiUserHandle
       const notification = await Notification.create({
         title: req.body.title,
         message: req.body.message,
-        target: user._id,
         sourceUser: req.loggedUser?.id,
-        targetUser: req.loggedUser?.id,
+        targetUser: user._id,
       });
 
       notificationId = notification._id;
