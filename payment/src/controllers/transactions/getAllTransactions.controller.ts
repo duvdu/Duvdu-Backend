@@ -56,9 +56,35 @@ export const transactionPagination: RequestHandler<
 
   // Handle date range properly
   if (req.query.from || req.query.to) {
-    req.pagination.filter.createdAt = {};
-    if (req.query.from) req.pagination.filter.createdAt.$gte = new Date(req.query.from);
-    if (req.query.to) req.pagination.filter.createdAt.$lte = new Date(req.query.to);
+    const startDate = req.query.from ? new Date(req.query.from) : new Date(0);
+    const endDate = req.query.to ? new Date(req.query.to) : new Date();
+    
+    // If start and end dates are the same, filter for the entire day
+    if (req.query.from && req.query.to && 
+        new Date(req.query.from).toDateString() === new Date(req.query.to).toDateString()) {
+      const dayStart = new Date(startDate);
+      dayStart.setHours(0, 0, 0, 0);
+      
+      const dayEnd = new Date(startDate);
+      dayEnd.setHours(23, 59, 59, 999);
+      
+      req.pagination.filter.createdAt = {
+        $gte: dayStart,
+        $lte: dayEnd,
+      };
+    } else {
+      // For different dates or single date filters
+      const filterEndDate = new Date(endDate);
+      // Include the entire end date by setting time to end of day
+      if (req.query.to) {
+        filterEndDate.setHours(23, 59, 59, 999);
+      }
+      
+      req.pagination.filter.createdAt = {
+        $gte: startDate,
+        $lte: filterEndDate,
+      };
+    }
   }
   next();
 };

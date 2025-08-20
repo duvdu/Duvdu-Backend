@@ -47,8 +47,37 @@ export const getFundingTransactionPagination: RequestHandler<
   if (fundAmountTo) req.pagination.filter.fundAmount = { $lte: fundAmountTo };
   if (fundAmount) req.pagination.filter.fundAmount = fundAmount;
 
-  if (createdAtFrom) req.pagination.filter.createdAt = { $gte: createdAtFrom };
-  if (createdAtTo) req.pagination.filter.createdAt = { $lte: createdAtTo };
+  if (createdAtFrom || createdAtTo) {
+    const startDate = createdAtFrom ? new Date(createdAtFrom) : new Date(0);
+    const endDate = createdAtTo ? new Date(createdAtTo) : new Date();
+    
+    // If start and end dates are the same, filter for the entire day
+    if (createdAtFrom && createdAtTo && 
+        new Date(createdAtFrom).toDateString() === new Date(createdAtTo).toDateString()) {
+      const dayStart = new Date(startDate);
+      dayStart.setHours(0, 0, 0, 0);
+      
+      const dayEnd = new Date(startDate);
+      dayEnd.setHours(23, 59, 59, 999);
+      
+      req.pagination.filter.createdAt = {
+        $gte: dayStart,
+        $lte: dayEnd,
+      };
+    } else {
+      // For different dates or single date filters
+      const filterEndDate = new Date(endDate);
+      // Include the entire end date by setting time to end of day
+      if (createdAtTo) {
+        filterEndDate.setHours(23, 59, 59, 999);
+      }
+      
+      req.pagination.filter.createdAt = {
+        $gte: startDate,
+        $lte: filterEndDate,
+      };
+    }
+  }
   if (contract) req.pagination.filter.contract = new Types.ObjectId(contract);
   if (ticketNumber) req.pagination.filter.ticketNumber = ticketNumber;
 
