@@ -8,7 +8,6 @@ import {
   NotFound,
   ProjectContractStatus,
   ProjectCycle,
-  Users,
 } from '@duvdu-v1/duvdu';
 import mongoose from 'mongoose';
 
@@ -680,8 +679,6 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
 
     projects[0].user.canChat = canChat;
 
-    // increment the user projects view count
-    await Users.updateOne({ _id: projects[0].user._id }, { $inc: { projectsView: 1 } });
 
     res.status(200).json({ message: 'success', data: projects[0] });
   } catch (error) {

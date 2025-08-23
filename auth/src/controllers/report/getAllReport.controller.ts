@@ -24,11 +24,37 @@ export const getReportsPagination: RequestHandler<
   if (req.query.search) {
     req.pagination.filter.$or = [{ desc: { $regex: req.query.search, $options: 'i' } }];
   }
+  // Handle date range properly
   if (req.query.startDate || req.query.endDate) {
-    req.pagination.filter.createdAt = {
-      $gte: req.query.startDate || new Date(0),
-      $lte: req.query.endDate || new Date(),
-    };
+    const startDate = req.query.startDate ? new Date(req.query.startDate) : new Date(0);
+    const endDate = req.query.endDate ? new Date(req.query.endDate) : new Date();
+    
+    // If start and end dates are the same, filter for the entire day
+    if (req.query.startDate && req.query.endDate && 
+        new Date(req.query.startDate).toDateString() === new Date(req.query.endDate).toDateString()) {
+      const dayStart = new Date(startDate);
+      dayStart.setHours(0, 0, 0, 0);
+      
+      const dayEnd = new Date(startDate);
+      dayEnd.setHours(23, 59, 59, 999);
+      
+      req.pagination.filter.createdAt = {
+        $gte: dayStart,
+        $lte: dayEnd,
+      };
+    } else {
+      // For different dates or single date filters
+      const filterEndDate = new Date(endDate);
+      // Include the entire end date by setting time to end of day
+      if (req.query.endDate) {
+        filterEndDate.setHours(23, 59, 59, 999);
+      }
+      
+      req.pagination.filter.createdAt = {
+        $gte: startDate,
+        $lte: filterEndDate,
+      };
+    }
   }
   if (req.query.isClosed !== undefined) {
     req.pagination.filter['state.isClosed'] = req.query.isClosed;
