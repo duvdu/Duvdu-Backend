@@ -96,6 +96,10 @@ export const createCopyrightQueues = async () => {
             'contract completed',
             Channels.notification,
           );
+
+          await Users.findByIdAndUpdate(contract!.sp, {
+            $inc: { acceptedProjectsCounter: 1 },
+          });
         }
       } catch (error) {
         throw new Error('Failed to process ongoing copyright contract expiration');

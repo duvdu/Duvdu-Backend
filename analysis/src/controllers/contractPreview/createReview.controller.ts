@@ -62,7 +62,6 @@ export async function updateUserRate(
 
   let newAverage: number;
   const ratersDelta = isAdd ? 1 : -1;
-  const projectsDelta = isAdd ? 1 : -1;
 
   if (isAdd) {
     // Adding a new review
@@ -77,7 +76,6 @@ export async function updateUserRate(
 
   await Users.findByIdAndUpdate(userId, {
     $inc: {
-      acceptedProjectsCounter: projectsDelta,
       'rate.ratersCounter': ratersDelta,
     },
     $set: {

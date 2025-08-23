@@ -99,6 +99,14 @@ export const createQueues = async () => {
           Channels.update_contract,
         );
       }
+
+      await Users.findByIdAndUpdate(contract!.sp, {
+        $inc: { acceptedProjectsCounter: 1 },
+      });
+
+      await Users.findByIdAndUpdate(contract!.customer, {
+        $inc: { acceptedProjectsCounter: -1 },
+      });
     },
     { connection: bullRedis },
   );

@@ -57,6 +57,10 @@ export const createRentalQueue = async () => {
           'rental contract completed please check it',
           Channels.update_contract,
         );
+
+        await Users.findByIdAndUpdate(contract!.sp, {
+          $inc: { acceptedProjectsCounter: 1 },
+        });
       }
     },
     { connection: bullRedis },

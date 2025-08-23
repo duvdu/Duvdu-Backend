@@ -201,7 +201,7 @@ export const userAnalysisCrmHandler: RequestHandler<unknown, any, unknown, Analy
       // Top users by accepted projects
       Users.aggregate([
         { $match: userFilter },
-        { $sort: { projectsCount: -1 } },
+        { $sort: { acceptedProjectsCounter: -1 } },
         { $limit: 10 },
         {
           $project: {
@@ -209,7 +209,7 @@ export const userAnalysisCrmHandler: RequestHandler<unknown, any, unknown, Analy
             name: 1,
             username: 1,
             profileImage: { $concat: [process.env.BUCKET_HOST, '/', '$profileImage'] },
-            acceptedProjectsCounter: '$projectsCount',
+            acceptedProjectsCounter: '$acceptedProjectsCounter',
             rank: 1,
           },
         },
