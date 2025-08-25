@@ -35,10 +35,15 @@ export const inviteCreatives = async (
     }
 
     const subCategoryExists = category.subCategories?.some((subCategory: any) => {
-      if (subCategory._id.toString() === user.mainCategory.subCategories.subCategory?.toString()) {
+      if (
+        subCategory &&
+        subCategory._id &&
+        subCategory._id.toString() === user.mainCategory.subCategories.subCategory?.toString()
+      ) {
         // check tags
         user.mainCategory.subCategories?.tags?.forEach((tag: any) => {
           if (
+            subCategory.tags &&
             !subCategory.tags.some((subTag: any) => subTag._id.toString() === tag.tag.toString())
           ) {
             throw new BadRequestError(
@@ -70,12 +75,15 @@ export const inviteCreatives = async (
 
       const relatedSubCategoryExists = relatedCategory.subCategories?.some((subCategory: any) => {
         if (
+          subCategory &&
+          subCategory._id &&
           subCategory._id.toString() ===
           user.mainCategory.relatedCategory?.subCategories.subCategory?.toString()
         ) {
           // check tags
           user.mainCategory.relatedCategory?.subCategories.tags?.forEach((tag: any) => {
             if (
+              subCategory.tags &&
               !subCategory.tags.some((subTag: any) => subTag._id.toString() === tag.tag.toString())
             ) {
               throw new BadRequestError(
@@ -167,11 +175,14 @@ export const validateCreative = async (
 
     const subCategoryExists = category.subCategories?.some((subCategory: any) => {
       if (
+        subCategory &&
+        subCategory._id &&
         subCategory._id.toString() === creative.mainCategory.subCategories.subCategory?.toString()
       ) {
         // check tags
         creative.mainCategory.subCategories.tags?.forEach((tag: any) => {
           if (
+            subCategory.tags &&
             !subCategory.tags.some((subTag: any) => subTag._id.toString() === tag.tag.toString())
           ) {
             throw new BadRequestError(
@@ -204,12 +215,15 @@ export const validateCreative = async (
 
       const relatedSubCategoryExists = relatedCategory.subCategories?.some((subCategory: any) => {
         if (
+          subCategory &&
+          subCategory._id &&
           subCategory._id.toString() ===
           creative.mainCategory.relatedCategory?.subCategories.subCategory?.toString()
         ) {
           // check tags
           creative.mainCategory.relatedCategory?.subCategories.tags?.forEach((tag: any) => {
             if (
+              subCategory.tags &&
               !subCategory.tags.some((subTag: any) => subTag._id.toString() === tag.tag.toString())
             ) {
               throw new BadRequestError(
