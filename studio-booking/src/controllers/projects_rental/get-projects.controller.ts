@@ -328,7 +328,20 @@ export const getProjectsPagination: RequestHandler<
 
   if (req.query.instant != undefined) req.pagination.filter.instant = req.query.instant;
   if (req.query.search) {
-    req.pagination.filter.$or = { $regex: req.query.search, $options: 'i' };
+    const searchRegex = { $regex: req.query.search, $options: 'i' };
+    req.pagination.filter.$or = [
+      { title: searchRegex },
+      { description: searchRegex },
+      { address: searchRegex },
+      { searchKeywords: { $in: [searchRegex] } },
+      { 'tags.ar': searchRegex },
+      { 'tags.en': searchRegex },
+      { 'subCategory.ar': searchRegex },
+      { 'subCategory.en': searchRegex },
+      { phoneNumber: searchRegex },
+      { email: searchRegex },
+      { ticketNumber: searchRegex }
+    ];
   }
   if (req.query.location) {
     req.pagination.filter.location = {
@@ -383,10 +396,21 @@ export const getProjectsPagination: RequestHandler<
     const englishTitles = subCategories.map((subCat) => subCat.title.en);
 
     // Ensure that at least one of the title arrays has content
-    req.pagination.filter['$or'] = [
+    const subCategoryFilter = [
       { 'subCategory.ar': { $in: arabicTitles } },
       { 'subCategory.en': { $in: englishTitles } },
     ];
+    
+    // If there's already a search filter, combine them with $and
+    if (req.pagination.filter.$or) {
+      req.pagination.filter.$and = [
+        { $or: req.pagination.filter.$or },
+        { $or: subCategoryFilter }
+      ];
+      delete req.pagination.filter.$or;
+    } else {
+      req.pagination.filter.$or = subCategoryFilter;
+    }
   }
 
   if (req.query.tags) {
