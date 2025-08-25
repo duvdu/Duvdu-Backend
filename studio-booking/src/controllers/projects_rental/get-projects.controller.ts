@@ -340,7 +340,8 @@ export const getProjectsPagination: RequestHandler<
       { 'subCategory.en': searchRegex },
       { phoneNumber: searchRegex },
       { email: searchRegex },
-      { ticketNumber: searchRegex }
+      { ticketNumber: searchRegex },
+      { searchKeyWords: { $in: req.query.search.split(' ') } },
     ];
   }
   if (req.query.location) {

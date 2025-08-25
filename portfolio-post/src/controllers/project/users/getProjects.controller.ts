@@ -54,6 +54,7 @@ export const getProjectsPagination: RequestHandler<
         { 'functions.name': { $regex: req.query.search, $options: 'i' } },
         { address: { $regex: req.query.search, $options: 'i' } },
         { ticketNumber: { $regex: req.query.search, $options: 'i' } },
+        { searchKeyWords: { $in: req.query.search.split(' ') } },
       ],
     };
   }
