@@ -119,15 +119,25 @@ export const createProjectHandler: RequestHandler<
       req.lang,
     );
 
-    // Validate creatives if present
-    if (req.body.creatives) {
-      await validateCreative(req.body.creatives, req.lang);
-    }
-
-    // Handle invited creatives
     let invitedCreative: any = [];
-    if (req.body.invitedCreatives) {
-      invitedCreative = (await inviteCreatives(req.body.invitedCreatives, req.lang)) || [];
+    try {
+      // Validate creatives if present
+      if (req.body.creatives) {
+        await validateCreative(req.body.creatives, req.lang);
+      }
+
+      // Handle invited creatives
+      if (req.body.invitedCreatives) {
+        invitedCreative = (await inviteCreatives(req.body.invitedCreatives, req.lang)) || [];
+      }
+    } catch (error) {
+      console.log('error from validateCreative', error);
+
+      if (error instanceof BadRequestError) {
+        return next(error);
+      }
+
+      throw error;
     }
 
     // Initialize S3 bucket and handle file uploads

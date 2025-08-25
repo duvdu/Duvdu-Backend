@@ -119,9 +119,9 @@ export const inviteCreatives = async (
         subCategories: invitedUsers[index].mainCategory.subCategories,
         relatedCategory: invitedUsers[index].mainCategory.relatedCategory
           ? {
-              category: invitedUsers[index].mainCategory.relatedCategory?.category,
-              subCategories: invitedUsers[index].mainCategory.relatedCategory?.subCategories,
-            }
+            category: invitedUsers[index].mainCategory.relatedCategory?.category,
+            subCategories: invitedUsers[index].mainCategory.relatedCategory?.subCategories,
+          }
           : null,
       },
     }));
