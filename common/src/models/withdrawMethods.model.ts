@@ -22,7 +22,7 @@ export interface IWithdrawMethod {
   default: boolean;
   status: WithdrawMethodStatus;
 }
-
+// 
 export const WithdrawMethodModel = model<IWithdrawMethod>(
   MODELS.withdrawMethod,
   new Schema<IWithdrawMethod>({
