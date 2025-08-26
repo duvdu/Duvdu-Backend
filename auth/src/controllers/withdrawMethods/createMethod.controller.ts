@@ -17,6 +17,6 @@ export const createMethod: RequestHandler<
       { user: req.loggedUser.id, _id: { $ne: method._id } },
       { default: false },
     );
-
+  // 
   res.status(201).json({ message: 'success' });
 };
