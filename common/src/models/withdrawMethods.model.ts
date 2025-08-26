@@ -17,7 +17,7 @@ export interface IWithdrawMethod {
   method: WithdrawMethod;
   name: string;
   number: string;
-  iban: string;
+  iban: string | null;
   isDeleted: boolean;
   default: boolean;
   status: WithdrawMethodStatus;
