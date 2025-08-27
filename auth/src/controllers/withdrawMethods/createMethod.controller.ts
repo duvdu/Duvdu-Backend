@@ -9,6 +9,7 @@ export const createMethod: RequestHandler<
   const method = await WithdrawMethodModel.create({
     ...req.body,
     user: req.loggedUser.id,
+    iban: req.body.iban || null, // Ensure iban is always present
   });
 
   // if the method is default, make all other methods default false
@@ -17,6 +18,6 @@ export const createMethod: RequestHandler<
       { user: req.loggedUser.id, _id: { $ne: method._id } },
       { default: false },
     );
-
+  // 
   res.status(201).json({ message: 'success' });
 };

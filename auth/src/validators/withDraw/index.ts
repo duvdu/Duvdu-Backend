@@ -5,8 +5,8 @@ export const createMethodValidator = [
   body('method').isIn(Object.values(WithdrawMethod)).withMessage('Method is required'),
   body('name').isString().withMessage('Name is required'),
   body('number').isString().withMessage('Number is required'),
-  body('default').optional().isBoolean().withMessage('Default is required'),
-  body('iban').optional().isString().withMessage('Iban is required'),
+  body('default').optional().isBoolean().withMessage('Default must be boolean'),
+  body('iban').optional().isString().withMessage('IBAN must be a string'),
   globalValidatorMiddleware,
 ];
 

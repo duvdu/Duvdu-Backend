@@ -17,12 +17,12 @@ export interface IWithdrawMethod {
   method: WithdrawMethod;
   name: string;
   number: string;
-  iban: string;
+  iban: string | null;
   isDeleted: boolean;
   default: boolean;
   status: WithdrawMethodStatus;
 }
-
+// 
 export const WithdrawMethodModel = model<IWithdrawMethod>(
   MODELS.withdrawMethod,
   new Schema<IWithdrawMethod>({
@@ -30,6 +30,7 @@ export const WithdrawMethodModel = model<IWithdrawMethod>(
     method: { type: String, enum: WithdrawMethod },
     name: { type: String, default: null },
     number: { type: String, default: null },
+    iban: { type: String, default: null },
     isDeleted: { type: Boolean, default: false },
     iban: { type: String, default: null },
     default: { type: Boolean, default: false },
