@@ -658,6 +658,11 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
       return next(new NotFound({ en: 'project not found', ar: 'المشروع غير موجود' }, req.lang));
     }
 
+    // Filter out projects where showOnHome is false and the logged user is not the owner or not logged in
+    if (projects[0].showOnHome === false && (!req.loggedUser?.id || req.loggedUser?.id !== projects[0].user._id.toString())) {
+      return next(new NotFound({ en: 'project not found', ar: 'المشروع غير موجود' }, req.lang));
+    }
+
     await incrementProjectsView(
       projects[0].user._id,
       MODELS.portfolioPost,

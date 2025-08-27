@@ -247,14 +247,29 @@ export const globalSearchHandler: RequestHandler<
       $match: {
         isDeleted: false,
         $or: [
-          { name: { $regex: searchKeyword, $options: 'i' } },
-          { description: { $regex: searchKeyword, $options: 'i' } },
-          { searchKeyWords: { $regex: searchKeyword, $options: 'i' } },
-          { 'subCategory.ar': { $regex: searchKeyword, $options: 'i' } },
-          { 'subCategory.en': { $regex: searchKeyword, $options: 'i' } },
-          { 'tags.ar': { $regex: searchKeyword, $options: 'i' } },
-          { 'tags.en': { $regex: searchKeyword, $options: 'i' } },
+          // If showOnHome is false, only show to the owner
+          {
+            $and: [
+              { showOnHome: false },
+              { user: new mongoose.Types.ObjectId(req.loggedUser?.id || '000000000000000000000000') }
+            ]
+          },
+          // If showOnHome is not false (true or undefined), show to everyone
+          { showOnHome: { $ne: false } }
         ],
+        $and: [
+          {
+            $or: [
+              { name: { $regex: searchKeyword, $options: 'i' } },
+              { description: { $regex: searchKeyword, $options: 'i' } },
+              { searchKeyWords: { $regex: searchKeyword, $options: 'i' } },
+              { 'subCategory.ar': { $regex: searchKeyword, $options: 'i' } },
+              { 'subCategory.en': { $regex: searchKeyword, $options: 'i' } },
+              { 'tags.ar': { $regex: searchKeyword, $options: 'i' } },
+              { 'tags.en': { $regex: searchKeyword, $options: 'i' } },
+            ]
+          }
+        ]
       },
     },
     {
@@ -484,14 +499,29 @@ export const globalSearchHandler: RequestHandler<
       $match: {
         isDeleted: false,
         $or: [
-          { name: { $regex: searchKeyword, $options: 'i' } },
-          { description: { $regex: searchKeyword, $options: 'i' } },
-          { searchKeyWords: { $regex: searchKeyword, $options: 'i' } },
-          { 'subCategory.ar': { $regex: searchKeyword, $options: 'i' } },
-          { 'subCategory.en': { $regex: searchKeyword, $options: 'i' } },
-          { 'tags.ar': { $regex: searchKeyword, $options: 'i' } },
-          { 'tags.en': { $regex: searchKeyword, $options: 'i' } },
+          // If showOnHome is false, only show to the owner
+          {
+            $and: [
+              { showOnHome: false },
+              { user: new mongoose.Types.ObjectId(req.loggedUser?.id || '000000000000000000000000') }
+            ]
+          },
+          // If showOnHome is not false (true or undefined), show to everyone
+          { showOnHome: { $ne: false } }
         ],
+        $and: [
+          {
+            $or: [
+              { name: { $regex: searchKeyword, $options: 'i' } },
+              { description: { $regex: searchKeyword, $options: 'i' } },
+              { searchKeyWords: { $regex: searchKeyword, $options: 'i' } },
+              { 'subCategory.ar': { $regex: searchKeyword, $options: 'i' } },
+              { 'subCategory.en': { $regex: searchKeyword, $options: 'i' } },
+              { 'tags.ar': { $regex: searchKeyword, $options: 'i' } },
+              { 'tags.en': { $regex: searchKeyword, $options: 'i' } },
+            ]
+          }
+        ]
       },
     },
     ...pipelines,
