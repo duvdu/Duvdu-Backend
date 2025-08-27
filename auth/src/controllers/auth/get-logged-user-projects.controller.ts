@@ -101,7 +101,7 @@ export const getUserProjectsByUsername: RequestHandler<
   })
     .populate({
       path: 'project.type',
-      select: 'cover title name creatives cycle audioCover isDeleted',
+      select: 'cover title name creatives cycle audioCover isDeleted showOnHome',
       populate: [
         { path: 'user', select: 'name username profileImage isOnline' },
         {
@@ -166,7 +166,15 @@ export const getUserProjectsByUsername: RequestHandler<
   });
 
   const filteredProjects = projects.filter((el: any) => {
-    return !el.project?.isDeleted;
+    // Filter out deleted projects
+    if (el.project?.isDeleted) return false;
+    
+    // Filter out projects where showOnHome is false and the logged user is not the owner
+    if (el.project?.showOnHome === false && req.loggedUser?.id !== targetUser.id.toString()) {
+      return false;
+    }
+    
+    return true;
   });
 
   res.status(200).json({ message: 'success', data: { total: count, projects: filteredProjects } });
