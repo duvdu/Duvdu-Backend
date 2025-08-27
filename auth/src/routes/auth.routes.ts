@@ -160,7 +160,7 @@ router
   );
 
 router.get('/profile/projects', isauthenticated, handlers.getLoggedUserProjects);
-router.get('/profile/projects/:username', isauthenticated, handlers.getUserProjectsByUsername);
+router.get('/profile/projects/:username', optionalAuthenticated, handlers.getUserProjectsByUsername);
 
 router.route('/profile/:username').get(optionalAuthenticated, handlers.getUserProfileHandler);
 
