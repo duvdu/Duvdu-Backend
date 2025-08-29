@@ -11,6 +11,7 @@ export enum PERMISSIONS {
   blockUser = 'block-user',
   unBlockUser = 'un-block-user',
   listUsers = 'list-users',
+  listAdmins = 'list-admins',
   removeUser = 'remove-user',
 
   // roles
