@@ -32,7 +32,6 @@ export const WithdrawMethodModel = model<IWithdrawMethod>(
     number: { type: String, default: null },
     iban: { type: String, default: null },
     isDeleted: { type: Boolean, default: false },
-    iban: { type: String, default: null },
     default: { type: Boolean, default: false },
     status: { type: String, enum: WithdrawMethodStatus, default: WithdrawMethodStatus.ACTIVE },
   }),

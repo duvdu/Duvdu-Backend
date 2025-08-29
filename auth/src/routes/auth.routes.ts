@@ -61,11 +61,14 @@ router
   )
   .get(
     isauthenticated,
+    isauthorized(PERMISSIONS.listUsers),
     val.findUsers,
     globalPaginationMiddleware,
     handlers.filterUsers,
     handlers.getCrmUsers,
   );
+
+router.get('/crm/admins', isauthenticated, isauthorized(PERMISSIONS.listAdmins), val.findUsers, globalPaginationMiddleware, handlers.filterUsers, handlers.getCrmUser);
 
 router
   .route('/crm/:userId')
