@@ -28,8 +28,8 @@ export const filterUsers: RequestHandler<
     role?: string;
     isOnline?: boolean;
     isDeleted?: boolean;
-    from?:Date;
-    to?:Date;
+    from?: Date;
+    to?: Date;
   }
 > = async (req, res, next) => {
   if (req.query.search) {
@@ -57,12 +57,14 @@ export const filterUsers: RequestHandler<
   if (req.query.isOnline !== undefined) req.pagination.filter.isOnline = req.query.isOnline;
 
   if (req.query.isAdmin != undefined) {
-    const roles = await Roles.find({key:{ $in: [SystemRoles.unverified , SystemRoles.verified] }});
+    const roles = await Roles.find({
+      key: { $in: [SystemRoles.unverified, SystemRoles.verified] },
+    });
     if (req.query.isAdmin) {
       req.pagination.filter.role = {
         $nin: roles.map((role) => role._id),
       };
-    }else{
+    } else {
       req.pagination.filter.role = {
         $in: roles.map((role) => role._id),
       };

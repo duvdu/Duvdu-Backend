@@ -6,7 +6,6 @@ export const getCrmUsers: RequestHandler<unknown, PaginationResponse<{ data: Ius
   req,
   res,
 ) => {
-
   const aggregationPipeline: PipelineStage[] = [];
 
   // Add filtering and matching stages

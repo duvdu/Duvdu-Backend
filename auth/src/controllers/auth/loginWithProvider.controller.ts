@@ -130,11 +130,7 @@ export const loginWithProviderHandler: RequestHandler<
   // Skip role checks if request is coming from Postman
   if (!isPostman) {
     if (isDashboard) {
-      if (
-        [SystemRoles.unverified, SystemRoles.verified].includes(
-          role.key as SystemRoles,
-        )
-      ) {
+      if ([SystemRoles.unverified, SystemRoles.verified].includes(role.key as SystemRoles)) {
         return next(
           new UnauthenticatedError(
             { en: 'User not authorized', ar: 'المستخدم غير مصرح له' },
@@ -143,11 +139,7 @@ export const loginWithProviderHandler: RequestHandler<
         );
       }
     } else if (isMobileApp) {
-      if (
-        ![SystemRoles.unverified, SystemRoles.verified].includes(
-          role.key as SystemRoles,
-        )
-      ) {
+      if (![SystemRoles.unverified, SystemRoles.verified].includes(role.key as SystemRoles)) {
         return next(
           new UnauthenticatedError(
             { en: 'User not authorized for mobile app', ar: 'المستخدم غير مصرح له للتطبيق' },
@@ -156,11 +148,7 @@ export const loginWithProviderHandler: RequestHandler<
         );
       }
     } else {
-      if (
-        ![SystemRoles.unverified, SystemRoles.verified].includes(
-          role.key as SystemRoles,
-        )
-      ) {
+      if (![SystemRoles.unverified, SystemRoles.verified].includes(role.key as SystemRoles)) {
         return next(
           new UnauthenticatedError(
             { en: 'User not authorized', ar: 'المستخدم غير مصرح له' },
@@ -179,7 +167,10 @@ export const loginWithProviderHandler: RequestHandler<
   if (user.isBlocked.value)
     return next(
       new UnauthenticatedError(
-        { en: `your account is blocked for reason of ${user.isBlocked.reason}`, ar: `حسابك محظور بسبب ${user.isBlocked.reason}` },
+        {
+          en: `your account is blocked for reason of ${user.isBlocked.reason}`,
+          ar: `حسابك محظور بسبب ${user.isBlocked.reason}`,
+        },
         req.lang,
       ),
     );
@@ -196,9 +187,7 @@ export const loginWithProviderHandler: RequestHandler<
 
     await user.save();
 
-    return res
-      .status(403)
-      .json(<any>{ message: 'success', username: user.username });
+    return res.status(403).json(<any>{ message: 'success', username: user.username });
   }
 
   const { accessToken, refreshToken } = await createOrUpdateSessionAndGenerateTokens(

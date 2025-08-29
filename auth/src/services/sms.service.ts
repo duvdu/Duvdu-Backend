@@ -29,15 +29,15 @@ export class SmsService {
         recipient: formattedTo,
         sender_id: this.senderId,
         type: 'plain',
-        message: `${this.senderId}: Your otp is ${otpCode}`
+        message: `${this.senderId}: Your otp is ${otpCode}`,
       };
 
       const response = await axios.post(this.apiUrl, payload, {
         headers: {
-          'Authorization': `Bearer ${this.bearerToken}`,
+          Authorization: `Bearer ${this.bearerToken}`,
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        }
+          Accept: 'application/json',
+        },
       });
       console.log(response.data);
 

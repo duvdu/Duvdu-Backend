@@ -123,9 +123,7 @@ export const signinHandler: SigninHandler = async (req, res, next) => {
 
     await smsService.sendOtp(user.phoneNumber.number, verificationCode);
     await user.save();
-    return res
-      .status(403)
-      .json(<any>{ message: 'success', username: user.username });
+    return res.status(403).json(<any>{ message: 'success', username: user.username });
   }
 
   const role = await Roles.findById(user.role);

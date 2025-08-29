@@ -40,7 +40,7 @@ export const deleteUser: RequestHandler<{ userId: string }> = async (req, res) =
         },
       },
     });
-    
+
     if (canDelete)
       throw new BadRequestError(
         {
@@ -57,7 +57,7 @@ export const deleteUser: RequestHandler<{ userId: string }> = async (req, res) =
   user.email = `deleted_${user._id}_${Date.now()}@deleted.com`;
   user.appleId = null as any;
   user.googleId = null as any;
-  user.fcmTokens=[];
+  user.fcmTokens = [];
   await user.save();
 
   res.status(200).json({

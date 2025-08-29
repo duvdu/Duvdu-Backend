@@ -168,12 +168,15 @@ export const getUserProjectsByUsername: RequestHandler<
   const filteredProjects = projects.filter((el: any) => {
     // Filter out deleted projects
     if (el.project?.isDeleted) return false;
-    
+
     // Filter out projects where showOnHome is false and the logged user is not the owner or not logged in
-    if (el.project?.showOnHome === false && (!req.loggedUser?.id || req.loggedUser?.id !== targetUser.id.toString())) {
+    if (
+      el.project?.showOnHome === false &&
+      (!req.loggedUser?.id || req.loggedUser?.id !== targetUser.id.toString())
+    ) {
       return false;
     }
-    
+
     return true;
   });
 

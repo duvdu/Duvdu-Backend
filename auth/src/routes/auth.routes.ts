@@ -11,20 +11,15 @@ import {
 import { Router } from 'express';
 import Stripe from 'stripe';
 
-
-
-
 import * as handlers from '../controllers/auth';
 import * as val from '../validators/auth';
 
 const router = Router();
 
 router.post('/webhook', (req, res) => {
-
-
-  console.log('webhook received' , req.body);
-  console.log('webhook received' , req.headers);
-  console.log('webhook received' , req.params);
+  console.log('webhook received', req.body);
+  console.log('webhook received', req.headers);
+  console.log('webhook received', req.params);
 
   const sig = req.headers['stripe-signature'] as string;
   let event: Stripe.Event;
@@ -51,7 +46,15 @@ router
   .route('/provider/phone')
   .post(isauthenticated, val.updatePhoneNumberVal, handlers.updateProviderPhoneNumberHandler);
 
-router.get('/admins', isauthenticated, isauthorized(PERMISSIONS.listAdmins), val.findUsers, globalPaginationMiddleware, handlers.filterUsers, handlers.getCrmUser);
+router.route('/admins').get(
+  isauthenticated,
+  isauthorized(PERMISSIONS.listAdmins),
+  val.findUsers,
+  globalPaginationMiddleware,
+  handlers.filterUsers,
+  handlers.getCrmUsers,
+);
+
 
 router
   .route('/crm')
@@ -70,7 +73,6 @@ router
     handlers.getCrmUsers,
   );
 
-
 router
   .route('/crm/:userId')
   .patch(
@@ -83,12 +85,7 @@ router
     val.updateUser,
     handlers.updateUserHandler,
   )
-  .get(
-    isauthenticated,
-    isauthorized(PERMISSIONS.listUsers),
-    val.getCrmUser,
-    handlers.getCrmUser,
-  )
+  .get(isauthenticated, isauthorized(PERMISSIONS.listUsers), val.getCrmUser, handlers.getCrmUser)
   .delete(
     isauthenticated,
     isauthorized(PERMISSIONS.removeUser),
@@ -164,7 +161,11 @@ router
   );
 
 router.get('/profile/projects', isauthenticated, handlers.getLoggedUserProjects);
-router.get('/profile/projects/:username', optionalAuthenticated, handlers.getUserProjectsByUsername);
+router.get(
+  '/profile/projects/:username',
+  optionalAuthenticated,
+  handlers.getUserProjectsByUsername,
+);
 
 router.route('/profile/:username').get(optionalAuthenticated, handlers.getUserProfileHandler);
 

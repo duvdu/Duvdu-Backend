@@ -6,12 +6,14 @@ export const updatePageController: RequestHandler<
   SuccessResponse<{ data: IPage }>,
   Partial<Pick<IPage, 'title' | 'content' | 'type'>>
 > = async (req, res) => {
-
   if (req.body.type) {
-    const page = await Pages.findOne({ type: req.body.type , _id: { $ne: req.params.id } });
-    if (page) 
-      throw new BadRequestError({ar: 'الصفحة موجودة مسبقاً', en: 'Page already exists' } , req.lang);
-  } 
+    const page = await Pages.findOne({ type: req.body.type, _id: { $ne: req.params.id } });
+    if (page)
+      throw new BadRequestError(
+        { ar: 'الصفحة موجودة مسبقاً', en: 'Page already exists' },
+        req.lang,
+      );
+  }
 
   const page = await Pages.findByIdAndUpdate(req.params.id, req.body, {
     new: true,

@@ -6,12 +6,14 @@ export const createPageController: RequestHandler<
   SuccessResponse<{ data: IPage }>,
   Pick<IPage, 'title' | 'content' | 'type'>
 > = async (req, res) => {
-
   if (req.body.type) {
     const page = await Pages.findOne({ type: req.body.type });
-    if (page) 
-      throw new BadRequestError({ar: 'الصفحة موجودة مسبقاً', en: 'Page already exists' } , req.lang);
-  } 
+    if (page)
+      throw new BadRequestError(
+        { ar: 'الصفحة موجودة مسبقاً', en: 'Page already exists' },
+        req.lang,
+      );
+  }
 
   const newPage = await Pages.create(req.body);
   res.status(201).json({
