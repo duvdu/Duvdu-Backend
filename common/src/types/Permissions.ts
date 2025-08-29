@@ -210,6 +210,7 @@ export const permissions = {
     PERMISSIONS.listTransactions,
     PERMISSIONS.updateFundTransactions,
     PERMISSIONS.listUserAnalysis,
+    PERMISSIONS.listAdmins,
   ],
   category: [
     PERMISSIONS.createCategory,
@@ -233,6 +234,7 @@ export const permissions = {
     PERMISSIONS.blockUser,
     PERMISSIONS.unBlockUser,
     PERMISSIONS.removeUser,
+    PERMISSIONS.listAdmins,
   ],
   messages: [PERMISSIONS.listMessagesFromTo, PERMISSIONS.sendNotificationToUsers],
   projects: [
