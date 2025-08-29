@@ -85,7 +85,7 @@ router
     val.updateUser,
     handlers.updateUserHandler,
   )
-  .get(isauthenticated, isauthorized(PERMISSIONS.listUsers), val.getCrmUser, handlers.getCrmUser)
+  .get(isauthenticated, val.getCrmUser, handlers.getCrmUser)
   .delete(
     isauthenticated,
     isauthorized(PERMISSIONS.removeUser),
