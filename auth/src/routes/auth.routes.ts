@@ -52,7 +52,6 @@ router
   .post(isauthenticated, val.updatePhoneNumberVal, handlers.updateProviderPhoneNumberHandler);
 
 router.get('/admins', isauthenticated, isauthorized(PERMISSIONS.listAdmins), val.findUsers, globalPaginationMiddleware, handlers.filterUsers, handlers.getCrmUser);
-router.get('/search', isauthenticated, val.findUsers, globalPaginationMiddleware, handlers.filterUsers, handlers.getCrmUser);
 
 router
   .route('/crm')
