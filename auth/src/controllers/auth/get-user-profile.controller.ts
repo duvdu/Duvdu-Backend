@@ -4,7 +4,7 @@ import { GetUserProfileHandler } from '../../types/endpoints/user.endpoints';
 
 export const getUserProfileHandler: GetUserProfileHandler = async (req, res, next) => {
   const user = await Users.aggregate([
-    { $match: { username: req.params.username } },
+    { $match: { username: req.params.username , isDeleted: false } },
     {
       $project: {
         googleId: 0,

@@ -31,7 +31,7 @@ export const updateProfileHandler: RequestHandler<
   >,
   unknown
 > = async (req, res, next) => {
-  const profile = await Users.findById(req.loggedUser.id);
+  const profile = await Users.findOne({ _id: req.loggedUser.id, isDeleted: false });
   if (!profile)
     return next(new NotFound({ en: 'no user found', ar: 'المستخدم غير موجود' }, req.lang));
 

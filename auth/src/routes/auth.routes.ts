@@ -51,7 +51,7 @@ router.route('/admins').get(
   isauthorized(PERMISSIONS.listAdmins),
   val.findUsers,
   globalPaginationMiddleware,
-  handlers.filterUsers,
+  handlers.filterCrmUsers,
   handlers.getCrmUsers,
 );
 
@@ -69,7 +69,7 @@ router
     isauthorized(PERMISSIONS.listUsers),
     val.findUsers,
     globalPaginationMiddleware,
-    handlers.filterUsers,
+    handlers.filterCrmUsers,
     handlers.getCrmUsers,
   );
 

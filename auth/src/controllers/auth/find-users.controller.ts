@@ -92,6 +92,8 @@ export const filterUsers: RequestHandler<
     req.pagination.filter.createdAt = { ...req.pagination.filter.createdAt, $lte: endDate };
   }
 
+  req.pagination.filter.isDeleted = false;
+
   next();
 };
 

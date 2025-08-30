@@ -1,6 +1,95 @@
-import { Iuser, MODELS, PaginationResponse, Users } from '@duvdu-v1/duvdu';
+import { Iuser, MODELS, PaginationResponse, Roles, SystemRoles, Users } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 import mongoose, { PipelineStage } from 'mongoose';
+
+
+
+export const filterCrmUsers: RequestHandler<
+  unknown,
+  unknown,
+  unknown,
+  {
+    search?: string;
+    username?: string;
+    phoneNumber?: string;
+    category?: string;
+    priceFrom?: number;
+    priceTo?: number;
+    hasVerificationPadge?: boolean;
+    isBlocked?: boolean;
+    isAdmin?: boolean;
+    maxDistance?: number;
+    role?: string;
+    isOnline?: boolean;
+    isDeleted?: boolean;
+    from?: Date;
+    to?: Date;
+  }
+> = async (req, res, next) => {
+  if (req.query.search) {
+    req.pagination.filter.$or = [
+      { 'phoneNumber.number': { $regex: `\\b${req.query.search}\\b`, $options: 'i' } },
+      { username: { $regex: `${req.query.search}`, $options: 'i' } },
+      { name: { $regex: `${req.query.search}`, $options: 'i' } },
+      { email: { $regex: `${req.query.search}`, $options: 'i' } },
+    ];
+  }
+  if (req.query.username) req.pagination.filter.username = req.query.username;
+  if (req.query.phoneNumber) req.pagination.filter['phoneNumber.number'] = req.query.phoneNumber;
+  if (req.query.category)
+    req.pagination.filter.categories = {
+      $in: [new mongoose.Types.ObjectId(req.query.category)],
+    };
+
+  if (req.query.priceFrom) req.pagination.filter.price = { $gte: req.query.priceFrom };
+  if (req.query.priceTo)
+    req.pagination.filter.price = { ...req.pagination.filter.price, $lte: req.query.priceTo };
+  if (req.query.hasVerificationPadge !== undefined)
+    req.pagination.filter.hasVerificationBadge = req.query.hasVerificationPadge;
+  if (req.query.isBlocked !== undefined)
+    req.pagination.filter['isBlocked.value'] = req.query.isBlocked;
+  if (req.query.isOnline !== undefined) req.pagination.filter.isOnline = req.query.isOnline;
+
+  if (req.query.isAdmin != undefined) {
+    const roles = await Roles.find({
+      key: { $in: [SystemRoles.unverified, SystemRoles.verified] },
+    });
+    if (req.query.isAdmin) {
+      req.pagination.filter.role = {
+        $nin: roles.map((role) => role._id),
+      };
+    } else {
+      req.pagination.filter.role = {
+        $in: roles.map((role) => role._id),
+      };
+    }
+  }
+
+  if (req.query.role) req.pagination.filter.role = new mongoose.Types.ObjectId(req.query.role);
+
+  req.query.maxDistance = +(req.query.maxDistance || 1000);
+
+  if (req.query.isDeleted !== undefined) req.pagination.filter.isDeleted = req.query.isDeleted;
+
+  // Handle date range filtering (inclusive of both start and end dates)
+  // If start date equals end date, this will return all records from that entire day
+  if (req.query.from) {
+    const startDate = new Date(req.query.from);
+    // Set the time to start of day (00:00:00.000) to include the entire start date
+    startDate.setHours(0, 0, 0, 0);
+    req.pagination.filter.createdAt = { $gte: startDate };
+  }
+  if (req.query.to) {
+    const endDate = new Date(req.query.to);
+    // Set the time to end of day (23:59:59.999) to include the entire end date
+    endDate.setHours(23, 59, 59, 999);
+    req.pagination.filter.createdAt = { ...req.pagination.filter.createdAt, $lte: endDate };
+  }
+
+
+  next();
+};
+
 
 export const getCrmUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser[] }>> = async (
   req,

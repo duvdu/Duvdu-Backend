@@ -1,4 +1,4 @@
-import { BadRequestError, Contracts, Irole, NotFound, SystemRoles } from '@duvdu-v1/duvdu';
+import { BadRequestError, Contracts, Irole, NotFound, SystemRoles, CopyRights, Rentals, ProjectCycle } from '@duvdu-v1/duvdu';
 import { Users } from '@duvdu-v1/duvdu/build/models/User.model';
 import { RequestHandler } from 'express';
 import 'express-async-errors';
@@ -59,6 +59,10 @@ export const deleteUser: RequestHandler<{ userId: string }> = async (req, res) =
   user.googleId = null as any;
   user.fcmTokens = [];
   await user.save();
+
+  await CopyRights.updateMany({ user:user._id }, { isDeleted:true});
+  await Rentals.updateMany({ user: user._id }, { isDeleted:true});
+  await ProjectCycle.updateMany({ user:user._id }, { isDeleted:true});
 
   res.status(200).json({
     message: 'User deleted successfully',
