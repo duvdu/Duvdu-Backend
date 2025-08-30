@@ -34,19 +34,19 @@ router
   .route('/:reportId')
   .patch(
     isauthenticated,
-    isauthorized(PERMISSIONS.updateReportHandler),
+    isauthorized(PERMISSIONS.updateReport),
     val.updateReportVal,
     handler.updateReportHandler,
   )
   .get(
     isauthenticated,
-    isauthorized(PERMISSIONS.getReportHandler),
+    isauthorized(PERMISSIONS.listReports),
     val.getReportVal,
     handler.getReportHandler,
   )
   .delete(
     isauthenticated,
-    isauthorized(PERMISSIONS.deleteReportHandler),
+    isauthorized(PERMISSIONS.deleteReport),
     val.deleteReportVal,
     handler.removeReportHandler,
   );
