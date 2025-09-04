@@ -11,8 +11,16 @@ export enum PERMISSIONS {
   blockUser = 'block-user',
   unBlockUser = 'un-block-user',
   listUsers = 'list-users',
-  listAdmins = 'list-admins',
   removeUser = 'remove-user',
+  
+  // admin
+  listAdmins = 'list-admins',
+  createAdmin = 'create-admin',
+  updateAdmin = 'update-admin',
+  unBlockAdmin = 'un-block-admin',
+  blockAdmin = 'block-admin',
+  removeAdmin = 'remove-admin',
+
 
   // roles
   createRoleHandler = 'create-role',
@@ -213,6 +221,11 @@ export const permissions = {
     PERMISSIONS.listUserAnalysis,
     PERMISSIONS.listAdmins,
     PERMISSIONS.listMessages,
+    PERMISSIONS.createAdmin,
+    PERMISSIONS.updateAdmin,
+    PERMISSIONS.blockAdmin,
+    PERMISSIONS.unBlockAdmin,
+    PERMISSIONS.removeAdmin,
   ],
   category: [
     PERMISSIONS.createCategory,
@@ -236,8 +249,8 @@ export const permissions = {
     PERMISSIONS.blockUser,
     PERMISSIONS.unBlockUser,
     PERMISSIONS.removeUser,
-    PERMISSIONS.listAdmins,
   ],
+  admins: [PERMISSIONS.listAdmins , PERMISSIONS.createAdmin, PERMISSIONS.updateAdmin, PERMISSIONS.blockAdmin, PERMISSIONS.unBlockAdmin, PERMISSIONS.removeAdmin],
   messages: [PERMISSIONS.listMessagesFromTo, PERMISSIONS.sendNotificationToUsers, PERMISSIONS.listMessages],
   projects: [
     PERMISSIONS.listProjects,
