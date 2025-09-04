@@ -24,6 +24,7 @@ export enum PERMISSIONS {
   //message
   listMessagesFromTo = 'list-messages-from-to',
   sendNotificationToUsers = 'send-notification-to-users',
+  listMessages = 'list-messages',
 
   // project
   listProjects = 'list-projects',
@@ -211,6 +212,7 @@ export const permissions = {
     PERMISSIONS.updateFundTransactions,
     PERMISSIONS.listUserAnalysis,
     PERMISSIONS.listAdmins,
+    PERMISSIONS.listMessages,
   ],
   category: [
     PERMISSIONS.createCategory,
@@ -236,7 +238,7 @@ export const permissions = {
     PERMISSIONS.removeUser,
     PERMISSIONS.listAdmins,
   ],
-  messages: [PERMISSIONS.listMessagesFromTo, PERMISSIONS.sendNotificationToUsers],
+  messages: [PERMISSIONS.listMessagesFromTo, PERMISSIONS.sendNotificationToUsers, PERMISSIONS.listMessages],
   projects: [
     PERMISSIONS.listProjects,
     PERMISSIONS.updateProject,
