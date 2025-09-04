@@ -8,6 +8,7 @@ import {
   ProjectContractStatus,
   SubmitFilesStatus,
   SuccessResponse,
+  Users,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
@@ -52,6 +53,11 @@ export const acceptAllFilesController: RequestHandler<
   });
 
   contract.status = ProjectContractStatus.completed;
+
+  // update sp accepted project
+  await Users.findByIdAndUpdate(contract.sp, {
+    $inc: { acceptedProjectsCounter: 1 },
+  });
 
   await contract.save();
 
