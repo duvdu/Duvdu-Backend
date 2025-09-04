@@ -1,4 +1,4 @@
-import { MODELS, UnauthenticatedError, Users } from '@duvdu-v1/duvdu';
+import { MODELS, UnauthenticatedError, updateRankForUser, Users } from '@duvdu-v1/duvdu';
 import mongoose from 'mongoose';
 
 import { GetLoggedUserProfileHandler } from '../../types/endpoints/user.endpoints';
@@ -70,6 +70,9 @@ export const getLoggedUserProfileHandler: GetLoggedUserProfileHandler = async (r
     },
   ]);
   if (!user[0]) return next(new UnauthenticatedError(undefined, req.lang));
+
+  // update rank
+  await updateRankForUser(user[0]._id.toString());
 
   res.status(200).json({ message: 'success', data: user[0] });
 };
