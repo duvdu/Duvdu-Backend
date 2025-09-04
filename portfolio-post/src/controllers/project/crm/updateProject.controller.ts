@@ -25,78 +25,83 @@ async function validateMediaRequirements(
   cover?: Express.Multer.File[],
   audioCover?: Express.Multer.File[],
 ) {
-  const mediaValidators = {
-    [CategoryMedia.image]: () => {
-      const imageFiles = filterFilesByType(attachments || [], 'image/');
-      if (imageFiles.length === 0) {
-        throw new BadRequestError(
-          {
-            en: 'There must be exactly one image file as an attachment',
-            ar: 'يجب أن يكون هناك ملف صورة واحد كمرفق',
-          },
-          lang,
-        );
-      }
-    },
-    [CategoryMedia.audio]: () => {
-      const audioFiles = filterFilesByType(attachments || [], 'audio/');
-      if (audioFiles.length === 0) {
-        throw new BadRequestError(
-          {
-            en: 'There must be exactly one audio file as an attachment',
-            ar: 'يجب أن يكون هناك ملف صوتي واحد كمرفق',
-          },
-          lang,
-        );
-      }
-    },
-    [CategoryMedia.video]: () => {
-      const videoFiles = filterFilesByType(attachments || [], 'video/');
-      if (videoFiles.length === 0) {
-        throw new BadRequestError(
-          {
-            en: 'There must be exactly one video file as an attachment',
-            ar: 'يجب أن يكون هناك ملف فيديو واحد كمرفق',
-          },
-          lang,
-        );
-      }
-    },
-  };
+  // Only validate uploaded attachments (optional for updates)
+  if (attachments && attachments.length > 0) {
+    const mediaValidators = {
+      [CategoryMedia.image]: () => {
+        const imageFiles = filterFilesByType(attachments, 'image/');
+        if (imageFiles.length === 0) {
+          throw new BadRequestError(
+            {
+              en: 'Attachment must be an image file for this category',
+              ar: 'يجب أن يكون المرفق ملف صورة لهذه الفئة',
+            },
+            lang,
+          );
+        }
+      },
+      [CategoryMedia.audio]: () => {
+        const audioFiles = filterFilesByType(attachments, 'audio/');
+        if (audioFiles.length === 0) {
+          throw new BadRequestError(
+            {
+              en: 'Attachment must be an audio file for this category',
+              ar: 'يجب أن يكون المرفق ملف صوتي لهذه الفئة',
+            },
+            lang,
+          );
+        }
+      },
+      [CategoryMedia.video]: () => {
+        const videoFiles = filterFilesByType(attachments, 'video/');
+        if (videoFiles.length === 0) {
+          throw new BadRequestError(
+            {
+              en: 'Attachment must be a video file for this category',
+              ar: 'يجب أن يكون المرفق ملف فيديو لهذه الفئة',
+            },
+            lang,
+          );
+        }
+      },
+    };
 
-  // Execute media-specific validation
-  mediaValidators[media]?.();
-
-  // Validate cover based on media type
-  if (
-    (media === CategoryMedia.image || media === CategoryMedia.audio) &&
-    !cover?.[0]?.mimetype.startsWith('image/')
-  ) {
-    throw new BadRequestError(
-      { en: 'Cover must be an image', ar: 'يجب أن يكون الغلاف صورة' },
-      lang,
-    );
+    // Execute media-specific validation only if attachments are uploaded
+    mediaValidators[media]?.();
   }
 
-  // Additional audio validation
-  if (media === CategoryMedia.audio) {
-    if (!audioCover?.[0]?.mimetype.startsWith('audio/')) {
+  // Validate cover based on media type (only if cover is uploaded)
+  if (cover && cover.length > 0) {
+    if (
+      (media === CategoryMedia.image || media === CategoryMedia.audio) &&
+      !cover[0]?.mimetype.startsWith('image/')
+    ) {
       throw new BadRequestError(
-        {
-          en: 'Audio cover is required and must be an audio file',
-          ar: 'يجب أن يكون الغلاف الصوتي صوتيًا',
-        },
+        { en: 'Cover must be an image', ar: 'يجب أن يكون الغلاف صورة' },
+        lang,
+      );
+    }
+
+    // Video cover validation (only if cover is uploaded)
+    if (media === CategoryMedia.video && !cover[0]?.mimetype.startsWith('video/')) {
+      throw new BadRequestError(
+        { en: 'Cover must be a video for video media type', ar: 'يجب أن يكون الغلاف فيديو' },
         lang,
       );
     }
   }
 
-  // Video cover validation
-  if (media === CategoryMedia.video && !cover?.[0]?.mimetype.startsWith('video/')) {
-    throw new BadRequestError(
-      { en: 'Cover must be a video for video media type', ar: 'يجب أن يكون الغلاف فيديو' },
-      lang,
-    );
+  // Additional audio validation (only if audioCover is uploaded)
+  if (media === CategoryMedia.audio && audioCover && audioCover.length > 0) {
+    if (!audioCover[0]?.mimetype.startsWith('audio/')) {
+      throw new BadRequestError(
+        {
+          en: 'Audio cover must be an audio file',
+          ar: 'يجب أن يكون الغلاف الصوتي ملف صوتي',
+        },
+        lang,
+      );
+    }
   }
 }
 
@@ -167,14 +172,14 @@ export const updateProjectCrmHandler: RequestHandler<
       audioCover?: Express.Multer.File[];
     };
 
-    // Validate media requirements if files are provided
+    // Validate media requirements for any uploaded files
     if (attachments || cover || audioCover) {
       await validateMediaRequirements(
         media as CategoryMedia,
         req.lang,
-        attachments || [],
-        cover || [],
-        audioCover || [],
+        attachments,
+        cover,
+        audioCover,
       );
     }
 
