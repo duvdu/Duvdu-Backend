@@ -20,14 +20,14 @@ import { filterFilesByType } from '../users/createProject.controller';
 
 async function validateMediaRequirements(
   media: CategoryMedia,
-  attachments: Express.Multer.File[],
-  cover: Express.Multer.File[],
-  audioCover: Express.Multer.File[],
   lang: string,
+  attachments?: Express.Multer.File[],
+  cover?: Express.Multer.File[],
+  audioCover?: Express.Multer.File[],
 ) {
   const mediaValidators = {
     [CategoryMedia.image]: () => {
-      const imageFiles = filterFilesByType(attachments, 'image/');
+      const imageFiles = filterFilesByType(attachments || [], 'image/');
       if (imageFiles.length === 0) {
         throw new BadRequestError(
           {
@@ -39,7 +39,7 @@ async function validateMediaRequirements(
       }
     },
     [CategoryMedia.audio]: () => {
-      const audioFiles = filterFilesByType(attachments, 'audio/');
+      const audioFiles = filterFilesByType(attachments || [], 'audio/');
       if (audioFiles.length === 0) {
         throw new BadRequestError(
           {
@@ -51,7 +51,7 @@ async function validateMediaRequirements(
       }
     },
     [CategoryMedia.video]: () => {
-      const videoFiles = filterFilesByType(attachments, 'video/');
+      const videoFiles = filterFilesByType(attachments || [], 'video/');
       if (videoFiles.length === 0) {
         throw new BadRequestError(
           {
@@ -70,7 +70,7 @@ async function validateMediaRequirements(
   // Validate cover based on media type
   if (
     (media === CategoryMedia.image || media === CategoryMedia.audio) &&
-    !cover[0]?.mimetype.startsWith('image/')
+    !cover?.[0]?.mimetype.startsWith('image/')
   ) {
     throw new BadRequestError(
       { en: 'Cover must be an image', ar: 'يجب أن يكون الغلاف صورة' },
@@ -92,7 +92,7 @@ async function validateMediaRequirements(
   }
 
   // Video cover validation
-  if (media === CategoryMedia.video && !cover[0]?.mimetype.startsWith('video/')) {
+  if (media === CategoryMedia.video && !cover?.[0]?.mimetype.startsWith('video/')) {
     throw new BadRequestError(
       { en: 'Cover must be a video for video media type', ar: 'يجب أن يكون الغلاف فيديو' },
       lang,
@@ -171,10 +171,10 @@ export const updateProjectCrmHandler: RequestHandler<
     if (attachments || cover || audioCover) {
       await validateMediaRequirements(
         media as CategoryMedia,
+        req.lang,
         attachments || [],
         cover || [],
         audioCover || [],
-        req.lang,
       );
     }
 

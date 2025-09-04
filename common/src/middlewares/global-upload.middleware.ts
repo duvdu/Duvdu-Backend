@@ -74,6 +74,7 @@ export const globalUploadMiddleware = (folder: string, options?: UploadOptions) 
           }
         },
   });
+  
 
   return {
     single: upload.single.bind(upload),
