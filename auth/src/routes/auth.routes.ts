@@ -53,7 +53,49 @@ router.route('/admins').get(
   globalPaginationMiddleware,
   handlers.filterCrmUsers,
   handlers.getCrmUsers,
-);
+)
+  .post(
+    isauthenticated,
+    isauthorized(PERMISSIONS.createAdmin),
+    val.createUser,
+    handlers.createUserHandler,
+  );
+
+router
+  .route('/admins/:userId')
+  .patch(
+    isauthenticated,
+    isauthorized(PERMISSIONS.updateAdmin),
+    globalUploadMiddleware(FOLDERS.auth).fields([
+      { name: 'profileImage', maxCount: 1 },
+      { name: 'coverImage', maxCount: 1 },
+    ]),
+    val.updateUser,
+    handlers.updateUserHandler,
+  )
+  .get(isauthenticated, val.getCrmUser, handlers.getCrmUser)
+  .delete(
+    isauthenticated,
+    isauthorized(PERMISSIONS.removeAdmin),
+    val.deleteUser,
+    handlers.deleteUser,
+  );
+
+router
+  .route('/admins/:userId/block')
+  .post(
+    isauthenticated,
+    isauthorized(PERMISSIONS.blockAdmin),
+    val.blockUser,
+    handlers.blockUserHandler,
+  )
+  .patch(
+    isauthenticated,
+    isauthorized(PERMISSIONS.unBlockAdmin),
+    val.unblockUser,
+    handlers.unBlockUserHandler,
+  );
+
 
 
 router
