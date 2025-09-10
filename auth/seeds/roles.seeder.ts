@@ -9,7 +9,9 @@ export const appInit = async () => {
   // await dbConnection(env.mongoDb.uri);
 
   // drop database
-  await mongoose.connection.db.dropDatabase();
+  if (mongoose.connection.db) {
+    await mongoose.connection.db.dropDatabase();
+  }
 
   let adminRole = await Roles.findOne({ key: SystemRoles.admin });
   if (!adminRole)
