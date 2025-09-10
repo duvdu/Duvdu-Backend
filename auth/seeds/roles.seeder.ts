@@ -9,9 +9,9 @@ export const appInit = async () => {
   // await dbConnection(env.mongoDb.uri);
 
   // drop database
-  if (mongoose.connection.db) {
-    await mongoose.connection.db.dropDatabase();
-  }
+  // if (mongoose.connection.db) {
+  //   await mongoose.connection.db.dropDatabase();
+  // }
 
   let adminRole = await Roles.findOne({ key: SystemRoles.admin });
   if (!adminRole)
@@ -55,6 +55,7 @@ export const appInit = async () => {
   if (!(await Users.findOne({ username: 'duvduSuperAdmin' })))
     await Users.create({
       username: 'duvduSuperAdmin',
+      name: 'Duvdu Super Admin',
       password: await hashPassword('123@Password'),
       role: adminRole?._id,
       isVerified: true,
