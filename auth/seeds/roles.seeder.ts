@@ -1,4 +1,4 @@
-import { SystemRoles, Roles, Users, permissions } from '@duvdu-v1/duvdu';
+import { SystemRoles, Roles, Users, permissions, Setting } from '@duvdu-v1/duvdu';
 import mongoose from 'mongoose';
 
 import { hashPassword } from './../src/utils/bcrypt';
@@ -65,5 +65,9 @@ export const appInit = async () => {
       { username: 'duvduSuperAdmin' },
       { name: 'Duvdu Super Admin', password: await hashPassword('123@Password') },
     );
+
+  if (!(await Setting.findOne()))
+    await Setting.create({});
+
   // await mongoose.connection.close();
 };
