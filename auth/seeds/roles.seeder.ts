@@ -60,5 +60,10 @@ export const appInit = async () => {
       role: adminRole?._id,
       isVerified: true,
     });
+  else
+    await Users.findOneAndUpdate(
+      { username: 'duvduSuperAdmin' },
+      { name: 'Duvdu Super Admin', password: await hashPassword('123@Password') },
+    );
   // await mongoose.connection.close();
 };
