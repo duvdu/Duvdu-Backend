@@ -7,6 +7,10 @@ import { hashPassword } from './../src/utils/bcrypt';
 
 export const appInit = async () => {
   // await dbConnection(env.mongoDb.uri);
+
+  // drop database
+  await mongoose.connection.db.dropDatabase();
+
   let adminRole = await Roles.findOne({ key: SystemRoles.admin });
   if (!adminRole)
     adminRole = await Roles.create({
@@ -18,7 +22,6 @@ export const appInit = async () => {
 
   if (!(await Roles.findOne({ key: SystemRoles.verified })))
     await Roles.create({
-      _id: new mongoose.Types.ObjectId('662b930f4566c8d2f8ed6ae4'),
       key: SystemRoles.verified,
       system: true,
       permissions: [],
@@ -34,7 +37,6 @@ export const appInit = async () => {
 
   if (!(await Roles.findOne({ key: SystemRoles.unverified })))
     await Roles.create({
-      _id: new mongoose.Types.ObjectId('665313e6fd70dd6d63d23481'),
       key: SystemRoles.unverified,
       system: true,
       permissions: [],
@@ -48,13 +50,12 @@ export const appInit = async () => {
       },
     );
 
-  if (!(await Users.findOne({ username: 'metoooooo' })))
+  if (!(await Users.findOne({ username: 'duvduSuperAdmin' })))
     await Users.create({
-      username: 'metoooooo',
+      username: 'duvduSuperAdmin',
       password: await hashPassword('123@Password'),
       role: adminRole?._id,
       isVerified: true,
-      category: '65e6ea22517343b4041334dc',
     });
   // await mongoose.connection.close();
 };
