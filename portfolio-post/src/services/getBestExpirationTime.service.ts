@@ -15,15 +15,21 @@ export async function getBestExpirationTime(isoDate: string, lang: string) {
     throw new NotFound({ en: 'setting not found', ar: 'الإعداد غير موجود' }, lang);
   }
 
-  const validTimes = settings.expirationTime
+  // Use default 24 hours if expirationTime is not set
+  const defaultExpirationTime = [{ time: 24 }];
+  const expirationTimeData = settings.expirationTime && settings.expirationTime.length > 0 
+    ? settings.expirationTime 
+    : defaultExpirationTime;
+
+  const validTimes = expirationTimeData
     .map((entry) => entry.time)
     .filter((time) => time % 2 === 0 && time * 2 <= timeDifferenceInHours);
 
   if (validTimes.length === 0) {
     throw new BadRequestError(
       {
-        en: `the minimum difference time between booking and now must be at least ${settings.expirationTime[0].time * 2} hour`,
-        ar: `الحد الأدنى للفترة الزمنية بين وقت الحجز والوقت الحالي يجب أن يكون على الأقل ${settings.expirationTime[0].time * 2} ساعة`,
+        en: `the minimum difference time between booking and now must be at least ${expirationTimeData[0].time * 2} hour`,
+        ar: `الحد الأدنى للفترة الزمنية بين وقت الحجز والوقت الحالي يجب أن يكون على الأقل ${expirationTimeData[0].time * 2} ساعة`,
       },
       lang,
     );

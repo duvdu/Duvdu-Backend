@@ -114,7 +114,7 @@ export const loginWithProviderHandler: RequestHandler<
       role: role._id,
       email: req.body.email,
       name: req.body.name,
-      avaliableContracts: 343,
+      avaliableContracts: 5,
       profileImage: appSettings?.default_profile,
       coverImage: appSettings?.default_cover,
       rank: await getRankProgress(),
