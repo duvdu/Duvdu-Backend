@@ -70,3 +70,38 @@ export const resetTotalVisitorsCount = async () => {
   const client = await getClient();
   await client.set(totalVisitors, 0);
 };
+
+// Track user connection count to handle multiple platform connections
+export const incrementUserConnectionCount = async (userId: string) => {
+  const client = await getClient();
+  const key = `user_connections_${userId}`;
+  const count = await client.incr(key);
+  
+  // Set expiration on first connection (24 hours as safety measure)
+  if (count === 1) {
+    await client.expire(key, 86400); // 24 hours
+  }
+  
+  return count;
+};
+
+export const decrementUserConnectionCount = async (userId: string) => {
+  const client = await getClient();
+  const key = `user_connections_${userId}`;
+  const count = await client.decr(key);
+  
+  // If count reaches 0 or goes negative, delete the key
+  if (count <= 0) {
+    await client.del(key);
+    return 0;
+  }
+  
+  return count;
+};
+
+export const getUserConnectionCount = async (userId: string) => {
+  const client = await getClient();
+  const key = `user_connections_${userId}`;
+  const count = await client.get(key);
+  return parseInt(count || '0');
+};

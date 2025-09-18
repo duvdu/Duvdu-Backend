@@ -12,6 +12,8 @@ import {
   getVisitorCount,
   addUniqueLoggedUser,
   removeUniqueLoggedUser,
+  incrementUserConnectionCount,
+  decrementUserConnectionCount,
 } from './users-counter';
 import { mySession } from '../app';
 import { env } from '../config/env';
@@ -82,9 +84,15 @@ export class SocketServer {
         await Users.findByIdAndUpdate(userId, { isOnline: true }, { new: true });
         this.io.sockets.sockets.set(userId, socket);
         
-        // Use unique user tracking to prevent double counting across platforms
-        const newCount = await addUniqueLoggedUser(userId);
-        this.io.emit(EVENTS.loggedCounterUpdate, { counter: newCount });
+        // Track user connection count for multiple platform support
+        const connectionCount = await incrementUserConnectionCount(userId);
+        
+        // Only count as new logged user if this is their first connection
+        let newCount;
+        if (connectionCount === 1) {
+          newCount = await addUniqueLoggedUser(userId);
+          this.io.emit(EVENTS.loggedCounterUpdate, { counter: newCount });
+        }
         
         // Mark this socket as having been counted for logged users
         (socket as any).wasCountedAsLogged = true;
@@ -107,9 +115,15 @@ export class SocketServer {
           if (socket.data.user) await handleEndUserSession(this.io, socket);
           
           if (userId && (socket as any).wasCountedAsLogged) {
-            await Users.findByIdAndUpdate(userId, { isOnline: false }, { new: true });
-            const newCount = await removeUniqueLoggedUser(userId);
-            this.io.emit(EVENTS.loggedCounterUpdate, { counter: newCount });
+            // Decrement user connection count
+            const remainingConnections = await decrementUserConnectionCount(userId);
+            
+            // Only mark user as offline and remove from logged count if no connections remain
+            if (remainingConnections === 0) {
+              await Users.findByIdAndUpdate(userId, { isOnline: false }, { new: true });
+              const newCount = await removeUniqueLoggedUser(userId);
+              this.io.emit(EVENTS.loggedCounterUpdate, { counter: newCount });
+            }
           } else if (isGuest && (socket as any).wasCountedAsVisitor) {
             // Only decrease visitor count if this was a guest connection that was counted
             await addUserToVisitor(-1);
