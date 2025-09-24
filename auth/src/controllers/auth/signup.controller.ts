@@ -53,7 +53,6 @@ export const signupHandler: SignupHandler = async (req, res, next) => {
         role: role.id,
         isVerified: false,
         haveInvitation: false,
-        avaliableContracts: 343,
         verificationCode: {
           code: hashVerificationCode(verificationCode),
           expireAt: new Date(Date.now() + 60 * 1000),
