@@ -39,7 +39,7 @@ const userSchema = new Schema<Iuser>(
     pricePerHour: { type: Number, default: 0 },
     role: { type: Schema.Types.ObjectId, ref: MODELS.role },
     hasVerificationBadge: { type: Boolean, default: false },
-    avaliableContracts: { type: Number, default: 0 },
+    avaliableContracts: { type: Number, default: 5 },
     rate: { ratersCounter: { type: Number, default: 0 }, totalRates: { type: Number, default: 0 } },
     isBlocked: {
       value: { type: Boolean, default: false },
