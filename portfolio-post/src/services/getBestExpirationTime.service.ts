@@ -22,7 +22,7 @@ export async function getBestExpirationTime(isoDate: string, currentDateCairo: s
   console.log( 'settings', settings);
 
   // Use default 24 hours if expirationTime is not set
-  const defaultExpirationTime = [{ time: 24 }];
+  const defaultExpirationTime = [{ time: 12 }];
   const expirationTimeData = settings.expirationTime && settings.expirationTime.length > 0 
     ? settings.expirationTime 
     : defaultExpirationTime;
