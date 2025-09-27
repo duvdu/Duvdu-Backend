@@ -30,7 +30,7 @@ export async function getBestExpirationTime(isoDate: string, lang: string) {
 
   const validTimes = expirationTimeData
     .map((entry) => entry.time)
-    .filter((time) => time % 2 === 0 && time * 2 <= timeDifferenceInHours);
+    .filter((time) => time * 2 <= timeDifferenceInHours);
 
   console.log( 'validTimes', validTimes);
   if (validTimes.length === 0) {
