@@ -5,8 +5,6 @@ export async function getBestExpirationTime(isoDate: string, currentDateCairo: s
   const givenDate = new Date(isoDate);
   const currentDate = new Date(currentDateCairo);
 
-  console.log( 'givenDate', givenDate);
-  console.log( 'currentDate', currentDate);
 
   const timeDifferenceInHours = Math.abs(
     (givenDate.getTime() - currentDate.getTime()) / (1000 * 60 * 60),
@@ -19,7 +17,6 @@ export async function getBestExpirationTime(isoDate: string, currentDateCairo: s
     throw new NotFound({ en: 'setting not found', ar: 'الإعداد غير موجود' }, lang);
   }
 
-  console.log( 'settings', settings);
 
   // Use default 24 hours if expirationTime is not set
   const defaultExpirationTime = [{ time: 12 }];
@@ -27,13 +24,11 @@ export async function getBestExpirationTime(isoDate: string, currentDateCairo: s
     ? settings.expirationTime 
     : defaultExpirationTime;
 
-  console.log( 'expirationTimeData', expirationTimeData);
 
   const validTimes = expirationTimeData
     .map((entry) => entry.time)
     .filter((time) => time * 2 <= timeDifferenceInHours);
 
-  console.log( 'validTimes', validTimes);
   if (validTimes.length === 0) {
     throw new BadRequestError(
       {

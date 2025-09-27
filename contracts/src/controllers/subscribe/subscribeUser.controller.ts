@@ -1,7 +1,9 @@
-import { Contracts, NotFound, PaymobService, Setting, Transaction, Users } from '@duvdu-v1/duvdu';
+import { Contracts, NotFound, Notification, PaymobService, Setting, Transaction, Users } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 import 'express-async-errors';
+import { NewNotificationPublisher } from '../../event/publisher/newNotification.publisher';
+import { natsWrapper } from '../../nats-wrapper';
 
 export const subscribeUserController: RequestHandler = async (req, res) => {
   const setting = await Setting.findOne();
@@ -12,6 +14,35 @@ export const subscribeUserController: RequestHandler = async (req, res) => {
     .sort({ createdAt: -1 })
     .limit(5)
     .populate('contract');
+
+  if(lastContracts.length === 0) {
+    await Users.findByIdAndUpdate(req.loggedUser.id, { avaliableContracts: 5 });
+    const currentUserNotification = await Notification.create({
+      sourceUser: req.loggedUser.id,
+      targetUser: req.loggedUser.id,
+      type: 'contract_subscription',
+      target: req.loggedUser.id,
+      title: 'subscribe success',
+      message: 'congratulations, you have new free contracts available',
+    });
+
+    const populatedCurrentUserNotification = await (
+      await currentUserNotification.save()
+    ).populate('sourceUser', 'isOnline profileImage username');
+
+    Promise.all([
+      new NewNotificationPublisher(natsWrapper.client).publish({
+        notificationDetails: {
+          message: currentUserNotification.message,
+          title: currentUserNotification.title,
+        },
+        populatedNotification: populatedCurrentUserNotification,
+        socketChannel: 'contract_subscription',
+        targetUser: currentUserNotification.targetUser.toString(),
+      }),
+    ]);
+    return res.status(200).json({ message: 'success', data: { newFiveContractsPrice: 5 } });
+  }
 
   const totalPrice = lastContracts.reduce(
     (acc: number, contract: any) => acc + (contract.contract.totalPrice || 0),
@@ -58,30 +89,7 @@ export const subscribeUserController: RequestHandler = async (req, res) => {
 
   res.status(200).json({ message: 'success', data: { paymentUrl: paymentLink.paymentUrl } });
 
-  // const currentUserNotification = await Notification.create({
-  //   sourceUser: req.loggedUser.id,
-  //   targetUser: req.loggedUser.id,
-  //   type: 'contract_subscription',
-  //   target: req.loggedUser.id,
-  //   title: 'subscribe success',
-  //   message: 'you have a new five contracts available',
-  // });
 
-  // const populatedCurrentUserNotification = await (
-  //   await currentUserNotification.save()
-  // ).populate('sourceUser', 'isOnline profileImage username');
-
-  // Promise.all([
-  //   new NewNotificationPublisher(natsWrapper.client).publish({
-  //     notificationDetails: {
-  //       message: currentUserNotification.message,
-  //       title: currentUserNotification.title,
-  //     },
-  //     populatedNotification: populatedCurrentUserNotification,
-  //     socketChannel: 'contract_subscription',
-  //     targetUser: currentUserNotification.targetUser.toString(),
-  //   }),
-  // ]);
 
   // return res.status(200).json(<any>{ message: 'success' });
 };
