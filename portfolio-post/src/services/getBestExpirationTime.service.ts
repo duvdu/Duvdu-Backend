@@ -1,9 +1,9 @@
 import { BadRequestError, NotFound, Setting } from '@duvdu-v1/duvdu';
 
-export async function getBestExpirationTime(isoDate: string, lang: string) {
-  // Convert both dates to Cairo timezone (UTC+2)
-  const givenDate = new Date(new Date(isoDate).toLocaleString("en-US", {timeZone: "Africa/Cairo"}));
-  const currentDate = new Date(new Date().toLocaleString("en-US", {timeZone: "Africa/Cairo"}));
+export async function getBestExpirationTime(isoDate: string, currentDateCairo: string, lang: string) {
+  // Both dates are already in Cairo timezone - no conversion needed
+  const givenDate = new Date(isoDate);
+  const currentDate = new Date(currentDateCairo);
 
   console.log( 'givenDate', givenDate);
   console.log( 'currentDate', currentDate);
