@@ -91,7 +91,7 @@ export const createContractHandler: CreateContractHandler = async (req, res, nex
           ),
         ).toISOString(),
       ),
-      getBestExpirationTime(req.body.appointmentDate.toISOString(), new Date().toLocaleString("en-US", {timeZone: "Africa/Cairo"}), req.lang),
+      getBestExpirationTime(req.body.appointmentDate.toString(), new Date().toLocaleString("en-US", {timeZone: "Africa/Cairo"}), req.lang),
       calculateTotalPrice(project._id.toString(), req.body.equipment, req.lang),
     ]);
 
