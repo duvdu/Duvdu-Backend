@@ -4,6 +4,9 @@ export async function getBestExpirationTime(isoDate: string, lang: string) {
   const givenDate = new Date(isoDate);
   const currentDate = new Date();
 
+  console.log( 'givenDate', givenDate);
+  console.log( 'currentDate', currentDate);
+
   const timeDifferenceInHours = Math.abs(
     (givenDate.getTime() - currentDate.getTime()) / (1000 * 60 * 60),
   );
