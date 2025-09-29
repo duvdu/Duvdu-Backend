@@ -6,6 +6,7 @@ export enum FundedTransactionStatus {
   PENDING = 'pending',
   SUCCESS = 'success',
   FAILED = 'failed',
+  CANCELED = 'canceled',
 }
 
 const generateFundedTransactionTicketNumber = (): string => {
