@@ -127,6 +127,7 @@ export const handleCopyrightsPayment = async (
       user: contract.sp,
       fundAmount: contract.firstPaymentAmount,
       contract: contract._id.toString(),
+      completedAt: contract.deadline,
     });
 
     return {
@@ -186,6 +187,7 @@ export const handleCopyrightsPayment = async (
       user: contract.sp,
       fundAmount: contract.secondPaymentAmount,
       contract: contract._id.toString(),
+      completedAt: contract.deadline,
     });
 
     return {

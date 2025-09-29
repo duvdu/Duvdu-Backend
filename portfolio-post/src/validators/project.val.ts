@@ -105,14 +105,14 @@ export const create = [
     .isMongoId()
     .withMessage('invitedCreatives'),
 
-  body('functions').optional().isArray({ min: 1 }).withMessage('functions'),
+  body('functions').optional().isArray({ min: 0 }).withMessage('functions'),
   body('functions.*').isObject().withMessage('functions'),
   body('functions.*.name').isString().exists().withMessage('functions'),
-  body('functions.*.unitPrice').isFloat({ min: 1 }).withMessage('functions'),
-  body('tools').optional().isArray({ min: 1 }).withMessage('tools'),
+  body('functions.*.unitPrice').isFloat({ min: 0 }).withMessage('functions'),
+  body('tools').optional().isArray({ min: 0 }).withMessage('tools'),
   body('tools.*').isObject().withMessage('tools'),
   body('tools.*.name').isString().exists().withMessage('tools'),
-  body('tools.*.unitPrice').isFloat({ min: 1 }).withMessage('tools'),
+  body('tools.*.unitPrice').isFloat({ min: 0 }).withMessage('tools'),
   body('location').isObject().withMessage('location'),
   body('location.lat').isFloat({ min: -90, max: 90 }).bail().toFloat().withMessage('location'),
   body('location.lng').isFloat({ min: -180, max: 180 }).bail().toFloat().withMessage('location'),
@@ -201,11 +201,11 @@ export const update = [
   body('functions').optional().isArray({ min: 1 }).withMessage('functions'),
   body('functions.*').isObject().withMessage('functions'),
   body('functions.*.name').isString().exists().withMessage('functions'),
-  body('functions.*.unitPrice').isFloat({ min: 1 }).withMessage('functions'),
+  body('functions.*.unitPrice').isFloat({ min: 0 }).withMessage('functions'),
   body('tools').optional().isArray({ min: 1 }).withMessage('tools'),
   body('tools.*').isObject().withMessage('tools'),
   body('tools.*.name').isString().exists().withMessage('tools'),
-  body('tools.*.unitPrice').isFloat({ min: 1 }).withMessage('tools'),
+  body('tools.*.unitPrice').isFloat({ min: 0 }).withMessage('tools'),
   globalValidatorMiddleware,
 ];
 

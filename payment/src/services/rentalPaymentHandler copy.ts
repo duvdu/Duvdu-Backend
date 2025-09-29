@@ -38,6 +38,7 @@ export const handleRentalPayment = async (
       user: contract?.sp,
       fundAmount: transactionData.amount,
       contract: contractId,
+      completedAt: contract?.deadline,
     });
 
     await sendNotification(
@@ -130,6 +131,7 @@ export const handleRentalPayment = async (
       user: contract.sp,
       fundAmount: contract.totalPrice,
       contract: contract._id.toString(),
+      completedAt: contract.deadline,
     });
 
     return {

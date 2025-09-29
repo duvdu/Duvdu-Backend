@@ -21,11 +21,10 @@ export const getContractCancelFilter: RequestHandler<
 > = (req, res, next) => {
   req.pagination.filter = {};
 
-  if (req.query.user)
-    req.pagination.filter.user = new mongoose.Types.ObjectId(req.query.user);
+  if (req.query.user) req.pagination.filter.user = new mongoose.Types.ObjectId(req.query.user);
   if (req.query.contract)
     req.pagination.filter.contract = new mongoose.Types.ObjectId(req.query.contract);
-  
+
   // Store search term separately for use in aggregation pipeline
   if (req.query.search) {
     req.pagination.searchTerm = req.query.search;
@@ -44,10 +43,10 @@ export const getContractsCancel: RequestHandler<
   try {
     // Build aggregation pipeline for contract cancellations with user search
     const pipeline: any[] = [];
-    
+
     // Build initial match conditions (before lookup for performance)
     const initialMatchConditions: any = {};
-    
+
     // Apply existing filters on ObjectId fields before lookup
     if (req.pagination.filter.user) {
       initialMatchConditions.user = req.pagination.filter.user;
@@ -55,12 +54,12 @@ export const getContractsCancel: RequestHandler<
     if (req.pagination.filter.contract) {
       initialMatchConditions.contract = req.pagination.filter.contract;
     }
-    
+
     // Add initial match stage if we have ObjectId filters
     if (Object.keys(initialMatchConditions).length > 0) {
       pipeline.push({ $match: initialMatchConditions });
     }
-    
+
     // Add lookup for user data
     pipeline.push({
       $lookup: {
@@ -70,13 +69,13 @@ export const getContractsCancel: RequestHandler<
         as: 'user',
       },
     });
-    
+
     // Unwind user array
     pipeline.push({ $unwind: '$user' });
-    
+
     // Build search match conditions (after lookup)
     const searchMatchConditions: any = {};
-    
+
     // Apply search conditions (search in both cancelReason and user fields)
     if (req.pagination.searchTerm) {
       searchMatchConditions.$or = [
@@ -87,12 +86,12 @@ export const getContractsCancel: RequestHandler<
         { 'user.phoneNumber.number': { $regex: req.pagination.searchTerm, $options: 'i' } },
       ];
     }
-    
+
     // Add search match stage if we have search conditions
     if (Object.keys(searchMatchConditions).length > 0) {
       pipeline.push({ $match: searchMatchConditions });
     }
-    
+
     // Add project stage to select required user fields
     pipeline.push({
       $project: {
@@ -112,17 +111,17 @@ export const getContractsCancel: RequestHandler<
         updatedAt: 1,
       },
     });
-    
+
     // Get total count
     const countPipeline = [...pipeline];
     countPipeline.push({ $count: 'total' });
     const countResult = await ContractCancel.aggregate(countPipeline);
     const resultCount = countResult.length > 0 ? countResult[0].total : 0;
-    
+
     // Add pagination
     pipeline.push({ $skip: req.pagination.skip });
     pipeline.push({ $limit: req.pagination.limit });
-    
+
     // Execute aggregation
     const contractCancels = await ContractCancel.aggregate(pipeline);
 
@@ -367,14 +366,14 @@ export const getContractsCancel: RequestHandler<
     // Combine contract cancels with their contract details and handle user image URLs
     const contractCancelsWithDetails = contractCancels.map((cancel) => {
       const contractId = cancel.contract.toString();
-      
+
       // Handle user profile image URL
       if (cancel.user && cancel.user.profileImage) {
         if (!cancel.user.profileImage.includes(process.env.BUCKET_HOST || '')) {
           cancel.user.profileImage = `${process.env.BUCKET_HOST}/${cancel.user.profileImage}`;
         }
       }
-      
+
       return {
         ...cancel,
         contract: contractsMap[contractId] || null,

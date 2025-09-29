@@ -6,7 +6,16 @@ export const getContractsCrm: RequestHandler<
   unknown,
   PaginationResponse<{ data: any }>,
   unknown,
-  { filter?: 'i_created' | 'i_received'; cycle?: string; user?: string; ticketNumber?: string; from?: Date; to?: Date , project?: string , status?: string }
+  {
+    filter?: 'i_created' | 'i_received';
+    cycle?: string;
+    user?: string;
+    ticketNumber?: string;
+    from?: Date;
+    to?: Date;
+    project?: string;
+    status?: string;
+  }
 > = async (req, res) => {
   const filter: any = {};
 
@@ -33,8 +42,6 @@ export const getContractsCrm: RequestHandler<
   if (req.query.project) filter.project = new mongoose.Types.ObjectId(req.query.project);
 
   // Note: status filtering will be applied after contract lookup
-
-  
 
   const contracts = await Contracts.aggregate([
     { $match: filter },
@@ -132,11 +139,15 @@ export const getContractsCrm: RequestHandler<
       },
     },
     // Filter by contract status if provided
-    ...(req.query.status ? [{
-      $match: {
-        'contract.status': req.query.status
-      }
-    }] : []),
+    ...(req.query.status
+      ? [
+          {
+            $match: {
+              'contract.status': req.query.status,
+            },
+          },
+        ]
+      : []),
     // Apply pagination after all filtering is complete
     { $skip: req.pagination.skip },
     { $limit: req.pagination.limit },
@@ -207,12 +218,12 @@ export const getContractsCrm: RequestHandler<
             if: {
               $or: [
                 { $eq: ['$ticketNumber', null] },
-                { $eq: [{ $type: '$ticketNumber' }, 'missing'] }
-              ]
+                { $eq: [{ $type: '$ticketNumber' }, 'missing'] },
+              ],
             },
             then: null,
-            else: '$ticketNumber'
-          }
+            else: '$ticketNumber',
+          },
         },
         customer: {
           _id: '$customer._id',
@@ -378,14 +389,18 @@ export const getContractsCrm: RequestHandler<
       },
     },
     // Apply status filter if provided (same as main pipeline)
-    ...(req.query.status ? [{
-      $match: {
-        'contract.status': req.query.status
-      }
-    }] : []),
+    ...(req.query.status
+      ? [
+          {
+            $match: {
+              'contract.status': req.query.status,
+            },
+          },
+        ]
+      : []),
     {
-      $count: 'total'
-    }
+      $count: 'total',
+    },
   ];
 
   const countResult = await Contracts.aggregate(countPipeline);

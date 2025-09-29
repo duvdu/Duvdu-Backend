@@ -21,13 +21,13 @@ export const closeComplaintHandler: RequestHandler<
     {
       ...(req.body.feedback
         ? {
-          $push: {
-            state: {
-              addedBy: req.loggedUser?.id,
-              feedback: req.body.feedback,
+            $push: {
+              state: {
+                addedBy: req.loggedUser?.id,
+                feedback: req.body.feedback,
+              },
             },
-          },
-        }
+          }
         : {}),
       isClosed: true,
       closedBy: req.loggedUser?.id,

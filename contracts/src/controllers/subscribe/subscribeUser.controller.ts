@@ -1,4 +1,12 @@
-import { Contracts, NotFound, Notification, PaymobService, Setting, Transaction, Users } from '@duvdu-v1/duvdu';
+import {
+  Contracts,
+  NotFound,
+  Notification,
+  PaymobService,
+  Setting,
+  Transaction,
+  Users,
+} from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
 import 'express-async-errors';
@@ -15,7 +23,7 @@ export const subscribeUserController: RequestHandler = async (req, res) => {
     .limit(5)
     .populate('contract');
 
-  if(lastContracts.length === 0) {
+  if (lastContracts.length === 0) {
     await Users.findByIdAndUpdate(req.loggedUser.id, { avaliableContracts: 5 });
     const currentUserNotification = await Notification.create({
       sourceUser: req.loggedUser.id,
@@ -88,8 +96,6 @@ export const subscribeUserController: RequestHandler = async (req, res) => {
   );
 
   res.status(200).json({ message: 'success', data: { paymentUrl: paymentLink.paymentUrl } });
-
-
 
   // return res.status(200).json(<any>{ message: 'success' });
 };

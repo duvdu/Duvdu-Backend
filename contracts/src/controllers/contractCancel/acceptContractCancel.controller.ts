@@ -17,6 +17,8 @@ import {
   Roles,
   SystemRoles,
   Users,
+  FundedTransaction,
+  FundedTransactionStatus,
 } from '@duvdu-v1/duvdu';
 import { RequestHandler } from 'express';
 
@@ -55,6 +57,13 @@ export const acceptContractCancel: RequestHandler<
   } else {
     throw new NotFound({ ar: 'العقد غير موجود', en: 'Contract not found' }, req.lang);
   }
+
+  const contracts = await FundedTransaction.find({ contract: contractCancel.contract });
+  if (contracts.length > 0)
+    await FundedTransaction.updateMany(
+      { contract: contractCancel.contract },
+      { status: FundedTransactionStatus.CANCELED },
+    );
 
   const role = await Roles.findOne({ 'key.en': SystemRoles.admin });
 

@@ -182,12 +182,12 @@ export const getContractCrm: RequestHandler<
             if: {
               $or: [
                 { $eq: ['$ticketNumber', null] },
-                { $eq: [{ $type: '$ticketNumber' }, 'missing'] }
-              ]
+                { $eq: [{ $type: '$ticketNumber' }, 'missing'] },
+              ],
             },
             then: null,
-            else: '$ticketNumber'
-          }
+            else: '$ticketNumber',
+          },
         },
         haveCancelRequest: 1,
         customer: {
