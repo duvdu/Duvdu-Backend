@@ -90,7 +90,7 @@ export const getFundingTransactions: RequestHandler<
 > = async (req, res) => {
   const transactions = await FundedTransaction.aggregate([
     { $match: req.pagination.filter },
-    { $sort: { createdAt: -1 } },
+    { $sort: { completedAt: -1 } },
     { $skip: req.pagination.skip },
     { $limit: req.pagination.limit },
     {
@@ -195,6 +195,7 @@ export const getFundingTransactions: RequestHandler<
         contract: 1,
         ticketNumber: { $ifNull: ['$ticketNumber', null] },
         status: 1,
+        completedAt: 1,
       },
     },
   ]);

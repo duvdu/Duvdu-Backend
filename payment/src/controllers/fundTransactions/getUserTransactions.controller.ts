@@ -8,7 +8,7 @@ export const getUserTransactions: RequestHandler<
 > = async (req, res) => {
   const transactions = await FundedTransaction.aggregate([
     { $match: { ...req.pagination.filter, user: new Types.ObjectId(req.loggedUser.id) } },
-    { $sort: { createdAt: -1 } },
+    { $sort: { completedAt: -1 } },
     { $skip: req.pagination.skip },
     { $limit: req.pagination.limit },
     {
@@ -113,6 +113,7 @@ export const getUserTransactions: RequestHandler<
         contract: 1,
         ticketNumber: { $ifNull: ['$ticketNumber', null] },
         status: 1,
+        completedAt: 1,
       },
     },
   ]);

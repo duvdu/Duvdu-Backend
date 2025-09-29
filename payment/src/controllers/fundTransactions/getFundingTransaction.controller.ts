@@ -116,6 +116,7 @@ export const getFundingTransaction: RequestHandler<
         contract: 1,
         ticketNumber: { $ifNull: ['$ticketNumber', null] },
         status: 1,
+        completedAt: 1,
       },
     },
   ]);
