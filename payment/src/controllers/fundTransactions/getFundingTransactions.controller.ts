@@ -50,16 +50,19 @@ export const getFundingTransactionPagination: RequestHandler<
   if (createdAtFrom || createdAtTo) {
     const startDate = createdAtFrom ? new Date(createdAtFrom) : new Date(0);
     const endDate = createdAtTo ? new Date(createdAtTo) : new Date();
-    
+
     // If start and end dates are the same, filter for the entire day
-    if (createdAtFrom && createdAtTo && 
-        new Date(createdAtFrom).toDateString() === new Date(createdAtTo).toDateString()) {
+    if (
+      createdAtFrom &&
+      createdAtTo &&
+      new Date(createdAtFrom).toDateString() === new Date(createdAtTo).toDateString()
+    ) {
       const dayStart = new Date(startDate);
       dayStart.setHours(0, 0, 0, 0);
-      
+
       const dayEnd = new Date(startDate);
       dayEnd.setHours(23, 59, 59, 999);
-      
+
       req.pagination.filter.createdAt = {
         $gte: dayStart,
         $lte: dayEnd,
@@ -71,7 +74,7 @@ export const getFundingTransactionPagination: RequestHandler<
       if (createdAtTo) {
         filterEndDate.setHours(23, 59, 59, 999);
       }
-      
+
       req.pagination.filter.createdAt = {
         $gte: startDate,
         $lte: filterEndDate,
