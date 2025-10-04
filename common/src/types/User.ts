@@ -62,4 +62,5 @@ export interface Iuser {
   faceRecognition: string | null;
   projectsCount: number;
   isDeleted: boolean;
+  hasFreeTime: boolean;
 }

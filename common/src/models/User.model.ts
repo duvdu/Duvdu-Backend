@@ -63,6 +63,7 @@ const userSchema = new Schema<Iuser>(
     haveInvitation: { type: Boolean, default: false },
     faceRecognition: { type: String, default: null },
     projectsCount: { type: Number, default: 0 },
+    hasFreeTime: { type: Boolean, default: false },
   },
   {
     timestamps: true,
