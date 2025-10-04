@@ -45,8 +45,8 @@ export async function getBestExpirationTime(isoDate: string, currentDateCairo: s
     if (givenDateDay !== newDateDay) {
       throw new BadRequestError(
         {
-          en: `Adding minimum expiration time (${lowestTime} hours) would extend beyond the same day`,
-          ar: `إضافة الحد الأدنى لوقت انتهاء الصلاحية (${lowestTime} ساعة) سيمتد إلى ما بعد نفس اليوم`,
+          en: `Please book for the next day as the minimum expiration time (${lowestTime} hours) would extend beyond today`,
+          ar: `يرجى الحجز لليوم التالي حيث أن الحد الأدنى لوقت انتهاء الصلاحية (${lowestTime} ساعة) سيمتد إلى ما بعد اليوم`,
         },
         lang,
       );
