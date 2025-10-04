@@ -16,6 +16,7 @@ export const updateComplaintHandler: RequestHandler<
   SuccessResponse,
   { feedback: string; sendNotification?: boolean }
 > = async (req, res, next) => {
+  const isSystem = req.body.sendNotification ?? false;
   const complaint = await ContractReports.findByIdAndUpdate(
     req.params.id,
     {
@@ -23,6 +24,7 @@ export const updateComplaintHandler: RequestHandler<
         state: {
           addedBy: req.loggedUser.id,
           feedback: req.body.feedback,
+          isSystem: isSystem,
         },
       },
     },
