@@ -14,6 +14,11 @@ import { NewNotificationPublisher } from '../../event/publisher/newNotification.
 import { natsWrapper } from '../../nats-wrapper';
 
 export const subscribeUserController: RequestHandler = async (req, res) => {
+
+  const existingUser = await Users.findById(req.loggedUser.id);
+  if (!existingUser)
+    throw new NotFound({ en: 'user not found', ar: 'المستخدم غير موجود' }, req.lang);
+
   const setting = await Setting.findOne();
   if (!setting)
     throw new NotFound({ en: 'setting not found ', ar: 'الإعدادات غير موجودة' }, req.lang);
@@ -23,7 +28,7 @@ export const subscribeUserController: RequestHandler = async (req, res) => {
     .limit(5)
     .populate('contract');
 
-  if (lastContracts.length === 0) {
+  if (!existingUser.hasFreeTime) {
     await Users.findByIdAndUpdate(req.loggedUser.id, { avaliableContracts: 5 });
     const currentUserNotification = await Notification.create({
       sourceUser: req.loggedUser.id,

@@ -13,6 +13,9 @@ export const checkUserSubscribeController: RequestHandler<
   if (!user)
     return next(new NotFound({ en: 'user not found', ar: 'المستخدم غير موجود' }, req.lang));
 
+  if (!user.hasFreeTime)
+    return res.status(200).json(<any>{ message: 'success', data: { newFiveContractsPrice: 0 } });
+
   if (user.avaliableContracts > 0)
     return res.status(400).json(<any>{ data: { avaliableContracts: user.avaliableContracts } });
 
