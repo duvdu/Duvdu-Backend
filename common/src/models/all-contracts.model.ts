@@ -49,7 +49,7 @@ export interface IcontractReport {
   ref: string;
   desc: string;
   attachments: string[];
-  state: [{ addedBy: Types.ObjectId; feedback: string }];
+  state: [{ addedBy: Types.ObjectId; feedback: string , isSystem: boolean }];
   isClosed: boolean;
   closedBy: Types.ObjectId;
   createdAt: Date;
@@ -74,6 +74,7 @@ export const ContractReports = model<IcontractReport>(
             default: null,
           },
           feedback: { type: String, default: null },
+          isSystem: { type: Boolean, default: true },
         },
       ],
       isClosed: {
