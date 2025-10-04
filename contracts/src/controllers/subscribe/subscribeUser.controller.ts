@@ -29,7 +29,7 @@ export const subscribeUserController: RequestHandler = async (req, res) => {
     .populate('contract');
 
   if (!existingUser.hasFreeTime) {
-    await Users.findByIdAndUpdate(req.loggedUser.id, { avaliableContracts: 5 });
+    await Users.findByIdAndUpdate(req.loggedUser.id, { avaliableContracts: 5  , hasFreeTime: true });
     const currentUserNotification = await Notification.create({
       sourceUser: req.loggedUser.id,
       targetUser: req.loggedUser.id,
