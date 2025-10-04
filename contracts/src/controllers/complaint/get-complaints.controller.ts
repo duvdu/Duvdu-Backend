@@ -264,6 +264,7 @@ export const getComplaintsHandler: RequestHandler<
                 },
               },
               feedback: '$$stateItem.feedback',
+              isSystem: '$$stateItem.isSystem',
             },
           },
         },

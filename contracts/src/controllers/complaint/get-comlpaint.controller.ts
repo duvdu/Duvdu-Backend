@@ -188,6 +188,7 @@ export const getComplaintHandler: RequestHandler<
               feedback: '$$stateItem.feedback',
               createdAt: '$$stateItem.createdAt',
               updatedAt: '$$stateItem.updatedAt',
+              isSystem: '$$stateItem.isSystem',
             },
           },
         },
