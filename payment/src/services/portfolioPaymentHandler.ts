@@ -9,7 +9,7 @@ import {
   Users,
 } from '@duvdu-v1/duvdu';
 
-import { sendNotification } from '../controllers/webhook/sendNotification';
+import { sendNotification, sendSystemNotification } from '../controllers/webhook/sendNotification';
 import {
   getOnGoingExpiration,
   getUpdateAfterFirstPaymentQueue,
@@ -63,7 +63,7 @@ export const handlePortfolioPayment = async (
     };
   }
 
-  const spUser = await Users.findById(contract?.sp);
+  let spUser = await Users.findById(contract?.sp);
   const user = await Users.findById(userId);
 
   if (contract.status === ProjectContractStatus.waitingForFirstPayment) {
@@ -75,7 +75,7 @@ export const handlePortfolioPayment = async (
     });
 
     // decrement the user contracts count
-    await Users.findOneAndUpdate(
+    spUser = await Users.findOneAndUpdate(
       { _id: contract.sp },
       { $inc: { avaliableContracts: -1 } },
       { new: true },
@@ -88,9 +88,8 @@ export const handlePortfolioPayment = async (
     }
 
     await Promise.all([
-      sendNotification(
-        userId,
-        contract.sp.toString(),
+      sendSystemNotification(
+        [contract.sp.toString()],
         contract._id.toString(),
         'contract',
         'available contracts',
