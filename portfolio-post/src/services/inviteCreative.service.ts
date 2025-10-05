@@ -34,35 +34,37 @@ export const inviteCreatives = async (
       );
     }
 
-    const subCategoryExists = category.subCategories?.some((subCategory: any) => {
-      if (
-        subCategory &&
-        subCategory._id &&
-        user.mainCategory.subCategories?.subCategory &&
-        subCategory._id.toString() === user.mainCategory.subCategories.subCategory.toString()
-      ) {
-        // check tags
-        user.mainCategory.subCategories?.tags?.forEach((tag: any) => {
-          if (
-            subCategory.tags &&
-            !subCategory.tags.some((subTag: any) => subTag._id.toString() === tag.tag.toString())
-          ) {
-            throw new BadRequestError(
-              { en: 'tag is not in the sub category', ar: 'التصنيف غير موجود في الفئة الفرعية' },
-              lang,
-            );
-          }
-        });
-        return true;
-      }
-      return false;
-    });
+    // Only validate subcategory if it's provided
+    if (user.mainCategory.subCategories?.subCategory) {
+      const subCategoryExists = category.subCategories?.some((subCategory: any) => {
+        if (
+          subCategory &&
+          subCategory._id &&
+          subCategory._id.toString() === user.mainCategory.subCategories.subCategory!.toString()
+        ) {
+          // check tags
+          user.mainCategory.subCategories?.tags?.forEach((tag: any) => {
+            if (
+              subCategory.tags &&
+              !subCategory.tags.some((subTag: any) => subTag._id.toString() === tag.tag.toString())
+            ) {
+              throw new BadRequestError(
+                { en: 'tag is not in the sub category', ar: 'التصنيف غير موجود في الفئة الفرعية' },
+                lang,
+              );
+            }
+          });
+          return true;
+        }
+        return false;
+      });
 
-    if (!subCategoryExists) {
-      throw new BadRequestError(
-        { en: 'sub category not found', ar: 'الفئة الفرعية غير موجودة' },
-        lang,
-      );
+      if (!subCategoryExists) {
+        throw new BadRequestError(
+          { en: 'sub category not found', ar: 'الفئة الفرعية غير موجودة' },
+          lang,
+        );
+      }
     }
 
     // check related category
@@ -175,35 +177,37 @@ export const validateCreative = async (
       );
     }
 
-    const subCategoryExists = category.subCategories?.some((subCategory: any) => {
-      if (
-        subCategory &&
-        subCategory._id &&
-        creative.mainCategory.subCategories?.subCategory &&
-        subCategory._id.toString() === creative.mainCategory.subCategories.subCategory.toString()
-      ) {
-        // check tags
-        creative.mainCategory.subCategories.tags?.forEach((tag: any) => {
-          if (
-            subCategory.tags &&
-            !subCategory.tags.some((subTag: any) => subTag._id.toString() === tag.tag.toString())
-          ) {
-            throw new BadRequestError(
-              { en: 'tag is not in the sub category', ar: 'التصنيف غير موجود في الفئة الفرعية' },
-              lang,
-            );
-          }
-        });
-        return true;
-      }
-      return false;
-    });
+    // Only validate subcategory if it's provided
+    if (creative.mainCategory.subCategories?.subCategory) {
+      const subCategoryExists = category.subCategories?.some((subCategory: any) => {
+        if (
+          subCategory &&
+          subCategory._id &&
+          subCategory._id.toString() === creative.mainCategory.subCategories.subCategory!.toString()
+        ) {
+          // check tags
+          creative.mainCategory.subCategories.tags?.forEach((tag: any) => {
+            if (
+              subCategory.tags &&
+              !subCategory.tags.some((subTag: any) => subTag._id.toString() === tag.tag.toString())
+            ) {
+              throw new BadRequestError(
+                { en: 'tag is not in the sub category', ar: 'التصنيف غير موجود في الفئة الفرعية' },
+                lang,
+              );
+            }
+          });
+          return true;
+        }
+        return false;
+      });
 
-    if (!subCategoryExists) {
-      throw new BadRequestError(
-        { en: 'sub category not found', ar: 'الفئة الفرعية غير موجودة' },
-        lang,
-      );
+      if (!subCategoryExists) {
+        throw new BadRequestError(
+          { en: 'sub category not found', ar: 'الفئة الفرعية غير موجودة' },
+          lang,
+        );
+      }
     }
 
     if (creative.mainCategory.relatedCategory) {
