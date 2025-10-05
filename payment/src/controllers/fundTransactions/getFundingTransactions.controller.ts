@@ -63,7 +63,7 @@ export const getFundingTransactionPagination: RequestHandler<
       const dayEnd = new Date(startDate);
       dayEnd.setHours(23, 59, 59, 999);
 
-      req.pagination.filter.createdAt = {
+      req.pagination.filter.completedAt = {
         $gte: dayStart,
         $lte: dayEnd,
       };
@@ -75,7 +75,7 @@ export const getFundingTransactionPagination: RequestHandler<
         filterEndDate.setHours(23, 59, 59, 999);
       }
 
-      req.pagination.filter.createdAt = {
+      req.pagination.filter.completedAt = {
         $gte: startDate,
         $lte: filterEndDate,
       };

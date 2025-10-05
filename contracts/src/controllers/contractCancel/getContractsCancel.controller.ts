@@ -58,6 +58,8 @@ export const getContractsCancel: RequestHandler<
     // Add initial match stage if we have ObjectId filters
     if (Object.keys(initialMatchConditions).length > 0) {
       pipeline.push({ $match: initialMatchConditions });
+      // sort by createdAt descending
+      pipeline.push({ $sort: { createdAt: -1 } });
     }
 
     // Add lookup for user data
