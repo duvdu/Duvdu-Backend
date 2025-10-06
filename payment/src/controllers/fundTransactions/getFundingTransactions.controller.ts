@@ -54,19 +54,16 @@ export const getFundingTransactionPagination: RequestHandler<
 
   // Date range filtering (using UTC to match MongoDB dates)
   if (createdAtFrom || createdAtTo) {
-    const startDate = createdAtFrom ? new Date(createdAtFrom) : new Date(0);
-    const endDate = createdAtTo ? new Date(createdAtTo) : new Date();
-
-    // If start and end dates are the same, filter for the entire day
+    // If both dates are provided and are the same, filter for the entire day
     if (
       createdAtFrom &&
       createdAtTo &&
       new Date(createdAtFrom).toDateString() === new Date(createdAtTo).toDateString()
     ) {
-      const dayStart = new Date(startDate);
+      const dayStart = new Date(createdAtFrom);
       dayStart.setUTCHours(0, 0, 0, 0);
 
-      const dayEnd = new Date(startDate);
+      const dayEnd = new Date(createdAtFrom);
       dayEnd.setUTCHours(23, 59, 59, 999);
 
       req.pagination.filter.completedAt = {
@@ -75,23 +72,19 @@ export const getFundingTransactionPagination: RequestHandler<
       };
     } else {
       // For different dates or single date filters
-      const filterStartDate = new Date(startDate);
-      const filterEndDate = new Date(endDate);
+      req.pagination.filter.completedAt = {};
       
-      // Set start date to beginning of day (UTC)
       if (createdAtFrom) {
+        const filterStartDate = new Date(createdAtFrom);
         filterStartDate.setUTCHours(0, 0, 0, 0);
+        req.pagination.filter.completedAt.$gte = filterStartDate;
       }
       
-      // Include the entire end date by setting time to end of day (UTC)
       if (createdAtTo) {
+        const filterEndDate = new Date(createdAtTo);
         filterEndDate.setUTCHours(23, 59, 59, 999);
+        req.pagination.filter.completedAt.$lte = filterEndDate;
       }
-
-      req.pagination.filter.completedAt = {
-        $gte: filterStartDate,
-        $lte: filterEndDate,
-      };
     }
   }
   if (contract) req.pagination.filter.contract = new Types.ObjectId(contract);

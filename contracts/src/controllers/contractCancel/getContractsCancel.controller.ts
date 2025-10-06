@@ -59,7 +59,7 @@ export const getContractsCancel: RequestHandler<
     if (Object.keys(initialMatchConditions).length > 0) {
       pipeline.push({ $match: initialMatchConditions });
       // sort by createdAt descending
-      pipeline.push({ $sort: { createdAt: -1 } });
+      pipeline.push({ $sort: { createdAt: 1 } });
     }
 
     // Add lookup for user data
