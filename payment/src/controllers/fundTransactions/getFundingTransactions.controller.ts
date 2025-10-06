@@ -52,7 +52,7 @@ export const getFundingTransactionPagination: RequestHandler<
     if (fundAmountTo) req.pagination.filter.fundAmount.$lte = fundAmountTo;
   }
 
-  // Date range filtering
+  // Date range filtering (using UTC to match MongoDB dates)
   if (createdAtFrom || createdAtTo) {
     const startDate = createdAtFrom ? new Date(createdAtFrom) : new Date(0);
     const endDate = createdAtTo ? new Date(createdAtTo) : new Date();
@@ -64,10 +64,10 @@ export const getFundingTransactionPagination: RequestHandler<
       new Date(createdAtFrom).toDateString() === new Date(createdAtTo).toDateString()
     ) {
       const dayStart = new Date(startDate);
-      dayStart.setHours(0, 0, 0, 0);
+      dayStart.setUTCHours(0, 0, 0, 0);
 
       const dayEnd = new Date(startDate);
-      dayEnd.setHours(23, 59, 59, 999);
+      dayEnd.setUTCHours(23, 59, 59, 999);
 
       req.pagination.filter.completedAt = {
         $gte: dayStart,
@@ -78,14 +78,14 @@ export const getFundingTransactionPagination: RequestHandler<
       const filterStartDate = new Date(startDate);
       const filterEndDate = new Date(endDate);
       
-      // Set start date to beginning of day
+      // Set start date to beginning of day (UTC)
       if (createdAtFrom) {
-        filterStartDate.setHours(0, 0, 0, 0);
+        filterStartDate.setUTCHours(0, 0, 0, 0);
       }
       
-      // Include the entire end date by setting time to end of day
+      // Include the entire end date by setting time to end of day (UTC)
       if (createdAtTo) {
-        filterEndDate.setHours(23, 59, 59, 999);
+        filterEndDate.setUTCHours(23, 59, 59, 999);
       }
 
       req.pagination.filter.completedAt = {
