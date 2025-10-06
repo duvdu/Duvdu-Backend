@@ -43,10 +43,16 @@ export const getFundingTransactionPagination: RequestHandler<
   if (status) req.pagination.filter.status = status;
   if (createdBy) req.pagination.filter.createdBy = new Types.ObjectId(createdBy);
 
-  if (fundAmountFrom) req.pagination.filter.fundAmount = { $gte: fundAmountFrom };
-  if (fundAmountTo) req.pagination.filter.fundAmount = { $lte: fundAmountTo };
-  if (fundAmount) req.pagination.filter.fundAmount = fundAmount;
+  // Fund amount filtering
+  if (fundAmount) {
+    req.pagination.filter.fundAmount = fundAmount;
+  } else if (fundAmountFrom || fundAmountTo) {
+    req.pagination.filter.fundAmount = {};
+    if (fundAmountFrom) req.pagination.filter.fundAmount.$gte = fundAmountFrom;
+    if (fundAmountTo) req.pagination.filter.fundAmount.$lte = fundAmountTo;
+  }
 
+  // Date range filtering
   if (createdAtFrom || createdAtTo) {
     const startDate = createdAtFrom ? new Date(createdAtFrom) : new Date(0);
     const endDate = createdAtTo ? new Date(createdAtTo) : new Date();
@@ -69,14 +75,21 @@ export const getFundingTransactionPagination: RequestHandler<
       };
     } else {
       // For different dates or single date filters
+      const filterStartDate = new Date(startDate);
       const filterEndDate = new Date(endDate);
+      
+      // Set start date to beginning of day
+      if (createdAtFrom) {
+        filterStartDate.setHours(0, 0, 0, 0);
+      }
+      
       // Include the entire end date by setting time to end of day
       if (createdAtTo) {
         filterEndDate.setHours(23, 59, 59, 999);
       }
 
       req.pagination.filter.completedAt = {
-        $gte: startDate,
+        $gte: filterStartDate,
         $lte: filterEndDate,
       };
     }
