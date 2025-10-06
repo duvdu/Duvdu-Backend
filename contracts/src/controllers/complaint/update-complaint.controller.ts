@@ -24,7 +24,7 @@ export const updateComplaintHandler: RequestHandler<
         state: {
           addedBy: req.loggedUser.id,
           feedback: req.body.feedback,
-          isSystem: isSystem,
+          isSystem: !isSystem,
         },
       },
     },
