@@ -36,7 +36,7 @@ export async function getBestExpirationTime(isoDate: string, currentDateCairo: s
     const lowestTime = Math.min(...allTimes);
     
     // Add the lowest time to the given date
-    newDate = new Date(givenDate.getTime() + (lowestTime * 60 * 60 * 1000));
+    newDate = new Date(givenDate.getTime() + ((lowestTime * 2) * 60 * 60 * 1000));
     
     // Check if the new date is the same day as the given date
     const givenDateDay = givenDate.toDateString(); // "Mon Jan 01 2024"
@@ -45,8 +45,8 @@ export async function getBestExpirationTime(isoDate: string, currentDateCairo: s
     if (givenDateDay !== newDateDay) {
       throw new BadRequestError(
         {
-          en: `Please book for the next day as the minimum expiration time (${lowestTime} hours) would extend beyond today`,
-          ar: `يرجى الحجز لليوم التالي حيث أن الحد الأدنى لوقت انتهاء الصلاحية (${lowestTime} ساعة) سيمتد إلى ما بعد اليوم`,
+          en: `Please book for the next day as the minimum expiration time (${lowestTime * 2} hours) would extend beyond today`,
+          ar: `يرجى الحجز لليوم التالي حيث أن الحد الأدنى لوقت انتهاء الصلاحية (${lowestTime * 2} ساعة) سيمتد إلى ما بعد اليوم`,
         },
         lang,
       );
