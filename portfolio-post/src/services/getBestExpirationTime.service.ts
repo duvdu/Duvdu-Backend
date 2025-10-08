@@ -21,7 +21,7 @@ export async function getBestExpirationTime(isoDate: string, currentDateCairo: s
     : defaultExpirationTime;
 
   const timeDifferenceInHours = Math.abs(
-    (givenDate.getTime() - currentDate.getTime()) / (1000 * 60 * 60),
+    (givenDate.getTime() - currentDate.getTime() + (2 * 60 * 1000)) / (1000 * 60 * 60),
   );
 
 
