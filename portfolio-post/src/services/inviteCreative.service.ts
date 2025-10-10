@@ -82,7 +82,7 @@ export const inviteCreatives = async (
           subCategory._id &&
           user.mainCategory.relatedCategory?.subCategories?.subCategory &&
           subCategory._id.toString() ===
-          user.mainCategory.relatedCategory.subCategories.subCategory.toString()
+            user.mainCategory.relatedCategory.subCategories.subCategory.toString()
         ) {
           // check tags
           user.mainCategory.relatedCategory?.subCategories.tags?.forEach((tag: any) => {
@@ -131,9 +131,9 @@ export const inviteCreatives = async (
         subCategories: invitedUsers[index].mainCategory.subCategories,
         relatedCategory: invitedUsers[index].mainCategory.relatedCategory
           ? {
-            category: invitedUsers[index].mainCategory.relatedCategory?.category,
-            subCategories: invitedUsers[index].mainCategory.relatedCategory?.subCategories,
-          }
+              category: invitedUsers[index].mainCategory.relatedCategory?.category,
+              subCategories: invitedUsers[index].mainCategory.relatedCategory?.subCategories,
+            }
           : null,
       },
     }));
@@ -226,7 +226,7 @@ export const validateCreative = async (
           subCategory._id &&
           creative.mainCategory.relatedCategory?.subCategories?.subCategory &&
           subCategory._id.toString() ===
-          creative.mainCategory.relatedCategory.subCategories.subCategory.toString()
+            creative.mainCategory.relatedCategory.subCategories.subCategory.toString()
         ) {
           // check tags
           creative.mainCategory.relatedCategory?.subCategories.tags?.forEach((tag: any) => {

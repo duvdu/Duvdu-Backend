@@ -183,7 +183,7 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
                               subCategory: {
                                 _id: '$$subCat._id',
                                 title: {
-                                  $getField: { field: req.lang, input: '$$subCat.title' }
+                                  $getField: { field: req.lang, input: '$$subCat.title' },
                                 },
                               },
                               tags: {
@@ -211,7 +211,9 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
                                           },
                                           in: {
                                             _id: '$$tag.tag',
-                                            title: { $getField: { field: req.lang, input: '$$tagData' } },
+                                            title: {
+                                              $getField: { field: req.lang, input: '$$tagData' },
+                                            },
                                           },
                                         },
                                       },
@@ -268,7 +270,9 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
                               else: {
                                 subCategory: {
                                   _id: '$$subCat._id',
-                                  title: { $getField: { field: req.lang, input: '$$subCat.title' } },
+                                  title: {
+                                    $getField: { field: req.lang, input: '$$subCat.title' },
+                                  },
                                 },
                                 tags: {
                                   $cond: {
@@ -301,7 +305,9 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
                                             },
                                             in: {
                                               _id: '$$tag.tag',
-                                              title: { $getField: { field: req.lang, input: '$$tagData' } },
+                                              title: {
+                                                $getField: { field: req.lang, input: '$$tagData' },
+                                              },
                                             },
                                           },
                                         },
@@ -615,7 +621,9 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
                                                                     then: null,
                                                                     else: {
                                                                       _id: '$$tagItem.tag',
-                                                                      title: '$$tagItem.title.' + req.lang,
+                                                                      title:
+                                                                        '$$tagItem.title.' +
+                                                                        req.lang,
                                                                     },
                                                                   },
                                                                 },
@@ -659,7 +667,10 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
     }
 
     // Filter out projects where showOnHome is false and the logged user is not the owner or not logged in
-    if (projects[0].showOnHome === false && (!req.loggedUser?.id || req.loggedUser?.id !== projects[0].user._id.toString())) {
+    if (
+      projects[0].showOnHome === false &&
+      (!req.loggedUser?.id || req.loggedUser?.id !== projects[0].user._id.toString())
+    ) {
       return next(new NotFound({ en: 'project not found', ar: 'المشروع غير موجود' }, req.lang));
     }
 
@@ -683,7 +694,6 @@ export const getProjectHandler: GetProjectHandler = async (req, res, next) => {
     }));
 
     projects[0].user.canChat = canChat;
-
 
     res.status(200).json({ message: 'success', data: projects[0] });
   } catch (error) {

@@ -109,12 +109,12 @@ export const getProjectsPagination: RequestHandler<
 
   if (req.query.startDate || req.query.endDate) {
     req.pagination.filter.createdAt = {};
-    
+
     // Check if both dates are provided and represent the same day
     if (req.query.startDate && req.query.endDate) {
       const startDate = new Date(req.query.startDate);
       const endDate = new Date(req.query.endDate);
-      
+
       // Compare dates (ignoring time)
       if (startDate.toDateString() === endDate.toDateString()) {
         // Same day: filter for projects created on this specific day only
@@ -122,7 +122,7 @@ export const getProjectsPagination: RequestHandler<
         dayStart.setHours(0, 0, 0, 0);
         const dayEnd = new Date(startDate);
         dayEnd.setHours(23, 59, 59, 999);
-        
+
         req.pagination.filter.createdAt.$gte = dayStart;
         req.pagination.filter.createdAt.$lte = dayEnd;
       } else {
@@ -140,7 +140,7 @@ export const getProjectsPagination: RequestHandler<
         startDate.setHours(0, 0, 0, 0);
         req.pagination.filter.createdAt.$gte = startDate;
       }
-      
+
       if (req.query.endDate) {
         // Set end date to end of the day
         const endDate = new Date(req.query.endDate);
@@ -221,9 +221,6 @@ export const getProjectsPagination: RequestHandler<
   next();
 };
 
-
-
-
 export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
   let isInstant = undefined;
   if (req.pagination.filter.instant != undefined) isInstant = req.pagination.filter.instant;
@@ -248,12 +245,12 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
     { $unwind: '$user' },
     ...(isInstant !== undefined
       ? [
-        {
-          $match: {
-            'user.isAvaliableToInstantProjects': isInstant,
+          {
+            $match: {
+              'user.isAvaliableToInstantProjects': isInstant,
+            },
           },
-        },
-      ]
+        ]
       : []),
     {
       $count: 'totalCount',
@@ -389,7 +386,7 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
                       then: null,
                       else: {
                         _id: '$mainCategoryDetails._id',
-                        title: '$mainCategoryDetails.title.' + req.lang
+                        title: '$mainCategoryDetails.title.' + req.lang,
                       },
                     },
                   },
@@ -447,7 +444,12 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
                                         },
                                         in: {
                                           _id: '$$tag.tag',
-                                          title: { $getField: { field: req.lang, input: '$$tagData.title' } },
+                                          title: {
+                                            $getField: {
+                                              field: req.lang,
+                                              input: '$$tagData.title',
+                                            },
+                                          },
                                         },
                                       },
                                     },
@@ -473,7 +475,7 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
                         then: null,
                         else: {
                           _id: '$relatedCategoryDetails._id',
-                          title: '$relatedCategoryDetails.title.' + req.lang
+                          title: '$relatedCategoryDetails.title.' + req.lang,
                         },
                       },
                     },
@@ -537,7 +539,12 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
                                           },
                                           in: {
                                             _id: '$$tag.tag',
-                                            title: { $getField: { field: req.lang, input: '$$tagData.title' } },
+                                            title: {
+                                              $getField: {
+                                                field: req.lang,
+                                                input: '$$tagData.title',
+                                              },
+                                            },
                                           },
                                         },
                                       },
@@ -669,7 +676,7 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
             input: '$tags',
             as: 'tag',
             in: {
-              title:   '$$tag.title.' + req.lang,
+              title: '$$tag.title.' + req.lang,
               _id: '$$tag._id',
             },
           },
@@ -833,7 +840,8 @@ export const getProjectsHandler: GetProjectsHandler = async (req, res) => {
                                                                   then: null,
                                                                   else: {
                                                                     _id: '$$tagItem.tag',
-                                                                    title: '$$tagItem.title.' + req.lang,
+                                                                    title:
+                                                                      '$$tagItem.title.' + req.lang,
                                                                   },
                                                                 },
                                                               },

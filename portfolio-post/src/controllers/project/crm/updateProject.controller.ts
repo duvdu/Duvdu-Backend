@@ -222,11 +222,7 @@ export const updateProjectCrmHandler: RequestHandler<
 
     // Update project and clean up old files in parallel
     const [updatedProject] = await Promise.all([
-      ProjectCycle.findOneAndUpdate(
-        { _id: req.params.projectId },
-        req.body,
-        { new: true },
-      ),
+      ProjectCycle.findOneAndUpdate({ _id: req.params.projectId }, req.body, { new: true }),
       project.attachments && attachments && s3.removeBucketFiles(...project.attachments),
       project.cover && cover && s3.removeBucketFiles(project.cover),
       project.audioCover && audioCover && s3.removeBucketFiles(project.audioCover),

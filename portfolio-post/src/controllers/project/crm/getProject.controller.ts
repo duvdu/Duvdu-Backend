@@ -185,7 +185,9 @@ export const getProjectCrmHandler: GetProjectHandler = async (req, res, next) =>
                                 title: {
                                   $cond: {
                                     if: req.forceLang,
-                                    then: { $getField: { field: req.lang, input: '$$subCat.title' } },
+                                    then: {
+                                      $getField: { field: req.lang, input: '$$subCat.title' },
+                                    },
                                     else: '$$subCat.title',
                                   },
                                 },
@@ -218,7 +220,12 @@ export const getProjectCrmHandler: GetProjectHandler = async (req, res, next) =>
                                             title: {
                                               $cond: {
                                                 if: req.forceLang,
-                                                then: { $getField: { field: req.lang, input: '$$tagData' } },
+                                                then: {
+                                                  $getField: {
+                                                    field: req.lang,
+                                                    input: '$$tagData',
+                                                  },
+                                                },
                                                 else: '$$tagData',
                                               },
                                             },
@@ -283,7 +290,9 @@ export const getProjectCrmHandler: GetProjectHandler = async (req, res, next) =>
                                   title: {
                                     $cond: {
                                       if: req.forceLang,
-                                      then: { $getField: { field: req.lang, input: '$$subCat.title' } },
+                                      then: {
+                                        $getField: { field: req.lang, input: '$$subCat.title' },
+                                      },
                                       else: '$$subCat.title',
                                     },
                                   },
@@ -322,7 +331,12 @@ export const getProjectCrmHandler: GetProjectHandler = async (req, res, next) =>
                                               title: {
                                                 $cond: {
                                                   if: req.forceLang,
-                                                  then: { $getField: { field: req.lang, input: '$$tagData' } },
+                                                  then: {
+                                                    $getField: {
+                                                      field: req.lang,
+                                                      input: '$$tagData',
+                                                    },
+                                                  },
                                                   else: '$$tagData',
                                                 },
                                               },
@@ -661,7 +675,8 @@ export const getProjectCrmHandler: GetProjectHandler = async (req, res, next) =>
                                                                     else: {
                                                                       _id: '$$tagItem.tag',
                                                                       title: req.forceLang
-                                                                        ? '$$tagItem.title.' + req.lang
+                                                                        ? '$$tagItem.title.' +
+                                                                          req.lang
                                                                         : '$$tagItem.title',
                                                                     },
                                                                   },

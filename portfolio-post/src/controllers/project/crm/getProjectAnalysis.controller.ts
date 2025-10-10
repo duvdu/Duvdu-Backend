@@ -11,7 +11,7 @@ export const getProjectAnalysis: RequestHandler<
   const matchedPeriod: any = {};
   if (req.query.startDate || req.query.endDate) {
     matchedPeriod.createdAt = {};
-    
+
     if (req.query.startDate) {
       // Set start date to beginning of the day
       const startDate = new Date(req.query.startDate);
@@ -20,7 +20,7 @@ export const getProjectAnalysis: RequestHandler<
     } else {
       matchedPeriod.createdAt.$gte = new Date(0);
     }
-    
+
     if (req.query.endDate) {
       // Set end date to end of the day
       const endDate = new Date(req.query.endDate);

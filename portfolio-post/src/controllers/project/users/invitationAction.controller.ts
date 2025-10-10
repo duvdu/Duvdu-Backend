@@ -49,7 +49,9 @@ export const invitationActionHandler: RequestHandler<
     CYCLES.portfolioPost,
     'project invitation updates',
     `${user?.name} ${
-      req.body.status === InviteStatus.accepted ? 'approved your tagging request' : 'declined your tagging request'
+      req.body.status === InviteStatus.accepted
+        ? 'approved your tagging request'
+        : 'declined your tagging request'
     }`,
     Channels.notification,
   );

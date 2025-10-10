@@ -5,8 +5,6 @@ import { InviteStatus, MODELS, ProjectCycle } from '@duvdu-v1/duvdu';
 import { GetProjectsForCrmHandler } from '../../../types/project.endoints';
 
 export const getProjetcsCrm: GetProjectsForCrmHandler = async (req, res) => {
-
-  
   const projects = await ProjectCycle.aggregate([
     {
       $match: req.pagination.filter,
@@ -116,7 +114,9 @@ export const getProjetcsCrm: GetProjectsForCrmHandler = async (req, res) => {
                       then: null,
                       else: {
                         _id: '$mainCategoryDetails._id',
-                        title: req.forceLang? '$mainCategoryDetails.title.' + req.lang : '$mainCategoryDetails.title',
+                        title: req.forceLang
+                          ? '$mainCategoryDetails.title.' + req.lang
+                          : '$mainCategoryDetails.title',
                       },
                     },
                   },
@@ -183,7 +183,9 @@ export const getProjetcsCrm: GetProjectsForCrmHandler = async (req, res) => {
                                           title: {
                                             $cond: {
                                               if: req.forceLang,
-                                              then: { $getField: { field: req.lang, input: '$$tagData' } },
+                                              then: {
+                                                $getField: { field: req.lang, input: '$$tagData' },
+                                              },
                                               else: '$$tagData',
                                             },
                                           },
@@ -248,7 +250,9 @@ export const getProjetcsCrm: GetProjectsForCrmHandler = async (req, res) => {
                                 title: {
                                   $cond: {
                                     if: req.forceLang,
-                                    then: { $getField: { field: req.lang, input: '$$subCat.title' } },
+                                    then: {
+                                      $getField: { field: req.lang, input: '$$subCat.title' },
+                                    },
                                     else: '$$subCat.title',
                                   },
                                 },
@@ -287,7 +291,12 @@ export const getProjetcsCrm: GetProjectsForCrmHandler = async (req, res) => {
                                             title: {
                                               $cond: {
                                                 if: req.forceLang,
-                                                then: { $getField: { field: req.lang, input: '$$tagData' } },
+                                                then: {
+                                                  $getField: {
+                                                    field: req.lang,
+                                                    input: '$$tagData',
+                                                  },
+                                                },
                                                 else: '$$tagData',
                                               },
                                             },
@@ -425,13 +434,13 @@ export const getProjetcsCrm: GetProjectsForCrmHandler = async (req, res) => {
     {
       $group: {
         _id: '$_id',
-        doc: { $first: '$$ROOT' }
-      }
+        doc: { $first: '$$ROOT' },
+      },
     },
     {
       $replaceRoot: {
-        newRoot: '$doc'
-      }
+        newRoot: '$doc',
+      },
     },
     { $sort: { createdAt: req.query.sortOrder === 'asc' ? 1 : -1 } },
     { $skip: req.pagination.skip },
