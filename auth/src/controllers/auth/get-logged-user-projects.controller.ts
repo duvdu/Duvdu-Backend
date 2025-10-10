@@ -5,9 +5,9 @@ export const getLoggedUserProjects: RequestHandler<
   unknown,
   SuccessResponse<{ data: any }>
 > = async (req, res, next) => {
-
   const user = await Users.findOne({ _id: req.loggedUser.id, isDeleted: false });
-  if (!user) return next(new NotFound({ en: 'user not found', ar: 'المستخدم غير موجود' }, req.lang));
+  if (!user)
+    return next(new NotFound({ en: 'user not found', ar: 'المستخدم غير موجود' }, req.lang));
 
   const count = await Project.countDocuments({
     user: req.loggedUser.id,
@@ -89,8 +89,12 @@ export const getUserProjectsByUsername: RequestHandler<
   { username: string },
   SuccessResponse<{ data: any }>
 > = async (req, res, next) => {
-  const targetUser = await Users.findOne({ username: req.params.username , isDeleted: false}, { _id: 1 });
-  if (!targetUser) return next(new NotFound({ en: 'user not found', ar: 'المستخدم غير موجود' }, req.lang));
+  const targetUser = await Users.findOne(
+    { username: req.params.username, isDeleted: false },
+    { _id: 1 },
+  );
+  if (!targetUser)
+    return next(new NotFound({ en: 'user not found', ar: 'المستخدم غير موجود' }, req.lang));
 
   const count = await Project.countDocuments({
     user: targetUser.id,

@@ -66,8 +66,7 @@ export const appInit = async () => {
       { name: 'Duvdu Super Admin', password: await hashPassword('123@Password') },
     );
 
-  if (!(await Setting.findOne()))
-    await Setting.create({});
+  if (!(await Setting.findOne())) await Setting.create({});
 
   // await mongoose.connection.close();
 };

@@ -1,4 +1,11 @@
-import { BadRequestError, Contracts, CopyRights, NotFound, ProjectCycle, Rentals } from '@duvdu-v1/duvdu';
+import {
+  BadRequestError,
+  Contracts,
+  CopyRights,
+  NotFound,
+  ProjectCycle,
+  Rentals,
+} from '@duvdu-v1/duvdu';
 import { Users } from '@duvdu-v1/duvdu/build/models/User.model';
 import { RequestHandler } from 'express';
 import 'express-async-errors';
@@ -41,9 +48,9 @@ export const deleteLoggedUser: RequestHandler = async (req, res) => {
   await user.save();
 
   // delete all user's projects
-  await CopyRights.updateMany({ user:user._id }, { isDeleted:true});
-  await Rentals.updateMany({ user: user._id }, { isDeleted:true});
-  await ProjectCycle.updateMany({ user:user._id }, { isDeleted:true});
+  await CopyRights.updateMany({ user: user._id }, { isDeleted: true });
+  await Rentals.updateMany({ user: user._id }, { isDeleted: true });
+  await ProjectCycle.updateMany({ user: user._id }, { isDeleted: true });
 
   res.status(200).json({
     message: 'User deleted successfully',

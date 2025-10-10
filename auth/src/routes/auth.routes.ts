@@ -46,14 +46,16 @@ router
   .route('/provider/phone')
   .post(isauthenticated, val.updatePhoneNumberVal, handlers.updateProviderPhoneNumberHandler);
 
-router.route('/admins').get(
-  isauthenticated,
-  isauthorized(PERMISSIONS.listAdmins),
-  val.findUsers,
-  globalPaginationMiddleware,
-  handlers.filterCrmUsers,
-  handlers.getCrmUsers,
-)
+router
+  .route('/admins')
+  .get(
+    isauthenticated,
+    isauthorized(PERMISSIONS.listAdmins),
+    val.findUsers,
+    globalPaginationMiddleware,
+    handlers.filterCrmUsers,
+    handlers.getCrmUsers,
+  )
   .post(
     isauthenticated,
     isauthorized(PERMISSIONS.createAdmin),
@@ -95,8 +97,6 @@ router
     val.unblockUser,
     handlers.unBlockUserHandler,
   );
-
-
 
 router
   .route('/crm')

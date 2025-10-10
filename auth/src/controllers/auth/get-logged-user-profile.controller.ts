@@ -5,7 +5,7 @@ import { GetLoggedUserProfileHandler } from '../../types/endpoints/user.endpoint
 
 export const getLoggedUserProfileHandler: GetLoggedUserProfileHandler = async (req, res, next) => {
   const user = await Users.aggregate([
-    { $match: { _id: new mongoose.Types.ObjectId(req.loggedUser.id) , isDeleted: false } },
+    { $match: { _id: new mongoose.Types.ObjectId(req.loggedUser.id), isDeleted: false } },
     //roles
     {
       $lookup: {

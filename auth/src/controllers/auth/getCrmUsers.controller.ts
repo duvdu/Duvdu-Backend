@@ -2,8 +2,6 @@ import { Iuser, MODELS, PaginationResponse, Roles, SystemRoles, Users } from '@d
 import { RequestHandler } from 'express';
 import mongoose, { PipelineStage } from 'mongoose';
 
-
-
 export const filterCrmUsers: RequestHandler<
   unknown,
   unknown,
@@ -86,10 +84,8 @@ export const filterCrmUsers: RequestHandler<
     req.pagination.filter.createdAt = { ...req.pagination.filter.createdAt, $lte: endDate };
   }
 
-
   next();
 };
-
 
 export const getCrmUsers: RequestHandler<unknown, PaginationResponse<{ data: Iuser[] }>> = async (
   req,
