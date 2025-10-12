@@ -3,7 +3,7 @@ import { check } from 'express-validator';
 
 export const createReportVal = [
   check('project').isMongoId().withMessage('projectInvalid'),
-  check('desc').isString().isLength({ min: 10, max: 100 }).withMessage('descLength'),
+  check('desc').isString().withMessage('descLength'),
   globalValidatorMiddleware,
 ];
 
@@ -23,7 +23,7 @@ export const getAllReportsVal = [
 
 export const updateReportVal = [
   check('reportId').isMongoId().withMessage('reportIdInvalid'),
-  check('feedback').isString().isLength({ min: 5, max: 50 }).withMessage('feedbackLength'),
+  check('feedback').isString().withMessage('feedbackLength'),
   globalValidatorMiddleware,
 ];
 
