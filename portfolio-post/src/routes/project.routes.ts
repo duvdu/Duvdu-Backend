@@ -56,7 +56,7 @@ router
     isauthorized(PERMISSIONS.updateProject),
     globalUploadMiddleware(FOLDERS.portfolio_post, {
       maxSize: 400 * 1024 * 1024,
-      fileTypes: ['video/*', 'image/*', 'audio/*', 'application/*'],
+      fileTypes: ['video/*', 'image/*', 'audio/*', 'audio/wav', 'audio/x-wav', 'application/*'],
     }).fields([
       { name: 'attachments', maxCount: 10 },
       { name: 'cover', maxCount: 1 },
@@ -78,7 +78,7 @@ router
     isauthenticated,
     globalUploadMiddleware(FOLDERS.portfolio_post, {
       maxSize: 400 * 1024 * 1024,
-      fileTypes: ['video/*', 'image/*', 'audio/*', 'application/*'],
+      fileTypes: ['video/*', 'image/*', 'audio/*', 'audio/wav', 'audio/x-wav', 'application/*'],
     }).fields([
       { name: 'attachments', maxCount: 10 },
       { name: 'cover', maxCount: 1 },
@@ -102,7 +102,7 @@ router
     isauthenticated,
     globalUploadMiddleware(FOLDERS.portfolio_post, {
       maxSize: 400 * 1024 * 1024,
-      fileTypes: ['video/*', 'image/*', 'audio/*', 'application/*'],
+      fileTypes: ['video/*', 'image/*', 'audio/*', 'audio/wav', 'audio/x-wav', 'application/*'],
     }).fields([
       { name: 'attachments', maxCount: 10 },
       { name: 'cover', maxCount: 1 },
