@@ -50,6 +50,15 @@ export const signinHandler: SigninHandler = async (req, res, next) => {
       ),
     );
 
+  // check if user role exists
+  if (!user.role)
+    return next(
+      new UnauthenticatedError(
+        { en: 'User role not found', ar: 'دور المستخدم غير موجود' },
+        req.lang,
+      ),
+    );
+
   // check if user is blocked
   if (user.isBlocked.value)
     return next(
