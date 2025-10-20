@@ -409,7 +409,13 @@ class PaymobPaymentProcessor {
     } catch (error) {
       const axiosError = error as AxiosError;
       console.log('=======================');
-      console.log('axiosError', error);
+      console.log('Paymob API Error Details:');
+      console.log('Status:', axiosError.response?.status);
+      console.log('Status Text:', axiosError.response?.statusText);
+      console.log('Response Data:', JSON.stringify(axiosError.response?.data, null, 2));
+      console.log('Request Data:', JSON.stringify(axiosError.config?.data, null, 2));
+      console.log('Request URL:', axiosError.config?.url);
+      console.log('Request Method:', axiosError.config?.method);
       console.log('=======================');
       throw new Error(`Failed to create Paymob payment intention: ${axiosError.message}`);
     }
@@ -459,7 +465,13 @@ class PaymobPaymentProcessor {
     } catch (error) {
       const axiosError = error as AxiosError;
       console.log('=======================');
-      console.log('axiosError', error);
+      console.log('Paymob API Error Details:');
+      console.log('Status:', axiosError.response?.status);
+      console.log('Status Text:', axiosError.response?.statusText);
+      console.log('Response Data:', JSON.stringify(axiosError.response?.data, null, 2));
+      console.log('Request Data:', JSON.stringify(axiosError.config?.data, null, 2));
+      console.log('Request URL:', axiosError.config?.url);
+      console.log('Request Method:', axiosError.config?.method);
       console.log('=======================');
       throw new Error(`Failed to create Paymob payment intention: ${axiosError.message}`);
     }
