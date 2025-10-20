@@ -69,7 +69,7 @@ export const payContract: RequestHandler<
 
     const paymob = new PaymobService();
     const paymentLink = await paymob.createPaymentUrlWithUserData(
-      firstPaymentAmount,
+      Math.round(firstPaymentAmount),
       req.loggedUser.id,
       contract._id.toString(),
       {
@@ -94,7 +94,7 @@ export const payContract: RequestHandler<
 
     const paymob = new PaymobService();
     const paymentLink = await paymob.createPaymentUrlWithUserData(
-      secondPaymentAmount,
+      Math.round(secondPaymentAmount),
       req.loggedUser.id,
       contract._id.toString(),
       {
