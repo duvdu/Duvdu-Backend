@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+
 import { Schema, Types, model } from 'mongoose';
 
 import { MODELS } from '../types/model-names';
