@@ -480,7 +480,7 @@ class PaymobPaymentProcessor {
     return {
       amount: amountInCents,
       currency,
-      payment_methods: [this.config.integrationId, 'card'],
+      payment_methods: [this.config.integrationId],
       items,
       billing_data: billingData,
       customer: {
