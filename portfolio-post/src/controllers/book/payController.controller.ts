@@ -60,7 +60,7 @@ export const payContract: RequestHandler<
       { _id: req.params.contractId },
       {
         firstPaymentAmount: ((10 * contract.totalPrice) / 100).toFixed(2),
-        secondPaymentAmount: contract.totalPrice - (10 * contract.totalPrice) / 100,
+        secondPaymentAmount: Number((contract.totalPrice - (10 * contract.totalPrice) / 100).toFixed(2)),
       },
     );
 
@@ -83,7 +83,7 @@ export const payContract: RequestHandler<
     await ProjectContract.updateOne(
       { _id: req.params.contractId },
       {
-        secondPaymentAmount: contract.totalPrice - contract.firstPaymentAmount,
+        secondPaymentAmount: Number((contract.totalPrice - contract.firstPaymentAmount).toFixed(2)),
       },
     );
 
