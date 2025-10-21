@@ -3,7 +3,19 @@ import * as admin from 'firebase-admin';
 import serviceAccount from './fcmKey.json';
 
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
+  credential: admin.credential.cert({
+    "type": "service_account",
+    "project_id": "duvdu2024",
+    "private_key_id": "5fe065ebe6b0470d3142a366269e1b2600e8adf2",
+    "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDbVICd0nRBRXc5\nlgEocvXNlCCQVEhfsKuweADUjv/mw8Q2H6gZa2wddjRAzUmKcC8MFJpfz5ONhTya\nrE1yNO5Va+vmX6JbAKjTAi76OuEcJv31jxEXhW2l99sKVcviTM1tSwFfPf6m3B3I\nlDWiw0qyAohRgy5tVoUemhQOd2IjZfSiX07JS67gW1XvFZ7Rx+bj+QFs5uh7SFbg\nUfHNfCXh5rLZdahFMLkAthzsza/5GZXfO425yJi0aYqfy36WcKbzsrjn5dLUWd4l\nANnKTTeK1bE0vZ3PI8d/0Fo4nwWae8YIH37D6WKgbs9L4nVkdmO2iDq0L9vsaBbj\n8iRRgranAgMBAAECggEAIHMAFFlumbmNShfHVBSuCRxBNRlDG+UngZQ/izMc6SdN\ngDRuylP6SuGSGYRFvRWb4E2sCUDMs8Nik/+p9ZufJ0QwQoUjoBMY5x8LlDnh1Chw\nqkPgY3p6HnPtFDpdT73NJr5SFaU2Z7lpLqO+y7XY9z0oreaal9KVH1HsZbeD7XiB\n6bips0DbuxCPMhpQf+xrBraiBKtJO8UXBnCot0vbnIQJ1uZjHo7nXGs2yML4I4B5\nwMfGKcyM4V947aDrPDQWqF2i2KqYd2L79fzqQYLQeHXm58mbaZCyc7W/zavvpSsH\n7a5PHCbyha/x+wYmEGKe+SZbKA+sJAfV2KN+F0AQAQKBgQD3wN13YcDmodmACnvB\nE1NHjFUjK080HFTp2lJ1v58sdGMWjbe2OfxBPFkXT1OS5ISlZ9r/fTqYIo4VVxHh\nPREESM5eAYpJzdCN/uindxuedRvKR/ovWXUYhqry5j971Z5GB759FcJbcEkb4k7D\nSUUq8ObdXbyq6V+KbN2oKSFV5wKBgQDioXBuUvxyLHCqu8ulSfFgUNZUqgHK/xnL\nWJgCLkU9pHDa83IQVDvqX1TpNOBSIyPMGmZJVkCE2VimyU9Y/UyMy06DtdggNSAJ\nXTM5+HIt6Mdv224Df4BR62lS9EfzxdnGUb7fm9PXinwZWpOqwI9xfayoJtm75cen\nfSuKqNoBQQKBgQCIn0aBitqBVEdIoH9WHX4TOoPIfR2UMvtwagCHBkCUlyn9SfFB\nAADnSIwomooPuwya2gaeVUR2mLeZdQZbGv3DSxLiLB9CS8jyRNuvXbNRUmscxUxl\nyAMWn0yt3eKsO0SogaS9/b3MBsOKKOYeMs19vJLTB9n+tesFvrsM/IFxiQKBgQCv\nonmlpn6qZTJzvtKWKHX+NOfF+XMmRQlShDhaCE309cnYha6yZPWCL5t4mFf4j+8g\nMJ1w3H1n96EysPTjfHqk6rLQdE8otsM7PpWCqb6jQbG+SIo7/8YMtqqLdXGFxKF/\nhr6sQPGuK079vyqNvGnuhH0YW/OGIQ/YB7OE5FL/gQKBgQDeDebaAwiXvc0uCwB1\nCbNY9SgRZ44c3lOaBknovdP15iUkIS7UP2FaPHP/x8eZLM7hIq9O0sX8iNu/NqQJ\ni9Qju2vLhIVdCcl1HbhmvYGbnlW9569m624rJkGzG+tJXXg76ugetpjPJMgprPeB\nXyRG0Exryke88a8hc77F+h0gZw==\n-----END PRIVATE KEY-----\n",
+    "client_email": "firebase-adminsdk-7a4er@duvdu2024.iam.gserviceaccount.com",
+    "client_id": "111484240942749096432",
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-7a4er%40duvdu2024.iam.gserviceaccount.com",
+    "universe_domain": "googleapis.com"
+  }),
 });
 
 export default admin;

@@ -68,8 +68,10 @@ export const payContract: RequestHandler<
     );
 
     const paymob = new PaymobService();
+    console.log('firstPaymentAmount', Number(firstPaymentAmount.toFixed(2)));
+    console.log('secondPaymentAmount', Number(secondPaymentAmount.toFixed(2)));
     const paymentLink = await paymob.createPaymentUrlWithUserData(
-      Math.round(firstPaymentAmount),
+      Number(firstPaymentAmount.toFixed(2)),
       req.loggedUser.id,
       contract._id.toString(),
       {
@@ -83,7 +85,7 @@ export const payContract: RequestHandler<
 
     res.status(200).json({ message: 'success', paymentUrl: paymentLink.paymentUrl });
   } else if (contract.status === ProjectContractStatus.waitingForTotalPayment) {
-    const secondPaymentAmount = Math.round((contract.totalPrice - contract.firstPaymentAmount) * 100) / 100;
+    const secondPaymentAmount = Number((contract.totalPrice - contract.firstPaymentAmount).toFixed(2));
     
     await ProjectContract.updateOne(
       { _id: req.params.contractId },
