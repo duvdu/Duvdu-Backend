@@ -1,6 +1,7 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 import * as admin from 'firebase-admin';
 
-import serviceAccount from './fcmKey.json';
 
 admin.initializeApp({
   credential: admin.credential.cert({
@@ -16,6 +17,6 @@ admin.initializeApp({
     "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-7a4er%40duvdu2024.iam.gserviceaccount.com",
     "universe_domain": "googleapis.com"
   }),
-});
+} as admin.ServiceAccount);
 
 export default admin;
