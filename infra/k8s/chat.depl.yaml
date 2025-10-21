@@ -119,6 +119,11 @@ spec:
                 secretKeyRef:
                   name: sms-bearer-token
                   key: SMS_BEARER_TOKEN
+            - name: FIREBASE_KEY_JSON
+              valueFrom:
+                secretKeyRef:
+                  name: firebase-key-json
+                  key: FIREBASE_KEY_JSON
 
 ---
 apiVersion: v1
