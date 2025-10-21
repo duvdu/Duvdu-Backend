@@ -1,4 +1,4 @@
-import admin from './fireBaseConfig';
+import { getFirebaseAdmin } from './fireBaseConfig';
 
 export const sendFcmToSpecificTopic = async (topic: string, title: string, message: string) => {
   const messagePayload = {
@@ -17,6 +17,7 @@ export const sendFcmToSpecificTopic = async (topic: string, title: string, messa
   };
 
   try {
+    const admin = getFirebaseAdmin();
     const response = await admin.messaging().send(messagePayload);
     console.log('Successfully sent FCM notification:', response);
   } catch (error) {

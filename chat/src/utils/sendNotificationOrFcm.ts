@@ -1,7 +1,7 @@
 import { ImessageDoc, Inotification, NotFound, Users } from '@duvdu-v1/duvdu';
 import SocketIO from 'socket.io';
 
-import admin from './fireBaseConfig';
+import { getFirebaseAdmin } from './fireBaseConfig';
 
 export async function sendFCMNotification(
   token: string[],
@@ -45,6 +45,7 @@ export async function sendFCMNotification(
   };
 
   try {
+    const admin = getFirebaseAdmin();
     const response = await admin.messaging().sendEachForMulticast(messagePayload);
     console.log(JSON.stringify(response));
     console.log('Successfully sent FCM notification:', JSON.stringify(response));

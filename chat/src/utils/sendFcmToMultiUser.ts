@@ -1,4 +1,4 @@
-import admin from './fireBaseConfig';
+import { getFirebaseAdmin } from './fireBaseConfig';
 
 interface FCMResponse {
   successCount: number;
@@ -75,6 +75,7 @@ export const sendFcmToMultipleUsers = async (
       );
 
       try {
+        const admin = getFirebaseAdmin();
         const response = await admin.messaging().sendMulticast(messagePayload);
 
         results.successCount += response.successCount;

@@ -31,5 +31,3 @@ const initializeFirebase = () => {
 export const getFirebaseAdmin = () => {
   return initializeFirebase();
 };
-
-export default admin;
