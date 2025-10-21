@@ -11,3 +11,8 @@ dockerfile.dev
 Dockerfile-dev
 .wakatime-project
 logs
+
+# Service account credentials
+**/serviceAccount.json
+**/service-account.json
+**/*service-account*.json
