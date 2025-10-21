@@ -9,10 +9,6 @@ const initializeFirebase = () => {
   }
 
   try {
-   
-
-    console.log(serviceAccount);
-
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
     });
