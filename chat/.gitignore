@@ -3,8 +3,3 @@ build
 # .env*
 ./package-lock.json
 media
-
-# Service account credentials
-serviceAccount.json
-service-account.json
-*service-account*.json
