@@ -46,7 +46,8 @@ export async function sendFCMNotification(
 
   try {
     const response = await admin.messaging().sendEachForMulticast(messagePayload);
-    console.log('Successfully sent FCM notification:', response);
+    console.log(JSON.stringify(response));
+    console.log('Successfully sent FCM notification:', JSON.stringify(response));
   } catch (error) {
     console.log(JSON.stringify(error));
     console.error('Error sending FCM notification:', error);
