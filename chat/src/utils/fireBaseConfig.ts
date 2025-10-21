@@ -1,5 +1,6 @@
 import * as admin from 'firebase-admin';
 
+import serviceAccount from './fcmToken.json';
 let initialized = false;
 
 const initializeFirebase = () => {
@@ -8,8 +9,7 @@ const initializeFirebase = () => {
   }
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const serviceAccount = import('./fcmToken.json');
+   
 
     console.log(serviceAccount);
 
