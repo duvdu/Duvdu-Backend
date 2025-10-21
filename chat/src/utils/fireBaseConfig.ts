@@ -8,7 +8,10 @@ const initializeFirebase = () => {
   }
 
   try {
-    const serviceAccount = require('./fcmKey.json');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const serviceAccount = import('./fcmToken.json');
+
+    console.log(serviceAccount);
 
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
