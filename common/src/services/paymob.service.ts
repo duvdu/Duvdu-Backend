@@ -430,6 +430,7 @@ class PaymobPaymentProcessor {
    * @param serviceType Type of service being paid for
    * @returns Promise<{paymentUrl: string}> Payment URL
    */
+
   async createPaymentUrlWithUserData(
     amount: number,
     userId: string,
@@ -556,7 +557,7 @@ class PaymobPaymentProcessor {
       {
         name: `${userId}-${contractId}`,
         description: serviceType,
-        amount: amount * 100,
+        amount: Number((amount * 100).toFixed(2)),
         quantity: 1,
       },
     ];
