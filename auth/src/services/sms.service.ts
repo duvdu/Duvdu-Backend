@@ -29,7 +29,7 @@ export class SmsService {
         recipient: formattedTo,
         sender_id: this.senderId,
         type: 'plain',
-        message: `${this.senderId}: Your otp is ${otpCode}`,
+        message: `${this.senderId}: One-Time-Code: ${otpCode}`,
       };
 
       const response = await axios.post(this.apiUrl, payload, {
