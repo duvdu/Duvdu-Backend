@@ -489,7 +489,7 @@ class PaymobPaymentProcessor {
     currency: string,
     extras?: Record<string, any>,
   ): PaymobIntentionRequest {
-    const amountInCents = amount * 100;
+    const amountInCents = Number((amount * 100).toFixed(2));
     return {
       amount: amountInCents,
       currency,
