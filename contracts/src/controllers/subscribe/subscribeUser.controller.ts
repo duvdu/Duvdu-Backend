@@ -63,6 +63,9 @@ export const subscribeUserController: RequestHandler = async (req, res) => {
   );
   const total = Number(((totalPrice * setting.contractSubscriptionPercentage) / 100).toFixed(2));
 
+  console.log('total', total);
+  
+
   const user = await Users.findById(req.loggedUser.id);
 
   let pendingTransaction = await Transaction.findOne({
@@ -88,7 +91,7 @@ export const subscribeUserController: RequestHandler = async (req, res) => {
 
   const paymob = new PaymobService();
   const paymentLink = await paymob.createPaymentUrlWithUserData(
-    total,
+   Number(total.toFixed(2)),
     req.loggedUser.id,
     pendingTransaction!._id.toString(),
     {
