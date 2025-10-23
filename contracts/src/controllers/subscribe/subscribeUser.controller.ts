@@ -61,7 +61,7 @@ export const subscribeUserController: RequestHandler = async (req, res) => {
     (acc: number, contract: any) => acc + (contract.contract.totalPrice || 0),
     0,
   );
-  const total = (totalPrice * setting.contractSubscriptionPercentage) / 100;
+  const total = Number(((totalPrice * setting.contractSubscriptionPercentage) / 100).toFixed(2));
 
   const user = await Users.findById(req.loggedUser.id);
 
