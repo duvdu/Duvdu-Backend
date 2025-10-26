@@ -1,3 +1,6 @@
+// disable eslint for this file
+/* eslint-disable */
+
 import { model, Schema, Types } from 'mongoose';
 
 import { RequestedDeadlineStatus, SubmitFilesStatus } from './copyright-contract.model';
@@ -47,6 +50,7 @@ export interface IprojectContract {
   secondPaymentAmount: number;
   status: ProjectContractStatus;
   rejectedBy?: 'customer' | 'sp';
+  canceledBy?: 'customer' | 'sp' | 'system';
   paymentLink: string;
   duration: number;
   createdAt: Date;
@@ -64,73 +68,76 @@ export interface IprojectContract {
   };
 }
 
-export const ProjectContract = model<IprojectContract>(
-  MODELS.projectContract,
-  new Schema<IprojectContract>(
-    {
-      sp: { type: Schema.Types.ObjectId, ref: MODELS.user },
-      ticketNumber: { type: String, default: generateTicketNumber, unique: true, sparse: true },
-      customer: { type: Schema.Types.ObjectId, ref: MODELS.user },
-      project: { type: Schema.Types.ObjectId, ref: MODELS.portfolioPost },
-      tools: [
-        {
-          name: { type: String, default: null },
-          unitPrice: { type: Number, default: 0 },
-          units: { type: Number, default: 0 },
-        },
-      ],
-      functions: [
-        {
-          name: { type: String, default: null },
-          unitPrice: { type: Number, default: 0 },
-          units: { type: Number, default: 0 },
-        },
-      ],
-      details: { type: String, default: null },
-      location: { lat: { type: Number, default: 0 }, lng: { type: Number, default: 0 } },
-      address: { type: String, default: null },
-      attachments: [String],
-      projectScale: {
-        unit: { type: String, default: null },
-        numberOfUnits: { type: Number, default: 0 },
+
+const projectContractSchema = new Schema<IprojectContract>(
+  {
+    sp: { type: Schema.Types.ObjectId, ref: MODELS.user },
+    ticketNumber: { type: String, default: generateTicketNumber, unique: true, sparse: true },
+    customer: { type: Schema.Types.ObjectId, ref: MODELS.user },
+    project: { type: Schema.Types.ObjectId, ref: MODELS.portfolioPost },
+    tools: [
+      {
+        name: { type: String, default: null },
         unitPrice: { type: Number, default: 0 },
+        units: { type: Number, default: 0 },
       },
-      appointmentDate: Date,
-      totalPrice: { type: Number, default: 0 },
-      deadline: Date,
-      startDate: Date,
-      stageExpiration: { type: Number, default: 0 },
-      actionAt: Date,
-      firstCheckoutAt: Date,
-      totalCheckoutAt: Date,
-      firstPaymentAmount: { type: Number, default: 0 },
-      secondPaymentAmount: { type: Number, default: 0 },
-      status: { type: String, enum: ProjectContractStatus },
-      rejectedBy: { type: String, enum: ['sp', 'customer'], default: null },
-      paymentLink: String,
-      duration: { type: Number, default: 0 },
-      equipmentPrice: { type: Number, default: 0 },
-      submitFiles: [
-        {
-          link: { type: String, default: null },
-          notes: { type: String, default: null },
-          reason: { type: String, default: null },
-          dateOfSubmission: { type: Date, default: null },
-          status: { type: String, enum: SubmitFilesStatus, default: SubmitFilesStatus.pending },
-        },
-      ],
-      requestedDeadline: {
-        deadline: { type: Date, default: null },
-        status: {
-          type: String,
-          enum: RequestedDeadlineStatus,
-          default: RequestedDeadlineStatus.pending,
-        },
-        user: { type: Schema.Types.ObjectId, ref: MODELS.user, default: null },
+    ],
+    functions: [
+      {
+        name: { type: String, default: null },
+        unitPrice: { type: Number, default: 0 },
+        units: { type: Number, default: 0 },
       },
+    ],
+    details: { type: String, default: null },
+    location: { lat: { type: Number, default: 0 }, lng: { type: Number, default: 0 } },
+    address: { type: String, default: null },
+    attachments: [String],
+    projectScale: {
+      unit: { type: String, default: null },
+      numberOfUnits: { type: Number, default: 0 },
+      unitPrice: { type: Number, default: 0 },
     },
-    { timestamps: true, collection: MODELS.projectContract },
-  ),
+    appointmentDate: Date,
+    totalPrice: { type: Number, default: 0 },
+    deadline: Date,
+    startDate: Date,
+    stageExpiration: { type: Number, default: 0 },
+    actionAt: Date,
+    firstCheckoutAt: Date,
+    totalCheckoutAt: Date,
+    firstPaymentAmount: { type: Number, default: 0 },
+    secondPaymentAmount: { type: Number, default: 0 },
+    status: { type: String, enum: ProjectContractStatus },
+    rejectedBy: { type: String, enum: ['sp', 'customer'], default: null },
+    canceledBy: { type: String, enum: ['sp', 'customer' , 'system'], default: null },
+    paymentLink: String,
+    duration: { type: Number, default: 0 },
+    equipmentPrice: { type: Number, default: 0 },
+    submitFiles: [
+      {
+        link: { type: String, default: null },
+        notes: { type: String, default: null },
+        reason: { type: String, default: null },
+        dateOfSubmission: { type: Date, default: null },
+        status: { type: String, enum: SubmitFilesStatus, default: SubmitFilesStatus.pending },
+      },
+    ],
+    requestedDeadline: {
+      deadline: { type: Date, default: null },
+      status: {
+        type: String,
+        enum: RequestedDeadlineStatus,
+        default: RequestedDeadlineStatus.pending,
+      },
+      user: { type: Schema.Types.ObjectId, ref: MODELS.user, default: null },
+    },
+  },
+  { timestamps: true, collection: MODELS.projectContract },
 );
 
-// i need here add ticket number to the project contract by default
+export const ProjectContract = model<IprojectContract>(
+  MODELS.projectContract,
+  projectContractSchema,
+);
+
