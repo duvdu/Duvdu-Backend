@@ -68,7 +68,7 @@ export const handleSubscribePayment = async (
 
   // If we reach here, it means the contract status was neither waitingForFirstPayment nor waitingForTotalPayment
   return {
-    success: false,
-    redirectUrl: 'http://duvdu.com/contracts?paymentStatus=failed',
+    success: true,
+    redirectUrl: 'http://duvdu.com/contracts?paymentStatus=success',
   };
 };
