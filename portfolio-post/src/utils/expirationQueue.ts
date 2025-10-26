@@ -37,7 +37,9 @@ export const createPortfolioQueues = async () => {
       try {
         const contract = await ProjectContract.findOneAndUpdate(
           { _id: job.data.contractId, status: ProjectContractStatus.pending },
-          { status: ProjectContractStatus.canceled, actionAt: new Date() },
+          { status: ProjectContractStatus.canceled, actionAt: new Date() , 
+            canceledBy:'system'
+          },
           { new: true },
         );
 
@@ -63,7 +65,7 @@ export const createPortfolioQueues = async () => {
       try {
         const contract = await ProjectContract.findOneAndUpdate(
           { _id: job.data.contractId, status: ProjectContractStatus.waitingForFirstPayment },
-          { status: ProjectContractStatus.canceled, actionAt: new Date() },
+          { status: ProjectContractStatus.canceled, actionAt: new Date() , canceledBy:'system' },
           { new: true },
         );
 
@@ -89,7 +91,7 @@ export const createPortfolioQueues = async () => {
       try {
         const contract = await ProjectContract.findOneAndUpdate(
           { _id: job.data.contractId, status: ProjectContractStatus.waitingForTotalPayment },
-          { status: ProjectContractStatus.canceled, actionAt: new Date() },
+          { status: ProjectContractStatus.canceled, actionAt: new Date() , canceledBy:'system' },
         );
 
         if (contract)
@@ -114,7 +116,7 @@ export const createPortfolioQueues = async () => {
       try {
         const contract = await ProjectContract.findOneAndUpdate(
           { _id: job.data.contractId, status: ProjectContractStatus.updateAfterFirstPayment },
-          { status: ProjectContractStatus.canceled, actionAt: new Date() },
+          { status: ProjectContractStatus.canceled, actionAt: new Date() , canceledBy:'system' },
         );
 
         if (contract)

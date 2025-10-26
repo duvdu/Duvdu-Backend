@@ -39,8 +39,11 @@ export const acceptContractCancel: RequestHandler<
   if (!contract) throw new NotFound({ ar: 'العقد غير موجود', en: 'Contract not found' }, req.lang);
 
   if (contract.ref === MODELS.projectContract) {
+    const contract = await ProjectContract.findById(contractCancel.contract);
+    if (!contract) throw new NotFound({ ar: 'العقد غير موجود', en: 'Contract not found' }, req.lang);
     await ProjectContract.findOneAndUpdate(contractCancel.contract, {
       status: ProjectContractStatus.canceled,
+      canceledBy: contractCancel.user === contract.customer ? 'customer' : 'sp',
     });
   } else if (contract.ref === MODELS.rentalContract) {
     await RentalContracts.findOneAndUpdate(contractCancel.contract, {
