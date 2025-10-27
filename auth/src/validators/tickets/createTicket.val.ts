@@ -2,7 +2,7 @@ import { globalValidatorMiddleware } from '@duvdu-v1/duvdu';
 import { check, query } from 'express-validator';
 
 export const createTicketVal = [
-  check('name').isString().isLength({ min: 4, max: 20 }).withMessage('nameLength'),
+  check('name').isString().withMessage('nameLength'),
   check('phoneNumber').exists().isObject().withMessage('phoneNumberRequired'),
   check('phoneNumber.key')
     .not()
@@ -14,7 +14,7 @@ export const createTicketVal = [
     .isString()
     .isMobilePhone('ar-EG')
     .withMessage('phoneNumberInvalid'),
-  check('message').exists().isString().isLength({ min: 20, max: 80 }).withMessage('messageLength'),
+  check('message').exists().isString().withMessage('messageLength'),
   check('state').not().exists().withMessage('stateRequired'),
   globalValidatorMiddleware,
 ];
