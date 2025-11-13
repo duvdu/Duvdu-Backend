@@ -88,5 +88,5 @@ export const ContractReports = model<IcontractReport>(
       },
     },
     { collection: MODELS.contractReports, timestamps: true },
-  ).index({ reporter: 1, contract: 1 }, { unique: true }),
+  ),
 );
