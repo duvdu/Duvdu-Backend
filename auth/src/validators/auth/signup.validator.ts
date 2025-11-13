@@ -96,6 +96,7 @@ export const updateUser = [
       minNumbers: 1,
     })
     .withMessage('passwordInvalid'),
+  body('email').optional().isEmail().withMessage('invalidEmail'),
   body('address').optional().exists().isString().withMessage('invalidAddress'),
   body('avaliableContracts')
     .optional()

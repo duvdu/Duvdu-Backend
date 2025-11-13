@@ -29,6 +29,7 @@ export const updateUserHandler: RequestHandler<
     | 'role'
     | 'categories'
     | 'avaliableContracts'
+    | 'email'
   >,
   unknown
 > = async (req, res, next) => {
@@ -62,6 +63,20 @@ export const updateUserHandler: RequestHandler<
       return next(
         new BadRequestError(
           { en: 'phone number already exist', ar: 'رقم الهاتف موجود بالفعل' },
+          req.lang,
+        ),
+      );
+  }
+
+  if (req.body.email) {
+    const user = await Users.findOne({
+      email: req.body.email,
+      _id: { $ne: req.params.userId },
+    });
+    if (user)
+      return next(
+        new BadRequestError(
+          { en: 'email already exist', ar: 'البريد الإلكتروني موجود بالفعل' },
           req.lang,
         ),
       );
