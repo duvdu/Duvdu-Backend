@@ -61,9 +61,6 @@ export const updateProviderPhoneNumberHandler: RequestHandler<
 
   await currentUser.save();
 
-  req.session.destroy((err) => {
-    if (err) throw new Error('Error destroying session');
-  });
   await smsService.sendOtp(currentUser.phoneNumber.number, verificationCode);
 
   res.status(200).json(<any>{ message: 'success' });
